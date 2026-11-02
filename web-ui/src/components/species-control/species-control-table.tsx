@@ -5,6 +5,7 @@ import { Badge } from "~/components/ui/badge.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import {
 	PAGE_RANGE_CLASS,
+	PAGE_ROW_CLASS,
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
@@ -412,38 +413,41 @@ export function SpeciesControlTable({
 			</Table>
 
 			{/* The detections footer: a band a row's height, its rule run out
-			    through the card's side padding, with the range and the selection's
-			    actions at the left and the pager held right. The card drops its
-			    bottom padding for it. */}
+			    through the card's side padding, with the selection's actions
+			    first and the range and pager after them as one group, so when the
+			    band wraps the actions go above and the range keeps the pager's
+			    row. The card drops its bottom padding for it. */}
 			<div className="-mr-(--card-edge) -ml-(--page-gap) flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-(--page-gap) border-t py-1.5 pr-(--card-edge) pl-(--page-gap) text-sm">
-				{rows === null ? (
-					<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
-						<ShellText className="w-40" barClassName="w-full" />
-					</div>
-				) : (
-					<PageRange first={firstIndex} last={lastIndex} total={total} />
-				)}
 				{actions}
-				{rows === null ? (
-					<span className="ml-auto">
-						<ShellSized className="rounded-md">
-							<PageStepper
-								label="Species pages"
-								page={page}
-								pageCount={pageCount}
-								onPageChange={() => {}}
-							/>
-						</ShellSized>
-					</span>
-				) : (
-					<PageStepper
-						className="ml-auto"
-						label="Species pages"
-						page={page}
-						pageCount={pageCount}
-						onPageChange={onPageChange}
-					/>
-				)}
+				<div className={PAGE_ROW_CLASS}>
+					{rows === null ? (
+						<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
+							<ShellText className="w-40" barClassName="w-full" />
+						</div>
+					) : (
+						<PageRange first={firstIndex} last={lastIndex} total={total} />
+					)}
+					{rows === null ? (
+						<span className="ml-auto">
+							<ShellSized className="rounded-md">
+								<PageStepper
+									label="Species pages"
+									page={page}
+									pageCount={pageCount}
+									onPageChange={() => {}}
+								/>
+							</ShellSized>
+						</span>
+					) : (
+						<PageStepper
+							className="ml-auto"
+							label="Species pages"
+							page={page}
+							pageCount={pageCount}
+							onPageChange={onPageChange}
+						/>
+					)}
+				</div>
 			</div>
 		</div>
 	);

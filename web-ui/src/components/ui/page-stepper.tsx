@@ -152,6 +152,17 @@ export function PageRange({
 	);
 }
 
+/**
+ * A table footer's range and stepper held together, so when the footer wraps
+ * around a selection's actions the two stay on one row under them. Sized from
+ * its content (`flex-auto`, not `flex-1`'s zero basis) so it drops below the
+ * actions whole rather than squeezing in beside them; it grows into the row's
+ * spare width with the stepper pushed right, and wraps itself only on a phone
+ * too narrow for the pair.
+ */
+export const PAGE_ROW_CLASS =
+	"flex min-w-0 flex-auto flex-wrap items-center gap-(--page-gap)";
+
 /** PageRange's line, for a loading shell to hold the same shape. */
 export const PAGE_RANGE_CLASS =
 	"flex h-8 pointer-coarse:h-9 min-w-0 items-center whitespace-nowrap text-muted-foreground text-sm";

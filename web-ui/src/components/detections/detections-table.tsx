@@ -15,6 +15,7 @@ import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
 import {
 	PAGE_RANGE_CLASS,
+	PAGE_ROW_CLASS,
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
@@ -916,7 +917,10 @@ export function DetectionsTable({
 			    once there is one, and the pager on the right. Delete lives here
 			    rather than among the filters -- it is an action on the rows just
 			    picked, and with nothing picked there is nothing to show at all, so
-			    no dead button. `ml-auto` holds the pager right on its own. The range leads, saying which rows these are.
+			    no dead button. The selection comes first; the range and pager
+			    follow as one group, so a wrapped band puts the selection above
+			    and keeps the range on the pager's row, `ml-auto` holding the
+			    pager right.
 			    The footer is a row's height too -- its 32px controls, 6px either
 			    side and the rule -- so header, rows and footer are one size. It
 			    owns the space
@@ -927,13 +931,6 @@ export function DetectionsTable({
 			    it. The rule runs the card's full width, out through its side
 			    padding like the rows, which the footer takes back as its own. */}
 			<div className="-mr-(--card-edge) -ml-(--page-gap) flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-(--page-gap) border-t py-1.5 pr-(--card-edge) pl-(--page-gap) text-sm">
-				{page ? (
-					<PageRange first={firstIndex} last={lastIndex} total={page.total} />
-				) : (
-					<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
-						<ShellText className="w-44" barClassName="w-full" />
-					</div>
-				)}
 				{canDelete && selectedCount > 0 ? (
 					<SelectionBar
 						count={selectedCount}
@@ -941,26 +938,35 @@ export function DetectionsTable({
 						onDelete={onDeleteSelected}
 					/>
 				) : null}
-				{skeleton ? (
-					<span className="ml-auto">
-						<ShellSized className="rounded-md">
-							<PageStepper
-								label="Detections pages"
-								page={search.page}
-								pageCount={pageCount}
-								onPageChange={() => {}}
-							/>
-						</ShellSized>
-					</span>
-				) : (
-					<PageStepper
-						className="ml-auto"
-						label="Detections pages"
-						page={search.page}
-						pageCount={pageCount}
-						onPageChange={(page) => updateSearch({ page })}
-					/>
-				)}
+				<div className={PAGE_ROW_CLASS}>
+					{page ? (
+						<PageRange first={firstIndex} last={lastIndex} total={page.total} />
+					) : (
+						<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
+							<ShellText className="w-44" barClassName="w-full" />
+						</div>
+					)}
+					{skeleton ? (
+						<span className="ml-auto">
+							<ShellSized className="rounded-md">
+								<PageStepper
+									label="Detections pages"
+									page={search.page}
+									pageCount={pageCount}
+									onPageChange={() => {}}
+								/>
+							</ShellSized>
+						</span>
+					) : (
+						<PageStepper
+							className="ml-auto"
+							label="Detections pages"
+							page={search.page}
+							pageCount={pageCount}
+							onPageChange={(page) => updateSearch({ page })}
+						/>
+					)}
+				</div>
 			</div>
 		</div>
 	);
