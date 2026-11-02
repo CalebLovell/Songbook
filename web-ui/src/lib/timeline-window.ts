@@ -169,6 +169,10 @@ export function shortAnchorLabel(
 	anchor: TimelineAnchor,
 	{ compact = false }: { compact?: boolean } = {},
 ): string {
+	// A Daily address that isn't a date at all still draws its toolbar (the page
+	// says what's wrong with it below), so the label shows it as written rather
+	// than failing to spell a day that doesn't exist.
+	if (!isValidAnchor(period, anchor)) return anchor;
 	switch (period) {
 		case "day":
 			// Spelled the way the masthead title is, so the two always agree.

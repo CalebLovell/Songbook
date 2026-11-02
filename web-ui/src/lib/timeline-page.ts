@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 import { isDayId } from "~/lib/day.ts";
 import type { HighlightThresholds } from "~/lib/highlight-thresholds.ts";
@@ -10,8 +11,11 @@ import {
 	type TimelineNav,
 	type TimelineRow,
 } from "~/lib/timeline.ts";
-import type { TimelinePeriod } from "~/lib/timeline-periods.ts";
-import { type TimelineAnchor, windowFor } from "~/lib/timeline-window.ts";
+import {
+	TIMELINE_PERIODS,
+	type TimelinePeriod,
+} from "~/lib/timeline-periods.ts";
+import type { TimelineAnchor } from "~/lib/timeline-window.ts";
 
 export type TimelinePageRequest = {
 	period: TimelinePeriod;
@@ -45,13 +49,20 @@ export type TimelinePageData = TimelineNav & {
 };
 
 export const getTimelinePage = createServerFn({ method: "GET" })
-	.validator((request: TimelinePageRequest) => request)
+	.validator(
+		z.object({
+			period: z.enum(TIMELINE_PERIODS),
+			anchor: z.string().max(32),
+		}) satisfies z.ZodType<TimelinePageRequest>,
+	)
 	.handler(async ({ data: { period, anchor } }): Promise<TimelinePageData> => {
 		// Any real day loads, future and pre-station ones included, so the
 		// picker can go anywhere; only a Daily anchor that isn't a date has no
 		// window to resolve and gets its own message.
 		if (period === "day" && !isDayId(anchor)) {
-			const nav = await loadTimelineNav("day", windowFor("day", anchor));
+			// No window to look around: a day that doesn't exist can't be spelled
+			// into one, let alone have neighbours.
+			const nav = await loadTimelineNav("day", null);
 			return { ...nav, period, body: { kind: "not-a-date" } };
 		}
 
