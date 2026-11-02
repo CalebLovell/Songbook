@@ -373,13 +373,13 @@ a {
 /* The vertical counterpart to .nav-link. The underline that marks the active
    header link reads as an underline, not a selection, once the links are
    stacked -- so the sidebar marks its active row with a filled pill instead.
-   Each row stands as tall as the site's larger buttons, so a link is as easy
-   to hit as one; a touch screen gets the full 44px finger target. */
+   Each row stands a little taller than the text needs, so a link is easy to
+   hit without the list looking padded; a touch screen gets a little more. */
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  min-height: 2.5rem;
+  min-height: 2.3rem;
   padding: 0 0.75rem;
   border-radius: var(--radius);
   text-decoration: none;
@@ -389,7 +389,7 @@ a {
 
 @media (pointer: coarse) {
   .sidebar-link {
-    min-height: 2.75rem;
+    min-height: 2.5rem;
   }
 }
 
