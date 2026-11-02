@@ -30,7 +30,11 @@ export function SidebarBody({
 					<Link
 						to="/"
 						onClick={onNavigate}
-						className="flex flex-col items-start px-[1.375rem] pt-1 pb-3 no-underline"
+						// A fixed band, so the hairline under it lands at
+						// `--masthead-h` from the card's top -- level with the page
+						// header's lower edge -- with or without a station name.
+						// The 14px is the card's border, its py-3 and the hairline.
+						className="flex h-[calc(var(--masthead-h)-14px)] flex-col items-start px-[1.375rem] pt-1 pb-3 no-underline"
 					>
 						<SongbookWordmark className="shrink-0 text-[24px] text-[var(--moss)]" />
 						{auth.siteName ? (
@@ -39,7 +43,12 @@ export function SidebarBody({
 							</span>
 						) : null}
 					</Link>
-					<div aria-hidden="true" className="mb-3 h-px bg-[var(--line)]" />
+					{/* A page gap under the hairline, as under a page's header card,
+					    so the search here sits level with the toolbar beside it. */}
+					<div
+						aria-hidden="true"
+						className="mb-(--page-gap) h-px bg-[var(--line)]"
+					/>
 				</>
 			) : null}
 

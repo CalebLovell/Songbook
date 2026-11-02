@@ -38,7 +38,8 @@ export function PageHeaderCard({
 	children,
 }: {
 	/** The page's sidebar icon, so the masthead names the page the same way
-	 * the nav entry you clicked did. Required: every masthead carries one. */
+	 * the nav entry you clicked did. Shown from `md` up; a narrower screen
+	 * gives the title the width instead. */
 	icon: ComponentType<{ className?: string }>;
 	title: string;
 	/** A sentence, or one with figures set into it. */
@@ -56,16 +57,21 @@ export function PageHeaderCard({
 }) {
 	return (
 		<section aria-label={title} className="space-y-(--page-gap)">
-			<div className="feature-card rounded-md p-4">
+			{/* `--masthead-h` tall, the sidebar's wordmark band, so the two cards'
+			    lower edges line up; the padding is trimmed to fit and the content
+			    centred in whatever is left. */}
+			<div className="feature-card flex min-h-(--masthead-h) flex-col justify-center rounded-md px-4 py-3">
 				{/* Under 400px the action drops beneath the description instead of
 				    squeezing the title and description into a narrow column beside it. */}
 				<div className="flex items-start justify-between gap-3 max-[400px]:flex-col max-[400px]:gap-2">
 					{/* The icon sits in the same sage well as the figures' icons below,
 					    a step larger since it stands for the whole page. Centred on the
-					    title and description together, so it never sits off a lone line. */}
-					<div className="flex min-w-0 items-center gap-4 max-[400px]:gap-3">
-						<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--icon-well)] text-[var(--moss)] max-[400px]:size-8">
-							<Icon aria-hidden="true" className="size-5 max-[400px]:size-4" />
+					    title and description together, so it never sits off a lone line.
+					    Desktop only: below `md` the title and description stand alone
+					    and take the full width. */}
+					<div className="flex min-w-0 items-center gap-4">
+						<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--icon-well)] text-[var(--moss)] max-md:hidden">
+							<Icon aria-hidden="true" className="size-5" />
 						</div>
 						<div className="min-w-0">
 							<h1 className="display-title font-bold text-xl leading-tight">
