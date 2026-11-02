@@ -21,6 +21,36 @@ export type DetectionWorkspaceSearch = {
 	to?: string;
 };
 
+// Where each column starts when first picked: names A to Z, the newest and
+// the most confident first. Picking the column already sorted by turns it
+// around instead.
+export const DETECTION_DEFAULT_DIRECTION: Record<
+	DetectionWorkspaceSort,
+	SortDirection
+> = {
+	recorded: "desc",
+	species: "asc",
+	scientific: "asc",
+	confidence: "desc",
+};
+
+export function nextDetectionSort(
+	search: DetectionWorkspaceSearch,
+	sort: DetectionWorkspaceSort,
+): DetectionWorkspaceSearch {
+	return {
+		...search,
+		page: 1,
+		sort,
+		direction:
+			search.sort === sort
+				? search.direction === "asc"
+					? "desc"
+					: "asc"
+				: DETECTION_DEFAULT_DIRECTION[sort],
+	};
+}
+
 function isIsoDate(value: string): boolean {
 	return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }

@@ -15,7 +15,7 @@ export type SpeciesControlWorkspaceSearch = {
 	query?: string;
 };
 
-const DEFAULT_DIRECTION: Record<
+export const SPECIES_CONTROL_DEFAULT_DIRECTION: Record<
 	SpeciesControlSort,
 	SpeciesControlSortDirection
 > = {
@@ -65,6 +65,6 @@ export function nextSpeciesControlSort(
 				? search.direction === "asc"
 					? "desc"
 					: "asc"
-				: DEFAULT_DIRECTION[sort],
+				: SPECIES_CONTROL_DEFAULT_DIRECTION[sort],
 	};
 }

@@ -1,4 +1,10 @@
-import { ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
+import {
+	ArrowDown,
+	ArrowDownWideNarrow,
+	ArrowUp,
+	ArrowUpNarrowWide,
+	ChevronDown,
+} from "lucide-react";
 
 type SortDirection = "asc" | "desc";
 
@@ -15,6 +21,7 @@ export function SortMenu<Sort extends string>({
 	labels,
 	sort,
 	direction,
+	reversed,
 	onSort,
 	onFlip,
 }: {
@@ -24,10 +31,16 @@ export function SortMenu<Sort extends string>({
 	labels: Record<Sort, string>;
 	sort: Sort;
 	direction: SortDirection;
+	/** Turned away from the column's natural order (names A to Z, the newest
+	    or biggest first). */
+	reversed: boolean;
 	onSort: (sort: Sort) => void;
 	onFlip: () => void;
 }) {
-	const DirectionIcon = direction === "asc" ? ArrowUp : ArrowDown;
+	// The All Birds sort's toggle, so every direction button reads the same:
+	// the wide-to-narrow glyph in a column's natural order, flipped and in the
+	// selected green once reversed.
+	const DirectionIcon = reversed ? ArrowUpNarrowWide : ArrowDownWideNarrow;
 	return (
 		// Held to the right edge, over the columns it orders, rather than hard
 		// against the checkbox.
@@ -57,9 +70,10 @@ export function SortMenu<Sort extends string>({
 			<button
 				type="button"
 				aria-label={`Sort ${direction === "asc" ? "descending" : "ascending"}`}
+				aria-pressed={reversed}
 				title={direction === "asc" ? "Ascending" : "Descending"}
 				onClick={onFlip}
-				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
 			>
 				<DirectionIcon className="size-4" aria-hidden="true" />
 			</button>

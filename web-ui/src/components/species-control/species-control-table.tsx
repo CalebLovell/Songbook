@@ -20,6 +20,7 @@ import type {
 	SpeciesStatus,
 } from "~/lib/species-control-data.ts";
 import {
+	SPECIES_CONTROL_DEFAULT_DIRECTION,
 	SPECIES_CONTROL_SORTS,
 	type SpeciesControlSort,
 	type SpeciesControlSortDirection,
@@ -96,6 +97,13 @@ const COLUMN_VISIBILITY: Record<string, string> = {
 	count: "hidden @min-[36rem]:block",
 };
 const GRID_ROW = "col-span-full grid grid-cols-subgrid items-center";
+// A body row as tall as a detections row -- the 28px recording button, the
+// cells' 8px above and below and the hairline -- so the two tables share one
+// rhythm though this one has no button setting its height.
+const BODY_ROW_HEIGHT = "min-h-[calc(1.75rem+1rem+1px)]";
+// The status as the confidence pill's size and weight, so a row's chip reads
+// as the same family as the detections table's.
+const STATUS_CHIP = "border-0 px-2.5 py-1.5 font-semibold leading-none";
 const COLUMN_GRID = {
 	"--cols-sm": "max-content max-content minmax(0, 1fr) max-content",
 	"--cols-md":
@@ -286,6 +294,9 @@ export function SpeciesControlTable({
 									labels={SORT_LABELS}
 									sort={sort}
 									direction={direction}
+									reversed={
+										direction !== SPECIES_CONTROL_DEFAULT_DIRECTION[sort]
+									}
 									onSort={onSortChange}
 									onFlip={() => onSortChange(sort)}
 								/>
@@ -321,6 +332,7 @@ export function SpeciesControlTable({
 								// on the detections table.
 								className={cn(
 									GRID_ROW,
+									BODY_ROW_HEIGHT,
 									isSelected ? "bg-[var(--row-selected)]" : "bg-card",
 								)}
 							>
@@ -379,7 +391,10 @@ export function SpeciesControlTable({
 									role="cell"
 									className={cn(CELL_GAP, STATUS_EDGE, "text-right")}
 								>
-									<Badge variant="ghost" className={presentation.className}>
+									<Badge
+										variant="ghost"
+										className={cn(STATUS_CHIP, presentation.className)}
+									>
 										{presentation.label}
 									</Badge>
 								</TableCell>
@@ -460,7 +475,11 @@ function SkeletonRow({
 	widestIndex: number;
 }) {
 	return (
-		<TableRow role="row" aria-hidden="true" className={cn(GRID_ROW, "bg-card")}>
+		<TableRow
+			role="row"
+			aria-hidden="true"
+			className={cn(GRID_ROW, BODY_ROW_HEIGHT, "bg-card")}
+		>
 			<TableCell role="cell" className={cn(CELL_GAP, FIRST_COLUMN_CLASSES)}>
 				<ShellBar className="size-(--row-checkbox-size) rounded-sm" />
 			</TableCell>
@@ -494,7 +513,9 @@ function SkeletonRow({
 				className={cn(CELL_GAP, STATUS_EDGE, "text-right")}
 			>
 				<ShellSized className="rounded-full">
-					<Badge variant="ghost">Automatic</Badge>
+					<Badge variant="ghost" className={STATUS_CHIP}>
+						Automatic
+					</Badge>
 				</ShellSized>
 			</TableCell>
 		</TableRow>

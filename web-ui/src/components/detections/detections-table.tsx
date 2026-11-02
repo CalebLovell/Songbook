@@ -29,10 +29,12 @@ import { SortButton, SortMenu } from "~/components/ui/table-sort.tsx";
 import { audioUrlFor } from "~/lib/audio.ts";
 import { formatDate, formatDateTime } from "~/lib/date-format.ts";
 import {
+	DETECTION_DEFAULT_DIRECTION,
 	DETECTION_SORTS,
 	type DetectionWorkspaceSearch,
 	type DetectionWorkspaceSort,
 	detectionRowKey,
+	nextDetectionSort,
 } from "~/lib/detection-workspace.ts";
 import type { DetectionPage, DetectionTableRow } from "~/lib/detections.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
@@ -175,6 +177,12 @@ function clockLabel(row: DetectionTableRow): string {
 function dayLabel(row: DetectionTableRow): string {
 	return formatDate(row.Date);
 }
+
+// The recording button's word shows from a 36rem table; narrower, the button
+// is just its speaker glyph, so it squares up to the 28px row button rather
+// than keeping the label's side padding -- width the species name needs.
+const LISTEN_LABEL = "hidden @min-[36rem]:inline";
+const LISTEN_SQUARE = "@max-[36rem]:w-7 @max-[36rem]:px-0";
 
 const SORT_LABELS: Record<DetectionWorkspaceSort, string> = {
 	recorded: "Recorded",
@@ -489,7 +497,8 @@ function SkeletonCell({
 						<RecordingButton
 							audioUrl={null}
 							size="sm"
-							labelClassName="hidden @min-[36rem]:inline"
+							labelClassName={LISTEN_LABEL}
+							className={LISTEN_SQUARE}
 						/>
 					</ShellSized>
 				</div>
@@ -522,11 +531,11 @@ export function DetectionsTable({
 	}
 
 	function sortBy(sort: DetectionWorkspaceSort) {
+		const next = nextDetectionSort(search, sort);
 		updateSearch({
-			page: 1,
-			sort,
-			direction:
-				search.sort === sort && search.direction === "desc" ? "asc" : "desc",
+			page: next.page,
+			sort: next.sort,
+			direction: next.direction,
 		});
 	}
 
@@ -591,7 +600,8 @@ export function DetectionsTable({
 						row.original.File_Name,
 					)}
 					size="sm"
-					labelClassName="hidden @min-[36rem]:inline"
+					labelClassName={LISTEN_LABEL}
+					className={LISTEN_SQUARE}
 					speciesName={row.original.Com_Name}
 				/>
 			</div>
@@ -833,6 +843,10 @@ export function DetectionsTable({
 									labels={SORT_LABELS}
 									sort={search.sort}
 									direction={search.direction}
+									reversed={
+										search.direction !==
+										DETECTION_DEFAULT_DIRECTION[search.sort]
+									}
 									onSort={sortBy}
 									onFlip={flipSort}
 								/>
