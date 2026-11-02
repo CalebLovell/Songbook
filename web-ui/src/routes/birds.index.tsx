@@ -98,7 +98,7 @@ const GRID_CLASS =
 const CARD_CLASS =
 	"feature-card relative flex flex-col gap-3 overflow-hidden rounded-md p-4 max-[400px]:gap-2";
 const FOOTER_CLASS =
-	"feature-card mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md px-(--page-gap) py-2 text-sm";
+	"mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 text-sm";
 
 function Species() {
 	const { cards } = Route.useLoaderData();
@@ -371,8 +371,6 @@ function SpeciesBrowser({ cards }: { cards: LifeListCard[] }) {
 					last={(currentPage - 1) * PAGE_SIZE + pageItems.length}
 					total={filtered.length}
 					lifeList={cards.length}
-					sort={sort}
-					reverse={reverse}
 					page={currentPage}
 					pageCount={pageCount}
 					onPageChange={(next) =>
@@ -399,17 +397,10 @@ const SORT_META: Record<
 	alpha: { label: "Name", icon: ArrowDownAZ },
 };
 
-/** How each sort reads in the footer, in its natural and reversed direction. */
-const SORT_PHRASE: Record<SortKey, [string, string]> = {
-	count: ["most recorded first", "least recorded first"],
-	recent: ["most recently heard first", "longest unheard first"],
-	alpha: ["A to Z", "Z to A"],
-};
-
 /**
- * The grid's footer: the same band the tables end on -- a hairline, then what
- * the page holds on the left and the stepper held right. The grid has no card
- * of its own, so the footer is one: a slim card the width of the grid. Shown
+ * The grid's footer: what the page holds on the left and the stepper held
+ * right, set on the page itself like the masthead above the grid -- no card,
+ * no band, and no sort phrase, since the sort tabs already say it. Shown
  * on a single page too, so the page keeps one shape as a search narrows it,
  * and held to the bottom of the page (`mt-auto` in the page's full-height
  * column) so a short last page doesn't pull it up under the grid.
@@ -419,8 +410,6 @@ function SpeciesFooter({
 	last,
 	total,
 	lifeList,
-	sort,
-	reverse,
 	page,
 	pageCount,
 	onPageChange,
@@ -429,16 +418,13 @@ function SpeciesFooter({
 	last: number;
 	total: number;
 	lifeList: number;
-	sort: SortKey;
-	reverse: boolean;
 	page: number;
 	pageCount: number;
 	onPageChange: (page: number) => void;
 }) {
-	const Icon = SORT_META[sort].icon;
 	return (
 		<div className={FOOTER_CLASS}>
-			<div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
+			<div className="min-w-0 text-muted-foreground">
 				<span>
 					<span className="tabular-data font-semibold text-foreground">
 						{first.toLocaleString()}&ndash;{last.toLocaleString()}
@@ -455,10 +441,6 @@ function SpeciesFooter({
 							<span className="tabular-data">{lifeList.toLocaleString()}</span>
 						</span>
 					) : null}
-				</span>
-				<span className="flex items-center gap-1.5 max-[400px]:hidden">
-					<Icon className="size-3.5" aria-hidden="true" />
-					{SORT_PHRASE[sort][reverse ? 1 : 0]}
 				</span>
 			</div>
 			<PageStepper
