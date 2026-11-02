@@ -1,6 +1,7 @@
 import {
 	createFileRoute,
 	Link,
+	notFound,
 	stripSearchParams,
 } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -97,7 +98,10 @@ export const Route = createFileRoute("/birds/$comName")({
 	// The detail is deferred: the page renders at once (see Deferred) and fills
 	// in when it arrives. Which means an unknown slug can't be thrown as the
 	// router's not-found -- the loader has returned long before anyone knows --
-	// so the page renders its not-found card in place instead.
+	// so the page renders its not-found card in place instead. The name lookup
+	// below is the exception: a slug that names no bird at all is known before
+	// the page renders, so that one is the router's not-found, and the server
+	// answers 404 rather than a page of placeholders.
 	//
 	// The bird's name alone is awaited, so the tab is titled the moment the page
 	// switches and never shows a stand-in first. A name this browser already
@@ -114,8 +118,13 @@ export const Route = createFileRoute("/birds/$comName")({
 		const comName =
 			comNameForSlug(params.comName) ??
 			(await getBirdName({ data: params.comName }));
+		if (!comName) {
+			// Not shown, so its answer (or failure) goes nowhere.
+			result.catch(() => {});
+			throw notFound();
+		}
 		// Remembered, so a new year or a return visit skips the lookup.
-		if (comName) comNameToSlug(comName);
+		comNameToSlug(comName);
 		return { result, comName };
 	},
 	head: ({ loaderData }) => ({
@@ -126,6 +135,7 @@ export const Route = createFileRoute("/birds/$comName")({
 	// to show one at once -- see router.tsx). A slow one still gets the shell.
 	pendingMs: 1000,
 	pendingComponent: BirdPendingShell,
+	notFoundComponent: SpeciesNotFound,
 	component: BirdPage,
 });
 
