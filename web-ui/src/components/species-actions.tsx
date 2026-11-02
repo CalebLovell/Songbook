@@ -15,13 +15,13 @@ type SpeciesActionsProps = {
 
 /**
  * The pair's size: the compact 24px buttons where a pointer aims at them, and
- * below `sm` -- a phone -- the 28px `sm` size, an easier tap. Exported for the
+ * below `sm` -- a phone -- the 30px `sm` size, an easier tap. Exported for the
  * skeletons that stand in for these buttons.
  */
 export const SPECIES_ACTION_BUTTON = {
 	size: "xs",
 	className:
-		"max-sm:h-7 max-sm:px-3 max-sm:text-xs max-sm:[&_svg:not([class*='size-'])]:size-3.5",
+		"max-sm:h-[30px] max-sm:px-3 max-sm:text-xs max-sm:[&_svg:not([class*='size-'])]:size-3.5",
 } as const;
 
 function SpeciesActions({
