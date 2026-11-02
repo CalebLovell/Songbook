@@ -1227,8 +1227,7 @@ function HighlightsSettingsCard({
 }
 
 function ago(iso: string) {
-	const label = formatTimeAgo(Date.now() - new Date(iso).getTime());
-	return label === "just now" ? label : `${label} ago`;
+	return formatTimeAgo(Date.now() - new Date(iso).getTime());
 }
 
 /**
