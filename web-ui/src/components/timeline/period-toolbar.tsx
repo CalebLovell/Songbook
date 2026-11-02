@@ -189,7 +189,8 @@ function PeriodSelect({
  *
  * Clicking the name opens the native picker for the granularity, laid
  * invisibly over it -- or, for a year, a native list of the station's years.
- * Fills the row beside the period menu on a phone; a fixed 16rem from 400px.
+ * Fills the row beside the period menu, up to 16rem -- never a fixed width, so
+ * it gives way rather than pushing past the page edge on a narrow phone.
  */
 function WindowStepper({
 	period,
@@ -213,7 +214,7 @@ function WindowStepper({
 	const overlay = "absolute inset-0 size-full cursor-pointer opacity-0";
 
 	return (
-		<div className="flex h-9 min-w-0 flex-1 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] min-[400px]:w-64 min-[400px]:flex-none">
+		<div className="flex h-9 min-w-0 max-w-64 flex-1 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)]">
 			<JoinedStep
 				direction="prev"
 				label={`Previous ${label.toLowerCase()}`}
