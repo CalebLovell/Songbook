@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { avg, desc, sql } from "drizzle-orm";
+import { z } from "zod";
 
 import { db, sqlite } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
@@ -166,10 +167,14 @@ function toPageNumber(page: number): number {
  * which reaches all the way to its first detection, not just the selected year.
  */
 export const getSpeciesVisits = createServerFn({ method: "GET" })
-	.validator((input: { comName: string; page: number }) => ({
-		comName: input.comName,
-		page: toPageNumber(input.page),
-	}))
+	.validator(
+		z
+			.object({ comName: z.string().max(200), page: z.number() })
+			.transform(({ comName, page }) => ({
+				comName,
+				page: toPageNumber(page),
+			})),
+	)
 	.handler(async ({ data: { comName, page } }): Promise<VisitPage> => {
 		const now = new Date();
 		return {
@@ -229,7 +234,7 @@ async function missToResult(slug: string): Promise<SpeciesDetailResult> {
  * model's catalog -- so the page can title the tab before its detail lands.
  */
 export const getBirdName = createServerFn({ method: "GET" })
-	.validator((slug: string) => slug)
+	.validator(z.string().max(200))
 	.handler(
 		async ({ data: slug }): Promise<string | null> =>
 			(await resolveComName(slug)) ??
@@ -245,7 +250,13 @@ export type SpeciesDetailInput = {
 };
 
 export const getSpeciesDetail = createServerFn({ method: "GET" })
-	.validator((input: SpeciesDetailInput) => input)
+	.validator(
+		z.object({
+			comNameSlug: z.string().max(200),
+			year: z.number().int(),
+			visitsPage: z.number().int().positive().optional(),
+		}) satisfies z.ZodType<SpeciesDetailInput>,
+	)
 	.handler(
 		async ({
 			data: { comNameSlug, year, visitsPage = 1 },

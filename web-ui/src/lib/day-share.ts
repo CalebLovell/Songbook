@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { count, countDistinct, desc, sql } from "drizzle-orm";
+import { z } from "zod";
 
 import { db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
+import { isDayId } from "~/lib/day.ts";
 import type { ShareCard } from "~/lib/share-card.ts";
 
 const HOURS = 24;
@@ -13,7 +15,7 @@ const HOURS = 24;
  * its queries unless they open the panel.
  */
 export const getDayShareCard = createServerFn({ method: "GET" })
-	.validator((date: string) => date)
+	.validator(z.string().refine(isDayId, "Not a date"))
 	.handler(async ({ data: date }): Promise<ShareCard> => {
 		const onDay = sql`${detections.Date} = ${date}`;
 		const hourExpr = sql<string>`strftime('%H', ${detections.Time})`;

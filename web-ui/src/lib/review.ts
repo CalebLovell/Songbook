@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { openWritableDetectionsDb, sqlite } from "~/db/index.ts";
 import { extractedDir } from "~/lib/audio.server.ts";
 import { requireUnlocked } from "~/lib/auth.ts";
@@ -14,6 +15,9 @@ import {
 	type SpeciesOption,
 } from "~/lib/review-data.ts";
 import { readReviewRareSpeciesMax } from "~/lib/settings.server.ts";
+
+/** A detections row, as every Review action names the one it acts on. */
+const rowIdSchema = z.object({ rowId: z.number().int().positive() });
 
 export const getReviewPage = createServerFn({ method: "GET" })
 	.middleware([requireUnlocked])
@@ -31,7 +35,7 @@ export const getReviewSpecies = createServerFn({ method: "GET" })
 	.handler(() => loadSpeciesCatalog());
 export const confirmReviewDetection = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
-	.validator((input: { rowId: number }) => input)
+	.validator(rowIdSchema)
 	.handler(({ data }) => {
 		const writable = openWritableDetectionsDb();
 		try {
@@ -44,7 +48,10 @@ export const confirmReviewDetection = createServerFn({ method: "POST" })
 export const recategorizeReviewDetection = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
 	.validator(
-		(input: { rowId: number; sciName: string; comName: string }) => input,
+		rowIdSchema.extend({
+			sciName: z.string().max(200),
+			comName: z.string().max(200),
+		}),
 	)
 	.handler(async ({ data }) => {
 		const writable = openWritableDetectionsDb();
@@ -62,7 +69,7 @@ export const recategorizeReviewDetection = createServerFn({ method: "POST" })
 	});
 export const deleteReviewDetection = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
-	.validator((input: { rowId: number }) => input)
+	.validator(rowIdSchema)
 	.handler(async ({ data }) => {
 		const writable = openWritableDetectionsDb();
 		try {

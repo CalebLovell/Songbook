@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 import { sqlite } from "~/db/index.ts";
 import { extractedDir } from "~/lib/audio.server.ts";
@@ -129,7 +130,7 @@ export type LearnRoundData = {
 };
 
 export const getLearnRound = createServerFn({ method: "GET" })
-	.validator((pool: LearnPool) => pool)
+	.validator(z.enum(LEARN_POOLS))
 	.handler(async ({ data: pool }): Promise<LearnRoundData> => {
 		const playable = playableSpecies();
 		const detections = allTimeDetections();

@@ -13,6 +13,7 @@ import {
 	sql,
 } from "drizzle-orm";
 import Fuse from "fuse.js";
+import { z } from "zod";
 import { db, openWritableDetectionsDb, sqlite } from "~/db/index.ts";
 import { type Detection, detections } from "~/db/schema.ts";
 import { extractedDir } from "~/lib/audio.server.ts";
@@ -292,9 +293,13 @@ async function deleteUnreferencedClips(
 // -- so the boundary has to sit here on the mutation rather than on the route.
 export const deleteDetections = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
-	.validator((input: DeletionRequest) => ({
-		rowIds: validRowIds(input.rowIds),
-	}))
+	.validator(
+		z
+			.object({ rowIds: z.array(z.number()).max(10_000) })
+			.transform((input: DeletionRequest) => ({
+				rowIds: validRowIds(input.rowIds),
+			})),
+	)
 	.handler(async ({ data }): Promise<DeleteDetectionsResult> => {
 		if (data.rowIds.length === 0) {
 			return {

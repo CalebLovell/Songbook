@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, avg, count, desc, sql } from "drizzle-orm";
+import { z } from "zod";
 
 import { db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
@@ -306,9 +307,11 @@ function toPageNumber(page: number): number {
  * runs when someone steps back through the window.
  */
 export const getRecentPage = createServerFn({ method: "GET" })
-	.validator((input: { page: number }) => ({
-		page: toPageNumber(input.page),
-	}))
+	.validator(
+		z
+			.object({ page: z.number() })
+			.transform(({ page }) => ({ page: toPageNumber(page) })),
+	)
 	.handler(async ({ data: { page } }): Promise<RecentPage> => {
 		const generatedAtDate = new Date();
 		const latest = await getLatestRow();
