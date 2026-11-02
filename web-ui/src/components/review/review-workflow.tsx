@@ -65,7 +65,7 @@ const PORTRAIT_CLASS =
 	"flex size-20 shrink-0 items-center justify-center overflow-hidden max-[400px]:size-14";
 // The verdict buttons' band, bled to the card's edges like the queue's pager.
 const ACTIONS_FOOTER_CLASS =
-	"-mx-(--page-gap) -mb-(--page-gap) flex flex-wrap items-center gap-2 border-t px-(--page-gap) py-3";
+	"-mx-(--page-gap) -mb-(--page-gap) flex flex-wrap items-center gap-(--page-gap) border-t px-(--page-gap) py-3";
 // Delete as a tonal button -- a pale clay fill with clay text -- rather than a
 // solid block: the confirm dialog's own Delete stays solid, so the card's
 // button only opens the question.
@@ -135,7 +135,7 @@ export function ReviewWorkflowSkeleton() {
 							<Trash2 />
 							Delete
 						</Button>
-						<div className="ml-auto flex items-center gap-2">
+						<div className="ml-auto flex items-center gap-(--page-gap)">
 							<Button variant="outline" size="default" disabled>
 								<Shuffle />
 								Recategorize
@@ -440,7 +440,7 @@ export function ReviewWorkflow({
 								<p className="grid h-40 place-items-center rounded-md border border-[var(--line)] border-dashed px-4 text-center text-destructive text-sm">
 									Audio unavailable. You can delete or skip this orphaned entry.
 								</p>
-								<div className="mt-(--page-gap) flex flex-wrap items-center justify-end gap-2">
+								<div className="mt-(--page-gap) flex flex-wrap items-center justify-end gap-(--page-gap)">
 									{heard}
 								</div>
 							</div>
@@ -459,7 +459,7 @@ export function ReviewWorkflow({
 								<Trash2 />
 								Delete
 							</Button>
-							<div className="ml-auto flex items-center gap-2">
+							<div className="ml-auto flex items-center gap-(--page-gap)">
 								<Button
 									variant="outline"
 									size="default"

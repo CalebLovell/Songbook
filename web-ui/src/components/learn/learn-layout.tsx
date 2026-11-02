@@ -45,7 +45,7 @@ export function LearnPoolSelector({
 }) {
 	return (
 		// The pool on the left, starting it over on the right.
-		<div className="mt-(--page-gap) flex items-center justify-between gap-2">
+		<div className="mt-(--page-gap) flex items-center justify-between gap-(--page-gap)">
 			{/* Joined segments want about 520px, and a segmented control can't
 			    wrap without breaking its own shape -- so below 640px the same choice
 			    becomes a dropdown, as the timeline's period and the species sort do. */}

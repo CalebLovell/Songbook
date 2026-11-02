@@ -2,12 +2,12 @@ import { Download, RotateCcw, Upload } from "lucide-react";
 import { useRef } from "react";
 import { Button } from "~/components/ui/button.tsx";
 
-// The toolbar's full-height buttons, at every width. On the smallest phones (under
-// 400px, where the page gap halves too) each drops the word "lists" rather
-// than shrinking, so all three still share one line under the search; the
-// aria-label keeps the full name.
-const TOOL_BUTTON = "h-8 pointer-coarse:h-9 max-[400px]:px-3";
-const LISTS_WORD = "max-[400px]:hidden";
+// The toolbar's full-height buttons, at every width. Where the toolbar is
+// under 30rem wide (a phone) each drops the word "lists" rather than
+// shrinking, so all three still share one line under the search, a page gap
+// apart; the aria-label keeps the full name.
+const TOOL_BUTTON = "h-8 pointer-coarse:h-9 @max-[30rem]:px-3";
+const LISTS_WORD = "@max-[30rem]:hidden";
 
 export function SpeciesControlTools({
 	onImport,
@@ -20,7 +20,7 @@ export function SpeciesControlTools({
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	return (
-		<div className="flex shrink-0 flex-wrap @min-[38rem]:justify-end gap-2 lg:ml-auto">
+		<div className="flex shrink-0 flex-wrap @min-[38rem]:justify-end gap-(--page-gap) lg:ml-auto">
 			<input
 				ref={inputRef}
 				className="sr-only"

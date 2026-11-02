@@ -182,7 +182,7 @@ function SpeciesControls() {
 		// One row at every width: the search takes what the sort leaves. The
 		// three sort tabs need about 340px beside a usable search box, so below
 		// 640px the same choice becomes a dropdown.
-		<div className="flex items-center gap-2">
+		<div className="flex items-center gap-(--page-gap)">
 			<SearchInput
 				aria-label="Filter birds"
 				placeholder="Search birds..."

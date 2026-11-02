@@ -95,7 +95,7 @@ export function PeriodToolbar({
 	return (
 		// One row at every width: the period and the window it picks never stack.
 		// The date field is what gives way, shrinking before anything wraps.
-		<div className="flex items-center justify-between gap-2">
+		<div className="flex items-center justify-between gap-(--page-gap)">
 			{/* Five joined segments need about 710px of row beside the picker, and a
 			    segmented control can't wrap without breaking its own shape -- so
 			    below 800px the same choice becomes a dropdown. */}

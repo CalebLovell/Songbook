@@ -81,8 +81,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - Radius: 4px cards and buttons (`rounded-md`), 6px nav rows, 2px tooltips,
   pills fully round.
 - Spacing: 16px is the unit for card padding, gaps between cards and the
-  page gutter. Controls in a toolbar (search, menus, toggles, buttons) sit
-  8px apart, side by side or stacked, whichever control they meet.
+  page gutter -- `--page-gap`, 8px under 400px. The same gap separates the
+  controls in a toolbar or a row of buttons (search, menus, toggles,
+  buttons), side by side or stacked; only a segmented control's own
+  segments are joined.
 - Motion: 180ms ease for color/border/lift; `.rise-in` 700ms on mount;
   `.flash-in` 2.4s sand highlight for new arrivals; charts 500ms.
   Only linked cards lift on hover (`feature-card-link`).
