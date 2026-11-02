@@ -39,9 +39,11 @@ import { FRESH_PROGRESS, type GameProgress } from "~/lib/learn-saved-game.ts";
  * reported through `onProgressChange` so the page can save it; the page starts
  * a fresh round by giving this component a new `key`.
  */
-// Shared by the game and its skeleton, so the two are one shape.
+// Shared by the game and its skeleton, so the two are one shape. The single
+// narrow track is minmax(0,1fr), not the implicit auto, so a long name
+// truncates instead of stretching the card past the screen.
 const QUIZ_GRID_CLASS =
-	"grid @3xl/quiz:grid-cols-[minmax(0,1fr)_24rem] @7xl/quiz:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-(--page-gap)";
+	"grid grid-cols-[minmax(0,1fr)] @3xl/quiz:grid-cols-[minmax(0,1fr)_24rem] @7xl/quiz:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-(--page-gap)";
 const GAME_CARD_CLASS =
 	"@container/game feature-card flex min-w-0 flex-col gap-(--page-gap) rounded-md p-4";
 const GAME_HEADER_CLASS =
