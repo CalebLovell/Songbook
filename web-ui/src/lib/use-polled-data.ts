@@ -53,31 +53,64 @@ export function usePolledData<T>(
 		};
 	}, [initialData]);
 
+	// Bumped by every answer that lands (and by `replace`), so a poll that was
+	// already in flight when something newer arrived is dropped, never shown
+	// over it.
+	const generationRef = useRef(0);
+
+	// One request at a time: the next poll is scheduled only once this one has
+	// answered, so a slow Pi never has requests stacking up or answering out of
+	// order. A hidden tab doesn't poll at all -- the station is public, and a
+	// forgotten tab shouldn't keep asking -- and catches up as soon as it's
+	// shown again.
 	useEffect(() => {
 		let cancelled = false;
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		let inFlight = false;
 
-		const id = setInterval(async () => {
+		const schedule = () => {
+			clearTimeout(timer);
+			if (!cancelled && !document.hidden) timer = setTimeout(poll, intervalMs);
+		};
+
+		async function poll() {
+			if (cancelled || inFlight || document.hidden) return;
+			inFlight = true;
+			const generation = generationRef.current;
 			try {
 				const next = await fetcherRef.current();
-				if (!cancelled) {
+				if (!cancelled && generation === generationRef.current) {
+					generationRef.current += 1;
 					setData(next);
 					setLastUpdated(new Date());
 				}
 			} catch {
 				// A transient failure shouldn't kill polling -- just try again
 				// on the next tick.
+			} finally {
+				inFlight = false;
+				schedule();
 			}
-		}, intervalMs);
+		}
 
+		const onVisibilityChange = () => {
+			if (document.hidden) clearTimeout(timer);
+			else void poll();
+		};
+
+		schedule();
+		document.addEventListener("visibilitychange", onVisibilityChange);
 		return () => {
 			cancelled = true;
-			clearInterval(id);
+			clearTimeout(timer);
+			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
 	}, [intervalMs]);
 
 	// For an answer that arrives some other way -- a mutation that returns the
 	// fresh value -- so the page shows it now rather than at the next tick.
 	const replace = useCallback((next: T) => {
+		generationRef.current += 1;
 		setData(next);
 		setLastUpdated(new Date());
 	}, []);
