@@ -978,7 +978,10 @@ function VisitLogCard({
 				) : (
 					<ul
 						aria-busy={loading}
-						className={`-mx-(--page-gap) divide-y transition-opacity ${loading ? "opacity-50" : ""}`}
+						// On the smallest phones (under 400px) every row holds its
+						// full content, one track as wide as the widest row, and the
+						// list scrolls sideways instead of cutting the day short.
+						className={`-mx-(--page-gap) divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
 					>
 						{visits.map((visit, i) => {
 							const heardAt = formatDateTime(visit.date, visit.time);

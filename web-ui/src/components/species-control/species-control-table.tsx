@@ -110,6 +110,9 @@ const BODY_ROW_HEIGHT = "min-h-[calc(1.75rem+1rem+1px)]";
 // as the same family as the detections table's.
 const STATUS_CHIP = "border-0 px-2.5 py-1.5 font-semibold leading-none";
 const COLUMN_GRID = {
+	// On the smallest phones (under 400px) the name keeps its full width and
+	// the table scrolls sideways rather than cutting it short.
+	"--cols-xs": "max-content max-content minmax(max-content, 1fr) max-content",
 	"--cols-sm": "max-content max-content minmax(0, 1fr) max-content",
 	"--cols-md":
 		"max-content max-content minmax(0, 1fr) minmax(max-content, 1fr) max-content",
@@ -227,7 +230,7 @@ export function SpeciesControlTable({
 			    still share their widths -- the detections table's arrangement. */}
 			<Table
 				role="table"
-				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)]"
+				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) max-[400px]:grid-cols-(--cols-xs) grid-rows-[auto_minmax(0,1fr)]"
 				style={COLUMN_GRID}
 				containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>

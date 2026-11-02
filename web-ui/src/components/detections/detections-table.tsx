@@ -157,12 +157,15 @@ const GRID_ROW = "col-span-full grid grid-cols-subgrid items-center";
 // column has to leave the list as well as the row. Species may shrink below its
 // name at the narrow widths, where it truncates; at the widest every column
 // holds its content on one line and the four between the ends share the rest.
+// On the smallest phones (under 400px) the name holds its full width again and
+// the scrollport scrolls sideways, rather than cutting it to a few letters.
 function gridColumns(canDelete: boolean, canListen: boolean): CSSProperties {
 	// The row number follows the checkbox at every width, sized to its widest.
 	const lead = canDelete ? "max-content max-content " : "max-content ";
 	const audio = canListen ? " max-content" : "";
 	const fill = "minmax(max-content, 1fr)";
 	return {
+		"--cols-xs": `${lead}${fill} max-content${audio}`,
 		"--cols-sm": `${lead}minmax(0, 1fr) max-content${audio}`,
 		"--cols-md": `${lead}minmax(0, 1fr) ${fill} ${fill}${audio}`,
 		"--cols-lg": `${lead}repeat(4, ${fill})${audio}`,
@@ -780,7 +783,7 @@ export function DetectionsTable({
 			    longer fit. */}
 			<Table
 				role="table"
-				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)]"
+				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) max-[400px]:grid-cols-(--cols-xs) grid-rows-[auto_minmax(0,1fr)]"
 				style={gridColumns(canDelete, canListen)}
 				containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>

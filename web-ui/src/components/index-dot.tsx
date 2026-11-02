@@ -14,9 +14,8 @@ export const TABLE_INDEX_FLOOR = 100;
  * numbers, every one on the page as wide as `widest` (the largest number the
  * page shows), so the column of dots and whatever sits beside them line up.
  *
- * On the smallest phones (under 400px, where the page gap halves too) the
- * capsule stops at four characters and a longer number ends in an ellipsis,
- * so a six-digit index doesn't crowd the species name out of the row.
+ * The number is always shown whole, on the smallest phones too: a long index
+ * takes its width from the text beside it rather than being cut short.
  */
 export function IndexDot({ index, widest }: { index: number; widest: number }) {
 	const digits = widest.toLocaleString().length;
@@ -24,9 +23,9 @@ export function IndexDot({ index, widest }: { index: number; widest: number }) {
 		<span
 			aria-hidden
 			style={{ "--digits": digits } as CSSProperties}
-			className="tabular-data inline-flex h-6 w-[max(1.5rem,calc(var(--digits)*1ch+0.75rem))] shrink-0 items-center justify-center rounded-full bg-muted px-1.5 font-bold text-foreground text-xs max-[400px]:w-[max(1.5rem,calc(min(var(--digits),4)*1ch+0.75rem))]"
+			className="tabular-data inline-flex h-6 w-[max(1.5rem,calc(var(--digits)*1ch+0.75rem))] shrink-0 items-center justify-center rounded-full bg-muted px-1.5 font-bold text-foreground text-xs"
 		>
-			<span className="min-w-0 truncate">{index.toLocaleString()}</span>
+			{index.toLocaleString()}
 		</span>
 	);
 }
