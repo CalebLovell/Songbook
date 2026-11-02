@@ -1043,7 +1043,6 @@ function VisitLogCard({
 							first={firstIndex}
 							last={lastIndex}
 							total={totalVisits}
-							noun={["visit", "visits"]}
 						/>
 						{pageCount > 1 ? (
 							<PageStepper

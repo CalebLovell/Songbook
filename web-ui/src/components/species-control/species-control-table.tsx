@@ -421,12 +421,7 @@ export function SpeciesControlTable({
 						<ShellText className="w-40" barClassName="w-full" />
 					</div>
 				) : (
-					<PageRange
-						first={firstIndex}
-						last={lastIndex}
-						total={total}
-						noun={["species", "species"]}
-					/>
+					<PageRange first={firstIndex} last={lastIndex} total={total} />
 				)}
 				{actions}
 				{rows === null ? (

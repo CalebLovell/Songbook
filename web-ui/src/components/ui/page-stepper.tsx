@@ -113,8 +113,10 @@ export function PageStepper({
 
 /**
  * The stepper's partner at the other end of a footer: what the page holds
- * ("1–24 of 78 species") in the stepper's own box -- height, border and card
- * surface -- so the footer's two ends match.
+ * ("1–24 of 78"), as bare text at the stepper's height rather than in a box of
+ * its own, so a big total still fits beside the pager on the narrowest phone.
+ * The table it sits under already says what the rows are; the noun is only
+ * for footers that need it.
  */
 export function PageRange({
 	first,
@@ -128,7 +130,7 @@ export function PageRange({
 	last: number;
 	total: number;
 	/** Plural; the singular is used when the total is one. */
-	noun: [singular: string, plural: string];
+	noun?: [singular: string, plural: string];
 	/** Anything said after the range, like what a search filtered it from. */
 	children?: React.ReactNode;
 	className?: string;
@@ -142,17 +144,17 @@ export function PageRange({
 				of{" "}
 				<span className="tabular-data font-semibold text-foreground">
 					{total.toLocaleString()}
-				</span>{" "}
-				{noun[total === 1 ? 0 : 1]}
+				</span>
+				{noun ? ` ${noun[total === 1 ? 0 : 1]}` : null}
 				{children}
 			</span>
 		</div>
 	);
 }
 
-/** PageRange's box, for a loading shell to hold the same shape. */
+/** PageRange's line, for a loading shell to hold the same shape. */
 export const PAGE_RANGE_CLASS =
-	"flex h-8 pointer-coarse:h-9 min-w-0 items-center rounded-md border border-input bg-card px-3 text-muted-foreground text-sm";
+	"flex h-8 pointer-coarse:h-9 min-w-0 items-center whitespace-nowrap text-muted-foreground text-sm";
 
 /**
  * How wide a formatted number sets in `tabular-data`, in ch: a full ch per

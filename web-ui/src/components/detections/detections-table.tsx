@@ -916,7 +916,7 @@ export function DetectionsTable({
 			    once there is one, and the pager on the right. Delete lives here
 			    rather than among the filters -- it is an action on the rows just
 			    picked, and with nothing picked there is nothing to show at all, so
-			    no dead button. `ml-auto` holds the pager right on its own. The range card leads, saying which rows these are.
+			    no dead button. `ml-auto` holds the pager right on its own. The range leads, saying which rows these are.
 			    The footer is a row's height too -- its 32px controls, 6px either
 			    side and the rule -- so header, rows and footer are one size. It
 			    owns the space
@@ -928,12 +928,7 @@ export function DetectionsTable({
 			    padding like the rows, which the footer takes back as its own. */}
 			<div className="-mr-(--card-edge) -ml-(--page-gap) flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-(--page-gap) border-t py-1.5 pr-(--card-edge) pl-(--page-gap) text-sm">
 				{page ? (
-					<PageRange
-						first={firstIndex}
-						last={lastIndex}
-						total={page.total}
-						noun={["detection", "detections"]}
-					/>
+					<PageRange first={firstIndex} last={lastIndex} total={page.total} />
 				) : (
 					<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
 						<ShellText className="w-44" barClassName="w-full" />
