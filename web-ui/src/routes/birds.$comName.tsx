@@ -689,7 +689,7 @@ const VISIT_ROW_CLASS =
 const VISIT_ROW_BUTTON = {
 	size: "sm" as const,
 	labelClassName: "@min-[26rem]:inline hidden",
-	className: "@min-[26rem]:w-auto w-[30px] @min-[26rem]:px-3 px-0",
+	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
 const VISIT_LOG_FOOTER_CLASS =
 	"-mx-(--page-gap) mt-auto -mb-(--page-gap) flex shrink-0 items-center border-t px-(--page-gap) py-2";

@@ -34,7 +34,7 @@ const buttonVariants = cva(
 			},
 			size: {
 				xs: "h-6 gap-1.5 px-2.5 text-[11px] [&_svg:not([class*='size-'])]:size-3",
-				sm: "h-[30px] gap-1.5 px-3 text-xs [&_svg:not([class*='size-'])]:size-3.5",
+				sm: "h-7 gap-1.5 px-3 text-xs [&_svg:not([class*='size-'])]:size-3.5",
 				default:
 					"h-8 gap-2 px-3.5 text-sm [&_svg:not([class*='size-'])]:size-4",
 				lg: "h-8 gap-2 pointer-coarse:h-9 px-5 text-sm [&_svg:not([class*='size-'])]:size-4",
@@ -42,7 +42,7 @@ const buttonVariants = cva(
 				// number in one, and without it the digit inherits the page's 16px
 				// and overflows a 24px box.
 				"icon-xs": "size-6 text-[11px] [&_svg:not([class*='size-'])]:size-3",
-				"icon-sm": "size-[30px] text-xs [&_svg:not([class*='size-'])]:size-3.5",
+				"icon-sm": "size-7 text-xs [&_svg:not([class*='size-'])]:size-3.5",
 				icon: "size-8 text-sm [&_svg:not([class*='size-'])]:size-4",
 				"icon-lg":
 					"size-8 pointer-coarse:size-9 text-sm [&_svg:not([class*='size-'])]:size-4",
