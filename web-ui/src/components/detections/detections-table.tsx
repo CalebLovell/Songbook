@@ -377,10 +377,9 @@ export function DetectionsFilters({
 		// container query only sees descendants, so `@container` here and
 		// `@min-[38rem]:flex-row` on the child.
 		<div className="@container">
-			{/* The page's 4-unit rhythm both stacked and side by side: the search,
-			    the date range and Delete are separate controls, and a tighter gap
-			    between them read as uneven next to the 16px everywhere else. */}
-			<div className="flex @min-[38rem]:flex-row flex-col @min-[38rem]:items-center @min-[38rem]:justify-between gap-(--page-gap)">
+			{/* 8px between the search and the date range, stacked or side by
+			    side: the gap every toolbar keeps between its controls. */}
+			<div className="flex @min-[38rem]:flex-row flex-col @min-[38rem]:items-center @min-[38rem]:justify-between gap-2">
 				<SearchInput
 					aria-label="Search detections"
 					placeholder="Search detections..."

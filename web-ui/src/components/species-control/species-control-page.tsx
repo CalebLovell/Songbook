@@ -40,7 +40,7 @@ import { SpeciesControlTools } from "./species-control-tools.tsx";
 
 // Shared by the page and its skeleton, so the two are one shape.
 const TOOLBAR_CLASS =
-	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-(--page-gap)";
+	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-2";
 const SEARCH_CLASS = "@min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
 const TABLE_CARD_CLASS =
 	"@container feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
