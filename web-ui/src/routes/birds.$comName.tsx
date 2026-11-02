@@ -31,7 +31,11 @@ import { SpeciesActions } from "~/components/species-actions.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
-import { PageStepper } from "~/components/ui/page-stepper.tsx";
+import {
+	PAGE_RANGE_CLASS,
+	PageRange,
+	PageStepper,
+} from "~/components/ui/page-stepper.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
 	Tooltip,
@@ -235,13 +239,13 @@ function SpeciesDetailShell({ year }: { year: number }) {
 				aria-label="Bird profile"
 				className={PROFILE_CARD_CLASS}
 			>
-				<div className="flex h-36 items-center justify-center overflow-hidden p-4 pb-0 sm:h-44 sm:pb-4">
-					<ShellBar className="h-full w-36 rounded-md" />
+				{/* The loaded card's own portrait slot and text column, so the
+				    shell stands exactly as tall and wide as the bird that
+				    replaces it; the bar fills the slot, as the Live hero's does. */}
+				<div className={PROFILE_PORTRAIT_CLASS}>
+					<ShellBar className="size-full rounded-md" />
 				</div>
-				<div
-					aria-hidden="true"
-					className="flex min-w-0 flex-col justify-center gap-3 p-4"
-				>
+				<div aria-hidden="true" className={PROFILE_TEXT_CLASS}>
 					<div className="min-w-0">
 						<ShellText
 							className="display-title font-bold text-2xl sm:text-3xl"
@@ -361,37 +365,38 @@ function VisitLogSkeleton() {
 			aria-label="Visit log"
 			className={VISIT_LOG_CLASS}
 		>
-			<div className={VISIT_LOG_HEADER_CLASS}>
-				<div className="island-kicker">Visit log</div>
-				<ShellText
-					className="w-16 text-xs"
-					barClassName="right-0 left-auto w-full"
-				/>
-			</div>
-			<ul aria-hidden="true" className="-mx-(--page-gap) divide-y">
-				{Array.from({ length: VISITS_PAGE_SIZE }, (_, index) => (
-					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
-					<li key={index} className={VISIT_ROW_CLASS}>
-						<ShellBar className="h-6 w-7 shrink-0 rounded-full" />
-						<div className="min-w-0 flex-1 text-sm">
-							<ShellText
-								className="font-medium"
-								barClassName="w-48 max-w-full"
-							/>
-							<ShellText className="text-xs" barClassName="w-20" />
-						</div>
-						<ShellSized className="rounded-full">
-							<ConfidencePill confidence={0.9} className="shrink-0" />
-						</ShellSized>
-						{canListen ? (
-							<ShellSized className="rounded-md">
-								<RecordingButton audioUrl={null} {...VISIT_ROW_BUTTON} />
+			<div className={VISIT_LOG_CARD_CLASS}>
+				<div className={VISIT_LOG_HEADER_CLASS}>
+					<div className="island-kicker">Visit log</div>
+				</div>
+				<ul aria-hidden="true" className="-mx-(--page-gap) divide-y">
+					{Array.from({ length: VISITS_PAGE_SIZE }, (_, index) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
+						<li key={index} className={VISIT_ROW_CLASS}>
+							<ShellBar className="h-6 w-7 shrink-0 rounded-full" />
+							<div className="min-w-0 flex-1 text-sm">
+								<ShellText
+									className="font-medium"
+									barClassName="w-48 max-w-full"
+								/>
+								<ShellText className="text-xs" barClassName="w-20" />
+							</div>
+							<ShellSized className="rounded-full">
+								<ConfidencePill confidence={0.9} className="shrink-0" />
 							</ShellSized>
-						) : null}
-					</li>
-				))}
-			</ul>
-			<div className={VISIT_LOG_FOOTER_CLASS}>
+							{canListen ? (
+								<ShellSized className="rounded-md">
+									<RecordingButton audioUrl={null} {...VISIT_ROW_BUTTON} />
+								</ShellSized>
+							) : null}
+						</li>
+					))}
+				</ul>
+			</div>
+			<div aria-hidden="true" className={VISIT_LOG_FOOTER_CLASS}>
+				<div className={PAGE_RANGE_CLASS}>
+					<ShellText className="w-36" barClassName="w-full" />
+				</div>
 				<span className="ml-auto">
 					<ShellSized className="rounded-md">
 						<PageStepper
@@ -676,12 +681,24 @@ function WeekdayLabels() {
 // Shared by the loaded page and its skeleton, so the two are one shape.
 const PROFILE_CARD_CLASS =
 	"feature-card mt-(--page-gap) grid overflow-hidden rounded-md sm:grid-cols-[11.5rem_minmax(0,1fr)]";
+// The profile card's portrait slot and text column, shared by SummaryCard and
+// its loading shell so the two never drift apart.
+const PROFILE_PORTRAIT_CLASS =
+	"flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4";
+const PROFILE_TEXT_CLASS =
+	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-[calc(7.75rem+2rem)] sm:justify-between sm:pl-0";
 const COLUMNS_CLASS =
 	"mt-(--page-gap) grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-(--page-gap)";
-const VISIT_LOG_BASE_CLASS =
-	"@container feature-card flex flex-col rounded-md p-4";
-const VISIT_LOG_CLASS = `${VISIT_LOG_BASE_CLASS} min-h-[420px]`;
-const VISIT_LOG_SHORT_CLASS = `${VISIT_LOG_BASE_CLASS} self-start`;
+// The log and its footer: the card, then the range and stepper set on the
+// page beneath it, the way the Birds grid ends.
+const VISIT_LOG_CLASS = "flex min-w-0 flex-col gap-(--page-gap) min-h-[420px]";
+const VISIT_LOG_SHORT_CLASS =
+	"flex min-w-0 flex-col gap-(--page-gap) self-start";
+// No bottom padding: with the footer outside, the last row ends on its own
+// padding like every other row. (Important, to beat the phone-width
+// `.feature-card.p-4` padding rule.)
+const VISIT_LOG_CARD_CLASS =
+	"@container feature-card flex flex-1 flex-col rounded-md p-4 pb-0!";
 const VISIT_LOG_HEADER_CLASS =
 	"-mx-(--page-gap) -mt-(--page-gap) flex min-h-[45px] flex-wrap items-center justify-between gap-2 border-b px-(--page-gap)";
 const VISIT_ROW_CLASS =
@@ -692,7 +709,7 @@ const VISIT_ROW_BUTTON = {
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
 const VISIT_LOG_FOOTER_CLASS =
-	"-mx-(--page-gap) mt-auto -mb-(--page-gap) flex shrink-0 items-center border-t px-(--page-gap) py-2";
+	"flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2";
 
 const SWATCH =
 	"size-3 rounded-[3px] border border-[var(--line)] transition-[outline] hover:z-10 hover:outline hover:outline-2 hover:outline-[var(--hover-line)] hover:outline-offset-1";
@@ -768,7 +785,7 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 			    column is its 9.5rem portrait column plus the 1rem padding either
 			    side, and the 120px bird's slot is centred in the card's height
 			    so the bird sits exactly where it does there. */}
-			<div className="flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4">
+			<div className={PROFILE_PORTRAIT_CLASS}>
 				<SpeciesImage
 					imageUrl={detail.imageUrl}
 					alt={detail.comName}
@@ -780,7 +797,7 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 			{/* Beside the portrait the rows run the card's full height -- the
 			    name level with the bird's head, the eBird link with its feet --
 			    rather than a block centred with space pooled above and below. */}
-			<div className="flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-[calc(7.75rem+2rem)] sm:justify-between sm:pl-0">
+			<div className={PROFILE_TEXT_CLASS}>
 				<div className="min-w-0">
 					<h1 className="display-title font-bold text-2xl text-[var(--moss)] sm:text-3xl">
 						{detail.comName}
@@ -935,103 +952,101 @@ function VisitLogCard({
 			//
 			// A log that fits on one page hugs its rows: stretched to the charts'
 			// height beside it, a short log would end in a block of empty card.
-			// Paged logs keep the full height so the stepper never jumps. With no
-			// footer to close it, the card drops its bottom padding, so the last
-			// row ends on its own padding like every other row. (Important, to beat
-			// the phone-width `.feature-card.p-4` padding rule.)
-			className={
-				pageCount > 1
-					? VISIT_LOG_CLASS
-					: `${VISIT_LOG_SHORT_CLASS} ${visits.length > 0 ? "pb-0!" : ""}`
-			}
+			// Paged logs keep the full height so the stepper never jumps.
+			className={pageCount > 1 ? VISIT_LOG_CLASS : VISIT_LOG_SHORT_CLASS}
 		>
-			{/* The footer's twin: the same full-width hairline and the same 45px
-			    band, rule included, so the log is bookended evenly. */}
-			<div className={VISIT_LOG_HEADER_CLASS}>
-				<div className="island-kicker">Visit log</div>
-				{totalVisits > 0 ? (
-					<div className="tabular-data text-muted-foreground text-xs">
-						{totalVisits.toLocaleString()}{" "}
-						{totalVisits === 1 ? "visit" : "visits"}
-					</div>
-				) : null}
+			<div
+				className={`${VISIT_LOG_CARD_CLASS} ${visits.length === 0 ? "pb-4!" : ""}`}
+			>
+				<div className={VISIT_LOG_HEADER_CLASS}>
+					<div className="island-kicker">Visit log</div>
+				</div>
+
+				{visits.length === 0 ? (
+					<EmptyNote>{EMPTY.window.birdVisits}</EmptyNote>
+				) : (
+					<ul
+						aria-busy={loading}
+						className={`-mx-(--page-gap) divide-y transition-opacity ${loading ? "opacity-50" : ""}`}
+					>
+						{visits.map((visit, i) => {
+							const heardAt = formatDateTime(visit.date, visit.time);
+
+							return (
+								<li
+									key={`${visit.date}-${visit.time}`}
+									aria-label={`${heardAt}${visit.confidence != null ? `, ${formatConfidence(visit.confidence)} confidence` : ""}`}
+									// 7px rather than the usual 10px, so ten rows take the
+									// height nine used to and the card doesn't grow.
+									//
+									// The moment it was heard over how long ago that was: two
+									// lines at every width. Under 26rem the button drops its
+									// label to make room.
+									//
+									// The dividers run out to the card's edges (the list
+									// bleeds through the card's padding), and the row's own
+									// padding hands that page gap back (the card's own padding, which
+									// halves on the smallest phones) so the content lines up with
+									// the header and footer and never pokes past the card's border.
+									className={VISIT_ROW_CLASS}
+								>
+									<IndexDot index={firstIndex + i} widest={lastIndex} />
+									<div className="min-w-0 flex-1 text-sm">
+										{/* The day links to its Timeline, like the detections
+										    table's Recorded column and the heat map's squares. */}
+										<Link
+											to="/timeline"
+											search={{ period: "day", date: visit.date }}
+											className="block max-w-fit truncate font-medium no-underline hover:underline"
+										>
+											<time dateTime={`${visit.date}T${visit.time}`}>
+												{heardAt}
+											</time>
+										</Link>
+										<div className="truncate text-muted-foreground text-xs">
+											{formatTimeAgo(visit.ageMs + offsetMs)}
+										</div>
+									</div>
+
+									<ConfidencePill
+										confidence={visit.confidence}
+										className="shrink-0"
+									/>
+									{canListen ? (
+										<RecordingButton
+											audioUrl={visit.audioUrl ?? null}
+											speciesName={comName}
+											{...VISIT_ROW_BUTTON}
+										/>
+									) : null}
+								</li>
+							);
+						})}
+					</ul>
+				)}
 			</div>
 
-			{visits.length === 0 ? (
-				<EmptyNote>{EMPTY.window.birdVisits}</EmptyNote>
-			) : (
-				<ul
-					aria-busy={loading}
-					className={`-mx-(--page-gap) divide-y transition-opacity ${loading ? "opacity-50" : ""}`}
-				>
-					{visits.map((visit, i) => {
-						const heardAt = formatDateTime(visit.date, visit.time);
-
-						return (
-							<li
-								key={`${visit.date}-${visit.time}`}
-								aria-label={`${heardAt}${visit.confidence != null ? `, ${formatConfidence(visit.confidence)} confidence` : ""}`}
-								// 7px rather than the usual 10px, so ten rows take the
-								// height nine used to and the card doesn't grow.
-								//
-								// The moment it was heard over how long ago that was: two
-								// lines at every width. Under 26rem the button drops its
-								// label to make room.
-								//
-								// The dividers run out to the card's edges (the list
-								// bleeds through the card's padding), and the row's own
-								// padding hands that page gap back (the card's own padding, which
-								// halves on the smallest phones) so the content lines up with
-								// the header and footer and never pokes past the card's border.
-								className={VISIT_ROW_CLASS}
-							>
-								<IndexDot index={firstIndex + i} widest={lastIndex} />
-								<div className="min-w-0 flex-1 text-sm">
-									{/* The day links to its Timeline, like the detections
-										    table's Recorded column and the heat map's squares. */}
-									<Link
-										to="/timeline"
-										search={{ period: "day", date: visit.date }}
-										className="block max-w-fit truncate font-medium no-underline hover:underline"
-									>
-										<time dateTime={`${visit.date}T${visit.time}`}>
-											{heardAt}
-										</time>
-									</Link>
-									<div className="truncate text-muted-foreground text-xs">
-										{formatTimeAgo(visit.ageMs + offsetMs)}
-									</div>
-								</div>
-
-								<ConfidencePill
-									confidence={visit.confidence}
-									className="shrink-0"
-								/>
-								{canListen ? (
-									<RecordingButton
-										audioUrl={visit.audioUrl ?? null}
-										speciesName={comName}
-										{...VISIT_ROW_BUTTON}
-									/>
-								) : null}
-							</li>
-						);
-					})}
-				</ul>
-			)}
-
-			{/* The detections table's pager, in a footer like the table's: a
-			    hairline across the card's full width, the stepper held right, and
-			    `mt-auto` pinning it to the card's bottom on a short last page. */}
-			{pageCount > 1 ? (
+			{/* Beneath the card, on the page like the Birds grid's footer: which
+			    visits these are on the left, the stepper held right. The card
+			    takes the height left over, so a short last page doesn't pull the
+			    footer up. */}
+			{visits.length > 0 ? (
 				<div className={VISIT_LOG_FOOTER_CLASS}>
-					<PageStepper
-						className="ml-auto"
-						label="Visit log pages"
-						page={page}
-						pageCount={pageCount}
-						onPageChange={onPageChange}
+					<PageRange
+						first={firstIndex}
+						last={lastIndex}
+						total={totalVisits}
+						noun={["visit", "visits"]}
 					/>
+					{pageCount > 1 ? (
+						<PageStepper
+							className="ml-auto"
+							label="Visit log pages"
+							page={page}
+							pageCount={pageCount}
+							onPageChange={onPageChange}
+						/>
+					) : null}
 				</div>
 			) : null}
 		</section>
