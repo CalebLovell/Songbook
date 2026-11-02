@@ -43,9 +43,11 @@ import { comNameToSlug } from "~/lib/species-slug.ts";
 /** A queue row's height: the 40px thumbnail and 7px above and below it. */
 const ROW_HEIGHT_PX = 54;
 
-// Shared by the workflow and its skeleton, so the two are one shape.
+// Shared by the workflow and its skeleton, so the two are one shape. The
+// single narrow track is minmax(0,1fr), not the implicit auto, so a long name
+// truncates instead of stretching the card past the screen.
 const REVIEW_GRID_CLASS =
-	"grid @3xl/review:grid-cols-[minmax(0,1fr)_24rem] @7xl/review:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-(--page-gap)";
+	"grid grid-cols-[minmax(0,1fr)] @3xl/review:grid-cols-[minmax(0,1fr)_24rem] @7xl/review:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-(--page-gap)";
 // The evidence spectrogram: taller than the quiz's, since here its detail is
 // the point.
 const REVIEW_PLOT_CLASS = "h-56 max-sm:h-40";
