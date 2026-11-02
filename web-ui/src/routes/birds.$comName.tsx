@@ -1039,11 +1039,7 @@ function VisitLogCard({
 			    bottom on a short last page. */}
 				{visits.length > 0 ? (
 					<div className={VISIT_LOG_FOOTER_CLASS}>
-						<PageRange
-							first={firstIndex}
-							last={lastIndex}
-							total={totalVisits}
-						/>
+						<PageRange first={firstIndex} last={lastIndex} />
 						{pageCount > 1 ? (
 							<PageStepper
 								className="ml-auto"

@@ -91,7 +91,6 @@ export function SpeciesControlPageSkeleton({
 					// The installed catalog runs to thousands of species, which is
 					// what sets the pager's width.
 					pageCount={130}
-					total={6500}
 					selected={new Set()}
 					sort={search.sort}
 					direction={search.direction}
@@ -514,7 +513,6 @@ export function SpeciesControlPage({
 						rows={pagedRows}
 						page={safePage}
 						pageCount={pageCount}
-						total={sorted.length}
 						selected={selected}
 						sort={search.sort}
 						direction={search.direction}

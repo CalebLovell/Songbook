@@ -112,25 +112,24 @@ export function PageStepper({
 }
 
 /**
- * The stepper's partner at the other end of a footer: what the page holds
- * ("1–24 of 78"), as bare text at the stepper's height rather than in a box of
- * its own, so a big total still fits beside the pager on the narrowest phone.
- * The table it sits under already says what the rows are; the noun is only
- * for footers that need it.
+ * The stepper's partner at the other end of a footer: which rows the page
+ * holds, as bare text at the stepper's height rather than in a box of its own,
+ * so it fits beside the pager on the narrowest phone. A table's footer gives
+ * just the rows ("1–50") -- the stepper beside it already says how far the
+ * pages run; a footer that needs it adds the total and a noun ("1–24 of 78
+ * species").
  */
 export function PageRange({
 	first,
 	last,
 	total,
-	noun,
 	children,
 	className,
 }: {
 	first: number;
 	last: number;
-	total: number;
-	/** Plural; the singular is used when the total is one. */
-	noun?: [singular: string, plural: string];
+	/** The total and its noun -- the singular used when the total is one. */
+	total?: { count: number; noun: [singular: string, plural: string] };
 	/** Anything said after the range, like what a search filtered it from. */
 	children?: React.ReactNode;
 	className?: string;
@@ -140,12 +139,17 @@ export function PageRange({
 			<span>
 				<span className="tabular-data font-semibold text-foreground">
 					{first.toLocaleString()}&ndash;{last.toLocaleString()}
-				</span>{" "}
-				of{" "}
-				<span className="tabular-data font-semibold text-foreground">
-					{total.toLocaleString()}
 				</span>
-				{noun ? ` ${noun[total === 1 ? 0 : 1]}` : null}
+				{total ? (
+					<>
+						{" "}
+						of{" "}
+						<span className="tabular-data font-semibold text-foreground">
+							{total.count.toLocaleString()}
+						</span>{" "}
+						{total.noun[total.count === 1 ? 0 : 1]}
+					</>
+				) : null}
 				{children}
 			</span>
 		</div>

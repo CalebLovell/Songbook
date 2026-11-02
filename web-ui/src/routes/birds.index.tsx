@@ -433,8 +433,7 @@ function SpeciesFooter({
 			<PageRange
 				first={first}
 				last={last}
-				total={total}
-				noun={["species", "species"]}
+				total={{ count: total, noun: ["species", "species"] }}
 			>
 				{total < lifeList ? (
 					<span className="max-sm:hidden">

@@ -940,7 +940,7 @@ export function DetectionsTable({
 				) : null}
 				<div className={PAGE_ROW_CLASS}>
 					{page ? (
-						<PageRange first={firstIndex} last={lastIndex} total={page.total} />
+						<PageRange first={firstIndex} last={lastIndex} />
 					) : (
 						<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
 							<ShellText className="w-44" barClassName="w-full" />

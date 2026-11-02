@@ -155,7 +155,6 @@ export function SpeciesControlTable({
 	rows,
 	page,
 	pageCount,
-	total,
 	selected,
 	sort,
 	direction,
@@ -170,16 +169,14 @@ export function SpeciesControlTable({
 	rows: SpeciesControlViewRow[] | null;
 	page: number;
 	pageCount: number;
-	/** How many species the search left, across every page. */
-	total: number;
 	selected: Set<string>;
 	sort: SpeciesSortKey;
 	direction: SpeciesControlSortDirection;
 	onSortChange: (key: SpeciesSortKey) => void;
 	onSelectedChange: (next: Set<string>) => void;
 	onPageChange: (page: number) => void;
-	/** Held at the footer's left, opposite the pager -- where the detections
-	 *  table keeps its selection bar. */
+	/** Leading the footer, above the range and pager once it wraps -- where
+	 *  the detections table keeps its selection bar. */
 	actions?: ReactNode;
 }) {
 	const allSelected = rows?.every((row) => selected.has(row.sciName));
@@ -425,7 +422,7 @@ export function SpeciesControlTable({
 							<ShellText className="w-40" barClassName="w-full" />
 						</div>
 					) : (
-						<PageRange first={firstIndex} last={lastIndex} total={total} />
+						<PageRange first={firstIndex} last={lastIndex} />
 					)}
 					{rows === null ? (
 						<span className="ml-auto">
