@@ -31,7 +31,7 @@ export function RecordingButton({
 	/** Names the bird in the accessible label, so a list of these buttons says
 	 * which bird each one plays. Pass it wherever the name is known. */
 	speciesName?: string;
-	size?: "xs" | "sm";
+	size?: "xs" | "sm" | "default";
 	/** Tap targets in a dense table want more than the default. */
 	iconSize?: "icon-xs" | "icon-lg";
 	/** Outline everywhere; the Birds grid's cards fill it with moss. */

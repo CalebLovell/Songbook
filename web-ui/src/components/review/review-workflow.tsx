@@ -60,7 +60,7 @@ const IDENTITY_ROW_CLASS = "flex items-start gap-(--page-gap)";
 const IDENTITY_TEXT_CLASS = "flex min-w-0 flex-1 flex-col items-start";
 const NAME_CLASS =
 	"display-title font-bold text-2xl leading-[1.15] sm:text-3xl";
-const EBIRD_LINK_CLASS = "mt-1 h-9";
+const EBIRD_LINK_CLASS = "mt-1";
 const PORTRAIT_CLASS =
 	"flex size-20 shrink-0 items-center justify-center overflow-hidden max-[400px]:size-14";
 // The verdict buttons' band, bled to the card's edges like the queue's pager.
@@ -114,7 +114,7 @@ export function ReviewWorkflowSkeleton() {
 								barClassName="w-36"
 							/>
 							<ShellSized className={`${EBIRD_LINK_CLASS} rounded-md`}>
-								<Button variant="outline">
+								<Button variant="outline" size="default">
 									<ExternalLink />
 									eBird
 								</Button>
@@ -407,6 +407,7 @@ export function ReviewWorkflow({
 									<Button
 										asChild
 										variant="outline"
+										size="default"
 										className={EBIRD_LINK_CLASS}
 									>
 										<a

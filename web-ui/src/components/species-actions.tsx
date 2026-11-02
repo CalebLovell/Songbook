@@ -8,6 +8,9 @@ type SpeciesActionsProps = {
 	audioUrl?: string | null;
 	speciesLink: SpeciesLink | null;
 	comName: string;
+	/** `compact` for the Birds grid's cards (SPECIES_ACTION_BUTTON); `default`
+	    is the 32px of the page's other action buttons, for a bird's own page. */
+	size?: "compact" | "default";
 };
 
 /**
@@ -25,7 +28,10 @@ function SpeciesActions({
 	audioUrl,
 	speciesLink,
 	comName,
+	size = "compact",
 }: SpeciesActionsProps) {
+	const sizing =
+		size === "compact" ? SPECIES_ACTION_BUTTON : { size: "default" as const };
 	return (
 		<div
 			className={
@@ -39,18 +45,13 @@ function SpeciesActions({
 					audioUrl={audioUrl}
 					speciesName={comName}
 					variant="default"
-					{...SPECIES_ACTION_BUTTON}
+					{...sizing}
 				/>
 			)}
 			{/* eBird for birds, iNaturalist for the frogs, insects and mammals;
 			    sound classes like Dog or Engine have no page, so no button. */}
 			{speciesLink && (
-				<Button
-					variant="outline"
-					{...SPECIES_ACTION_BUTTON}
-					icon={ExternalLink}
-					asChild
-				>
+				<Button variant="outline" {...sizing} icon={ExternalLink} asChild>
 					<a
 						href={speciesLink.href}
 						target="_blank"
