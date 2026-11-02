@@ -223,205 +223,199 @@ export function SpeciesControlTable({
 	return (
 		// A column: the scrollport takes the leftover height so the rows are the
 		// only thing that scrolls, and the pager below stays put.
-		<div className="@container flex min-h-0 flex-1 flex-col gap-(--page-gap)">
-			<div className={TABLE_CARD_CLASS}>
-				{/* Laid out as a grid with the header, body and every row as subgrids of
+		<div className="@container flex min-h-0 flex-1 flex-col">
+			{/* Laid out as a grid with the header, body and every row as subgrids of
 			    its columns, so the header can sit above the rows' scrollport and
 			    still share their widths -- the detections table's arrangement. */}
-				<Table
-					role="table"
-					className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)]"
-					style={COLUMN_GRID}
-					containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
+			<Table
+				role="table"
+				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)]"
+				style={COLUMN_GRID}
+				containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
+			>
+				{/* The detections header band, run up to the card's top edge. */}
+				<TableHeader
+					role="rowgroup"
+					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
-					{/* The detections header band, run up to the card's top edge. */}
-					<TableHeader
-						role="rowgroup"
-						className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto @min-[36rem]:[&_th]:pt-4 [&_th]:pt-[calc(var(--page-gap)/2+1px)] @min-[36rem]:[&_th]:pb-[15px] [&_th]:pb-[calc(var(--page-gap)/2)] [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-auto [&_tr]:border-none"
-					>
-						<TableRow role="row" className={GRID_ROW}>
-							<TableHead
-								role="columnheader"
-								className={cn(
-									SELECT_COLUMN_WIDTH,
-									"w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))] min-w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))] font-semibold",
-									CELL_GAP,
-									FIRST_COLUMN_CLASSES,
-								)}
-							>
-								<input
-									aria-label="Select all species on this page"
-									checked={allSelected}
-									className="row-checkbox"
-									type="checkbox"
-									onChange={(event) => {
-										const next = new Set(selected);
-										for (const row of rows ?? [])
-											event.target.checked
-												? next.add(row.sciName)
-												: next.delete(row.sciName);
-										onSelectedChange(next);
-									}}
-								/>
-							</TableHead>
-							<TableHead
-								role="columnheader"
-								className={cn(
-									"@min-[36rem]:block hidden text-center font-semibold",
-									CELL_GAP,
-								)}
-							>
-								{/* The row numbers need no heading, so their slot holds the
-							    statuses' tip, just right of the select-all box. */}
-								<StatusTip />
-								<span className="sr-only">Row</span>
-							</TableHead>
-							{sortHeading("species")}
-							{sortHeading("scientific")}
-							{sortHeading("count", "text-right")}
-							{sortHeading(
-								"status",
-								cn(
-									STATUS_EDGE,
-									"text-right @min-[36rem]:w-36 @min-[36rem]:min-w-36",
-								),
+					<TableRow role="row" className={GRID_ROW}>
+						<TableHead
+							role="columnheader"
+							className={cn(
+								SELECT_COLUMN_WIDTH,
+								"w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))] min-w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))] font-semibold",
+								CELL_GAP,
+								FIRST_COLUMN_CLASSES,
 							)}
-							{/* Narrow, the headings give way to one sort menu spanning the
+						>
+							<input
+								aria-label="Select all species on this page"
+								checked={allSelected}
+								className="row-checkbox"
+								type="checkbox"
+								onChange={(event) => {
+									const next = new Set(selected);
+									for (const row of rows ?? [])
+										event.target.checked
+											? next.add(row.sciName)
+											: next.delete(row.sciName);
+									onSelectedChange(next);
+								}}
+							/>
+						</TableHead>
+						<TableHead
+							role="columnheader"
+							className={cn(
+								"@min-[36rem]:block hidden text-center font-semibold",
+								CELL_GAP,
+							)}
+						>
+							{/* The row numbers need no heading, so their slot holds the
+							    statuses' tip, just right of the select-all box. */}
+							<StatusTip />
+							<span className="sr-only">Row</span>
+						</TableHead>
+						{sortHeading("species")}
+						{sortHeading("scientific")}
+						{sortHeading("count", "text-right")}
+						{sortHeading(
+							"status",
+							cn(
+								STATUS_EDGE,
+								"text-right @min-[36rem]:w-36 @min-[36rem]:min-w-36",
+							),
+						)}
+						{/* Narrow, the headings give way to one sort menu spanning the
 						    columns after the checkbox. */}
-							<TableHead
-								role="columnheader"
-								// The header drops the scrollbar gutter at this width, so the
-								// menu takes the card's full padding at the right.
-								className="col-[2/-1] @min-[36rem]:hidden pr-(--page-gap)"
+						<TableHead
+							role="columnheader"
+							// The header drops the scrollbar gutter at this width, so the
+							// menu takes the card's full padding at the right.
+							className="col-[2/-1] @min-[36rem]:hidden pr-(--page-gap)"
+						>
+							<div className="flex items-center gap-2">
+								<StatusTip />
+								<SortMenu
+									label="Sort species by"
+									sorts={SPECIES_CONTROL_SORTS}
+									labels={SORT_LABELS}
+									sort={sort}
+									direction={direction}
+									reversed={
+										direction !== SPECIES_CONTROL_DEFAULT_DIRECTION[sort]
+									}
+									onSort={onSortChange}
+									onFlip={() => onSortChange(sort)}
+								/>
+							</div>
+						</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody
+					role="rowgroup"
+					aria-busy={rows === null || undefined}
+					data-scroll-reset=""
+					className="col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+				>
+					{rows === null
+						? Array.from({ length: SPECIES_CONTROL_PAGE_SIZE }, (_, index) => (
+								<SkeletonRow
+									// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
+									key={index}
+									index={index}
+									widestIndex={Math.max(lastIndex, TABLE_INDEX_FLOOR)}
+								/>
+							))
+						: null}
+					{(rows ?? []).map((row, index) => {
+						const isSelected = selected.has(row.sciName);
+						const presentation = STATUS_PRESENTATION[row.status];
+						return (
+							<TableRow
+								key={row.sciName}
+								role="row"
+								data-state={isSelected && "selected"}
+								// Plain card-white rows split by the shared row's hairline, as
+								// on the detections table.
+								className={cn(
+									GRID_ROW,
+									BODY_ROW_HEIGHT,
+									isSelected ? "bg-[var(--row-selected)]" : "bg-card",
+								)}
 							>
-								<div className="flex items-center gap-2">
-									<StatusTip />
-									<SortMenu
-										label="Sort species by"
-										sorts={SPECIES_CONTROL_SORTS}
-										labels={SORT_LABELS}
-										sort={sort}
-										direction={direction}
-										reversed={
-											direction !== SPECIES_CONTROL_DEFAULT_DIRECTION[sort]
+								<TableCell
+									role="cell"
+									className={cn(CELL_GAP, FIRST_COLUMN_CLASSES)}
+								>
+									<input
+										aria-label={`Select ${row.comName}`}
+										checked={isSelected}
+										className="row-checkbox"
+										type="checkbox"
+										onChange={(event) =>
+											toggle(row.sciName, event.target.checked)
 										}
-										onSort={onSortChange}
-										onFlip={() => onSortChange(sort)}
 									/>
-								</div>
-							</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody
-						role="rowgroup"
-						aria-busy={rows === null || undefined}
-						data-scroll-reset=""
-						className="col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
-					>
-						{rows === null
-							? Array.from(
-									{ length: SPECIES_CONTROL_PAGE_SIZE },
-									(_, index) => (
-										<SkeletonRow
-											// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
-											key={index}
-											index={index}
-											widestIndex={Math.max(lastIndex, TABLE_INDEX_FLOOR)}
-										/>
-									),
-								)
-							: null}
-						{(rows ?? []).map((row, index) => {
-							const isSelected = selected.has(row.sciName);
-							const presentation = STATUS_PRESENTATION[row.status];
-							return (
-								<TableRow
-									key={row.sciName}
-									role="row"
-									data-state={isSelected && "selected"}
-									// Plain card-white rows split by the shared row's hairline, as
-									// on the detections table.
+								</TableCell>
+								<TableCell role="cell" className={cn(CELL_GAP, "text-center")}>
+									<IndexDot
+										index={firstIndex + index}
+										widest={Math.max(lastIndex, TABLE_INDEX_FLOOR)}
+									/>
+								</TableCell>
+								<TableCell
+									role="cell"
+									className={cn(CELL_GAP, "min-w-0 truncate")}
+								>
+									<Link
+										to="/birds/$comName"
+										params={{ comName: comNameToSlug(row.comName) }}
+										className="font-medium no-underline hover:underline"
+									>
+										{row.comName}
+									</Link>
+								</TableCell>
+								<TableCell
+									role="cell"
+									className={cn(CELL_GAP, COLUMN_VISIBILITY.scientific)}
+								>
+									<em className="text-[var(--bark)]">{row.sciName}</em>
+								</TableCell>
+								{/* Most of a 6,000-row catalogue has never been heard, so a
+								    zero is muted rather than competing with real counts. */}
+								<TableCell
+									role="cell"
 									className={cn(
-										GRID_ROW,
-										BODY_ROW_HEIGHT,
-										isSelected ? "bg-[var(--row-selected)]" : "bg-card",
+										CELL_GAP,
+										COLUMN_VISIBILITY.count,
+										"tabular-data text-right",
+										!row.history.detections && "text-muted-foreground",
 									)}
 								>
-									<TableCell
-										role="cell"
-										className={cn(CELL_GAP, FIRST_COLUMN_CLASSES)}
+									{row.history.detections.toLocaleString()}
+								</TableCell>
+								<TableCell
+									role="cell"
+									className={cn(CELL_GAP, STATUS_EDGE, "text-right")}
+								>
+									<Badge
+										variant="ghost"
+										className={cn(STATUS_CHIP, presentation.className)}
 									>
-										<input
-											aria-label={`Select ${row.comName}`}
-											checked={isSelected}
-											className="row-checkbox"
-											type="checkbox"
-											onChange={(event) =>
-												toggle(row.sciName, event.target.checked)
-											}
-										/>
-									</TableCell>
-									<TableCell
-										role="cell"
-										className={cn(CELL_GAP, "text-center")}
-									>
-										<IndexDot
-											index={firstIndex + index}
-											widest={Math.max(lastIndex, TABLE_INDEX_FLOOR)}
-										/>
-									</TableCell>
-									<TableCell
-										role="cell"
-										className={cn(CELL_GAP, "min-w-0 truncate")}
-									>
-										<Link
-											to="/birds/$comName"
-											params={{ comName: comNameToSlug(row.comName) }}
-											className="font-medium no-underline hover:underline"
-										>
-											{row.comName}
-										</Link>
-									</TableCell>
-									<TableCell
-										role="cell"
-										className={cn(CELL_GAP, COLUMN_VISIBILITY.scientific)}
-									>
-										<em className="text-[var(--bark)]">{row.sciName}</em>
-									</TableCell>
-									{/* Most of a 6,000-row catalogue has never been heard, so a
-								    zero is muted rather than competing with real counts. */}
-									<TableCell
-										role="cell"
-										className={cn(
-											CELL_GAP,
-											COLUMN_VISIBILITY.count,
-											"tabular-data text-right",
-											!row.history.detections && "text-muted-foreground",
-										)}
-									>
-										{row.history.detections.toLocaleString()}
-									</TableCell>
-									<TableCell
-										role="cell"
-										className={cn(CELL_GAP, STATUS_EDGE, "text-right")}
-									>
-										<Badge
-											variant="ghost"
-											className={cn(STATUS_CHIP, presentation.className)}
-										>
-											{presentation.label}
-										</Badge>
-									</TableCell>
-								</TableRow>
-							);
-						})}
-					</TableBody>
-				</Table>
-			</div>
+										{presentation.label}
+									</Badge>
+								</TableCell>
+							</TableRow>
+						);
+					})}
+				</TableBody>
+			</Table>
 
-			{/* The detections footer, beneath the card: the range and the
-			    selection's actions at the left, the pager held right. */}
-			<div className={TABLE_FOOTER_CLASS}>
+			{/* The detections footer: a band a row's height, its rule run out
+			    through the card's side padding, with the range and the selection's
+			    actions at the left and the pager held right. The card drops its
+			    bottom padding for it. */}
+			<div className="-mr-(--card-edge) -ml-(--page-gap) flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-(--page-gap) border-t py-1.5 pr-(--card-edge) pl-(--page-gap) text-sm">
 				{rows === null ? (
 					<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
 						<ShellText className="w-40" barClassName="w-full" />
@@ -546,15 +540,3 @@ function SkeletonRow({
 		</TableRow>
 	);
 }
-/**
- * The rows' card. Its header band and rows run out to its edges and take its
- * padding as their own inset, so the right padding is the narrower card edge
- * and there is none at the bottom: the pager sits beneath the card, on the
- * page, rather than in a band inside it.
- */
-const TABLE_CARD_CLASS =
-	"@container feature-card flex min-h-80 flex-1 flex-col overflow-hidden rounded-md p-(--page-gap) pr-(--card-edge) pb-0 [--card-edge:min(var(--page-gap),0.75rem)]";
-/** Beneath the card: what the page holds and any selection on the left, the
-    pager held right -- the Birds grid's footer. */
-const TABLE_FOOTER_CLASS =
-	"flex shrink-0 flex-wrap items-center gap-(--page-gap) text-sm";
