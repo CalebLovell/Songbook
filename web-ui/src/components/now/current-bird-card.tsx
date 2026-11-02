@@ -3,6 +3,7 @@ import { LivePillSkeleton } from "~/components/now/live-pill.tsx";
 import {
 	HERO_ACTIONS_CLASS,
 	HERO_CARD_SHELL,
+	HERO_PORTRAIT_SLOT,
 	HeroCardShell,
 	HeroTextShell,
 	SpeciesHeroCard,
@@ -127,7 +128,7 @@ function NestPortrait() {
 	return (
 		// Aligned like HeroPortrait, so the empty state sits in the same slot as
 		// the bird it stands in for.
-		<div className="flex h-28 w-full items-center justify-center overflow-hidden">
+		<div className={`${HERO_PORTRAIT_SLOT} overflow-hidden`}>
 			<img
 				src="/illustrations/nest.webp"
 				alt="An empty nest"

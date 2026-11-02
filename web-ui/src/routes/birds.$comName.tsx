@@ -252,7 +252,7 @@ function SpeciesDetailShell({ year }: { year: number }) {
 					<ShellText className="text-sm" barClassName="w-80 max-w-full" />
 					<div className="relative z-10 flex flex-wrap items-center gap-2">
 						<ShellSized className="rounded-md">
-							<Button variant="outline" size="default" icon={ExternalLink}>
+							<Button variant="outline" size="sm" icon={ExternalLink}>
 								eBird
 							</Button>
 						</ShellSized>
@@ -452,7 +452,7 @@ function UndetectedSpecies({
 					<SpeciesActions
 						speciesLink={speciesLinkFor(sciName)}
 						comName={comName}
-						size="default"
+						size="sm"
 					/>
 				</div>
 			</section>
@@ -675,7 +675,7 @@ function WeekdayLabels() {
 
 // Shared by the loaded page and its skeleton, so the two are one shape.
 const PROFILE_CARD_CLASS =
-	"feature-card mt-(--page-gap) grid overflow-hidden rounded-md sm:grid-cols-[12rem_minmax(0,1fr)]";
+	"feature-card mt-(--page-gap) grid overflow-hidden rounded-md sm:grid-cols-[11.5rem_minmax(0,1fr)]";
 const COLUMNS_CLASS =
 	"mt-(--page-gap) grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-(--page-gap)";
 const VISIT_LOG_BASE_CLASS =
@@ -761,9 +761,14 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 			    column becomes a band, and beside it from sm up. Either way the
 			    bird is centred in its column, so a narrow painting doesn't sit
 			    hard left with a gap pooled between it and the name. A fixed
-			    height, as on the Today hero, so the illustration's own size never
-			    sets the card's. */}
-			<div className="flex h-36 items-center justify-center overflow-hidden p-4 pb-0 sm:h-44 sm:pb-4">
+			    120px bird, as on the Live hero (HERO_PORTRAIT_SLOT), so the
+			    illustration's own size never sets the card's and the bird keeps
+			    one size between the two pages. */}
+			{/* From sm, the Live hero's geometry (HERO_CARD_ROW): an 11.5rem
+			    column is its 9.5rem portrait column plus the 1rem padding either
+			    side, and the 120px bird's slot is centred in the card's height
+			    so the bird sits exactly where it does there. */}
+			<div className="flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4">
 				<SpeciesImage
 					imageUrl={detail.imageUrl}
 					alt={detail.comName}
@@ -772,9 +777,10 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 				/>
 			</div>
 
-			{/* Centred against the portrait, which is usually the taller of the
-			    two, so the text doesn't sit high with a gap pooled beneath it. */}
-			<div className="flex min-w-0 flex-col justify-center gap-3 p-4">
+			{/* Beside the portrait the rows run the card's full height -- the
+			    name level with the bird's head, the eBird link with its feet --
+			    rather than a block centred with space pooled above and below. */}
+			<div className="flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-[calc(7.75rem+2rem)] sm:justify-between sm:pl-0">
 				<div className="min-w-0">
 					<h1 className="display-title font-bold text-2xl text-[var(--moss)] sm:text-3xl">
 						{detail.comName}
@@ -810,7 +816,7 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 				<SpeciesActions
 					speciesLink={detail.speciesLink}
 					comName={detail.comName}
-					size="default"
+					size="sm"
 				/>
 			</div>
 		</section>

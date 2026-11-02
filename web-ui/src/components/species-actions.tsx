@@ -8,9 +8,9 @@ type SpeciesActionsProps = {
 	audioUrl?: string | null;
 	speciesLink: SpeciesLink | null;
 	comName: string;
-	/** `compact` for the Birds grid's cards (SPECIES_ACTION_BUTTON); `default`
-	    is the 32px of the page's other action buttons, for a bird's own page. */
-	size?: "compact" | "default";
+	/** `compact` for the Birds grid's cards (SPECIES_ACTION_BUTTON); `sm` is
+	    the 28px link under a bird's name on its own page, as on Review. */
+	size?: "compact" | "sm";
 };
 
 /**
@@ -31,7 +31,7 @@ function SpeciesActions({
 	size = "compact",
 }: SpeciesActionsProps) {
 	const sizing =
-		size === "compact" ? SPECIES_ACTION_BUTTON : { size: "default" as const };
+		size === "compact" ? SPECIES_ACTION_BUTTON : { size: "sm" as const };
 	return (
 		<div
 			className={

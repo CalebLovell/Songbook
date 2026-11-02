@@ -20,15 +20,32 @@ export const HERO_CARD_SHELL = "feature-card rounded-md p-4";
  * that row. Centring the portrait against the whole card instead would walk the
  * bird down the page every time the panel opened.
  */
+//
+// The bird page's profile card (PROFILE_CARD_CLASS) copies this geometry, so a
+// bird keeps its place going from this hero to its own page: a 9.5rem portrait
+// column inside the card's 1rem padding, the bird centred in it, and a row at
+// least 7.75rem (124px) tall -- the taller of the two cards' text -- so both
+// cards stand 158px whichever text they hold.
 const HERO_CARD_ROW =
-	"grid items-center gap-(--page-gap) sm:grid-cols-[11rem_minmax(0,1fr)]";
+	"grid items-center gap-(--page-gap) sm:min-h-[7.75rem] sm:grid-cols-[9.5rem_minmax(0,1fr)]";
 
 /**
- * Indented past the portrait column and the gap after it -- 11rem + gap-4 --
- * so what unfolds lines up with the text above it rather than starting under
- * the bird. Below `sm` the row is one column and there is nothing to clear.
+ * Indented past the portrait column and the gap after it -- 9.5rem + the page
+ * gap -- so what unfolds lines up with the text above it rather than starting
+ * under the bird. Below `sm` the row is one column and there is nothing to
+ * clear.
  */
-const HERO_CARD_FOOTER = "sm:pl-48";
+const HERO_CARD_FOOTER = "sm:pl-[calc(9.5rem+var(--page-gap))]";
+
+/**
+ * The portrait's slot: 120px, the bird page's portrait height, so a bird is
+ * drawn the same size on the hero and on its own page, and the card stands
+ * about 150px -- the text beside it fills that height rather than floating in
+ * a taller one. The illustration, the loading shell and the empty station's
+ * nest all take it, so the card is one height whichever it shows.
+ */
+export const HERO_PORTRAIT_SLOT =
+	"flex h-30 w-full shrink-0 items-center justify-center";
 
 /**
  * The top-right controls (the Live pill, say) share the title's line beside
@@ -66,7 +83,10 @@ export function HeroCardShell({
 			<div className={HERO_CARD_ROW}>
 				{portrait}
 
-				<div className="flex min-w-0 flex-col gap-2.5 max-[400px]:gap-2">
+				{/* Beside the portrait the column runs its full height -- the name
+				    level with the bird's head, the last row with its feet -- with
+				    whatever is left between them, not pooled above and below. */}
+				<div className="flex min-w-0 flex-col gap-2.5 max-[400px]:gap-2 sm:justify-between sm:self-stretch">
 					{children}
 				</div>
 			</div>
@@ -90,15 +110,16 @@ export function HeroPortrait({
 		// splits it. Sizing the column to the bird instead would move the text's
 		// left edge per species, which the Today hero would jump through on every
 		// poll.
-		// h-28 sits just under the text column's own height (title, scientific
-		// name, age, heard-at row), so the text sets the card's height and runs
-		// edge to edge -- name at the top, heard-at row at the bottom -- rather
-		// than floating mid-card with dead space above and below it.
-		<div className="flex h-28 w-full shrink-0 items-center justify-center overflow-hidden">
+		// Sized and cropped like the bird page's portrait -- HERO_PORTRAIT_SLOT,
+		// cropped to the painted bird rather than its whole canvas -- so going
+		// from this hero to the bird's own page keeps the bird the same size
+		// instead of jumping by a third.
+		<div className={`${HERO_PORTRAIT_SLOT} overflow-hidden`}>
 			<SpeciesImage
 				imageUrl={imageUrl}
 				alt={comName}
 				glyphClassName="size-16"
+				cropToPainting
 			/>
 		</div>
 	);
@@ -218,7 +239,7 @@ export function SpeciesHeroCardShell({
 			portrait={
 				// The portrait's whole slot, as HeroPortrait sizes it -- the space the
 				// painting is given, however much of it a bird fills.
-				<div className="flex h-28 w-full shrink-0 items-center justify-center">
+				<div className={HERO_PORTRAIT_SLOT}>
 					<ShellBar className="size-full rounded-md" />
 				</div>
 			}

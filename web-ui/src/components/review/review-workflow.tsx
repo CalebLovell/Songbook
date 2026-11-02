@@ -114,7 +114,7 @@ export function ReviewWorkflowSkeleton() {
 								barClassName="w-36"
 							/>
 							<ShellSized className={`${EBIRD_LINK_CLASS} rounded-md`}>
-								<Button variant="outline" size="default">
+								<Button variant="outline" size="sm">
 									<ExternalLink />
 									eBird
 								</Button>
@@ -407,7 +407,7 @@ export function ReviewWorkflow({
 									<Button
 										asChild
 										variant="outline"
-										size="default"
+										size="sm"
 										className={EBIRD_LINK_CLASS}
 									>
 										<a
