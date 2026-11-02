@@ -1,12 +1,15 @@
-import { Download, RotateCcw, Upload } from "lucide-react";
+import { Download, type LucideIcon, RotateCcw, Upload } from "lucide-react";
 import { useRef } from "react";
-import { Button } from "~/components/ui/button.tsx";
 
-// The toolbar's full-height buttons, at every width. Where the toolbar is
-// under 30rem wide (a phone) each drops the word "lists" rather than
-// shrinking, so all three still share one line under the search, a page gap
-// apart; the aria-label keeps the full name.
-const TOOL_BUTTON = "h-8 pointer-coarse:h-9 @max-[30rem]:px-3";
+// Import, Export and Reset as one joined control -- the pager's and the sort
+// menu's box, border and card surface, a hairline between the segments --
+// rather than three buttons a gap apart. Where the toolbar is under 30rem wide
+// (a phone) each segment drops the word "lists" rather than shrinking, so the
+// control keeps one line under the search; the aria-label keeps the full name.
+const GROUP_CLASS =
+	"flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm @min-[38rem]:self-auto self-start lg:ml-auto";
+const SEGMENT_CLASS =
+	"flex items-center gap-2 @max-[30rem]:px-3 px-3.5 transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:outline-none [&+&]:border-input [&+&]:border-l";
 const LISTS_WORD = "@max-[30rem]:hidden";
 
 export function SpeciesControlTools({
@@ -20,7 +23,7 @@ export function SpeciesControlTools({
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	return (
-		<div className="flex shrink-0 flex-wrap @min-[38rem]:justify-end gap-(--page-gap) lg:ml-auto">
+		<div className={GROUP_CLASS}>
 			<input
 				ref={inputRef}
 				className="sr-only"
@@ -32,36 +35,40 @@ export function SpeciesControlTools({
 					event.target.value = "";
 				}}
 			/>
-			<Button
-				className={TOOL_BUTTON}
-				size="default"
-				variant="outline"
-				aria-label="Import lists"
+			<Segment
+				icon={Upload}
+				verb="Import"
 				onClick={() => inputRef.current?.click()}
-			>
-				<Upload />
-				Import<span className={LISTS_WORD}> lists</span>
-			</Button>
-			<Button
-				className={TOOL_BUTTON}
-				size="default"
-				variant="outline"
-				aria-label="Export lists"
-				onClick={onExport}
-			>
-				<Download />
-				Export<span className={LISTS_WORD}> lists</span>
-			</Button>
-			<Button
-				className={TOOL_BUTTON}
-				size="default"
-				variant="outline"
-				aria-label="Reset lists"
-				onClick={onReset}
-			>
-				<RotateCcw />
-				Reset<span className={LISTS_WORD}> lists</span>
-			</Button>
+			/>
+			<Segment icon={Download} verb="Export" onClick={onExport} />
+			<Segment icon={RotateCcw} verb="Reset" onClick={onReset} />
 		</div>
+	);
+}
+
+function Segment({
+	icon: Icon,
+	verb,
+	onClick,
+}: {
+	icon: LucideIcon;
+	verb: string;
+	onClick: () => void;
+}) {
+	return (
+		<button
+			type="button"
+			aria-label={`${verb} lists`}
+			className={SEGMENT_CLASS}
+			onClick={onClick}
+		>
+			<Icon className="size-4 shrink-0" aria-hidden="true" />
+			{/* One text box for the whole label, so the button's icon gap never
+			    lands between the verb and "lists" on top of the space. */}
+			<span>
+				{verb}
+				<span className={LISTS_WORD}> lists</span>
+			</span>
+		</button>
 	);
 }
