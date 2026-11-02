@@ -27,7 +27,10 @@ import { EmptyNote } from "~/components/empty-state.tsx";
 import { IndexDot } from "~/components/index-dot.tsx";
 import { PageStatus } from "~/components/page-status.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
-import { SpeciesActions } from "~/components/species-actions.tsx";
+import {
+	SPECIES_ACTION_BUTTON,
+	SpeciesActions,
+} from "~/components/species-actions.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
@@ -252,7 +255,11 @@ function SpeciesDetailShell({ year }: { year: number }) {
 					<ShellText className="text-sm" barClassName="w-80 max-w-full" />
 					<div className="relative z-10 flex flex-wrap items-center gap-2">
 						<ShellSized className="rounded-md">
-							<Button variant="outline" className="h-9" icon={ExternalLink}>
+							<Button
+								variant="outline"
+								{...SPECIES_ACTION_BUTTON}
+								icon={ExternalLink}
+							>
 								eBird
 							</Button>
 						</ShellSized>

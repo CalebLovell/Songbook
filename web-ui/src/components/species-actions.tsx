@@ -8,15 +8,23 @@ type SpeciesActionsProps = {
 	audioUrl?: string | null;
 	speciesLink: SpeciesLink | null;
 	comName: string;
-	/** 36px by default, the height of the app's other controls. */
-	size?: "xs" | "sm" | "default";
 };
+
+/**
+ * The pair's size: the compact 24px buttons where a pointer aims at them, and
+ * below `sm` -- a phone -- the 28px `sm` size, an easier tap. Exported for the
+ * skeletons that stand in for these buttons.
+ */
+export const SPECIES_ACTION_BUTTON = {
+	size: "xs",
+	className:
+		"max-sm:h-7 max-sm:px-3 max-sm:text-xs max-sm:[&_svg:not([class*='size-'])]:size-3.5",
+} as const;
 
 function SpeciesActions({
 	audioUrl,
 	speciesLink,
 	comName,
-	size = "default",
 }: SpeciesActionsProps) {
 	return (
 		<div
@@ -31,7 +39,7 @@ function SpeciesActions({
 					audioUrl={audioUrl}
 					speciesName={comName}
 					variant="default"
-					size={size}
+					{...SPECIES_ACTION_BUTTON}
 				/>
 			)}
 			{/* eBird for birds, iNaturalist for the frogs, insects and mammals;
@@ -39,8 +47,7 @@ function SpeciesActions({
 			{speciesLink && (
 				<Button
 					variant="outline"
-					size={size}
-					className={size === "default" ? "h-9" : undefined}
+					{...SPECIES_ACTION_BUTTON}
 					icon={ExternalLink}
 					asChild
 				>

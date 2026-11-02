@@ -22,7 +22,10 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { Deferred } from "~/components/deferred.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
-import { SpeciesActions } from "~/components/species-actions.tsx";
+import {
+	SPECIES_ACTION_BUTTON,
+	SpeciesActions,
+} from "~/components/species-actions.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { PageStepper } from "~/components/ui/page-stepper.tsx";
@@ -282,12 +285,16 @@ function SpeciesCardSkeleton({ index }: { index: number }) {
 				</div>
 				<div className="flex w-full flex-wrap items-center gap-2">
 					<ShellSized className="rounded-md">
-						<Button className="h-9" icon={Volume2}>
+						<Button {...SPECIES_ACTION_BUTTON} icon={Volume2}>
 							Listen
 						</Button>
 					</ShellSized>
 					<ShellSized className="rounded-md">
-						<Button variant="outline" className="h-9" icon={ExternalLink}>
+						<Button
+							variant="outline"
+							{...SPECIES_ACTION_BUTTON}
+							icon={ExternalLink}
+						>
 							eBird
 						</Button>
 					</ShellSized>
