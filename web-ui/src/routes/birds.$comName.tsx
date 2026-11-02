@@ -392,23 +392,23 @@ function VisitLogSkeleton() {
 						</li>
 					))}
 				</ul>
-			</div>
-			<div aria-hidden="true" className={VISIT_LOG_FOOTER_CLASS}>
-				<div className={PAGE_RANGE_CLASS}>
-					<ShellText className="w-36" barClassName="w-full" />
+				<div aria-hidden="true" className={VISIT_LOG_FOOTER_CLASS}>
+					<div className={PAGE_RANGE_CLASS}>
+						<ShellText className="w-36" barClassName="w-full" />
+					</div>
+					<span className="ml-auto">
+						<ShellSized className="rounded-md">
+							<PageStepper
+								label="Visit log pages"
+								page={1}
+								// A heard bird's log runs to many pages, which is what
+								// sets the stepper's width.
+								pageCount={100}
+								onPageChange={() => {}}
+							/>
+						</ShellSized>
+					</span>
 				</div>
-				<span className="ml-auto">
-					<ShellSized className="rounded-md">
-						<PageStepper
-							label="Visit log pages"
-							page={1}
-							// A heard bird's log runs to many pages, which is what
-							// sets the stepper's width.
-							pageCount={100}
-							onPageChange={() => {}}
-						/>
-					</ShellSized>
-				</span>
 			</div>
 		</section>
 	);
@@ -689,13 +689,10 @@ const PROFILE_TEXT_CLASS =
 	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-[calc(7.75rem+2rem)] sm:justify-between sm:pl-0";
 const COLUMNS_CLASS =
 	"mt-(--page-gap) grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-(--page-gap)";
-// The log and its footer: the card, then the range and stepper set on the
-// page beneath it, the way the Birds grid ends.
-const VISIT_LOG_CLASS = "flex min-w-0 flex-col gap-(--page-gap) min-h-[420px]";
-const VISIT_LOG_SHORT_CLASS =
-	"flex min-w-0 flex-col gap-(--page-gap) self-start";
-// No bottom padding: with the footer outside, the last row ends on its own
-// padding like every other row. (Important, to beat the phone-width
+const VISIT_LOG_CLASS = "flex min-w-0 flex-col min-h-[420px]";
+const VISIT_LOG_SHORT_CLASS = "flex min-w-0 flex-col self-start";
+// No bottom padding: the footer band runs to the card's bottom edge, or, with
+// no visits, the empty note keeps its own. (Important, to beat the phone-width
 // `.feature-card.p-4` padding rule.)
 const VISIT_LOG_CARD_CLASS =
 	"@container feature-card flex flex-1 flex-col rounded-md p-4 pb-0!";
@@ -708,8 +705,9 @@ const VISIT_ROW_BUTTON = {
 	labelClassName: "@min-[26rem]:inline hidden",
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
+// The header's 45px: its rule, then 6px either side of the 32px controls.
 const VISIT_LOG_FOOTER_CLASS =
-	"flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2";
+	"-mx-(--page-gap) mt-auto flex min-h-[45px] shrink-0 flex-wrap items-center gap-(--page-gap) border-t px-(--page-gap) py-1.5";
 
 const SWATCH =
 	"size-3 rounded-[3px] border border-[var(--line)] transition-[outline] hover:z-10 hover:outline hover:outline-2 hover:outline-[var(--hover-line)] hover:outline-offset-1";
@@ -1024,31 +1022,31 @@ function VisitLogCard({
 						})}
 					</ul>
 				)}
-			</div>
 
-			{/* Beneath the card, on the page like the Birds grid's footer: which
-			    visits these are on the left, the stepper held right. The card
-			    takes the height left over, so a short last page doesn't pull the
-			    footer up. */}
-			{visits.length > 0 ? (
-				<div className={VISIT_LOG_FOOTER_CLASS}>
-					<PageRange
-						first={firstIndex}
-						last={lastIndex}
-						total={totalVisits}
-						noun={["visit", "visits"]}
-					/>
-					{pageCount > 1 ? (
-						<PageStepper
-							className="ml-auto"
-							label="Visit log pages"
-							page={page}
-							pageCount={pageCount}
-							onPageChange={onPageChange}
+				{/* The header's twin: the same full-width hairline and the same 45px
+			    band, so the log is bookended evenly. Which visits these are on the
+			    left, the stepper held right, and `mt-auto` pinning it to the card's
+			    bottom on a short last page. */}
+				{visits.length > 0 ? (
+					<div className={VISIT_LOG_FOOTER_CLASS}>
+						<PageRange
+							first={firstIndex}
+							last={lastIndex}
+							total={totalVisits}
+							noun={["visit", "visits"]}
 						/>
-					) : null}
-				</div>
-			) : null}
+						{pageCount > 1 ? (
+							<PageStepper
+								className="ml-auto"
+								label="Visit log pages"
+								page={page}
+								pageCount={pageCount}
+								onPageChange={onPageChange}
+							/>
+						) : null}
+					</div>
+				) : null}
+			</div>
 		</section>
 	);
 }
