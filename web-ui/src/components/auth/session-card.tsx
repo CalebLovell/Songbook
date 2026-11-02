@@ -8,6 +8,7 @@ import { toast } from "~/components/ui/toaster.tsx";
 import { lockFn } from "~/lib/auth.ts";
 import { SESSION_IDLE_DAYS } from "~/lib/auth-limits.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
+import { forgetFetchedClips } from "~/lib/use-playable-audio.ts";
 
 /** The Sign-in card's title, the same signed in or out: its body says which
  *  way this browser stands, not its name. */
@@ -28,6 +29,7 @@ export function SessionCard() {
 		try {
 			await lock({ data: undefined });
 			forgetUnlockStatus();
+			forgetFetchedClips();
 			await router.invalidate();
 		} catch (cause) {
 			console.error(cause);

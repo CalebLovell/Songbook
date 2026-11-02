@@ -33,6 +33,12 @@ export function fetchAudioBlob(audioUrl: string): Promise<Blob> {
 	return pending;
 }
 
+/** Drops every fetched clip, for signing out: those the gate let through only
+ *  while signed in must not go on playing from memory afterwards. */
+export function forgetFetchedClips() {
+	clipCache.clear();
+}
+
 // One clip at a time across the whole app: starting a call pauses whichever
 // one was already playing, rather than letting two rows talk over each other.
 let playingClip: HTMLAudioElement | null = null;
