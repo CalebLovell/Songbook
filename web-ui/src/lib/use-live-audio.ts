@@ -104,14 +104,20 @@ export function useLiveAudio(streamUrl: string) {
 		connectStartedAt.current = Date.now();
 		setState("connecting");
 		try {
+			// iOS routes Web Audio through the ringer, so the silent switch would
+			// mute the feed; asking for the playback session (Safari 17+) doesn't.
+			const session = (navigator as { audioSession?: { type: string } })
+				.audioSession;
+			if (session) session.type = "playback";
 			ensureGraph();
-			await ctxRef.current?.resume();
 			// Assigning src here (not in markup) keeps a locked/idle visitor from
 			// ever opening the gated proxy connection. After a failure the element
 			// is stuck in its error state, so a retry reloads the source.
 			if (!audio.src) audio.src = streamUrl;
 			else if (audio.error) audio.load();
-			await audio.play();
+			// Both start inside the tap: iOS Safari refuses a play() that only
+			// runs once an awaited resume() has settled.
+			await Promise.all([ctxRef.current?.resume(), audio.play()]);
 		} catch {
 			fail();
 		}
@@ -134,6 +140,19 @@ export function useLiveAudio(streamUrl: string) {
 		},
 		[relink],
 	);
+
+	// Locking the phone or switching apps suspends the context on iOS while the
+	// element plays on, so coming back left a "Live" feed with no sound.
+	useEffect(() => {
+		const onVisible = () => {
+			const ctx = ctxRef.current;
+			if (document.visibilityState !== "visible" || !ctx) return;
+			if (ctx.state !== "running" && !audioRef.current?.paused)
+				ctx.resume().catch(() => {});
+		};
+		document.addEventListener("visibilitychange", onVisible);
+		return () => document.removeEventListener("visibilitychange", onVisible);
+	}, []);
 
 	useEffect(() => {
 		return () => {

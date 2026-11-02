@@ -37,6 +37,19 @@ export function fetchAudioBlob(audioUrl: string): Promise<Blob> {
 // one was already playing, rather than letting two rows talk over each other.
 let playingClip: HTMLAudioElement | null = null;
 
+/**
+ * Call from the tap that asks for a clip, before fetching it. iOS Safari lets
+ * an element start sound only from inside a tap, and by the time the clip has
+ * arrived the tap is over, so its play() is refused -- the first tap on a slow
+ * phone did nothing. A play() during the tap lifts that for the element for
+ * good; the pause() straight after keeps this one from sounding or counting.
+ */
+export function primeForPlayback(audio: HTMLAudioElement | null) {
+	if (!audio || audio.src) return;
+	audio.play().catch(() => {});
+	audio.pause();
+}
+
 /** Call as `audio` starts playing: pauses whichever clip had the floor. */
 export function claimPlayback(audio: HTMLAudioElement | null) {
 	if (playingClip && playingClip !== audio) playingClip.pause();
@@ -86,6 +99,7 @@ export function usePlayableAudio(audioUrl: string | null) {
 			audio.pause();
 			return;
 		}
+		primeForPlayback(audio);
 		if (!(await load())) return;
 		audio.play().catch(() => setIsPlaying(false));
 	}

@@ -21,7 +21,11 @@ import {
 	clipTransition,
 	INITIAL_CLIP_STATE,
 } from "~/lib/clip-player-machine.ts";
-import { claimPlayback, fetchAudioBlob } from "~/lib/use-playable-audio.ts";
+import {
+	claimPlayback,
+	fetchAudioBlob,
+	primeForPlayback,
+} from "~/lib/use-playable-audio.ts";
 
 const DEFAULT_HEIGHT = "h-36 max-[400px]:h-28";
 // The controls sit the card's own padding below the plot -- the same gap the
@@ -215,6 +219,13 @@ export function SpectrogramPlayer({
 		paint(clamped);
 	}
 
+	/** Play/pause from a tap or key. The clip is fetched before it can sound, so
+	 * the element is primed here, while the gesture still counts. */
+	function toggle() {
+		primeForPlayback(audioRef.current);
+		dispatch({ type: "toggle" });
+	}
+
 	function fractionAt(event: PointerEvent<HTMLDivElement>): number {
 		const box = event.currentTarget.getBoundingClientRect();
 		return (event.clientX - box.left) / box.width;
@@ -265,7 +276,7 @@ export function SpectrogramPlayer({
 		};
 		if (event.key === " ") {
 			event.preventDefault();
-			dispatch({ type: "toggle" });
+			toggle();
 		} else if (event.key in moves) {
 			event.preventDefault();
 			seekTo(moves[event.key]);
@@ -324,7 +335,7 @@ export function SpectrogramPlayer({
 					size="icon-sm"
 					icon={isPlaying ? Pause : Play}
 					loading={isLoading}
-					onClick={() => dispatch({ type: "toggle" })}
+					onClick={toggle}
 					aria-label={recordingActionLabel(isPlaying, speciesName)}
 				/>
 				<span className={TIME_CLASS}>
