@@ -13,7 +13,11 @@ import { useDebouncedCallback } from "use-debounce";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
-import { PageStepper } from "~/components/ui/page-stepper.tsx";
+import {
+	PAGE_RANGE_CLASS,
+	PageRange,
+	PageStepper,
+} from "~/components/ui/page-stepper.tsx";
 import { SearchInput } from "~/components/ui/search-input.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
@@ -427,6 +431,19 @@ const SPECIES_WIDTHS = ["w-36", "w-28", "w-40", "w-32", "w-24"];
 const SCIENTIFIC_WIDTHS = ["w-40", "w-32", "w-44", "w-36", "w-28"];
 
 /**
+ * The rows' card. Its header band and rows run out to its edges and take its
+ * padding as their own inset, so the right padding is the narrower card edge
+ * and there is none at the bottom: the pager sits beneath the card, on the
+ * page, rather than in a band inside it.
+ */
+const TABLE_CARD_CLASS =
+	"@container feature-card flex min-h-80 flex-1 flex-col overflow-hidden rounded-md p-(--page-gap) pr-(--card-edge) pb-0 [--card-edge:min(var(--page-gap),0.75rem)]";
+/** Beneath the card: what the page holds and any selection on the left, the
+    pager held right -- the Birds grid's footer. */
+const TABLE_FOOTER_CLASS =
+	"flex shrink-0 flex-wrap items-center gap-(--page-gap) text-sm";
+
+/**
  * One cell of a loading row: a shell of whatever its column holds, in the
  * column's own type and at its own size -- the checkbox's square, the index
  * dot, the names' lines, the recorded time (two lines narrow, one wide), the
@@ -745,20 +762,19 @@ export function DetectionsTable({
 		: 1000;
 	const selectedCount = Object.values(rowSelection).filter(Boolean).length;
 	return (
-		// A column, not a stack: the scrollport takes the leftover height so the
-		// rows are the only thing that scrolls, and the pager below stays put.
+		// A column: the card's scrollport takes the leftover height so the rows
+		// are the only thing that scrolls, and the pager below stays put.
 		// `min-h-0` is what lets it shrink -- a flex child defaults to
 		// `min-height: auto` and would otherwise push the pager off the page.
-		// No gap: the rows scroll directly beneath the pager's top rule, so the
-		// footer reads as the edge of the scrollport rather than floating over it.
-		<div className="@container flex min-h-0 flex-1 flex-col">
-			{/* `-ml-(--page-gap) pl-0` pulls the scrollport out through the card's
+		<div className="@container flex min-h-0 flex-1 flex-col gap-(--page-gap)">
+			<div className={TABLE_CARD_CLASS}>
+				{/* `-ml-(--page-gap) pl-0` pulls the scrollport out through the card's
 			    left padding, so the zebra fill and the header's band run to the card's
 			    edge; the first column carries that inset instead. `-mt-4` does the
 			    same at the top: the header band meets the card's top edge and its
 			    cells take the 16px as padding, so the labels sit exactly the card's
 			    4 units down rather than that plus half a centred 40px row. */}
-			{/* Only the rows scroll: the header sits above the scrollport rather
+				{/* Only the rows scroll: the header sits above the scrollport rather
 			    than stuck to the top of it, so the scrollbar runs beside the rows
 			    and stops at the column labels. That takes the header out of the
 			    rows' scroll box, and a table can't share column widths across two
@@ -773,13 +789,13 @@ export function DetectionsTable({
 			    column lines up with the body's whether or not a classic scrollbar
 			    is showing. Sideways, the whole grid scrolls once the columns no
 			    longer fit. */}
-			<Table
-				role="table"
-				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)]"
-				style={gridColumns(canDelete, canListen)}
-				containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
-			>
-				{/* A hairline under the header, the footer's rule mirrored, so the
+				<Table
+					role="table"
+					className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)]"
+					style={gridColumns(canDelete, canListen)}
+					containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
+				>
+					{/* A hairline under the header, the footer's rule mirrored, so the
 				    rows are framed top and bottom by the same line running the card's
 				    full width. It sits on the rowgroup rather than the row (the base
 				    `[&_tr]:border-b` is switched off) and its 1px comes out of the
@@ -791,141 +807,146 @@ export function DetectionsTable({
 				    scrollbar gutter so its headings sit over their columns -- except
 				    narrow, where one sort menu spans them and the gutter would only
 				    leave an empty strip at its right. */}
-				<TableHeader
-					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto @min-[36rem]:[&_th]:pt-4 [&_th]:pt-[calc(var(--page-gap)/2+1px)] @min-[36rem]:[&_th]:pb-[15px] [&_th]:pb-[calc(var(--page-gap)/2)] [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-auto [&_tr]:border-none"
-				>
-					{table.getHeaderGroups().map((headerGroup) => (
-						<TableRow key={headerGroup.id} role="row" className={GRID_ROW}>
-							{headerGroup.headers.map((header) => (
-								<TableHead
-									key={header.id}
-									role="columnheader"
-									className={cn(
-										"font-semibold",
-										CELL_GAP,
-										HEADER_CLASSES[header.column.id],
-										!canListen && LAST_EDGE_WITHOUT_AUDIO[header.column.id],
-										header.column.id === "select"
-											? undefined
-											: (COLUMN_VISIBILITY[header.column.id] ??
-													"@min-[36rem]:block hidden"),
-										header.index === 0 && FIRST_COLUMN_CLASSES,
-									)}
-								>
-									{header.isPlaceholder
-										? null
-										: flexRender(
-												header.column.columnDef.header,
-												header.getContext(),
-											)}
-								</TableHead>
-							))}
-							{/* Narrow, the labels give way to one sort menu spanning the
+					<TableHeader
+						role="rowgroup"
+						className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto @min-[36rem]:[&_th]:pt-4 [&_th]:pt-[calc(var(--page-gap)/2+1px)] @min-[36rem]:[&_th]:pb-[15px] [&_th]:pb-[calc(var(--page-gap)/2)] [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-auto [&_tr]:border-none"
+					>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id} role="row" className={GRID_ROW}>
+								{headerGroup.headers.map((header) => (
+									<TableHead
+										key={header.id}
+										role="columnheader"
+										className={cn(
+											"font-semibold",
+											CELL_GAP,
+											HEADER_CLASSES[header.column.id],
+											!canListen && LAST_EDGE_WITHOUT_AUDIO[header.column.id],
+											header.column.id === "select"
+												? undefined
+												: (COLUMN_VISIBILITY[header.column.id] ??
+														"@min-[36rem]:block hidden"),
+											header.index === 0 && FIRST_COLUMN_CLASSES,
+										)}
+									>
+										{header.isPlaceholder
+											? null
+											: flexRender(
+													header.column.columnDef.header,
+													header.getContext(),
+												)}
+									</TableHead>
+								))}
+								{/* Narrow, the labels give way to one sort menu spanning the
 							    columns after the checkbox: three bare headings over three
 							    columns said little, and two of the four sorts belong to
 							    columns this width does not show. */}
-							<TableHead
-								role="columnheader"
-								className={cn(
-									"@min-[36rem]:hidden",
-									canDelete
-										? "col-[2/-1]"
-										: `col-[1/-1] ${FIRST_COLUMN_CLASSES}`,
-									// The header drops the scrollbar gutter at this width, so
-									// the menu takes the card's full padding at the right.
-									"pr-(--page-gap)",
-								)}
-							>
-								<SortMenu
-									label="Sort detections by"
-									sorts={DETECTION_SORTS}
-									labels={SORT_LABELS}
-									sort={search.sort}
-									direction={search.direction}
-									reversed={
-										search.direction !==
-										DETECTION_DEFAULT_DIRECTION[search.sort]
-									}
-									onSort={sortBy}
-									onFlip={flipSort}
-								/>
-							</TableHead>
-						</TableRow>
-					))}
-				</TableHeader>
-				{/* TODO(audit 18): the body scrolls inside the card, so a 100-row page
+								<TableHead
+									role="columnheader"
+									className={cn(
+										"@min-[36rem]:hidden",
+										canDelete
+											? "col-[2/-1]"
+											: `col-[1/-1] ${FIRST_COLUMN_CLASSES}`,
+										// The header drops the scrollbar gutter at this width, so
+										// the menu takes the card's full padding at the right.
+										"pr-(--page-gap)",
+									)}
+								>
+									<SortMenu
+										label="Sort detections by"
+										sorts={DETECTION_SORTS}
+										labels={SORT_LABELS}
+										sort={search.sort}
+										direction={search.direction}
+										reversed={
+											search.direction !==
+											DETECTION_DEFAULT_DIRECTION[search.sort]
+										}
+										onSort={sortBy}
+										onFlip={flipSort}
+									/>
+								</TableHead>
+							</TableRow>
+						))}
+					</TableHeader>
+					{/* TODO(audit 18): the body scrolls inside the card, so a 100-row page
 				    shows a second scrollbar nested in the page's own. Let the page
 				    scroll instead; also add a jump-to-page control (the pager only
 				    steps, across 1,000+ pages) and species / confidence filters
 				    beside the search and dates. */}
-				{/* No empty row here: the page renders its own empty card instead of
+					{/* No empty row here: the page renders its own empty card instead of
 				    this table, so the header, footer and pager come off with it. */}
-				<TableBody
-					role="rowgroup"
-					aria-busy={skeleton || undefined}
-					data-scroll-reset=""
-					className="col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
-				>
-					{table.getRowModel().rows.map((row) => (
-						<TableRow
-							key={row.id}
-							role="row"
-							data-state={row.getIsSelected() && "selected"}
-							// Plain card-white rows split by the shared row's hairline -- the
-							// same idiom as the Now page's recent log and the species visit
-							// log. Selection is a conditional class rather than stacking
-							// `data-[state=selected]:` over the fill, so intent wins over
-							// Tailwind's own ordering. The shared row's height is a floor
-							// here, not a fixed height, and the body's `auto-rows-max`
-							// lets each track grow to it: otherwise the scrolling body
-							// held every row at 41px and the narrow two-line time
-							// spilled over the rules.
-							className={cn(
-								GRID_ROW,
-								"h-auto min-h-[calc(2.5rem+1px)]",
-								row.getIsSelected() ? "bg-[var(--row-selected)]" : "bg-card",
-							)}
-						>
-							{row.getVisibleCells().map((cell, index) => (
-								<TableCell
-									key={cell.id}
-									role="cell"
-									// Narrow, the stacked time and day make the row two lines
-									// deep; a little more air above and below keeps them off
-									// the rules.
-									className={cn(
-										CELL_GAP,
-										"@max-[36rem]:py-2.5",
-										CELL_CLASSES[cell.column.id],
-										!canListen && LAST_EDGE_WITHOUT_AUDIO[cell.column.id],
-										COLUMN_VISIBILITY[cell.column.id],
-										index === 0 && FIRST_COLUMN_CLASSES,
-									)}
-								>
-									{flexRender(cell.column.columnDef.cell, cell.getContext())}
-								</TableCell>
-							))}
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+					<TableBody
+						role="rowgroup"
+						aria-busy={skeleton || undefined}
+						data-scroll-reset=""
+						className="col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+					>
+						{table.getRowModel().rows.map((row) => (
+							<TableRow
+								key={row.id}
+								role="row"
+								data-state={row.getIsSelected() && "selected"}
+								// Plain card-white rows split by the shared row's hairline -- the
+								// same idiom as the Now page's recent log and the species visit
+								// log. Selection is a conditional class rather than stacking
+								// `data-[state=selected]:` over the fill, so intent wins over
+								// Tailwind's own ordering. The shared row's height is a floor
+								// here, not a fixed height, and the body's `auto-rows-max`
+								// lets each track grow to it: otherwise the scrolling body
+								// held every row at 41px and the narrow two-line time
+								// spilled over the rules.
+								className={cn(
+									GRID_ROW,
+									"h-auto min-h-[calc(2.5rem+1px)]",
+									row.getIsSelected() ? "bg-[var(--row-selected)]" : "bg-card",
+								)}
+							>
+								{row.getVisibleCells().map((cell, index) => (
+									<TableCell
+										key={cell.id}
+										role="cell"
+										// Narrow, the stacked time and day make the row two lines
+										// deep; a little more air above and below keeps them off
+										// the rules.
+										className={cn(
+											CELL_GAP,
+											"@max-[36rem]:py-2.5",
+											CELL_CLASSES[cell.column.id],
+											!canListen && LAST_EDGE_WITHOUT_AUDIO[cell.column.id],
+											COLUMN_VISIBILITY[cell.column.id],
+											index === 0 && FIRST_COLUMN_CLASSES,
+										)}
+									>
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									</TableCell>
+								))}
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</div>
 
-			{/* The footer carries what acts on the rows: the selection on the left,
-			    once there is one, and the pager on the right. Delete lives here
-			    rather than among the filters -- it is an action on the rows just
-			    picked, and with nothing picked there is nothing to show at all, so
-			    no dead button. `ml-auto` holds the pager right on its own.
-			    The footer is the narrow header's twin: half a page gap either side
-			    of the same controls as the sort menu, so the table is
-			    bookended by two bands of one height. It owns the space
-			    down to the card's edge; the card drops its bottom padding for it.
-			    A hairline sets it off from the rows: the header gets away without
-			    one because the first row is always a zebra row, but the last row
-			    in view is as often white, and then the footer ran straight into
-			    it. The rule runs the card's full width, out through its side
-			    padding like the rows, which the footer takes back as its own. */}
-			<div className="-mr-(--card-edge) -ml-(--page-gap) flex shrink-0 flex-wrap items-center gap-2 border-t pt-[calc(var(--page-gap)/2)] pr-(--card-edge) pb-[calc(var(--page-gap)/2+1px)] pl-(--page-gap) text-sm">
+			{/* The footer carries what the page holds and what acts on the rows:
+			    the range, then the selection once there is one, and the pager on
+			    the right. Delete lives here rather than among the filters -- it is
+			    an action on the rows just picked, and with nothing picked there is
+			    nothing to show at all, so no dead button. `ml-auto` holds the pager
+			    right on its own. */}
+			<div className={TABLE_FOOTER_CLASS}>
+				{page ? (
+					<PageRange
+						first={firstIndex}
+						last={lastIndex}
+						total={page.total}
+						noun={["detection", "detections"]}
+					/>
+				) : (
+					<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
+						<ShellText className="w-44" barClassName="w-full" />
+					</div>
+				)}
 				{canDelete && selectedCount > 0 ? (
 					<SelectionBar
 						count={selectedCount}

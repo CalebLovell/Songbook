@@ -42,8 +42,9 @@ import { SpeciesControlTools } from "./species-control-tools.tsx";
 const TOOLBAR_CLASS =
 	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-(--page-gap)";
 const SEARCH_CLASS = "@min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
-const TABLE_CARD_CLASS =
-	"@container feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
+// The table and its footer take the leftover height; the table draws its own
+// card.
+const TABLE_SECTION_CLASS = "flex min-h-0 flex-1 flex-col";
 
 /**
  * The page before the catalog arrives: the masthead and toolbar as
@@ -83,7 +84,7 @@ export function SpeciesControlPageSkeleton({
 			<section
 				aria-busy="true"
 				aria-label="Installed species"
-				className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
+				className={TABLE_SECTION_CLASS}
 			>
 				<SpeciesControlTable
 					rows={null}
@@ -91,6 +92,7 @@ export function SpeciesControlPageSkeleton({
 					// The installed catalog runs to thousands of species, which is
 					// what sets the pager's width.
 					pageCount={130}
+					total={6500}
 					selected={new Set()}
 					sort={search.sort}
 					direction={search.direction}
@@ -502,17 +504,13 @@ export function SpeciesControlPage({
 					<EmptyNote>{EMPTY.filter.speciesControlSearch}</EmptyNote>
 				</section>
 			) : (
-				/* The table card: its header band, rows and footer run out to its
-			   edges and take its padding as their own inset, so the right padding
-			   is the narrower card edge and there is none at the bottom. */
-				<section
-					aria-label="Installed species"
-					className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
-				>
+				/* The table draws its own card, with the footer beneath it. */
+				<section aria-label="Installed species" className={TABLE_SECTION_CLASS}>
 					<SpeciesControlTable
 						rows={pagedRows}
 						page={safePage}
 						pageCount={pageCount}
+						total={sorted.length}
 						selected={selected}
 						sort={search.sort}
 						direction={search.direction}

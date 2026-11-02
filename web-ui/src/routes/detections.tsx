@@ -38,9 +38,9 @@ export const Route = createFileRoute("/detections")({
 	component: Detections,
 });
 
-// Shared by the loaded table's card and its skeleton's.
-const TABLE_CARD_CLASS =
-	"feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
+// The table and its footer take the leftover height; the table draws its own
+// card.
+const TABLE_SECTION_CLASS = "flex min-h-0 flex-1 flex-col";
 
 function Detections() {
 	const { page: pagePromise } = Route.useLoaderData();
@@ -163,14 +163,8 @@ function Detections() {
 							</EmptyNote>
 						</section>
 					) : (
-						/* Takes the leftover height, so only the rows scroll.
-						   `overflow-hidden` clips the table's header band, which runs
-						   out to the card's top-left edge, to the card's rounded corner
-						   -- square, it painted over the border's curve there. */
-						<section
-							aria-label="Detections"
-							className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
-						>
+						/* Takes the leftover height, so only the rows scroll. */
+						<section aria-label="Detections" className={TABLE_SECTION_CLASS}>
 							<DetectionsTable
 								page={loaded}
 								search={search}
@@ -217,7 +211,7 @@ function DetectionsTableShell({
 		<section
 			aria-busy="true"
 			aria-label="Detections"
-			className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
+			className={TABLE_SECTION_CLASS}
 		>
 			<DetectionsTable
 				page={null}
