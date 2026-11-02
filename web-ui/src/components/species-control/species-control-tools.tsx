@@ -2,11 +2,11 @@ import { Download, RotateCcw, Upload } from "lucide-react";
 import { useRef } from "react";
 import { Button } from "~/components/ui/button.tsx";
 
-// The toolbar's 36px buttons, at every width. On the smallest phones (under
+// The toolbar's full-height buttons, at every width. On the smallest phones (under
 // 400px, where the page gap halves too) each drops the word "lists" rather
 // than shrinking, so all three still share one line under the search; the
 // aria-label keeps the full name.
-const TOOL_BUTTON = "h-9 max-[400px]:px-3";
+const TOOL_BUTTON = "h-8 pointer-coarse:h-9 max-[400px]:px-3";
 const LISTS_WORD = "max-[400px]:hidden";
 
 export function SpeciesControlTools({

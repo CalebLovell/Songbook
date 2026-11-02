@@ -203,7 +203,7 @@ function DateRangeFilter({
 	return (
 		<fieldset
 			aria-label="Date range"
-			className="flex h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)]"
+			className="flex h-8 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)]"
 		>
 			<DateSegment
 				label="From date"
@@ -233,7 +233,7 @@ function DateRangeFilter({
 				title="Clear dates"
 				disabled={!from && !to}
 				onClick={() => onChange({ from: undefined, to: undefined })}
-				className="flex w-9 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -322,7 +322,7 @@ function SelectionBar({
 	return (
 		<fieldset
 			aria-label="Selected detections"
-			className="flex h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
+			className="flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
 			{/* Narrow, the words go and the count and the trash glyph carry it,
 			    so the bar fits one row beside the pager; screen readers still get
@@ -338,7 +338,7 @@ function SelectionBar({
 				aria-label="Clear selection"
 				title="Clear selection"
 				onClick={onClear}
-				className="flex w-9 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -346,7 +346,7 @@ function SelectionBar({
 				type="button"
 				aria-label={`Delete ${count} selected ${noun}`}
 				onClick={onDelete}
-				className="flex @min-[36rem]:w-auto w-9 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive transition-colors hover:bg-destructive/10"
+				className="flex @min-[36rem]:w-auto pointer-coarse:w-9 w-8 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive transition-colors hover:bg-destructive/10"
 			>
 				<Trash2 className="size-4" aria-hidden="true" />
 				<span className="sr-only @min-[36rem]:not-sr-only">Delete</span>
@@ -904,7 +904,7 @@ export function DetectionsTable({
 			    picked, and with nothing picked there is nothing to show at all, so
 			    no dead button. `ml-auto` holds the pager right on its own.
 			    The footer is the narrow header's twin: half a page gap either side
-			    of the same 36px controls as the sort menu, so the table is
+			    of the same controls as the sort menu, so the table is
 			    bookended by two bands of one height. It owns the space
 			    down to the card's edge; the card drops its bottom padding for it.
 			    A hairline sets it off from the rows: the header gets away without

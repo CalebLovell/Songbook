@@ -90,6 +90,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 
 - **Button** (`ui/button.tsx`): the default size is `xs` (24px). Pass glyphs
   via `icon`, never as children, so padding stays constant.
+- **Control height**: 32px is the most any button, toggle, input, select or
+  joined control stands with a mouse. On a touch screen (`pointer-coarse:`)
+  the full-height toolbar controls step up to 36px for an easier tap; nothing
+  is taller.
 - **Toggle group**: on = moss fill, white text; segments share borders.
 - **Input**: focus is shown by a `--focus-ring` border, not the outline.
 - **Nav rows**: active is marked by fill alone (a step deeper than the meadow

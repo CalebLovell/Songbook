@@ -474,7 +474,7 @@ function SpeciesFooter({
 
 /**
  * The sort on a narrow screen: a native select dressed like the timeline's
- * period menu -- the same 36px box, border, card surface and hover, the chosen
+ * period menu -- the same box, border, card surface and hover, the chosen
  * sort's icon in front -- with the direction joined to its right end by a
  * hairline, the way the timeline's date stepper joins its arrows -- the same
  * direction button the tabs carry from 640px.
@@ -492,7 +492,7 @@ function SortSelect({
 }) {
 	const Icon = SORT_META[sort].icon;
 	return (
-		<div className="flex h-9 shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] sm:hidden">
+		<div className="flex h-8 pointer-coarse:h-9 shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] sm:hidden">
 			<div className="relative">
 				{/* Under 400px the icon goes: the search box needs the width more. */}
 				<Icon
@@ -570,7 +570,7 @@ function SortTabs({
 			<DirectionButton
 				reverse={reverse}
 				onReverse={onReverse}
-				className="w-9 rounded-r-md border border-l-0"
+				className="pointer-coarse:w-9 w-8 rounded-r-md border border-l-0"
 			/>
 		</div>
 	);

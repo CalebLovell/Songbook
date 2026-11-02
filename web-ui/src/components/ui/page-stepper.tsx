@@ -24,7 +24,7 @@ export function parsePageInput(
  * field) goes there, clamped to the pages that exist; Escape puts back the
  * current one. A list of every page would be 2,788 options on a busy station.
  *
- * 36px tall, the height of the search box, date range and sort menu, so a
+ * The height of the search box, date range and sort menu, so a
  * table's footer carries controls the same size as the ones above it. The
  * page field's type goes up to 16px under a finger, as every field's does, so
  * a phone doesn't zoom in on it.
@@ -70,7 +70,7 @@ export function PageStepper({
 		<nav
 			aria-label={label}
 			className={cn(
-				"flex h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm focus-within:border-[var(--focus-ring)]",
+				"flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm focus-within:border-[var(--focus-ring)]",
 				className,
 			)}
 		>
@@ -139,7 +139,7 @@ function StepButton({
 			title={label}
 			disabled={disabled}
 			onClick={onClick}
-			className={`flex w-9 shrink-0 items-center justify-center border-input transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
+			className={`flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
 		>
 			<Icon className="size-4" aria-hidden="true" />
 		</button>

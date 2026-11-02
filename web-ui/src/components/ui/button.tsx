@@ -9,7 +9,8 @@ import { cn } from "~/lib/utils.ts";
  * The station's one button. `xs` is the Today page's Bird Call control, measured
  * off the card it lives in, and it is the default size -- a bare `<Button>` is
  * already the right button. The larger steps exist so the scale stays coherent,
- * not because anything currently uses them.
+ * not because anything currently uses them. None stands taller than 32px with
+ * a mouse; `lg` and `icon-lg` grow to 36px only on a touch screen.
  *
  * Note the absence of shadcn's `has-[>svg]:px-*` rule, which trims horizontal
  * padding whenever a button contains an icon. Padding that depends on the
@@ -36,14 +37,15 @@ const buttonVariants = cva(
 				sm: "h-7 gap-1.5 px-3 text-xs [&_svg:not([class*='size-'])]:size-3.5",
 				default:
 					"h-8 gap-2 px-3.5 text-sm [&_svg:not([class*='size-'])]:size-4",
-				lg: "h-9 gap-2 px-5 text-sm [&_svg:not([class*='size-'])]:size-4",
+				lg: "h-8 gap-2 pointer-coarse:h-9 px-5 text-sm [&_svg:not([class*='size-'])]:size-4",
 				// The square sizes still carry a font size: pagination puts a page
 				// number in one, and without it the digit inherits the page's 16px
 				// and overflows a 24px box.
 				"icon-xs": "size-6 text-[11px] [&_svg:not([class*='size-'])]:size-3",
 				"icon-sm": "size-7 text-xs [&_svg:not([class*='size-'])]:size-3.5",
 				icon: "size-8 text-sm [&_svg:not([class*='size-'])]:size-4",
-				"icon-lg": "size-9 text-sm [&_svg:not([class*='size-'])]:size-4",
+				"icon-lg":
+					"size-8 pointer-coarse:size-9 text-sm [&_svg:not([class*='size-'])]:size-4",
 			},
 		},
 		defaultVariants: {

@@ -154,14 +154,14 @@ const BAR_CLASS = `${BAR_BASE_CLASS} px-4 max-[400px]:px-2`;
 const DRAWER_BAR_CLASS = `${BAR_BASE_CLASS} px-3`;
 
 const ROUND_BUTTON_CLASS =
-	"flex size-9 items-center justify-center rounded-full bg-[var(--paper-raised)] text-[var(--moss)] transition-colors duration-[180ms] hover:bg-[color-mix(in_oklab,var(--moss)_8%,var(--paper-raised))]";
+	"flex size-8 pointer-coarse:size-9 items-center justify-center rounded-full bg-[var(--paper-raised)] text-[var(--moss)] transition-colors duration-[180ms] hover:bg-[color-mix(in_oklab,var(--moss)_8%,var(--paper-raised))]";
 
 function SiteName({ onClick }: { onClick?: () => void }) {
 	return (
 		<Link
 			to="/"
 			onClick={onClick}
-			className="display-title flex h-9 items-center gap-2 rounded-md px-2 font-semibold text-lg no-underline transition-colors duration-[180ms] hover:bg-[color-mix(in_oklab,var(--moss)_8%,var(--paper-raised))]"
+			className="display-title flex h-8 pointer-coarse:h-9 items-center gap-2 rounded-md px-2 font-semibold text-lg no-underline transition-colors duration-[180ms] hover:bg-[color-mix(in_oklab,var(--moss)_8%,var(--paper-raised))]"
 		>
 			<SongbookWordmark className="shrink-0 text-[24px] text-[var(--moss)]" />
 		</Link>

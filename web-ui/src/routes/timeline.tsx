@@ -334,7 +334,7 @@ function TimelineHeader({
 				// Below `xl` the menu bar carries it instead, where it has room.
 				action={
 					canShare ? (
-						<ShareButton state={share} className="h-10 max-xl:hidden" />
+						<ShareButton state={share} className="max-xl:hidden" />
 					) : undefined
 				}
 				// Between the title and the body card, so the window it picks reads as
