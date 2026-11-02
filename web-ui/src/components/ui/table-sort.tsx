@@ -12,8 +12,10 @@ type SortDirection = "asc" | "desc";
  * A narrow table's header: which column orders the rows and which way, as one
  * joined control in the family of the pager and the date range -- a native
  * menu (so a phone opens its own picker) and the direction beside it. Shared by
- * the detections and species control tables. The search box and date range's
- * height, so the controls above a table read as one size.
+ * the detections and species control tables. It sits inside the column
+ * header's row rather than the toolbar, so it stands 28px, a step under the
+ * search box, at every pointer. Under a finger its type stays 16px, as every
+ * field's does, so a phone doesn't zoom in when it opens.
  */
 export function SortMenu<Sort extends string>({
 	label,
@@ -44,7 +46,7 @@ export function SortMenu<Sort extends string>({
 	return (
 		// Held to the right edge, over the columns it orders, rather than hard
 		// against the checkbox.
-		<div className="ml-auto flex h-8 pointer-coarse:h-9 w-fit overflow-hidden rounded-md border border-input bg-card font-normal pointer-coarse:text-base text-sm">
+		<div className="ml-auto flex h-7 w-fit overflow-hidden rounded-md border border-input bg-card font-normal pointer-coarse:text-base text-sm">
 			<div className="relative flex">
 				<select
 					aria-label={label}
@@ -54,7 +56,7 @@ export function SortMenu<Sort extends string>({
 					onChange={(event) =>
 						sort !== event.target.value && onSort(event.target.value as Sort)
 					}
-					className="h-full cursor-pointer appearance-none bg-transparent pr-8 pl-3 transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none"
+					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 leading-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none"
 				>
 					{sorts.map((option) => (
 						<option key={option} value={option}>
@@ -63,7 +65,7 @@ export function SortMenu<Sort extends string>({
 					))}
 				</select>
 				<ChevronDown
-					className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+					className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-muted-foreground"
 					aria-hidden="true"
 				/>
 			</div>
@@ -73,9 +75,9 @@ export function SortMenu<Sort extends string>({
 				aria-pressed={reversed}
 				title={direction === "asc" ? "Ascending" : "Descending"}
 				onClick={onFlip}
-				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
+				className="flex w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
 			>
-				<DirectionIcon className="size-4" aria-hidden="true" />
+				<DirectionIcon className="size-3.5" aria-hidden="true" />
 			</button>
 		</div>
 	);
