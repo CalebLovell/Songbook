@@ -161,11 +161,12 @@ export function PageRange({
  * around a selection's actions the two stay on one row under them. Sized from
  * its content (`flex-auto`, not `flex-1`'s zero basis) so it drops below the
  * actions whole rather than squeezing in beside them; it grows into the row's
- * spare width with the stepper pushed right, and wraps itself only on a phone
- * too narrow for the pair.
+ * spare width with the stepper pushed right. Under 360px, where the pair at
+ * its widest ("83,401–83,452" beside "835 of 835") no longer fits a row, the
+ * two stack centred instead of the stepper wrapping off to the right alone.
  */
 export const PAGE_ROW_CLASS =
-	"flex min-w-0 flex-auto flex-wrap items-center gap-(--page-gap)";
+	"flex min-w-0 flex-auto flex-wrap items-center gap-(--page-gap) max-[359px]:flex-col max-[359px]:*:mx-auto";
 
 /** PageRange's line, for a loading shell to hold the same shape. */
 export const PAGE_RANGE_CLASS =

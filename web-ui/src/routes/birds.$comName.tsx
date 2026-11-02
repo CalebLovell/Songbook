@@ -34,6 +34,7 @@ import { Button } from "~/components/ui/button.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
 import {
 	PAGE_RANGE_CLASS,
+	PAGE_ROW_CLASS,
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
@@ -403,21 +404,23 @@ function VisitLogSkeleton() {
 					))}
 				</ul>
 				<div aria-hidden="true" className={VISIT_LOG_FOOTER_CLASS}>
-					<div className={PAGE_RANGE_CLASS}>
-						<ShellText className="w-36" barClassName="w-full" />
+					<div className={PAGE_ROW_CLASS}>
+						<div className={PAGE_RANGE_CLASS}>
+							<ShellText className="w-36" barClassName="w-full" />
+						</div>
+						<span className="ml-auto">
+							<ShellSized className="rounded-md">
+								<PageStepper
+									label="Visit log pages"
+									page={1}
+									// A heard bird's log runs to many pages, which is what
+									// sets the stepper's width.
+									pageCount={100}
+									onPageChange={() => {}}
+								/>
+							</ShellSized>
+						</span>
 					</div>
-					<span className="ml-auto">
-						<ShellSized className="rounded-md">
-							<PageStepper
-								label="Visit log pages"
-								page={1}
-								// A heard bird's log runs to many pages, which is what
-								// sets the stepper's width.
-								pageCount={100}
-								onPageChange={() => {}}
-							/>
-						</ShellSized>
-					</span>
 				</div>
 			</div>
 		</section>
@@ -1035,20 +1038,23 @@ function VisitLogCard({
 
 				{/* The header's twin: the same full-width hairline and the same 45px
 			    band, so the log is bookended evenly. Which visits these are on the
-			    left, the stepper held right, and `mt-auto` pinning it to the card's
+			    left, the stepper held right (stacked centred on the smallest
+			    phones), and `mt-auto` pinning it to the card's
 			    bottom on a short last page. */}
 				{visits.length > 0 ? (
 					<div className={VISIT_LOG_FOOTER_CLASS}>
-						<PageRange first={firstIndex} last={lastIndex} />
-						{pageCount > 1 ? (
-							<PageStepper
-								className="ml-auto"
-								label="Visit log pages"
-								page={page}
-								pageCount={pageCount}
-								onPageChange={onPageChange}
-							/>
-						) : null}
+						<div className={PAGE_ROW_CLASS}>
+							<PageRange first={firstIndex} last={lastIndex} />
+							{pageCount > 1 ? (
+								<PageStepper
+									className="ml-auto"
+									label="Visit log pages"
+									page={page}
+									pageCount={pageCount}
+									onPageChange={onPageChange}
+								/>
+							) : null}
+						</div>
 					</div>
 				) : null}
 			</div>
