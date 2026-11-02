@@ -19,6 +19,7 @@ import {
 import { forwardedClientAddress } from "./auth-policy.server.ts";
 import {
 	COOKIE_MAX_AGE_SECONDS,
+	sessionNeedsRenewal,
 	signSessionToken,
 	UNLOCK_COOKIE_NAME,
 	verifySessionToken,
@@ -117,9 +118,11 @@ export async function readUnlockStatus(): Promise<UnlockStatus> {
 	// Anything but a readable, set password is locked -- never open.
 	if (loaded.state !== "ready") return { unlocked: false, state: loaded.state };
 	const { auth } = loaded;
-	const unlocked = verifySessionToken(auth, getCookie(UNLOCK_COOKIE_NAME));
-	// Sliding renewal: every verified request pushes the expiry back out.
-	if (unlocked) issueSession(auth);
+	const token = getCookie(UNLOCK_COOKIE_NAME);
+	const unlocked = verifySessionToken(auth, token);
+	// Sliding renewal: a verified request a day or more after the token was
+	// issued pushes the expiry back out.
+	if (unlocked && token && sessionNeedsRenewal(token)) issueSession(auth);
 	return { unlocked, state: "ready" };
 }
 

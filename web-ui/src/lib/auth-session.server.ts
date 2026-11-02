@@ -7,9 +7,10 @@ import { SESSION_IDLE_DAYS } from "./auth-limits.ts";
 
 export const UNLOCK_COOKIE_NAME = "birdnet_unlock";
 
-/** Thirty days without a visit signs a browser out. Every verified request
- *  re-issues the token with a fresh timestamp, so a device in regular use never
- *  falls out -- only a forgotten one does. Revocation before then is by password
+/** Thirty days without a visit signs a browser out. A verified request
+ *  re-issues the token with a fresh timestamp (at most once a day -- see
+ *  `sessionNeedsRenewal`), so a device in regular use never falls out -- only
+ *  a forgotten one does. Revocation before then is by password
  *  change or nonce rotation. */
 const SESSION_IDLE_MS = SESSION_IDLE_DAYS * 24 * 60 * 60 * 1000;
 export const COOKIE_MAX_AGE_SECONDS = SESSION_IDLE_MS / 1000;
@@ -34,6 +35,17 @@ function sign(auth: AuthFile, payload: string) {
 export function signSessionToken(auth: AuthFile, issuedAt = Date.now()) {
 	const payload = `${TOKEN_VERSION}.${issuedAt}`;
 	return `${payload}.${sign(auth, payload)}`;
+}
+
+/** Long enough that a page of clips, each asking the gate, doesn't rewrite the
+ *  cookie on every one; short against the thirty-day idle limit, so renewal
+ *  still keeps a device in regular use signed in. */
+const RENEW_AFTER_MS = 24 * 60 * 60 * 1000;
+
+/** Whether a verified token is old enough to be re-issued. Only meaningful for
+ *  a token `verifySessionToken` has accepted. */
+export function sessionNeedsRenewal(token: string, now = Date.now()) {
+	return now - Number(token.split(".")[1]) > RENEW_AFTER_MS;
 }
 
 export function verifySessionToken(

@@ -4,7 +4,11 @@ import test from "node:test";
 import type { AuthFile } from "./auth-file.server.ts";
 import { hashPassword } from "./auth-file.server.ts";
 import { SESSION_IDLE_DAYS } from "./auth-limits.ts";
-import { signSessionToken, verifySessionToken } from "./auth-session.server.ts";
+import {
+	sessionNeedsRenewal,
+	signSessionToken,
+	verifySessionToken,
+} from "./auth-session.server.ts";
 
 const auth: AuthFile = {
 	hash: hashPassword("swifts-over-the-creek"),
@@ -62,4 +66,13 @@ test("a token unused for longer than the idle limit is rejected", () => {
 		verifySessionToken(auth, token, issuedAt + SESSION_IDLE_DAYS * day + 1),
 		false,
 	);
+});
+
+test("a token is renewed only once it is a day old", () => {
+	const issuedAt = Date.UTC(2026, 10, 1);
+	const token = signSessionToken(auth, issuedAt);
+	const hour = 60 * 60 * 1000;
+	assert.equal(sessionNeedsRenewal(token, issuedAt + hour), false);
+	assert.equal(sessionNeedsRenewal(token, issuedAt + 23 * hour), false);
+	assert.equal(sessionNeedsRenewal(token, issuedAt + 25 * hour), true);
 });
