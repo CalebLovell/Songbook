@@ -8,15 +8,15 @@ type SpeciesActionsProps = {
 	audioUrl?: string | null;
 	speciesLink: SpeciesLink | null;
 	comName: string;
-	/** The Birds grid's cards take the larger buttons. */
-	size?: "xs" | "sm";
+	/** 36px by default, the height of the app's other controls. */
+	size?: "xs" | "sm" | "default";
 };
 
 function SpeciesActions({
 	audioUrl,
 	speciesLink,
 	comName,
-	size = "xs",
+	size = "default",
 }: SpeciesActionsProps) {
 	return (
 		<div
@@ -37,7 +37,13 @@ function SpeciesActions({
 			{/* eBird for birds, iNaturalist for the frogs, insects and mammals;
 			    sound classes like Dog or Engine have no page, so no button. */}
 			{speciesLink && (
-				<Button variant="outline" size={size} icon={ExternalLink} asChild>
+				<Button
+					variant="outline"
+					size={size}
+					className={size === "default" ? "h-9" : undefined}
+					icon={ExternalLink}
+					asChild
+				>
 					<a
 						href={speciesLink.href}
 						target="_blank"

@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { CSSProperties, ReactNode } from "react";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
+import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { PageStepper } from "~/components/ui/page-stepper.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
@@ -82,8 +83,12 @@ export function sortSpeciesControlRows(
 // take the card's padding as their inset, and every cell keeps half the page
 // gap either side so neighbours sit a full gap apart.
 const FIRST_COLUMN_CLASSES = "pl-(--page-gap)";
-const CELL_GAP = "px-[calc(var(--page-gap)/2)]";
-const STATUS_EDGE = "pr-(--page-gap)";
+const CELL_GAP = "px-(--cell-gap)";
+// Less whatever a classic scrollbar's gutter already leaves at that edge, as
+// `.page-wrap` does, so the right inset doesn't come out a scrollbar wider
+// than the left.
+const STATUS_EDGE =
+	"pr-[max(calc(var(--spacing)*1),calc(var(--page-gap)-var(--scrollbar-w,0px)))]";
 // Hidden, a cell leaves the grid's flow, and the grid's own column list (on the
 // <Table>) drops its track.
 const COLUMN_VISIBILITY: Record<string, string> = {
@@ -216,14 +221,14 @@ export function SpeciesControlTable({
 				{/* The detections header band, run up to the card's top edge. */}
 				<TableHeader
 					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] [scrollbar-gutter:stable] [&_th]:h-auto @min-[36rem]:[&_th]:pt-4 [&_th]:pt-[calc(var(--page-gap)/2+1px)] @min-[36rem]:[&_th]:pb-[15px] [&_th]:pb-[calc(var(--page-gap)/2)] [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-auto [&_tr]:border-none"
+					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto @min-[36rem]:[&_th]:pt-4 [&_th]:pt-[calc(var(--page-gap)/2+1px)] @min-[36rem]:[&_th]:pb-[15px] [&_th]:pb-[calc(var(--page-gap)/2)] [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-auto [&_tr]:border-none"
 				>
 					<TableRow role="row" className={GRID_ROW}>
 						<TableHead
 							role="columnheader"
 							className={cn(
 								SELECT_COLUMN_WIDTH,
-								"w-[calc(var(--page-gap)*1.5+0.875rem)] min-w-[calc(var(--page-gap)*1.5+0.875rem)] font-semibold",
+								"w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))] min-w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))] font-semibold",
 								CELL_GAP,
 								FIRST_COLUMN_CLASSES,
 							)}
@@ -231,7 +236,7 @@ export function SpeciesControlTable({
 							<input
 								aria-label="Select all species on this page"
 								checked={allSelected}
-								className="block size-3.5 accent-[var(--moss)]"
+								className="row-checkbox"
 								type="checkbox"
 								onChange={(event) => {
 									const next = new Set(selected);
@@ -250,7 +255,9 @@ export function SpeciesControlTable({
 								CELL_GAP,
 							)}
 						>
-							<span aria-hidden="true">#</span>
+							{/* The row numbers need no heading, so their slot holds the
+							    statuses' tip, just right of the select-all box. */}
+							<StatusTip />
 							<span className="sr-only">Row</span>
 						</TableHead>
 						{sortHeading("species")}
@@ -267,17 +274,22 @@ export function SpeciesControlTable({
 						    columns after the checkbox. */}
 						<TableHead
 							role="columnheader"
-							className={cn("col-[2/-1] @min-[36rem]:hidden", STATUS_EDGE)}
+							// The header drops the scrollbar gutter at this width, so the
+							// menu takes the card's full padding at the right.
+							className="col-[2/-1] @min-[36rem]:hidden pr-(--page-gap)"
 						>
-							<SortMenu
-								label="Sort species by"
-								sorts={SPECIES_CONTROL_SORTS}
-								labels={SORT_LABELS}
-								sort={sort}
-								direction={direction}
-								onSort={onSortChange}
-								onFlip={() => onSortChange(sort)}
-							/>
+							<div className="flex items-center gap-2">
+								<StatusTip />
+								<SortMenu
+									label="Sort species by"
+									sorts={SPECIES_CONTROL_SORTS}
+									labels={SORT_LABELS}
+									sort={sort}
+									direction={direction}
+									onSort={onSortChange}
+									onFlip={() => onSortChange(sort)}
+								/>
+							</div>
 						</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -319,7 +331,7 @@ export function SpeciesControlTable({
 									<input
 										aria-label={`Select ${row.comName}`}
 										checked={isSelected}
-										className="block size-3.5 accent-[var(--moss)]"
+										className="row-checkbox"
 										type="checkbox"
 										onChange={(event) =>
 											toggle(row.sciName, event.target.checked)
@@ -408,6 +420,31 @@ export function SpeciesControlTable({
 	);
 }
 
+/** What the four statuses mean -- the ones the Status column shows and the
+    selection bar sets -- in the header beside the select-all box. */
+function StatusTip() {
+	return (
+		<InfoTip label="Species statuses">
+			{/* One status a line, its name first, as the quiz's tip lists its
+			    pools. */}
+			<ul className="space-y-1">
+				<li>
+					<strong>Automatic:</strong> uses BirdNET's usual species rules.
+				</li>
+				<li>
+					<strong>Custom:</strong> adds the species to your custom list.
+				</li>
+				<li>
+					<strong>Always detect:</strong> skips its species-frequency check.
+				</li>
+				<li>
+					<strong>Never detect:</strong> excludes it outright.
+				</li>
+			</ul>
+		</InfoTip>
+	);
+}
+
 const NAME_WIDTHS = ["w-36", "w-28", "w-40", "w-32", "w-24"];
 const SCIENTIFIC_WIDTHS = ["w-40", "w-32", "w-44", "w-36", "w-28"];
 
@@ -425,7 +462,7 @@ function SkeletonRow({
 	return (
 		<TableRow role="row" aria-hidden="true" className={cn(GRID_ROW, "bg-card")}>
 			<TableCell role="cell" className={cn(CELL_GAP, FIRST_COLUMN_CLASSES)}>
-				<ShellBar className="size-3.5 rounded-sm" />
+				<ShellBar className="size-(--row-checkbox-size) rounded-sm" />
 			</TableCell>
 			<TableCell role="cell" className={cn(CELL_GAP, "text-center")}>
 				<ShellSized className="rounded-full">

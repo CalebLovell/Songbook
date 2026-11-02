@@ -2,11 +2,12 @@ import { Download, RotateCcw, Upload } from "lucide-react";
 import { useRef } from "react";
 import { Button } from "~/components/ui/button.tsx";
 
-// The toolbar's 36px buttons, dropped to the compact 28px size on the smallest
-// phones (under 400px, where the page gap halves too) so all three share one
-// line under the search rather than wrapping onto two.
-const SMALLEST_SCREEN =
-	"h-9 max-[400px]:h-7 max-[400px]:gap-1.5 max-[400px]:px-2.5 max-[400px]:text-xs max-[400px]:[&_svg]:size-3.5";
+// The toolbar's 36px buttons, at every width. On the smallest phones (under
+// 400px, where the page gap halves too) each drops the word "lists" rather
+// than shrinking, so all three still share one line under the search; the
+// aria-label keeps the full name.
+const TOOL_BUTTON = "h-9 max-[400px]:px-3";
+const LISTS_WORD = "max-[400px]:hidden";
 
 export function SpeciesControlTools({
 	onImport,
@@ -32,31 +33,34 @@ export function SpeciesControlTools({
 				}}
 			/>
 			<Button
-				className={SMALLEST_SCREEN}
+				className={TOOL_BUTTON}
 				size="default"
 				variant="outline"
+				aria-label="Import lists"
 				onClick={() => inputRef.current?.click()}
 			>
 				<Upload />
-				Import lists
+				Import<span className={LISTS_WORD}> lists</span>
 			</Button>
 			<Button
-				className={SMALLEST_SCREEN}
+				className={TOOL_BUTTON}
 				size="default"
 				variant="outline"
+				aria-label="Export lists"
 				onClick={onExport}
 			>
 				<Download />
-				Export lists
+				Export<span className={LISTS_WORD}> lists</span>
 			</Button>
 			<Button
-				className={SMALLEST_SCREEN}
+				className={TOOL_BUTTON}
 				size="default"
 				variant="outline"
+				aria-label="Reset lists"
 				onClick={onReset}
 			>
 				<RotateCcw />
-				Reset lists
+				Reset<span className={LISTS_WORD}> lists</span>
 			</Button>
 		</div>
 	);

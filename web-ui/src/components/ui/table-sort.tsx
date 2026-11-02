@@ -6,7 +6,8 @@ type SortDirection = "asc" | "desc";
  * A narrow table's header: which column orders the rows and which way, as one
  * joined control in the family of the pager and the date range -- a native
  * menu (so a phone opens its own picker) and the direction beside it. Shared by
- * the detections and species control tables.
+ * the detections and species control tables. 36px, the search box and date
+ * range's height, so the controls above a table read as one size.
  */
 export function SortMenu<Sort extends string>({
 	label,
@@ -30,7 +31,7 @@ export function SortMenu<Sort extends string>({
 	return (
 		// Held to the right edge, over the columns it orders, rather than hard
 		// against the checkbox.
-		<div className="ml-auto flex h-7 w-fit overflow-hidden rounded-md border border-input bg-card font-normal text-sm">
+		<div className="ml-auto flex h-9 w-fit overflow-hidden rounded-md border border-input bg-card font-normal pointer-coarse:text-base text-sm">
 			<div className="relative flex">
 				<select
 					aria-label={label}
@@ -40,7 +41,7 @@ export function SortMenu<Sort extends string>({
 					onChange={(event) =>
 						sort !== event.target.value && onSort(event.target.value as Sort)
 					}
-					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none"
+					className="h-full cursor-pointer appearance-none bg-transparent pr-8 pl-3 transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none"
 				>
 					{sorts.map((option) => (
 						<option key={option} value={option}>
@@ -49,7 +50,7 @@ export function SortMenu<Sort extends string>({
 					))}
 				</select>
 				<ChevronDown
-					className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-muted-foreground"
+					className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground"
 					aria-hidden="true"
 				/>
 			</div>
@@ -58,7 +59,7 @@ export function SortMenu<Sort extends string>({
 				aria-label={`Sort ${direction === "asc" ? "descending" : "ascending"}`}
 				title={direction === "asc" ? "Ascending" : "Descending"}
 				onClick={onFlip}
-				className="flex w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+				className="flex w-9 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 			>
 				<DirectionIcon className="size-4" aria-hidden="true" />
 			</button>

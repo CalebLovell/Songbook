@@ -13,7 +13,8 @@ export const PLAY_LABEL = "Listen";
  * icon carries play/pause state, so the button holds its width mid-playback.
  * `iconOnly` drops the label for tight rows; the accessible name comes from
  * aria-label either way. `size="sm"` is for rows where it sits beside a
- * confidence pill, so the two stand the same height. Where there's room for a spectrogram, use
+ * confidence pill, so the two stand the same height; `default` is the 36px
+ * size of a card's own buttons. Where there's room for a spectrogram, use
  * `SpectrogramPlayer` instead.
  */
 export function RecordingButton({
@@ -31,7 +32,7 @@ export function RecordingButton({
 	/** Names the bird in the accessible label, so a list of these buttons says
 	 * which bird each one plays. Pass it wherever the name is known. */
 	speciesName?: string;
-	size?: "xs" | "sm";
+	size?: "xs" | "sm" | "default";
 	/** Tap targets in a dense table want more than the default. */
 	iconSize?: "icon-xs" | "icon-lg";
 	/** Outline everywhere; the Birds grid's cards fill it with moss. */
@@ -56,7 +57,7 @@ export function RecordingButton({
 			<Button
 				variant={variant}
 				size={iconOnly ? iconSize : size}
-				className={`shrink-0 ${className}`}
+				className={`shrink-0 ${size === "default" && !iconOnly ? "h-9" : ""} ${className}`}
 				icon={isPlaying ? Pause : Volume2}
 				loading={isLoading}
 				disabled={!audioUrl}

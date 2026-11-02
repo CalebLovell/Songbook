@@ -13,7 +13,6 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
-import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { SearchInput } from "~/components/ui/search-input.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
@@ -44,7 +43,7 @@ const TOOLBAR_CLASS =
 	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-(--page-gap)";
 const SEARCH_CLASS = "@min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
 const TABLE_CARD_CLASS =
-	"@container feature-card flex min-h-0 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
+	"@container feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
 
 /**
  * The page before the catalog arrives: the masthead and toolbar as
@@ -58,7 +57,7 @@ export function SpeciesControlPageSkeleton({
 	search: SpeciesControlWorkspaceSearch;
 }) {
 	return (
-		<div className="page-wrap flex h-full min-h-0 flex-col gap-(--page-gap) py-4">
+		<div className="page-wrap flex h-full min-h-fit flex-col gap-(--page-gap) py-4">
 			<div className="@container shrink-0 space-y-(--page-gap)">
 				<PageHeaderCard
 					icon={SlidersHorizontal}
@@ -131,28 +130,34 @@ type ProposedDialog =
 const BULK_STATUS_ACTIONS: Array<{
 	status: SpeciesStatus;
 	label: string;
+	/** What a narrow bar shows, so all four fit beside the count on a phone. */
+	short: string;
 	className: string;
 }> = [
 	{
 		status: "automatic",
 		label: "Automatic",
+		short: "Auto",
 		className: "text-muted-foreground hover:bg-muted",
 	},
 	{
 		status: "custom",
 		label: "Custom",
+		short: "Custom",
 		className:
 			"text-[var(--moss)] hover:bg-[color-mix(in_oklab,var(--sage)_35%,var(--paper-raised))]",
 	},
 	{
 		status: "always",
 		label: "Always detect",
+		short: "Always",
 		className:
 			"text-[var(--bark)] hover:bg-[color-mix(in_oklab,var(--sand)_30%,var(--paper-raised))]",
 	},
 	{
 		status: "never",
 		label: "Never detect",
+		short: "Never",
 		className:
 			"text-destructive hover:bg-[color-mix(in_oklab,var(--clay)_15%,var(--paper-raised))]",
 	},
@@ -161,7 +166,9 @@ const BULK_STATUS_ACTIONS: Array<{
 /**
  * The detections table's selection bar, with the four statuses where its
  * Delete sits: the count, a clear, then the verdicts to apply. It only shows
- * once species are picked, so there are no dead buttons.
+ * once species are picked, so there are no dead buttons. Narrow, it spans
+ * the footer and the statuses go by their short names, so all four fit on a
+ * phone; the pager drops to the line below.
  */
 export function SpeciesSelectionBar({
 	count,
@@ -175,7 +182,7 @@ export function SpeciesSelectionBar({
 	return (
 		<fieldset
 			aria-label="Set selected species status"
-			className="flex h-7 w-fit max-w-full shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
+			className="flex h-9 @max-[36rem]:w-full w-fit max-w-full shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
 			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
 				<span className="tabular-data font-semibold text-foreground">
@@ -188,7 +195,7 @@ export function SpeciesSelectionBar({
 				aria-label="Clear selection"
 				title="Clear selection"
 				onClick={onClear}
-				className="flex w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+				className="flex w-9 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -198,9 +205,10 @@ export function SpeciesSelectionBar({
 					type="button"
 					aria-label={`Set selected species to ${action.label}`}
 					onClick={() => onStatus(action.status)}
-					className={`flex items-center whitespace-nowrap border-input border-l @min-[36rem]:px-3 px-2 transition-colors ${action.className}`}
+					className={`flex @max-[36rem]:flex-1 items-center justify-center whitespace-nowrap border-input border-l @min-[36rem]:px-3 px-2 transition-colors ${action.className}`}
 				>
-					{action.label}
+					<span className="@max-[36rem]:hidden">{action.label}</span>
+					<span className="@min-[36rem]:hidden">{action.short}</span>
 				</button>
 			))}
 		</fieldset>
@@ -443,10 +451,13 @@ export function SpeciesControlPage({
 	}
 
 	return (
-		// Fills `main` exactly and never scrolls itself, so the header, toolbar and
-		// the card's pager hold their place and only the rows move. `h-full`
-		// measures against `main`, which the shell already bounds to the viewport.
-		<div className="page-wrap flex h-full min-h-0 flex-col gap-(--page-gap) py-4">
+		// Fills `main` exactly, so the header, toolbar and the card's pager hold
+		// their place and only the rows move. `h-full` measures against `main`,
+		// which the shell already bounds to the viewport. The table card has a
+		// 320px floor, though, and `min-h-fit` lets the page grow past `main` to
+		// keep it: on a short screen or zoomed right in, the page scrolls rather
+		// than squeezing the rows down to nothing.
+		<div className="page-wrap flex h-full min-h-fit flex-col gap-(--page-gap) py-4">
 			<div className="@container shrink-0 space-y-(--page-gap)">
 				<PageHeaderCard
 					icon={SlidersHorizontal}
@@ -514,38 +525,13 @@ export function SpeciesControlPage({
 							setSelected(new Set());
 							onSearchChange({ ...search, page });
 						}}
-						// The tip explains the four status buttons, so it arrives with them:
-						// with nothing selected there is nothing for it to explain.
 						actions={
 							selected.size > 0 ? (
-								<>
-									<InfoTip label="Species statuses">
-										{/* One status a line, its name first, as the quiz's tip
-										    lists its pools. */}
-										<ul className="space-y-1">
-											<li>
-												<strong>Automatic:</strong> uses BirdNET's usual species
-												rules.
-											</li>
-											<li>
-												<strong>Custom:</strong> adds the species to your custom
-												list.
-											</li>
-											<li>
-												<strong>Always detect:</strong> skips its
-												species-frequency check.
-											</li>
-											<li>
-												<strong>Never detect:</strong> excludes it outright.
-											</li>
-										</ul>
-									</InfoTip>
-									<SpeciesSelectionBar
-										count={selected.size}
-										onClear={() => setSelected(new Set())}
-										onStatus={proposeBulkStatus}
-									/>
-								</>
+								<SpeciesSelectionBar
+									count={selected.size}
+									onClear={() => setSelected(new Set())}
+									onStatus={proposeBulkStatus}
+								/>
 							) : null
 						}
 					/>

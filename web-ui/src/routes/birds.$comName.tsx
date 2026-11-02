@@ -252,7 +252,7 @@ function SpeciesDetailShell({ year }: { year: number }) {
 					<ShellText className="text-sm" barClassName="w-80 max-w-full" />
 					<div className="relative z-10 flex flex-wrap items-center gap-2">
 						<ShellSized className="rounded-md">
-							<Button variant="outline" icon={ExternalLink}>
+							<Button variant="outline" className="h-9" icon={ExternalLink}>
 								eBird
 							</Button>
 						</ShellSized>

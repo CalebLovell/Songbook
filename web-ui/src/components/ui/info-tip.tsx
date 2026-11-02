@@ -22,7 +22,11 @@ export function InfoTip({
 	children: ReactNode;
 }) {
 	return (
-		<Hint content={children} className="max-w-80 space-y-2 leading-relaxed">
+		<Hint
+			content={children}
+			// Never wider than the screen leaves it, so a phone shows all of it.
+			className="max-w-[min(20rem,var(--radix-tooltip-content-available-width))] space-y-2 leading-relaxed"
+		>
 			<button
 				type="button"
 				aria-label={`About ${label}`}

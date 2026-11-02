@@ -190,6 +190,52 @@ code {
   font-variant-numeric: tabular-nums;
 }
 
+/* A table's select-row checkbox, drawn rather than native: phones size and
+   draw a native box by their own rules, so the header's select-all and the
+   rows' boxes came out different sizes. 16px, 18px under a finger. */
+:root {
+  --row-checkbox-size: 1rem;
+}
+@media (pointer: coarse) {
+  :root {
+    --row-checkbox-size: 1.125rem;
+  }
+}
+
+.row-checkbox {
+  appearance: none;
+  display: block;
+  flex: none;
+  width: var(--row-checkbox-size);
+  height: var(--row-checkbox-size);
+  margin: 0;
+  border: 1.5px solid color-mix(in oklab, var(--ink) 35%, transparent);
+  border-radius: 3px;
+  background: var(--card) center / 75% no-repeat;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.row-checkbox:checked {
+  border-color: var(--moss);
+  background-color: var(--moss);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.25 5 8.75l4.5-5.5'/%3E%3C/svg%3E");
+}
+
+.row-checkbox:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* The space either side of a table cell: half the page gap, so neighbours sit
+   a full gap apart, but never under 6px a side -- on the smallest phones the
+   halved page gap left columns 8px apart and the row ran together. */
+:root {
+  --cell-gap: max(0.375rem, calc(var(--page-gap) / 2));
+}
+
 /* A count of birds or detections set in running UI -- a species row's total,
    a card's "117 detections · 30 species" readout. Bold 13px ink, tabular, so
    every count reads alike wherever it sits. Not for headline stat figures

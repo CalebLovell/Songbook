@@ -99,21 +99,26 @@ type DetectionsFiltersProps = Pick<
 // is the page gap -- 16px, or 8px on the smallest phones -- so every offset
 // here reads the variable rather than a number.
 //
-// The space between columns follows it too: each cell keeps half the gap
-// either side, so neighbours sit a full gap apart -- 16px, or 8px on the
-// smallest phones. The select column is the padding, the 14px box and half a
-// gap, so the box sits that same full gap from the species name.
+// The space between columns follows it too: each cell keeps `--cell-gap`
+// either side -- half the page gap, never under 6px -- so neighbours sit 16px
+// apart, or 12px on the smallest phones. The select column is the padding, the
+// checkbox and one cell gap, so the box sits that same full gap from the
+// row number.
 const FIRST_COLUMN_CLASSES = "pl-(--page-gap)";
-const CELL_GAP = "px-[calc(var(--page-gap)/2)]";
+const CELL_GAP = "px-(--cell-gap)";
 // The rows run out to the card's right edge as well, so the last column takes
 // the card's padding as its own inset -- the mirror of the first column.
-const AUDIO_EDGE = "pr-(--page-gap)";
+// Less whatever a classic scrollbar's gutter already leaves at that edge, as
+// `.page-wrap` does, so the right inset doesn't come out a scrollbar wider
+// than the left.
+const AUDIO_EDGE =
+	"pr-[max(calc(var(--spacing)*1),calc(var(--page-gap)-var(--scrollbar-w,0px)))]";
 // Which columns sit out at which width. Hidden, a cell leaves the grid's flow
 // entirely, and the grid's own column list (on the <Table>) drops its track.
 // Without the Recording column, the last column showing takes the card's
 // padding instead: Recorded on the narrow row, Confidence from 36rem.
 const LAST_EDGE_WITHOUT_AUDIO: Record<string, string> = {
-	recorded: `${AUDIO_EDGE} @min-[36rem]:pr-[calc(var(--page-gap)/2)]`,
+	recorded: `${AUDIO_EDGE} @min-[36rem]:pr-(--cell-gap)`,
 	confidence: AUDIO_EDGE,
 };
 const COLUMN_VISIBILITY: Record<string, string> = {
@@ -121,7 +126,7 @@ const COLUMN_VISIBILITY: Record<string, string> = {
 	confidence: "hidden @min-[36rem]:block",
 };
 const HEADER_CLASSES: Record<string, string> = {
-	select: `${SELECT_COLUMN_WIDTH} w-[calc(var(--page-gap)*1.5+0.875rem)] min-w-[calc(var(--page-gap)*1.5+0.875rem)]`,
+	select: `${SELECT_COLUMN_WIDTH} w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))] min-w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))]`,
 	index: "text-center",
 	confidence: "text-right",
 	audio: `${AUDIO_EDGE} text-right @min-[36rem]:w-32 @min-[36rem]:min-w-32`,
@@ -317,7 +322,7 @@ function SelectionBar({
 	return (
 		<fieldset
 			aria-label="Selected detections"
-			className="flex h-7 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
+			className="flex h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
 			{/* Narrow, the words go and the count and the trash glyph carry it,
 			    so the bar fits one row beside the pager; screen readers still get
@@ -333,7 +338,7 @@ function SelectionBar({
 				aria-label="Clear selection"
 				title="Clear selection"
 				onClick={onClear}
-				className="flex w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+				className="flex w-9 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -341,7 +346,7 @@ function SelectionBar({
 				type="button"
 				aria-label={`Delete ${count} selected ${noun}`}
 				onClick={onDelete}
-				className="flex @min-[36rem]:w-auto w-7 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive transition-colors hover:bg-destructive/10"
+				className="flex @min-[36rem]:w-auto w-9 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive transition-colors hover:bg-destructive/10"
 			>
 				<Trash2 className="size-4" aria-hidden="true" />
 				<span className="sr-only @min-[36rem]:not-sr-only">Delete</span>
@@ -431,7 +436,7 @@ function SkeletonCell({
 }) {
 	switch (columnId) {
 		case "select":
-			return <ShellBar className="size-3.5 rounded-sm" />;
+			return <ShellBar className="size-(--row-checkbox-size) rounded-sm" />;
 		case "index":
 			return (
 				<ShellSized className="rounded-full">
@@ -532,7 +537,7 @@ export function DetectionsTable({
 			<input
 				aria-label="Select all detections on this page"
 				checked={table.getIsAllPageRowsSelected()}
-				className="block size-3.5 accent-[var(--moss)]"
+				className="row-checkbox"
 				type="checkbox"
 				onChange={table.getToggleAllPageRowsSelectedHandler()}
 			/>
@@ -541,7 +546,7 @@ export function DetectionsTable({
 			<input
 				aria-label={`Select ${row.original.Com_Name}`}
 				checked={row.getIsSelected()}
-				className="block size-3.5 accent-[var(--moss)]"
+				className="row-checkbox"
 				type="checkbox"
 				onChange={row.getToggleSelectedHandler()}
 			/>
@@ -773,10 +778,13 @@ export function DetectionsTable({
 				    `leading-none` sets the label's line to its 14px type, so the 16px
 				    above it reaches the letters rather than a 20px line's leading, and
 				    `[&_tr]:h-auto` drops the shared row's 41px floor so the band is its
-				    padding plus the label and nothing more. */}
+				    padding plus the label and nothing more. It keeps the body's
+				    scrollbar gutter so its headings sit over their columns -- except
+				    narrow, where one sort menu spans them and the gutter would only
+				    leave an empty strip at its right. */}
 				<TableHeader
 					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] [scrollbar-gutter:stable] [&_th]:h-auto @min-[36rem]:[&_th]:pt-4 [&_th]:pt-[calc(var(--page-gap)/2+1px)] @min-[36rem]:[&_th]:pb-[15px] [&_th]:pb-[calc(var(--page-gap)/2)] [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-auto [&_tr]:border-none"
+					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto @min-[36rem]:[&_th]:pt-4 [&_th]:pt-[calc(var(--page-gap)/2+1px)] @min-[36rem]:[&_th]:pb-[15px] [&_th]:pb-[calc(var(--page-gap)/2)] [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-auto [&_tr]:border-none"
 				>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} role="row" className={GRID_ROW}>
@@ -815,7 +823,9 @@ export function DetectionsTable({
 									canDelete
 										? "col-[2/-1]"
 										: `col-[1/-1] ${FIRST_COLUMN_CLASSES}`,
-									AUDIO_EDGE,
+									// The header drops the scrollbar gutter at this width, so
+									// the menu takes the card's full padding at the right.
+									"pr-(--page-gap)",
 								)}
 							>
 								<SortMenu
@@ -842,7 +852,7 @@ export function DetectionsTable({
 					role="rowgroup"
 					aria-busy={skeleton || undefined}
 					data-scroll-reset=""
-					className="col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+					className="col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
 				>
 					{table.getRowModel().rows.map((row) => (
 						<TableRow
@@ -853,9 +863,14 @@ export function DetectionsTable({
 							// same idiom as the Now page's recent log and the species visit
 							// log. Selection is a conditional class rather than stacking
 							// `data-[state=selected]:` over the fill, so intent wins over
-							// Tailwind's own ordering.
+							// Tailwind's own ordering. The shared row's height is a floor
+							// here, not a fixed height, and the body's `auto-rows-max`
+							// lets each track grow to it: otherwise the scrolling body
+							// held every row at 41px and the narrow two-line time
+							// spilled over the rules.
 							className={cn(
 								GRID_ROW,
+								"h-auto min-h-[calc(2.5rem+1px)]",
 								row.getIsSelected() ? "bg-[var(--row-selected)]" : "bg-card",
 							)}
 						>
@@ -863,8 +878,12 @@ export function DetectionsTable({
 								<TableCell
 									key={cell.id}
 									role="cell"
+									// Narrow, the stacked time and day make the row two lines
+									// deep; a little more air above and below keeps them off
+									// the rules.
 									className={cn(
 										CELL_GAP,
+										"@max-[36rem]:py-2.5",
 										CELL_CLASSES[cell.column.id],
 										!canListen && LAST_EDGE_WITHOUT_AUDIO[cell.column.id],
 										COLUMN_VISIBILITY[cell.column.id],
@@ -884,10 +903,9 @@ export function DetectionsTable({
 			    rather than among the filters -- it is an action on the rows just
 			    picked, and with nothing picked there is nothing to show at all, so
 			    no dead button. `ml-auto` holds the pager right on its own.
-			    The footer is the header's twin: a 46px band -- the 1px rule, 8px,
-			    the 28px controls, 9px -- against the header's 16px either side of
-			    its 14px labels, so the table is bookended by two bands of one height
-			    rather than a footer that outweighs the header. It owns the space
+			    The footer is the narrow header's twin: half a page gap either side
+			    of the same 36px controls as the sort menu, so the table is
+			    bookended by two bands of one height. It owns the space
 			    down to the card's edge; the card drops its bottom padding for it.
 			    A hairline sets it off from the rows: the header gets away without
 			    one because the first row is always a zebra row, but the last row

@@ -40,7 +40,7 @@ export const Route = createFileRoute("/detections")({
 
 // Shared by the loaded table's card and its skeleton's.
 const TABLE_CARD_CLASS =
-	"feature-card flex min-h-0 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
+	"feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
 
 function Detections() {
 	const { page: pagePromise } = Route.useLoaderData();
@@ -103,11 +103,13 @@ function Detections() {
 	}
 
 	return (
-		// The page fills `main` exactly and never scrolls itself, so the header,
-		// filters and the card's pager all hold their place and only the rows
-		// move. `h-full` measures against `main`, which the shell has already
-		// bounded to the viewport.
-		<div className="page-wrap flex h-full min-h-0 flex-col gap-(--page-gap) py-4">
+		// The page fills `main` exactly, so the header, filters and the card's
+		// pager all hold their place and only the rows move. `h-full` measures
+		// against `main`, which the shell has already bounded to the viewport.
+		// The table card has a 320px floor, though, and `min-h-fit` lets the page
+		// grow past `main` to keep it: on a short screen or zoomed right in, the
+		// page scrolls rather than squeezing the rows down to nothing.
+		<div className="page-wrap flex h-full min-h-fit flex-col gap-(--page-gap) py-4">
 			<div className="shrink-0 space-y-(--page-gap)">
 				<PageHeaderCard
 					icon={AudioWaveform}

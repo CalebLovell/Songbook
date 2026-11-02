@@ -23,12 +23,15 @@ function TooltipTrigger(
 function TooltipContent({
 	className,
 	sideOffset = 6,
+	// Kept a little off the screen's edges, so a tip near one isn't cut off.
+	collisionPadding = 8,
 	...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
 	return (
 		<TooltipPrimitive.Portal>
 			<TooltipPrimitive.Content
 				sideOffset={sideOffset}
+				collisionPadding={collisionPadding}
 				className={cn(
 					"z-50 rounded-md border border-[var(--line)] bg-[var(--paper-raised)] px-2 py-1 text-[var(--ink)] text-xs shadow-md",
 					className,

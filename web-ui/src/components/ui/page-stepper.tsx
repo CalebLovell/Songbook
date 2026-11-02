@@ -24,8 +24,10 @@ export function parsePageInput(
  * field) goes there, clamped to the pages that exist; Escape puts back the
  * current one. A list of every page would be 2,788 options on a busy station.
  *
- * 28px tall -- the compact size of the joined controls, for a table's footer,
- * where it sits in a band the same height as the table's header.
+ * 36px tall, the height of the search box, date range and sort menu, so a
+ * table's footer carries controls the same size as the ones above it. The
+ * page field's type goes up to 16px under a finger, as every field's does, so
+ * a phone doesn't zoom in on it.
  */
 export function PageStepper({
 	page,
@@ -68,7 +70,7 @@ export function PageStepper({
 		<nav
 			aria-label={label}
 			className={cn(
-				"flex h-7 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm focus-within:border-[var(--focus-ring)]",
+				"flex h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm focus-within:border-[var(--focus-ring)]",
 				className,
 			)}
 		>
@@ -78,9 +80,9 @@ export function PageStepper({
 				onClick={() => onPageChange(page - 1)}
 			/>
 			<label
-				className="flex cursor-text items-center justify-center gap-[0.5ch] px-2 text-muted-foreground"
+				className="flex cursor-text items-center justify-center gap-[0.5ch] px-3 text-muted-foreground"
 				style={{
-					minWidth: `calc(${2 * numberWidth(pageTotal) + 2.4}ch + 1rem)`,
+					minWidth: `calc(${2 * numberWidth(pageTotal) + 2.4}ch + 1.5rem)`,
 				}}
 			>
 				<input
@@ -137,7 +139,7 @@ function StepButton({
 			title={label}
 			disabled={disabled}
 			onClick={onClick}
-			className={`flex w-7 shrink-0 items-center justify-center border-input transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
+			className={`flex w-9 shrink-0 items-center justify-center border-input transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
 		>
 			<Icon className="size-4" aria-hidden="true" />
 		</button>

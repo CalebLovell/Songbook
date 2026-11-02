@@ -282,12 +282,12 @@ function SpeciesCardSkeleton({ index }: { index: number }) {
 				</div>
 				<div className="flex w-full flex-wrap items-center gap-2">
 					<ShellSized className="rounded-md">
-						<Button size="sm" icon={Volume2}>
-							Bird Call
+						<Button className="h-9" icon={Volume2}>
+							Listen
 						</Button>
 					</ShellSized>
 					<ShellSized className="rounded-md">
-						<Button variant="outline" size="sm" icon={ExternalLink}>
+						<Button variant="outline" className="h-9" icon={ExternalLink}>
 							eBird
 						</Button>
 					</ShellSized>
@@ -660,7 +660,6 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 					audioUrl={card.audioUrl}
 					speciesLink={card.speciesLink}
 					comName={card.comName}
-					size="sm"
 				/>
 				<div className={`w-full self-end text-right ${CARD_NOTE_CLASS}`}>
 					Last heard · {lastHeard}
