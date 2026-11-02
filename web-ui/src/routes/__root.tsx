@@ -4,6 +4,7 @@ import {
 	ScriptOnce,
 	Scripts,
 } from "@tanstack/react-router";
+import { PullToRefresh } from "~/components/pull-to-refresh.tsx";
 import { RouteError, RouteNotFound } from "~/components/root-status.tsx";
 import { MobileNav } from "~/components/sidebar/mobile-nav.tsx";
 import { SiteSidebar } from "~/components/sidebar/site-sidebar.tsx";
@@ -109,12 +110,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						    empty card, say) doesn't change the content's width and
 						    walk everything sideways. Right edge only: mirroring it on
 						    the left opens a gap between the sidebar and the page. */}
-						<main
-							id="app-scroll"
-							className="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]"
-						>
-							{children}
-						</main>
+						<PullToRefresh>
+							<main
+								id="app-scroll"
+								className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain [scrollbar-gutter:stable]"
+							>
+								{children}
+							</main>
+						</PullToRefresh>
 					</div>
 				</div>
 				<Toaster />
