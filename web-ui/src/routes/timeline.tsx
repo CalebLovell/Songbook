@@ -416,12 +416,12 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 	const detections = rows?.reduce((sum, row) => sum + row.totalDetections, 0);
 
 	return (
-		// Under 400px there's no room beside the kicker and the view switcher, so
+		// Under 480px there's no room beside the kicker and the view switcher, so
 		// the figures take their own line beneath both (the cards' header wraps
 		// there), dropping the divider that only made sense beside the kicker.
-		<div className="flex min-w-0 items-center gap-2.5 max-[400px]:order-last max-[400px]:basis-full">
+		<div className="flex min-w-0 items-center gap-2.5 max-[480px]:order-last max-[480px]:basis-full">
 			<span
-				className="h-4 w-px shrink-0 bg-[var(--line)] max-[400px]:hidden"
+				className="h-4 w-px shrink-0 bg-[var(--line)] max-[480px]:hidden"
 				aria-hidden="true"
 			/>
 			{/* Lifted 1.5px so its ink centres on the kicker's. The boxes already

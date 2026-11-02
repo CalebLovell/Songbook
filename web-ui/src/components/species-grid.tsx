@@ -78,12 +78,12 @@ export function SpeciesGrid({
 				className={`feature-card rounded-md p-4 ${className}`}
 			>
 				<div
-					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[400px]:flex-wrap max-[400px]:gap-y-2 ${species.length === 0 && !action ? "" : "mb-(--page-gap)"}`}
+					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${species.length === 0 && !action ? "" : "mb-(--page-gap)"}`}
 				>
 					{/* "Activity" -- identical to the heat-map view's kicker -- so the
 					    summary beside it stays put when the view toggle swaps the cards.
 					    Not "Species": the summary already says "N species" beside it. */}
-					{/* Under 400px this wrapper steps aside (`contents`) so the kicker,
+					{/* Under 480px this wrapper steps aside (`contents`) so the kicker,
 					    the summary and the switcher wrap as one row: the kicker and the
 					    switcher on the first line, the summary on its own below them.
 					    See WindowSummary on the timeline page. */}
@@ -91,7 +91,7 @@ export function SpeciesGrid({
 					    the kicker sits where every other card's title does -- the taller
 					    switcher beside it can't push it down. The summary centres on it and
 					    overhangs by a hair; a quiet window with none doesn't move it. */}
-					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[400px]:contents">
+					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 						<div className="island-kicker shrink-0">Activity</div>
 						{summary}
 					</div>
@@ -193,9 +193,9 @@ export function SpeciesGridSkeleton({
 			className={`feature-card rounded-md p-4 ${className}`}
 		>
 			<div
-				className={`${CARD_HEADER_CLASS} mb-(--page-gap) gap-3 py-2 max-[400px]:flex-wrap max-[400px]:gap-y-2`}
+				className={`${CARD_HEADER_CLASS} mb-(--page-gap) gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
 			>
-				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[400px]:contents">
+				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 					<div className="island-kicker shrink-0">Activity</div>
 					{summary}
 				</div>

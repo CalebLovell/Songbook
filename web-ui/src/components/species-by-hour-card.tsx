@@ -122,14 +122,14 @@ export function SpeciesByHourCard({
 				className={`feature-card @container/card rounded-md p-4 ${isEmpty ? "" : "pb-1!"} ${className}`}
 			>
 				<div
-					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[400px]:flex-wrap max-[400px]:gap-y-2 ${isEmpty ? (action ? "mb-(--page-gap)" : "") : ""}`}
+					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${isEmpty ? (action ? "mb-(--page-gap)" : "") : ""}`}
 				>
 					{/* "Activity" -- identical to the grid view's kicker -- so the summary
 					    beside it sits at the same x in both bodies and doesn't jump when
 					    the view toggle swaps one card for the other. Not "Species": the
 					    summary already says "N species" right beside it. The masthead
 					    subtitle carries the by-hour vs. how-often distinction. */}
-					{/* Under 400px this wrapper steps aside (`contents`) so the kicker,
+					{/* Under 480px this wrapper steps aside (`contents`) so the kicker,
 					    the summary and the switcher wrap as one row: the kicker and the
 					    switcher on the first line, the summary on its own below them.
 					    See WindowSummary on the timeline page. */}
@@ -137,7 +137,7 @@ export function SpeciesByHourCard({
 					    the kicker sits where every other card's title does -- the taller
 					    switcher beside it can't push it down. The summary centres on it and
 					    overhangs by a hair; a quiet window with none doesn't move it. */}
-					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[400px]:contents">
+					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 						<div className="island-kicker shrink-0">Activity</div>
 						{summary}
 					</div>
@@ -361,9 +361,9 @@ export function SpeciesByHourCardSkeleton({
 			className={`feature-card @container/card rounded-md p-4 pb-1! ${className}`}
 		>
 			<div
-				className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[400px]:flex-wrap max-[400px]:gap-y-2`}
+				className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
 			>
-				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[400px]:contents">
+				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 					<div className="island-kicker shrink-0">Activity</div>
 					{summary}
 				</div>
