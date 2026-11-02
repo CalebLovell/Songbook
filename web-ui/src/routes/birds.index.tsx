@@ -99,6 +99,9 @@ const CARD_CLASS =
 	"feature-card relative flex flex-col gap-3 overflow-hidden rounded-md p-4 max-[400px]:gap-2";
 const FOOTER_CLASS =
 	"mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 text-sm";
+// The count's own small card: the stepper's box, so the footer's two ends match.
+const FOOTER_COUNT_CLASS =
+	"flex h-8 pointer-coarse:h-9 min-w-0 items-center rounded-md border border-input bg-card px-3 text-muted-foreground";
 
 function Species() {
 	const { cards } = Route.useLoaderData();
@@ -234,7 +237,9 @@ function SpeciesGridShell() {
 				))}
 			</div>
 			<div aria-hidden="true" className={FOOTER_CLASS}>
-				<ShellText className="w-40 text-sm" barClassName="w-full" />
+				<div className={FOOTER_COUNT_CLASS}>
+					<ShellText className="w-40 text-sm" barClassName="w-full" />
+				</div>
 				<span className="ml-auto">
 					<ShellSized className="rounded-md">
 						<PageStepper
@@ -424,7 +429,7 @@ function SpeciesFooter({
 }) {
 	return (
 		<div className={FOOTER_CLASS}>
-			<div className="min-w-0 text-muted-foreground">
+			<div className={FOOTER_COUNT_CLASS}>
 				<span>
 					<span className="tabular-data font-semibold text-foreground">
 						{first.toLocaleString()}&ndash;{last.toLocaleString()}
