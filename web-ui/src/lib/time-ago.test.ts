@@ -10,17 +10,17 @@ const DAY = 24 * HOUR;
 const MONTH = 30 * DAY;
 const YEAR = 365 * DAY;
 
-test("labels very recent moments as just now", () => {
+test("labels anything under a minute as just now", () => {
 	assert.equal(formatTimeAgo(0), "just now");
 	assert.equal(formatTimeAgo(9 * SECOND), "just now");
+	assert.equal(formatTimeAgo(MINUTE - SECOND), "just now");
 });
 
 test("reads a clock running ahead of the viewer as just now", () => {
 	assert.equal(formatTimeAgo(-30 * SECOND), "just now");
 });
 
-test("labels seconds, minutes, hours and days", () => {
-	assert.equal(formatTimeAgo(10 * SECOND), "10 seconds ago");
+test("labels minutes, hours and days", () => {
 	assert.equal(formatTimeAgo(2 * MINUTE), "2 minutes ago");
 	assert.equal(formatTimeAgo(3 * HOUR), "3 hours ago");
 	assert.equal(formatTimeAgo(2 * DAY), "2 days ago");
@@ -44,7 +44,6 @@ test("uses singular units for a count of one", () => {
 });
 
 test("switches unit exactly at each boundary", () => {
-	assert.equal(formatTimeAgo(MINUTE - SECOND), "59 seconds ago");
 	assert.equal(formatTimeAgo(HOUR - SECOND), "59 minutes ago");
 	assert.equal(formatTimeAgo(DAY - SECOND), "23 hours ago");
 	assert.equal(formatTimeAgo(MONTH - SECOND), "29 days ago");

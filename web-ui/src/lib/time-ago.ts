@@ -15,14 +15,13 @@ function plural(value: number, unit: string): string {
 }
 
 /**
- * A human elapsed-time label. Anything under ten seconds -- including a
+ * A human elapsed-time label. Anything under a minute reads as "just now", so
+ * a fresh detection doesn't tick upward second by second. That includes a
  * negative elapsed time, which happens when the station's clock runs slightly
- * ahead of the viewer's -- reads as "just now" rather than exposing the skew.
+ * ahead of the viewer's, rather than exposing the skew.
  */
 export function formatTimeAgo(elapsedMs: number): string {
-	if (elapsedMs < 10 * SECOND) return "just now";
-	if (elapsedMs < MINUTE)
-		return plural(Math.floor(elapsedMs / SECOND), "second");
+	if (elapsedMs < MINUTE) return "just now";
 	if (elapsedMs < HOUR) return plural(Math.floor(elapsedMs / MINUTE), "minute");
 	if (elapsedMs < DAY) return plural(Math.floor(elapsedMs / HOUR), "hour");
 	if (elapsedMs < MONTH) return plural(Math.floor(elapsedMs / DAY), "day");
