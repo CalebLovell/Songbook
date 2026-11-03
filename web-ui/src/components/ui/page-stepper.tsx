@@ -116,8 +116,10 @@ export function PageStepper({
  * holds, as bare text at the stepper's height rather than in a box of its own,
  * so it fits beside the pager on the narrowest phone. A table's footer gives
  * just the rows ("1–50") -- the stepper beside it already says how far the
- * pages run; a footer that needs it adds the total and a noun ("1–24 of 78
- * species").
+ * pages run -- and under 360px, where the pair at its widest ("83,401–83,452"
+ * beside "835 of 835") no longer fits a row, it steps aside and leaves the
+ * stepper alone at the right. A footer that needs it adds the total and a noun
+ * ("1–24 of 78 species"), and then it always shows.
  */
 export function PageRange({
 	first,
@@ -135,7 +137,13 @@ export function PageRange({
 	className?: string;
 }) {
 	return (
-		<div className={cn(PAGE_RANGE_CLASS, className)}>
+		<div
+			className={cn(
+				PAGE_RANGE_CLASS,
+				!total && PAGE_RANGE_NARROW_HIDDEN,
+				className,
+			)}
+		>
 			<span>
 				<span className="tabular-data font-semibold text-foreground">
 					{first.toLocaleString()}&ndash;{last.toLocaleString()}
@@ -161,12 +169,13 @@ export function PageRange({
  * around a selection's actions the two stay on one row under them. Sized from
  * its content (`flex-auto`, not `flex-1`'s zero basis) so it drops below the
  * actions whole rather than squeezing in beside them; it grows into the row's
- * spare width with the stepper pushed right. Under 360px, where the pair at
- * its widest ("83,401–83,452" beside "835 of 835") no longer fits a row, the
- * two stack centred instead of the stepper wrapping off to the right alone.
+ * spare width with the stepper pushed right.
  */
 export const PAGE_ROW_CLASS =
-	"flex min-w-0 flex-auto flex-wrap items-center gap-(--page-gap) max-[359px]:flex-col max-[359px]:*:mx-auto";
+	"flex min-w-0 flex-auto flex-wrap items-center gap-(--page-gap)";
+
+/** A table footer's range stepping aside under 360px; its loading shell too. */
+export const PAGE_RANGE_NARROW_HIDDEN = "max-[359px]:hidden";
 
 /** PageRange's line, for a loading shell to hold the same shape. */
 export const PAGE_RANGE_CLASS =

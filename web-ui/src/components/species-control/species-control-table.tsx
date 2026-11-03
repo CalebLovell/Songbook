@@ -5,6 +5,7 @@ import { Badge } from "~/components/ui/badge.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import {
 	PAGE_RANGE_CLASS,
+	PAGE_RANGE_NARROW_HIDDEN,
 	PAGE_ROW_CLASS,
 	PageRange,
 	PageStepper,
@@ -421,7 +422,10 @@ export function SpeciesControlTable({
 				{actions}
 				<div className={PAGE_ROW_CLASS}>
 					{rows === null ? (
-						<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
+						<div
+							aria-hidden="true"
+							className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}
+						>
 							<ShellText className="w-40" barClassName="w-full" />
 						</div>
 					) : (

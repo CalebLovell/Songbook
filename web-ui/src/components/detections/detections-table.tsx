@@ -15,6 +15,7 @@ import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
 import {
 	PAGE_RANGE_CLASS,
+	PAGE_RANGE_NARROW_HIDDEN,
 	PAGE_ROW_CLASS,
 	PageRange,
 	PageStepper,
@@ -945,7 +946,10 @@ export function DetectionsTable({
 					{page ? (
 						<PageRange first={firstIndex} last={lastIndex} />
 					) : (
-						<div aria-hidden="true" className={PAGE_RANGE_CLASS}>
+						<div
+							aria-hidden="true"
+							className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}
+						>
 							<ShellText className="w-44" barClassName="w-full" />
 						</div>
 					)}

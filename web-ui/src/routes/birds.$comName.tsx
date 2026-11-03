@@ -34,6 +34,7 @@ import { Button } from "~/components/ui/button.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
 import {
 	PAGE_RANGE_CLASS,
+	PAGE_RANGE_NARROW_HIDDEN,
 	PAGE_ROW_CLASS,
 	PageRange,
 	PageStepper,
@@ -405,7 +406,7 @@ function VisitLogSkeleton() {
 				</ul>
 				<div aria-hidden="true" className={VISIT_LOG_FOOTER_CLASS}>
 					<div className={PAGE_ROW_CLASS}>
-						<div className={PAGE_RANGE_CLASS}>
+						<div className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}>
 							<ShellText className="w-36" barClassName="w-full" />
 						</div>
 						<span className="ml-auto">
@@ -1041,8 +1042,7 @@ function VisitLogCard({
 
 				{/* The header's twin: the same full-width hairline and the same 45px
 			    band, so the log is bookended evenly. Which visits these are on the
-			    left, the stepper held right (stacked centred on the smallest
-			    phones), and `mt-auto` pinning it to the card's
+			    left, the stepper held right, and `mt-auto` pinning it to the card's
 			    bottom on a short last page. */}
 				{visits.length > 0 ? (
 					<div className={VISIT_LOG_FOOTER_CLASS}>
