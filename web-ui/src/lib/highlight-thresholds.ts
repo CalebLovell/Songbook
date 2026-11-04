@@ -156,8 +156,8 @@ export function highlightGuide(
 	return [
 		{
 			kind: "activity",
-			name: "Up or down",
-			meaning: `Compared with ${period === "live" ? "the 24 hours before" : unit.last}.`,
+			name: "Trend",
+			meaning: `Activity compared with ${period === "live" ? "the previous 24 hours" : unit.last}.`,
 		},
 		busiest,
 		{ kind: "new", name: "New", meaning: "First record ever." },
@@ -169,12 +169,12 @@ export function highlightGuide(
 		{
 			kind: "vocal",
 			name: "Vocal",
-			meaning: `${thresholds.vocal.ratio}× its usual, vs. ${past(thresholds.vocal)}.`,
+			meaning: `Birds heard ${thresholds.vocal.ratio}× their usual amount.`,
 		},
 		{
 			kind: "returned",
 			name: "Returned",
-			meaning: `Silent ${past(thresholds.returned)}, back ${unit.this}; not rare.`,
+			meaning: `Silent ${past(thresholds.returned)}, back ${unit.this}.`,
 		},
 		{
 			kind: "consistent",
@@ -189,7 +189,7 @@ export function highlightGuide(
 		{
 			kind: "routine",
 			name: "Gone quiet",
-			meaning: `Heard ${past(thresholds.goneQuiet)}, not ${unit.this}.`,
+			meaning: "A regular that has stopped singing.",
 		},
 	];
 }

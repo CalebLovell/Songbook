@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import {
 	AudioLines,
 	Clock,
@@ -30,7 +29,6 @@ import type {
 	HighlightBird,
 	SpeciesHighlightKind,
 } from "~/lib/highlights-data.ts";
-import { comNameToSlug } from "~/lib/species-slug.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 
 /**
@@ -133,16 +131,23 @@ function PendingNotes() {
 }
 
 /** What each line on the card means for this period -- the basics, from the
-    same thresholds the rules use. */
+    same thresholds the rules use -- each led by the glyph it wears on the
+    card, so the two read as one key. */
 function HighlightsInfo({ guide }: { guide: HighlightGuideEntry[] }) {
 	return (
 		<InfoTip label="Highlights" size="default">
-			<ul className="space-y-1">
-				{guide.map((entry) => (
-					<li key={entry.name}>
-						<strong>{entry.name}:</strong> {entry.meaning}
-					</li>
-				))}
+			<ul className="space-y-2">
+				{guide.map((entry) => {
+					const { icon, badge } = guideGlyph(entry.kind);
+					return (
+						<li key={entry.name} className="flex items-center gap-2.5">
+							<GlyphChip icon={icon} style={badge} />
+							<span className="min-w-0">
+								<strong>{entry.name}:</strong> {entry.meaning}
+							</span>
+						</li>
+					);
+				})}
 			</ul>
 		</InfoTip>
 	);
@@ -194,6 +199,18 @@ const SPECIES_NOTES: Record<
 	returned: { icon: Undo2, lead: () => "returned" },
 	vocal: { icon: AudioLines, lead: () => "vocal" },
 };
+
+/** A kind's glyph and tint for the guide. The activity line's change with its
+    direction; the guide shows it going up, in the line's tint. */
+function guideGlyph(kind: Highlight["kind"]): {
+	icon: LucideIcon;
+	badge: CSSProperties;
+} {
+	if (kind === "activity") return { icon: TrendingUp, badge: UP_TINT };
+	if (kind === "busiest-hour")
+		return { icon: Clock, badge: LINE_TINTS["busiest-hour"] };
+	return { icon: SPECIES_NOTES[kind].icon, badge: LINE_TINTS[kind] };
+}
 
 function HighlightNote({
 	highlight,
@@ -344,26 +361,11 @@ function BirdNames({
 						: rest === 0 && i === birds.length - 1
 							? " and "
 							: ", "}
-					<BirdName bird={bird} />
+					{bird.comName}
 				</Fragment>
 			))}
 			{rest > 0 ? ` and ${rest} more` : null}
 		</>
-	);
-}
-
-/** A named bird, linked to its bird page the way Recent activity links its
- * birds: moss at medium weight, underlined only on hover, so a line of four
- * names reads as links without turning into a row of rules. */
-function BirdName({ bird }: { bird: HighlightBird }) {
-	return (
-		<Link
-			to="/birds/$comName"
-			params={{ comName: comNameToSlug(bird.comName) }}
-			className="font-medium no-underline hover:underline"
-		>
-			{bird.comName}
-		</Link>
 	);
 }
 
