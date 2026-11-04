@@ -169,7 +169,6 @@ function LiveBody({
 			<div className="mt-(--page-gap) grid grid-cols-1 items-start gap-(--page-gap) lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
 				<RecentLogCard
 					recent={snapshot.recent}
-					recentTotal={snapshot.recentTotal}
 					generatedAt={snapshot.generatedAt}
 					freshKeys={freshKeys}
 				/>

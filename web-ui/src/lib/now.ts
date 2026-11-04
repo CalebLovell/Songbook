@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, avg, count, desc, sql } from "drizzle-orm";
-import { z } from "zod";
 
 import { db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
@@ -89,26 +88,11 @@ export type NowSnapshot = {
 	    is showing: each bird sits in one place at a time, and moves down into
 	    the log when the next arrives. */
 	recent: RecentVisit[];
-	/** Every row the log can page through: the window's visits, less the
-	    hero's own. */
-	recentTotal: number;
 };
 
-/** One page of the log beneath the hero, aged against `generatedAt`. */
-export type RecentPage = {
-	page: number;
-	recent: RecentVisit[];
-	recentTotal: number;
-	generatedAt: string;
-};
-
-/** Rows per page of the log beneath the hero. */
-export const RECENT_PAGE_SIZE = 15;
-
-/** How many log pages `total` rows fill. */
-export function recentPageCount(total: number): number {
-	return Math.max(1, Math.ceil(total / RECENT_PAGE_SIZE));
-}
+/** Rows in the log beneath the hero. The page is a glance at what's been
+    around; the rest of the day is the Timeline's. */
+export const RECENT_LIMIT = 10;
 
 type LatestRow = {
 	comName: string;
@@ -235,16 +219,14 @@ async function getWindowVisits(heroKey: string | undefined) {
 	return { rows, visits, log };
 }
 
-/** One page of the log, newest first, aged against `generatedAtMs`. */
-function buildRecentPage(
+/** The log's rows, newest first, aged against `generatedAtMs`. */
+function buildRecentVisits(
 	log: Visit<WindowRow>[],
-	page: number,
 	generatedAtMs: number,
 	withAudio: boolean,
 ): Promise<RecentVisit[]> {
-	const start = (page - 1) * RECENT_PAGE_SIZE;
 	return Promise.all(
-		log.slice(start, start + RECENT_PAGE_SIZE).map(async (visit) => {
+		log.slice(0, RECENT_LIMIT).map(async (visit) => {
 			const first = visit.moments[0];
 			const last = visit.moments[visit.moments.length - 1];
 			const best = visit.moments.reduce((top, moment) =>
@@ -292,42 +274,7 @@ export const getNowSnapshot = createServerFn({ method: "GET" }).handler(
 			current,
 			hasAnyDetections: anyDetections,
 			summary: { detections: window.rows.length },
-			recent: await buildRecentPage(window.log, 1, generatedAtMs, withAudio),
-			recentTotal: window.log.length,
+			recent: await buildRecentVisits(window.log, generatedAtMs, withAudio),
 		};
 	},
 );
-
-function toPageNumber(page: number): number {
-	return Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1;
-}
-
-/**
- * A later page of the log. The snapshot already carries page one, so this only
- * runs when someone steps back through the window.
- */
-export const getRecentPage = createServerFn({ method: "GET" })
-	.validator(
-		z
-			.object({ page: z.number() })
-			.transform(({ page }) => ({ page: toPageNumber(page) })),
-	)
-	.handler(async ({ data: { page } }): Promise<RecentPage> => {
-		const generatedAtDate = new Date();
-		const latest = await getLatestRow();
-		const withAudio = await canHearEveryClip();
-		const { log } = await getWindowVisits(
-			latest ? detectionKey(latest) : undefined,
-		);
-		return {
-			page,
-			recent: await buildRecentPage(
-				log,
-				page,
-				generatedAtDate.getTime(),
-				withAudio,
-			),
-			recentTotal: log.length,
-			generatedAt: localTimestamp(generatedAtDate),
-		};
-	});

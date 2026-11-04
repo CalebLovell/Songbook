@@ -1,30 +1,19 @@
 import { Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
 
+import { CardHeader } from "~/components/card-header.tsx";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
-import { PageStepper } from "~/components/ui/page-stepper.tsx";
+import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
-import {
-	getRecentPage,
-	RECENT_PAGE_SIZE,
-	type RecentPage,
-	type RecentVisit,
-	recentPageCount,
-} from "~/lib/now.ts";
+import { RECENT_LIMIT, type RecentVisit } from "~/lib/now.ts";
 import { formatClockRange, formatTimeAgo } from "~/lib/time-ago.ts";
 import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
-
-/** A row's height: the 40px thumbnail and 7px above and below it. Paged, the
-    list holds a full page's height, so a short last page never pulls the
-    pager up from under the cursor. */
-const ROW_HEIGHT_PX = 54;
+import { VISIT_GAP_MINUTES } from "~/lib/visits.ts";
 
 // Shared with the skeleton below, which is built from the same pieces so the
 // card is the same shape loading and loaded.
@@ -38,20 +27,42 @@ const ROW_BUTTON = {
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
 const FOOTER_CLASS =
-	"-mx-(--page-gap) mt-auto -mb-(--page-gap) flex shrink-0 items-center border-t px-(--page-gap) py-2";
+	"-mx-(--page-gap) mt-auto -mb-(--page-gap) flex min-h-[45px] shrink-0 items-center justify-end border-t px-(--page-gap)";
+const FOOTER_LINK_CLASS =
+	"inline-flex items-center gap-1 text-muted-foreground text-xs no-underline hover:text-foreground hover:underline";
 
 /** The visit log's header band: a full-width hairline under a 45px strip,
-    the link held right. Needs no data, so the skeleton draws it as itself. */
+    the info tip held right. Needs no data, so the skeleton draws it as
+    itself. */
 function RecentLogHeader() {
 	return (
-		<div className="-mx-(--page-gap) -mt-(--page-gap) flex min-h-[45px] flex-wrap items-center justify-between gap-2 border-b px-(--page-gap)">
-			<div className="island-kicker">Recent activity</div>
+		<CardHeader title="Recent activity">
+			<InfoTip label="Recent activity" size="default">
+				<p>
+					The live activity from your station is updated here in real time, and
+					detections are listed from most recent to least recent. Visits are
+					combined when the same bird is heard repeatedly without a{" "}
+					{VISIT_GAP_MINUTES} minute gap.
+				</p>
+				<p>
+					Each row displays the species, number of detections, when they were
+					heard, and the confidence percentile assigned by the BirdNET
+					algorithm. The link in the bottom right redirects to the complete
+					timeline view for the day.
+				</p>
+			</InfoTip>
+		</CardHeader>
+	);
+}
+
+/** The visit log's footer: a hairline across the card's full width, the
+    card's one link held right. Needs no data either. */
+function RecentLogFooter() {
+	return (
+		<div className={FOOTER_CLASS}>
 			{/* The log is a rolling 24 hours; the calendar day, hour by hour, is
 			    the Timeline's Daily view, which opens on today. */}
-			<Link
-				to="/timeline"
-				className="inline-flex items-center gap-1 text-muted-foreground text-xs no-underline hover:text-foreground hover:underline"
-			>
+			<Link to="/timeline" className={FOOTER_LINK_CLASS}>
 				All of today
 				<ArrowRight aria-hidden className="size-3" />
 			</Link>
@@ -60,13 +71,11 @@ function RecentLogHeader() {
 }
 
 /**
- * The card before its first snapshot: the header as itself, then ten rows
- * built from the real row's pieces -- a thumbnail-sized square, a bar on each
- * of the name's two lines, the time column, and shells the exact size of the
- * pill and the play button -- over the pager.
+ * The card before its first snapshot: the header as itself, then a full
+ * log's rows built from the real row's pieces -- a thumbnail-sized square, a
+ * bar on each of the name's two lines, the time column, and shells the exact
+ * size of the pill and the play button -- over the footer as itself.
  */
-const SKELETON_ROWS = 10;
-
 export function RecentLogCardSkeleton() {
 	const canListen = useCanListen();
 	return (
@@ -77,7 +86,7 @@ export function RecentLogCardSkeleton() {
 		>
 			<RecentLogHeader />
 			<ul aria-hidden="true" className="-mx-(--page-gap) divide-y">
-				{Array.from({ length: SKELETON_ROWS }, (_, index) => (
+				{Array.from({ length: RECENT_LIMIT }, (_, index) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 					<li key={index} className={ROW_CLASS}>
 						<div className="flex size-10 shrink-0 items-center justify-center">
@@ -111,18 +120,7 @@ export function RecentLogCardSkeleton() {
 					</li>
 				))}
 			</ul>
-			<div className={FOOTER_CLASS}>
-				<span className="ml-auto">
-					<ShellSized className="rounded-md">
-						<PageStepper
-							label="Recent activity pages"
-							page={1}
-							pageCount={2}
-							onPageChange={() => {}}
-						/>
-					</ShellSized>
-				</span>
-			</div>
+			<RecentLogFooter />
 		</section>
 	);
 }
@@ -131,92 +129,44 @@ export function RecentLogCardSkeleton() {
 const NAME_WIDTHS = ["w-36", "w-28", "w-44", "w-32", "w-40"];
 
 /**
- * The window's visits, most recently heard first, set like the bird page's visit
- * log: a header band that links on to today's Timeline, hairline-divided rows bled to
- * the card's edges, and a layout that answers to the card's own width rather than the
- * screen's -- the card spans the page on a phone and takes the wider track
- * beside the rail at lg.
+ * The window's newest visits, most recently heard first, set like the bird
+ * page's visit log: a header band, hairline-divided rows bled to the card's
+ * edges, a footer that links on to today's Timeline, and a layout that answers to
+ * the card's own width rather than the screen's -- the card spans the page on
+ * a phone and takes the wider track beside the rail at lg.
  *
  * A row is a visit, not a detection: BirdNET-Pi writes one row per 3-second
  * window, so a singing robin would otherwise bury everything else under forty
  * copies of itself. The row says how many detections it folds up and the span
  * they cover, and plays the most confident one.
  *
- * Page one is the snapshot the page polls, so it stays live. A later page is
- * fetched when stepped to, and again on every poll, so it keeps pace as new
- * birds push the older ones down.
+ * It shows the newest RECENT_LIMIT visits and no more: the page is a glance
+ * at what's been around, so rather than paging through the window, the
+ * footer hands the rest of the day to the Timeline.
  */
 export function RecentLogCard({
 	recent,
-	recentTotal,
 	generatedAt,
 	freshKeys,
 }: {
-	/** Page one, from the polled snapshot. */
+	/** The newest visits, from the polled snapshot. */
 	recent: RecentVisit[];
-	/** Every row the log can page through. */
-	recentTotal: number;
-	/** When the snapshot was built; a new one re-fetches a later page. */
+	/** When the snapshot was built, which the ages are measured from. */
 	generatedAt: string;
 	freshKeys: Set<string>;
 }) {
 	const canListen = useCanListen();
-	const fetchPage = useServerFn(getRecentPage);
-	const [page, setPage] = useState(1);
-	const [fetched, setFetched] = useState<RecentPage | null>(null);
-	const firstPage = useMemo<RecentPage>(
-		() => ({ page: 1, recent, recentTotal, generatedAt }),
-		[recent, recentTotal, generatedAt],
-	);
-	const pageCount = recentPageCount(firstPage.recentTotal);
-
-	// The window slides, so the page someone is on can stop existing.
-	useEffect(() => {
-		if (page > pageCount) setPage(pageCount);
-	}, [page, pageCount]);
-
-	// `generatedAt` is the re-fetch trigger: each poll brings a later page up
-	// to date, not just stepping to it.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: re-fetch trigger
-	useEffect(() => {
-		if (page === 1) return;
-		let cancelled = false;
-		fetchPage({ data: { page } }).then((data) => {
-			if (!cancelled) setFetched(data);
-		});
-		return () => {
-			cancelled = true;
-		};
-	}, [page, generatedAt, fetchPage]);
-
-	// Until the next page lands the previous one stays up, dimmed, so paging
-	// never collapses the card to nothing.
-	const current =
-		page === 1 ? firstPage : fetched?.page === page ? fetched : null;
-	const [held, setHeld] = useState(firstPage);
-	useEffect(() => {
-		if (current) setHeld(current);
-	}, [current]);
-	const shown = current ?? held;
-	const loading = !current;
-	const offsetMs = useAgeOffset(shown.generatedAt);
-	const paged = pageCount > 1;
+	const offsetMs = useAgeOffset(generatedAt);
 
 	return (
 		<section aria-label="Recent detections" className={CARD_CLASS}>
 			<RecentLogHeader />
 
-			{shown.recent.length === 0 ? (
+			{recent.length === 0 ? (
 				<EmptyNote>{EMPTY.window.last24Hours}</EmptyNote>
 			) : (
-				<ul
-					aria-busy={loading}
-					style={
-						paged ? { minHeight: RECENT_PAGE_SIZE * ROW_HEIGHT_PX } : undefined
-					}
-					className={`-mx-(--page-gap) divide-y transition-opacity ${paged ? "" : "-mb-(--page-gap)"} ${loading ? "opacity-50" : ""}`}
-				>
-					{shown.recent.map((visit) => {
+				<ul className="-mx-(--page-gap) divide-y">
+					{recent.map((visit) => {
 						const clock = formatClockRange(visit.firstAt, visit.lastAt);
 						const age = formatTimeAgo(visit.ageMs + offsetMs);
 
@@ -231,7 +181,7 @@ export function RecentLogCard({
 								// The dividers run out to the card's edges and the row's own
 								// padding hands the page gap back, so the content lines up
 								// with the header's.
-								className={`${ROW_CLASS} ${shown.page === 1 && freshKeys.has(visit.key) ? "flash-in" : ""}`}
+								className={`${ROW_CLASS} ${freshKeys.has(visit.key) ? "flash-in" : ""}`}
 							>
 								<SpeciesThumbnail
 									imageUrl={visit.imageUrl}
@@ -291,19 +241,7 @@ export function RecentLogCard({
 				</ul>
 			)}
 
-			{/* The visit log's footer: a hairline across the card's full width,
-			    the stepper held right. */}
-			{paged ? (
-				<div className={FOOTER_CLASS}>
-					<PageStepper
-						className="ml-auto"
-						label="Recent activity pages"
-						page={Math.min(page, pageCount)}
-						pageCount={pageCount}
-						onPageChange={setPage}
-					/>
-				</div>
-			) : null}
+			<RecentLogFooter />
 		</section>
 	);
 }
