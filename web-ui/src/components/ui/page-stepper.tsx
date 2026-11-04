@@ -29,18 +29,25 @@ export function parsePageInput(
  * table's footer carries controls the same size as the ones above it. The
  * page field's type goes up to 16px under a finger, as every field's does, so
  * a phone doesn't zoom in on it.
+ *
+ * `ghost` is the same stepper for a card's footer, where the card already draws
+ * the lines: no box and no hairlines, just arrows that outline on hover like the
+ * info icon. `outline` is for a page's bare ground, where the box is all that
+ * holds the control together.
  */
 export function PageStepper({
 	page,
 	pageCount,
 	onPageChange,
 	label = "Pagination",
+	variant = "outline",
 	className,
 }: {
 	page: number;
 	pageCount: number;
 	onPageChange: (page: number) => void;
 	label?: string;
+	variant?: "outline" | "ghost";
 	className?: string;
 }) {
 	const [draft, setDraft] = useState(String(page));
@@ -71,12 +78,15 @@ export function PageStepper({
 		<nav
 			aria-label={label}
 			className={cn(
-				"flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm focus-within:border-[var(--focus-ring)]",
+				"flex h-8 pointer-coarse:h-9 w-fit shrink-0 pointer-coarse:text-base text-sm",
+				variant === "outline" &&
+					"overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)]",
 				className,
 			)}
 		>
 			<StepButton
 				direction="prev"
+				variant={variant}
 				disabled={page <= 1}
 				onClick={() => onPageChange(page - 1)}
 			/>
@@ -104,6 +114,7 @@ export function PageStepper({
 			</label>
 			<StepButton
 				direction="next"
+				variant={variant}
 				disabled={page >= pageCount}
 				onClick={() => onPageChange(page + 1)}
 			/>
@@ -120,11 +131,15 @@ export function PageStepper({
  * beside "835 of 835") no longer fits a row, it steps aside and leaves the
  * stepper alone at the right. A footer that needs it adds the total and a noun
  * ("1–24 of 78 species"), and then it always shows.
+ *
+ * `card` is for a footer on the page's bare ground, with no card around it: the
+ * range wears the pager's white box.
  */
 export function PageRange({
 	first,
 	last,
 	total,
+	card = false,
 	children,
 	className,
 }: {
@@ -132,6 +147,7 @@ export function PageRange({
 	last: number;
 	/** The total and its noun -- the singular used when the total is one. */
 	total?: { count: number; noun: [singular: string, plural: string] };
+	card?: boolean;
 	/** Anything said after the range, like what a search filtered it from. */
 	children?: React.ReactNode;
 	className?: string;
@@ -140,6 +156,7 @@ export function PageRange({
 		<div
 			className={cn(
 				PAGE_RANGE_CLASS,
+				card && PAGE_RANGE_CARD_CLASS,
 				!total && PAGE_RANGE_NARROW_HIDDEN,
 				className,
 			)}
@@ -181,6 +198,10 @@ export const PAGE_RANGE_NARROW_HIDDEN = "max-[359px]:hidden";
 export const PAGE_RANGE_CLASS =
 	"flex h-8 pointer-coarse:h-9 min-w-0 items-center whitespace-nowrap text-muted-foreground text-sm";
 
+/** PageRange's white box when `card` is set, for a loading shell to match. */
+export const PAGE_RANGE_CARD_CLASS =
+	"rounded-md border border-input bg-card px-3";
+
 /**
  * How wide a formatted number sets in `tabular-data`, in ch: a full ch per
  * digit and a little under half one per separator, plus a hair of slack so the
@@ -191,13 +212,16 @@ function numberWidth(formatted: string): number {
 	return digits + (formatted.length - digits) * 0.45 + 0.1;
 }
 
-/** One end of the stepper, divided from the page by a hairline. */
+/** One end of the stepper: split from the page by a hairline, or, as a ghost,
+    standing alone with the info icon's hover. */
 function StepButton({
 	direction,
+	variant,
 	disabled,
 	onClick,
 }: {
 	direction: "prev" | "next";
+	variant: "outline" | "ghost";
 	disabled: boolean;
 	onClick: () => void;
 }) {
@@ -210,7 +234,12 @@ function StepButton({
 			title={label}
 			disabled={disabled}
 			onClick={onClick}
-			className={`flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
+			className={cn(
+				"flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50",
+				variant === "outline"
+					? cn("border-input", direction === "prev" ? "border-r" : "border-l")
+					: "rounded-md border border-transparent text-muted-foreground hover:border-border",
+			)}
 		>
 			<Icon className="size-4" aria-hidden="true" />
 		</button>

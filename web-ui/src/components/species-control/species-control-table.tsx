@@ -435,6 +435,7 @@ export function SpeciesControlTable({
 						<span className="ml-auto">
 							<ShellSized className="rounded-md">
 								<PageStepper
+									variant="ghost"
 									label="Species pages"
 									page={page}
 									pageCount={pageCount}
@@ -445,6 +446,7 @@ export function SpeciesControlTable({
 					) : (
 						<PageStepper
 							className="ml-auto"
+							variant="ghost"
 							label="Species pages"
 							page={page}
 							pageCount={pageCount}

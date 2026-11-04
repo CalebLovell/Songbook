@@ -957,6 +957,7 @@ export function DetectionsTable({
 						<span className="ml-auto">
 							<ShellSized className="rounded-md">
 								<PageStepper
+									variant="ghost"
 									label="Detections pages"
 									page={search.page}
 									pageCount={pageCount}
@@ -967,6 +968,7 @@ export function DetectionsTable({
 					) : (
 						<PageStepper
 							className="ml-auto"
+							variant="ghost"
 							label="Detections pages"
 							page={search.page}
 							pageCount={pageCount}

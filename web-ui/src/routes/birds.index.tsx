@@ -29,6 +29,7 @@ import {
 import { SpeciesImage } from "~/components/species-image.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import {
+	PAGE_RANGE_CARD_CLASS,
 	PAGE_RANGE_CLASS,
 	PageRange,
 	PageStepper,
@@ -238,7 +239,7 @@ function SpeciesGridShell() {
 				))}
 			</div>
 			<div aria-hidden="true" className={FOOTER_CLASS}>
-				<div className={PAGE_RANGE_CLASS}>
+				<div className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_CARD_CLASS}`}>
 					<ShellText className="w-40 text-sm" barClassName="w-full" />
 				</div>
 				<span className="ml-auto">
@@ -431,6 +432,7 @@ function SpeciesFooter({
 	return (
 		<div className={FOOTER_CLASS}>
 			<PageRange
+				card
 				first={first}
 				last={last}
 				total={{ count: total, noun: ["species", "species"] }}

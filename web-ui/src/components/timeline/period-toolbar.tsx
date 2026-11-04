@@ -69,6 +69,7 @@ export function PeriodToolbar({
 	window,
 	lastActiveDay,
 	stationRange,
+	viewSwitch,
 	onChange,
 }: {
 	period: TimelinePeriod;
@@ -76,6 +77,8 @@ export function PeriodToolbar({
 	window: TimelineWindow | null;
 	lastActiveDay: string | null;
 	stationRange: { first: string; last: string } | null;
+	/** How the window is drawn, set just before the date it draws. */
+	viewSwitch?: React.ReactNode;
 	onChange: (next: { period?: TimelinePeriod; date?: string }) => void;
 }) {
 	const pickPeriod = (next: TimelinePeriod) => {
@@ -93,9 +96,10 @@ export function PeriodToolbar({
 	};
 
 	return (
-		// One row at every width: the period and the window it picks never stack.
-		// The date field is what gives way, shrinking before anything wraps.
-		<div className="flex items-center justify-between gap-(--page-gap)">
+		// One row, the date field shrinking first as it narrows. Under 480px the
+		// three no longer fit without cutting the date short, so it takes a full
+		// row of its own beneath the period and the view switch.
+		<div className="flex items-center justify-between gap-(--page-gap) max-[480px]:flex-wrap">
 			{/* Five joined segments need about 710px of row beside the picker, and a
 			    segmented control can't wrap without breaking its own shape -- so
 			    below 800px the same choice becomes a dropdown. */}
@@ -121,19 +125,20 @@ export function PeriodToolbar({
 				</ToggleGroup>
 			</div>
 
-			{/* Date picker on the right. "all" has no window to pick, so an empty slot
-			    holds the right edge and keeps the period switcher pinned left rather
-			    than letting it slide over. */}
-			{period !== "all" ? (
-				<WindowStepper
-					period={period}
-					anchor={anchor}
-					stationRange={stationRange}
-					onPick={(date) => onChange({ date })}
-				/>
-			) : (
-				<div />
-			)}
+			{/* The view switch and date picker on the right, the date holding the
+			    far edge. "all" has no window to pick, so the switch takes the edge
+			    itself and the period switcher stays pinned left. */}
+			<div className="flex min-w-0 flex-1 items-center justify-end gap-(--page-gap) max-[480px]:contents">
+				{viewSwitch}
+				{period !== "all" ? (
+					<WindowStepper
+						period={period}
+						anchor={anchor}
+						stationRange={stationRange}
+						onPick={(date) => onChange({ date })}
+					/>
+				) : null}
+			</div>
 		</div>
 	);
 }
@@ -214,7 +219,7 @@ function WindowStepper({
 	const overlay = "absolute inset-0 size-full cursor-pointer opacity-0";
 
 	return (
-		<div className="flex h-8 pointer-coarse:h-9 min-w-0 max-w-64 flex-1 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)]">
+		<div className="flex h-8 pointer-coarse:h-9 min-w-0 max-w-64 flex-1 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] max-[480px]:max-w-none max-[480px]:basis-full">
 			<JoinedStep
 				direction="prev"
 				label={`Previous ${label.toLowerCase()}`}

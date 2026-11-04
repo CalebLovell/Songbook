@@ -412,6 +412,7 @@ function VisitLogSkeleton() {
 						<span className="ml-auto">
 							<ShellSized className="rounded-md">
 								<PageStepper
+									variant="ghost"
 									label="Visit log pages"
 									page={1}
 									// A heard bird's log runs to many pages, which is what
@@ -1051,6 +1052,7 @@ function VisitLogCard({
 							{pageCount > 1 ? (
 								<PageStepper
 									className="ml-auto"
+									variant="ghost"
 									label="Visit log pages"
 									page={page}
 									pageCount={pageCount}

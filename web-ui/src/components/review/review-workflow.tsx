@@ -203,6 +203,7 @@ export function ReviewWorkflowSkeleton() {
 						<span className="ml-auto">
 							<ShellSized className="rounded-md">
 								<PageStepper
+									variant="ghost"
 									label="Review queue pages"
 									page={1}
 									pageCount={20}
@@ -551,6 +552,7 @@ export function ReviewWorkflow({
 						<div className={QUEUE_FOOTER_CLASS}>
 							<PageStepper
 								className="ml-auto"
+								variant="ghost"
 								label="Review queue pages"
 								page={page.page}
 								pageCount={pageCount}

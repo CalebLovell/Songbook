@@ -23,6 +23,7 @@ import { StatusPage } from "~/components/status-page.tsx";
 import { PeriodToolbar } from "~/components/timeline/period-toolbar.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
 import { ShellFigure } from "~/components/ui/shell.tsx";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import { TooltipProvider } from "~/components/ui/tooltip.tsx";
 import { getDayShareCard } from "~/lib/day-share.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
@@ -46,7 +47,6 @@ import {
 	windowFor,
 } from "~/lib/timeline-window.ts";
 import { useSettled } from "~/lib/use-settled.ts";
-import { cn } from "~/lib/utils.ts";
 
 const DEFAULT_PERIOD: TimelinePeriod = "day";
 
@@ -147,6 +147,12 @@ function Timeline() {
 					staleData={settled?.value ?? null}
 					period={period}
 					anchor={anchor}
+					viewSwitch={
+						<ViewToggle
+							view={view}
+							onViewChange={(next) => show({ view: next })}
+						/>
+					}
 					onChange={show}
 				/>
 
@@ -158,13 +164,7 @@ function Timeline() {
 				<Deferred
 					promise={page}
 					shellAfterMs={SHELL_DELAY_MS}
-					shell={
-						<TimelineCardsShell
-							period={period}
-							view={view}
-							onViewChange={(next) => show({ view: next })}
-						/>
-					}
+					shell={<TimelineCardsShell period={period} view={view} />}
 				>
 					{(data) =>
 						data.body.kind === "not-a-date" ? null : (
@@ -180,7 +180,6 @@ function Timeline() {
 								windowLabel={data.window?.label ?? null}
 								stationEmpty={!data.hasAnyDetections}
 								view={view}
-								onViewChange={(next) => show({ view: next })}
 							/>
 						)
 					}
@@ -192,34 +191,26 @@ function Timeline() {
 
 /**
  * The cards as TimelineCards lays them out, each its own skeleton: the body
- * in the view the URL asks for, with the real view toggle and the window's
- * figures blurred in its header, then the Highlights and the hour chart.
+ * in the view the URL asks for, with the window's figures blurred in its
+ * header, then the Highlights and the hour chart.
  */
 function TimelineCardsShell({
 	period,
 	view,
-	onViewChange,
 }: {
 	period: TimelinePeriod;
 	view: TimelineView;
-	onViewChange: (next: TimelineView) => void;
 }) {
-	const toggle = <ViewToggle view={view} onViewChange={onViewChange} />;
 	const summary = <WindowSummary rows={null} />;
 	return (
 		<div className="min-[1800px]:flex min-[1800px]:items-start min-[1800px]:gap-4">
 			{view === "hours" ? (
 				<SpeciesByHourCardSkeleton
 					summary={summary}
-					action={toggle}
 					className={BODY_CARD_WIDTH}
 				/>
 			) : (
-				<SpeciesGridSkeleton
-					summary={summary}
-					action={toggle}
-					className={BODY_CARD_WIDTH}
-				/>
+				<SpeciesGridSkeleton summary={summary} className={BODY_CARD_WIDTH} />
 			)}
 			<div className="mt-(--page-gap) grid min-w-0 gap-(--page-gap) md:max-[1799px]:grid-cols-2 min-[1800px]:mt-0 min-[1800px]:flex-1">
 				<HighlightsCard
@@ -295,6 +286,7 @@ function TimelineHeader({
 	staleData,
 	period,
 	anchor,
+	viewSwitch,
 	onChange,
 }: {
 	/** This window's page, once it has arrived. */
@@ -304,6 +296,7 @@ function TimelineHeader({
 	staleData: TimelinePageData | null;
 	period: TimelinePeriod;
 	anchor: string;
+	viewSwitch: React.ReactNode;
 	onChange: (next: { period?: TimelinePeriod; date?: string }) => void;
 }) {
 	const rows = data?.body.kind === "rows" ? data.body.rows : [];
@@ -366,6 +359,7 @@ function TimelineHeader({
 						window={data ? data.window : safeWindow(period, anchor)}
 						lastActiveDay={data?.lastActiveDay ?? null}
 						stationRange={toolbarData?.stationRange ?? null}
+						viewSwitch={viewSwitch}
 						onChange={onChange}
 					/>
 				}
@@ -427,9 +421,9 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 	const detections = rows?.reduce((sum, row) => sum + row.totalDetections, 0);
 
 	return (
-		// Under 480px there's no room beside the kicker and the view switcher, so
-		// the figures take their own line beneath both (the cards' header wraps
-		// there), dropping the divider that only made sense beside the kicker.
+		// Under 480px the widest figures don't fit beside the kicker, so they take
+		// their own line beneath it (the cards' header wraps there), dropping the
+		// divider that only made sense beside the kicker.
 		<div className="flex min-w-0 items-center gap-2.5 max-[480px]:order-last max-[480px]:basis-full">
 			<span
 				className="h-4 w-px shrink-0 bg-[var(--line)] max-[480px]:hidden"
@@ -479,7 +473,6 @@ function TimelineCards({
 	windowLabel,
 	stationEmpty,
 	view,
-	onViewChange,
 }: {
 	rows: TimelineRow[];
 	highlights: TimelineData["highlights"];
@@ -491,7 +484,6 @@ function TimelineCards({
 	/** The station has recorded nothing at all, in any window. */
 	stationEmpty: boolean;
 	view: TimelineView;
-	onViewChange: (next: TimelineView) => void;
 }) {
 	const emptyMessage = stationEmpty
 		? EMPTY.station.detections
@@ -535,9 +527,8 @@ function TimelineCards({
 		hourCounts: row.hourCounts,
 	}));
 
-	// Kept for a quiet window too: the shell drew both, so dropping them once
-	// the data lands would change the card's header under the reader.
-	const toggle = <ViewToggle view={view} onViewChange={onViewChange} />;
+	// Kept for a quiet window too: the shell drew it, so dropping it once the
+	// data lands would change the card's header under the reader.
 	const summary = <WindowSummary rows={rows} />;
 
 	// The window's day for the side column's hour chart: every species summed,
@@ -557,7 +548,6 @@ function TimelineCards({
 				emptyMessage={emptyMessage}
 				emptyAction={emptyAction}
 				summary={summary}
-				action={toggle}
 				className={BODY_CARD_WIDTH}
 			/>
 		) : (
@@ -566,7 +556,6 @@ function TimelineCards({
 				emptyMessage={emptyMessage}
 				emptyAction={emptyAction}
 				summary={summary}
-				action={toggle}
 				className={BODY_CARD_WIDTH}
 			/>
 		);
@@ -647,21 +636,11 @@ const VIEW_META: Record<
 };
 
 /**
- * Picks which body the window draws -- set against the card's title, top-right.
- * One bordered box split into two tabs, each only as wide as its icon and
- * word, with a hairline between them. Its corners match the period toolbar's
- * controls (rounded-md). Each tab carries its own see-through hairline, the
- * way the period toggle's items do, so the active tab's fill shows through
- * its border and runs right to the edge instead of sitting inside a pale
- * ring. Only the outer corners round; where the tabs meet they sit flush.
- * The active tab takes the moss fill with paper text -- the same on state as
- * the period toggle above the card -- so every "which view" control on the
- * page marks its choice the same way.
- *
- * Below 520px the words go (kept for screen readers) and each tab is just its
- * icon, so the pill shrinks to leave the kicker's figures room. Not sooner:
- * the kicker, the widest figures ("139,372 detections · 50 species", all
- * time) and the labelled pill still share one line down to about 513px.
+ * Picks which body the window draws. It lives in the page's toolbar rather than
+ * on the body card: it steers the whole window, as the period and date beside
+ * it do, and on the page's bare ground its border isn't a line inside a card's
+ * lines. The period toggle's own group, down to icons alone, so the row reads as
+ * one family of controls and the toolbar has room for it.
  */
 function ViewToggle({
 	view,
@@ -671,29 +650,31 @@ function ViewToggle({
 	onViewChange: (next: TimelineView) => void;
 }) {
 	return (
-		<div className="flex shrink-0 rounded-md bg-card">
+		<ToggleGroup
+			type="single"
+			variant="outline"
+			aria-label="View"
+			className="shrink-0"
+			value={view}
+			onValueChange={(value) => {
+				if (value) onViewChange(value as TimelineView);
+			}}
+		>
 			{TIMELINE_VIEWS.map((value) => {
 				const { label, icon: Icon } = VIEW_META[value];
-				const active = value === view;
 				return (
-					<button
+					<ToggleGroupItem
 						key={value}
-						type="button"
-						aria-pressed={active}
-						onClick={() => !active && onViewChange(value)}
-						className={cn(
-							"flex h-6 items-center justify-center gap-1.5 whitespace-nowrap border border-[var(--line)] px-3 font-medium text-xs transition-colors first:rounded-l-md last:rounded-r-md max-[520px]:px-2.5 [&+&]:border-l-0",
-							active
-								? "bg-primary text-primary-foreground"
-								: "text-muted-foreground hover:bg-[var(--meadow)] hover:text-foreground",
-						)}
+						value={value}
+						aria-label={label}
+						title={label}
+						className="pointer-coarse:w-9 w-8 px-0"
 					>
-						<Icon className="size-[15.5px] shrink-0" aria-hidden="true" />
-						<span className="max-[520px]:sr-only">{label}</span>
-					</button>
+						<Icon className="size-4" aria-hidden="true" />
+					</ToggleGroupItem>
 				);
 			})}
-		</div>
+		</ToggleGroup>
 	);
 }
 

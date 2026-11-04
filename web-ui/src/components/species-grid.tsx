@@ -55,7 +55,6 @@ export function SpeciesGrid({
 	emptyMessage,
 	emptyAction,
 	summary,
-	action,
 	className = "",
 }: {
 	species: SpeciesGridItem[];
@@ -66,9 +65,6 @@ export function SpeciesGrid({
 	    page's detections/species readout, kept on both bodies so the view toggle
 	    doesn't drop it. Omitted by callers that show the card on its own. */
 	summary?: ReactNode;
-	/** A control set against the card title, top-right -- the view switcher on
-	    the timeline page. Omitted by callers that show the card on its own. */
-	action?: ReactNode;
 	className?: string;
 }) {
 	return (
@@ -78,25 +74,21 @@ export function SpeciesGrid({
 				className={`feature-card rounded-md p-4 ${className}`}
 			>
 				<div
-					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${species.length === 0 && !action ? "" : "mb-(--page-gap)"}`}
+					className={`${CARD_HEADER_CLASS} mb-(--page-gap) gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
 				>
 					{/* "Activity" -- identical to the heat-map view's kicker -- so the
 					    summary beside it stays put when the view toggle swaps the cards.
 					    Not "Species": the summary already says "N species" beside it. */}
-					{/* Under 480px this wrapper steps aside (`contents`) so the kicker,
-					    the summary and the switcher wrap as one row: the kicker and the
-					    switcher on the first line, the summary on its own below them.
-					    See WindowSummary on the timeline page. */}
-					{/* Exactly the kicker's own line box, pinned to the top of the row, so
-					    the kicker sits where every other card's title does -- the taller
-					    switcher beside it can't push it down. The summary centres on it and
-					    overhangs by a hair; a quiet window with none doesn't move it. */}
+					{/* Under 480px this wrapper steps aside (`contents`) so the kicker
+					    and the summary wrap: the kicker on the first line, the summary
+					    on its own below it. See WindowSummary on the timeline page. */}
+					{/* Exactly the kicker's own line box, so the kicker sits where every
+					    other card's title does. The summary centres on it and overhangs
+					    by a hair; a quiet window with none doesn't move it. */}
 					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 						<div className="island-kicker shrink-0">Activity</div>
 						{summary}
 					</div>
-					{/* The switcher holds the band's right end. */}
-					{action ? <div className="shrink-0">{action}</div> : null}
 				</div>
 
 				{species.length === 0 ? (
@@ -170,19 +162,17 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 const NAME_WIDTHS = ["w-32", "w-24", "w-36", "w-28"];
 
 /**
- * The grid before its species arrive: the header band (with whatever the
- * caller sets in it) and tiles built from the real tile's pieces -- the
+ * The grid before its species arrive: the header band (with the caller's
+ * summary in it) and tiles built from the real tile's pieces -- the
  * thumbnail's square, bars on the two name lines and the count, and the
  * hour chart's skeleton under a hairline.
  */
 export function SpeciesGridSkeleton({
 	summary,
-	action,
 	tiles = 9,
 	className = "",
 }: {
 	summary?: ReactNode;
-	action?: ReactNode;
 	tiles?: number;
 	className?: string;
 }) {
@@ -199,7 +189,6 @@ export function SpeciesGridSkeleton({
 					<div className="island-kicker shrink-0">Activity</div>
 					{summary}
 				</div>
-				{action ? <div className="shrink-0">{action}</div> : null}
 			</div>
 			<ul aria-hidden="true" className={LIST_CLASS}>
 				{Array.from({ length: tiles }, (_, index) => (

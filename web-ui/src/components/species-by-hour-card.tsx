@@ -96,7 +96,6 @@ export function SpeciesByHourCard({
 	emptyMessage,
 	emptyAction,
 	summary,
-	action,
 	className = "",
 }: {
 	rows: SpeciesHourRow[];
@@ -107,9 +106,6 @@ export function SpeciesByHourCard({
 	 * page's detections/species readout. Omitted by callers that show the card
 	 * on its own. */
 	summary?: ReactNode;
-	/** A control set against the card title, top-right -- the view switcher on
-	 * the timeline page. Omitted by callers that show the card on its own. */
-	action?: ReactNode;
 	className?: string;
 }) {
 	const isEmpty = rows.length === 0;
@@ -122,27 +118,23 @@ export function SpeciesByHourCard({
 				className={`feature-card @container/card rounded-md p-4 ${isEmpty ? "" : "pb-1!"} ${className}`}
 			>
 				<div
-					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${isEmpty ? (action ? "mb-(--page-gap)" : "") : ""}`}
+					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${isEmpty ? "mb-(--page-gap)" : ""}`}
 				>
 					{/* "Activity" -- identical to the grid view's kicker -- so the summary
 					    beside it sits at the same x in both bodies and doesn't jump when
 					    the view toggle swaps one card for the other. Not "Species": the
 					    summary already says "N species" right beside it. The masthead
 					    subtitle carries the by-hour vs. how-often distinction. */}
-					{/* Under 480px this wrapper steps aside (`contents`) so the kicker,
-					    the summary and the switcher wrap as one row: the kicker and the
-					    switcher on the first line, the summary on its own below them.
-					    See WindowSummary on the timeline page. */}
-					{/* Exactly the kicker's own line box, pinned to the top of the row, so
-					    the kicker sits where every other card's title does -- the taller
-					    switcher beside it can't push it down. The summary centres on it and
-					    overhangs by a hair; a quiet window with none doesn't move it. */}
+					{/* Under 480px this wrapper steps aside (`contents`) so the kicker
+					    and the summary wrap: the kicker on the first line, the summary
+					    on its own below it. See WindowSummary on the timeline page. */}
+					{/* Exactly the kicker's own line box, so the kicker sits where every
+					    other card's title does. The summary centres on it and overhangs
+					    by a hair; a quiet window with none doesn't move it. */}
 					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 						<div className="island-kicker shrink-0">Activity</div>
 						{summary}
 					</div>
-					{/* The switcher holds the band's right end. */}
-					{action ? <div className="shrink-0">{action}</div> : null}
 				</div>
 
 				{isEmpty ? (
@@ -339,18 +331,16 @@ const NAME_WIDTHS = ["w-40", "w-28", "w-36", "w-32", "w-44", "w-24"];
 
 /**
  * The card before its rows arrive, built from the card's own pieces: the
- * header band (with whatever the caller sets in it), the header row as
+ * header band (with the caller's summary in it), the header row as
  * itself, then rows of the real height -- the bird's square, bars for the
  * name and the count, and the 24 hour cells as soft tiles.
  */
 export function SpeciesByHourCardSkeleton({
 	summary,
-	action,
 	rows = 15,
 	className = "",
 }: {
 	summary?: ReactNode;
-	action?: ReactNode;
 	rows?: number;
 	className?: string;
 }) {
@@ -367,7 +357,6 @@ export function SpeciesByHourCardSkeleton({
 					<div className="island-kicker shrink-0">Activity</div>
 					{summary}
 				</div>
-				{action ? <div className="shrink-0">{action}</div> : null}
 			</div>
 			<div aria-hidden="true" className="-mx-1 px-1">
 				<HeaderRow />
