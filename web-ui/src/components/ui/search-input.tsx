@@ -31,7 +31,7 @@ function SearchInput({
 					type="button"
 					aria-label="Clear search"
 					onClick={onClear}
-					className="absolute inset-y-0 right-0 flex pointer-coarse:w-9 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+					className="absolute inset-y-0 right-0 flex pointer-coarse:w-9 w-8.5 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
 				>
 					<X className="size-4" />
 				</button>

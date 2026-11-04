@@ -7,7 +7,7 @@ import { useRef } from "react";
 // (a phone) each segment drops the word "lists" rather than shrinking, so the
 // control keeps one line under the search; the aria-label keeps the full name.
 const GROUP_CLASS =
-	"flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm @min-[38rem]:self-auto self-start lg:ml-auto";
+	"flex h-8.5 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm @min-[38rem]:self-auto self-start lg:ml-auto";
 const SEGMENT_CLASS =
 	"flex items-center gap-2 @max-[30rem]:px-3 px-3.5 transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:outline-none [&+&]:border-input [&+&]:border-l";
 const LISTS_WORD = "@max-[30rem]:hidden";

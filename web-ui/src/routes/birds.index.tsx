@@ -476,7 +476,7 @@ function SortSelect({
 }) {
 	const Icon = SORT_META[sort].icon;
 	return (
-		<div className="flex h-8 pointer-coarse:h-9 shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] sm:hidden">
+		<div className="flex h-8.5 pointer-coarse:h-9 shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] sm:hidden">
 			<div className="relative">
 				{/* Under 400px the icon goes: the search box needs the width more. */}
 				<Icon
@@ -503,7 +503,7 @@ function SortSelect({
 			<DirectionButton
 				reverse={reverse}
 				onReverse={onReverse}
-				className="w-8 border-l"
+				className="w-8.5 border-l"
 			/>
 		</div>
 	);
@@ -554,7 +554,7 @@ function SortTabs({
 			<DirectionButton
 				reverse={reverse}
 				onReverse={onReverse}
-				className="pointer-coarse:w-9 w-8 rounded-r-md border border-l-0"
+				className="pointer-coarse:w-9 w-8.5 rounded-r-md border border-l-0"
 			/>
 		</div>
 	);

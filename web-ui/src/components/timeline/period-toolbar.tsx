@@ -169,7 +169,7 @@ function PeriodSelect({
 				aria-label="Period"
 				value={period}
 				onChange={(event) => onPick(event.target.value as TimelinePeriod)}
-				className="h-8 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-[var(--focus-ring)] focus-visible:outline-none max-[400px]:pl-2.5"
+				className="h-8.5 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-[var(--focus-ring)] focus-visible:outline-none max-[400px]:pl-2.5"
 			>
 				{TIMELINE_PERIODS.map((value) => (
 					<option key={value} value={value}>
@@ -219,7 +219,7 @@ function WindowStepper({
 	const overlay = "absolute inset-0 size-full cursor-pointer opacity-0";
 
 	return (
-		<div className="flex h-8 pointer-coarse:h-9 min-w-0 max-w-64 flex-1 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] max-[480px]:max-w-none max-[480px]:basis-full">
+		<div className="flex h-8.5 pointer-coarse:h-9 min-w-0 max-w-64 flex-1 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] max-[480px]:max-w-none max-[480px]:basis-full">
 			<JoinedStep
 				direction="prev"
 				label={`Previous ${label.toLowerCase()}`}
@@ -348,7 +348,7 @@ function JoinedStep({
 			title={label}
 			disabled={target === null}
 			onClick={() => target && onPick(target)}
-			className={`flex w-8 shrink-0 items-center justify-center border-input transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
+			className={`flex w-8.5 shrink-0 items-center justify-center border-input transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
 		>
 			<Icon className="size-4" aria-hidden="true" />
 		</button>

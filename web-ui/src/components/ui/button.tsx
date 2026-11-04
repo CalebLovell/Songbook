@@ -9,8 +9,9 @@ import { cn } from "~/lib/utils.ts";
  * The station's one button. `xs` is the Today page's Bird Call control, measured
  * off the card it lives in, and it is the default size -- a bare `<Button>` is
  * already the right button. The larger steps exist so the scale stays coherent,
- * not because anything currently uses them. None stands taller than 32px with
- * a mouse; `lg` and `icon-lg` grow to 36px only on a touch screen.
+ * not because anything currently uses them. `lg` is the toolbar's height, 34px
+ * with a mouse; nothing else stands taller than 32px. `lg` and `icon-lg` grow to
+ * 36px only on a touch screen.
  *
  * Note the absence of shadcn's `has-[>svg]:px-*` rule, which trims horizontal
  * padding whenever a button contains an icon. Padding that depends on the
@@ -37,7 +38,7 @@ const buttonVariants = cva(
 				sm: "h-7 gap-1.5 px-3 text-xs [&_svg:not([class*='size-'])]:size-3.5",
 				default:
 					"h-8 gap-2 px-3.5 text-sm [&_svg:not([class*='size-'])]:size-4",
-				lg: "h-8 gap-2 pointer-coarse:h-9 px-5 text-sm [&_svg:not([class*='size-'])]:size-4",
+				lg: "h-8.5 gap-2 pointer-coarse:h-9 px-5 text-sm [&_svg:not([class*='size-'])]:size-4",
 				// The square sizes still carry a font size: pagination puts a page
 				// number in one, and without it the digit inherits the page's 16px
 				// and overflows a 24px box.

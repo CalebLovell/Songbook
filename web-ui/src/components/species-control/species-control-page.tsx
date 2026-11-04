@@ -182,7 +182,7 @@ export function SpeciesSelectionBar({
 	return (
 		<fieldset
 			aria-label="Set selected species status"
-			className="flex h-8 pointer-coarse:h-9 @max-[36rem]:w-full w-fit max-w-full shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
+			className="flex h-8.5 pointer-coarse:h-9 @max-[36rem]:w-full w-fit max-w-full shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
 			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
 				<span className="tabular-data font-semibold text-foreground">
@@ -195,7 +195,7 @@ export function SpeciesSelectionBar({
 				aria-label="Clear selection"
 				title="Clear selection"
 				onClick={onClear}
-				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>

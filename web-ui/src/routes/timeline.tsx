@@ -668,7 +668,7 @@ function ViewToggle({
 						value={value}
 						aria-label={label}
 						title={label}
-						className="pointer-coarse:w-9 w-8 px-0"
+						className="pointer-coarse:w-9 w-8.5 px-0"
 					>
 						<Icon className="size-4" aria-hidden="true" />
 					</ToggleGroupItem>

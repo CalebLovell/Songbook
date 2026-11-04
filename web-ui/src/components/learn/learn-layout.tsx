@@ -86,7 +86,7 @@ export function LearnPoolSelector({
 					variant="outline"
 					size="lg"
 					icon={RotateCcw}
-					className="px-3 max-[400px]:w-8 pointer-coarse:max-[400px]:w-9 max-[400px]:px-0 pointer-coarse:sm:max-md:w-9 sm:max-md:w-8 sm:max-md:px-0"
+					className="px-3 max-[400px]:w-8.5 pointer-coarse:max-[400px]:w-9 max-[400px]:px-0 pointer-coarse:sm:max-md:w-9 sm:max-md:w-8.5 sm:max-md:px-0"
 					onClick={onNewRound}
 				>
 					<span className="max-[400px]:sr-only sm:max-md:sr-only">Restart</span>
@@ -98,7 +98,7 @@ export function LearnPoolSelector({
 
 /**
  * How many species a pool picks from, as a small round pill after its label.
- * A fixed 20px tall, so it sits inside the 32px segment without making it any
+ * A fixed 20px tall, so it sits inside the 34px segment without making it any
  * taller, and with a line box that full height: the count's Georgia figures
  * are old-style and dip below the baseline, so a tighter line lets them spill
  * out of the pill. A faint ink wash on the other segments; on the chosen one
@@ -141,7 +141,7 @@ function PoolSelect({
 				aria-label="Which birds"
 				value={pool}
 				onChange={(event) => onPoolChange(event.target.value as LearnPool)}
-				className="h-8 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-[var(--focus-ring)] focus-visible:outline-none"
+				className="h-8.5 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-[var(--focus-ring)] focus-visible:outline-none"
 			>
 				{LEARN_POOLS.map((option) => (
 					<option key={option} value={option}>

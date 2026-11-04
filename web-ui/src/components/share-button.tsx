@@ -131,7 +131,7 @@ export function useShare({
  * for reading here.
  *
  * `pill` is the page header's: round-ended, as tall as the page icon across
- * from it (the caller sets the height). `plain` is an ordinary button at the
+ * from it rather than the 34px toolbar below. `plain` is an ordinary button at the
  * `default` size, for the menu bar.
  */
 export function ShareButton({
@@ -156,7 +156,7 @@ export function ShareButton({
 						onClick={state.share}
 						className={cn(
 							shape === "pill" &&
-								"self-center rounded-full px-4 text-[var(--moss)] transition-colors duration-[180ms] hover:border-[var(--hover-line)] hover:bg-[var(--icon-well)] hover:text-[var(--moss)] [&_svg]:size-5!",
+								"h-8 self-center rounded-full px-4 text-[var(--moss)] transition-colors duration-[180ms] hover:border-[var(--hover-line)] hover:bg-[var(--icon-well)] hover:text-[var(--moss)] [&_svg]:size-5!",
 							className,
 						)}
 					>

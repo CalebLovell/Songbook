@@ -377,7 +377,7 @@ a {
 /* The vertical counterpart to .nav-link. The underline that marks the active
    header link reads as an underline, not a selection, once the links are
    stacked -- so the sidebar marks its active row with a filled pill instead.
-   Each row is sized like the app's controls: with a mouse, a 32px row with
+   Each row is sized like the app's controls: with a mouse, a 34px row with
    a button's 14px label and 16px glyph; on a touch screen, a 36px row with
    the controls' 16px touch text and an 18px glyph, so the label and icon
    grow with the target rather than floating in it. */
@@ -385,7 +385,7 @@ a {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  min-height: 2rem;
+  min-height: 2.125rem;
   padding: 0 0.75rem;
   border-radius: var(--radius);
   text-decoration: none;
