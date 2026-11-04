@@ -8,14 +8,6 @@ import { SidebarBody } from "~/components/sidebar/site-sidebar.tsx";
 import { SongbookWordmark } from "~/components/sidebar/songbook-wordmark.tsx";
 import { useUpdateOffered } from "~/lib/use-update-offered.ts";
 
-/**
- * The narrow-screen counterpart to the sidebar: a slim bar carrying the site
- * name and a hamburger, plus the drawer it opens.
- *
- * Hidden from `xl` up, where the sidebar itself is always on screen. Not
- * earlier: the sidebar only takes its column once the page beside it can hold
- * the timeline's full heat map (see SiteSidebar).
- */
 export function MobileNav() {
 	const [isOpen, setIsOpen] = useState(false);
 	const { auth } = useRouteContext({ from: "__root__" });
@@ -24,8 +16,6 @@ export function MobileNav() {
 		select: (state) => state.location.pathname,
 	});
 
-	// Closes on Escape while open. Bound only when open so the listener isn't
-	// sitting on the document for the whole session.
 	useEffect(() => {
 		if (!isOpen) return;
 		function onKeyDown(event: KeyboardEvent) {
@@ -35,9 +25,6 @@ export function MobileNav() {
 		return () => document.removeEventListener("keydown", onKeyDown);
 	}, [isOpen]);
 
-	// A link tap closes the drawer through `onNavigate`, but the browser's back
-	// button and any programmatic navigation don't go through it -- watching the
-	// path catches those too.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: close on route change
 	useEffect(() => {
 		setIsOpen(false);
@@ -45,10 +32,6 @@ export function MobileNav() {
 
 	return (
 		<>
-			{/* `shrink-0`, not `sticky`: the bar sits outside the scrolling pane in
-			    the shell, so it holds its place without any stickiness. Its side
-			    padding tracks the page gutter (.page-wrap), halving under 400px, so
-			    the round menu button stays in line with the cards' left edge. */}
 			<div className={BAR_CLASS}>
 				<button
 					type="button"
@@ -58,8 +41,6 @@ export function MobileNav() {
 					className={`relative ${ROUND_BUTTON_CLASS}`}
 				>
 					<Menu className="size-5" aria-hidden="true" />
-					{/* Closed, the drawer hides the Settings link's dot, so the
-					    button carries one too. */}
 					{offered ? (
 						<UpdateDot
 							className="absolute top-1.5 right-1.5 ring-2 ring-[var(--paper-raised)]"
@@ -68,23 +49,15 @@ export function MobileNav() {
 					) : null}
 				</button>
 				<SiteName />
-				{/* Where a page puts its own control for the narrow screen, against
-				    the bar's right edge (see InMenuBar). */}
 				<div id={MENU_BAR_SLOT_ID} className="ml-auto flex items-center" />
 			</div>
 
-			{/* Always mounted so it can slide both ways: closed, the panel waits
-			    off-screen to the left and the layer goes `invisible` (and `inert`)
-			    so nothing in it takes a click, a tab or a screen reader's focus.
-			    Visibility flips at once on open but only after the slide on close,
-			    which is what lets the panel be seen sliding out. */}
 			<div
 				inert={!isOpen}
 				className={`fixed inset-0 z-40 transition-[visibility] duration-300 motion-reduce:duration-0 xl:hidden ${
 					isOpen ? "visible" : "invisible"
 				}`}
 			>
-				{/* Sits under the panel and above the page; clicking it dismisses. */}
 				<button
 					type="button"
 					aria-label="Close navigation"
@@ -99,9 +72,6 @@ export function MobileNav() {
 						isOpen ? "translate-x-0" : "-translate-x-full"
 					}`}
 				>
-					{/* The bar's height and look, with the name against the panel's left
-					    edge, in line with the search box below, and the close button at
-					    its far end. */}
 					<div className={DRAWER_BAR_CLASS}>
 						<SiteName onClick={() => setIsOpen(false)} />
 						<button
@@ -113,9 +83,6 @@ export function MobileNav() {
 							<X className="size-5" aria-hidden="true" />
 						</button>
 					</div>
-					{/* Only the part under the bar scrolls, and only when a short
-					    screen needs it: the body fills this box exactly, so the
-					    Station group sits at its foot without overflowing it. */}
 					<div className="min-h-0 flex-1 overflow-y-auto">
 						<SidebarBody
 							withTitle={false}
@@ -130,13 +97,6 @@ export function MobileNav() {
 
 const MENU_BAR_SLOT_ID = "menu-bar-actions";
 
-/**
- * Draws its children at the right end of the menu bar, for a page whose one
- * control has no room in its header on a narrow screen. The bar only shows
- * below `xl`, so the page keeps its own copy for wider screens and hides it
- * there. Nothing renders until mounted: the slot is found in the document,
- * which the server doesn't have.
- */
 export function InMenuBar({ children }: { children: ReactNode }) {
 	const [slot, setSlot] = useState<HTMLElement | null>(null);
 	useEffect(() => {
@@ -145,12 +105,9 @@ export function InMenuBar({ children }: { children: ReactNode }) {
 	return slot ? createPortal(children, slot) : null;
 }
 
-// Shared by the bar and the drawer's top row so the two stay the same size.
 const BAR_BASE_CLASS =
 	"z-30 flex h-14 shrink-0 items-center gap-2 border-[var(--line)] border-b bg-[var(--paper-raised)] xl:hidden";
 const BAR_CLASS = `${BAR_BASE_CLASS} px-4 max-[400px]:px-2`;
-// The drawer's row takes the sidebar body's inset instead of the page gutter,
-// so the name's box lines up with the search box under it at every width.
 const DRAWER_BAR_CLASS = `${BAR_BASE_CLASS} px-3`;
 
 const ROUND_BUTTON_CLASS =

@@ -1,11 +1,6 @@
 import { Download, type LucideIcon, RotateCcw, Upload } from "lucide-react";
 import { useRef } from "react";
 
-// Import, Export and Reset as one joined control -- the pager's and the sort
-// menu's box, border and card surface, a hairline between the segments --
-// rather than three buttons a gap apart. Where the toolbar is under 30rem wide
-// (a phone) each segment drops the word "lists" rather than shrinking, so the
-// control keeps one line under the search; the aria-label keeps the full name.
 const GROUP_CLASS =
 	"flex h-8.5 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm @min-[38rem]:self-auto self-start lg:ml-auto";
 const SEGMENT_CLASS =
@@ -63,8 +58,6 @@ function Segment({
 			onClick={onClick}
 		>
 			<Icon className="size-4 shrink-0" aria-hidden="true" />
-			{/* One text box for the whole label, so the button's icon gap never
-			    lands between the verb and "lists" on top of the space. */}
 			<span>
 				{verb}
 				<span className={LISTS_WORD}> lists</span>

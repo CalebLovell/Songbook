@@ -12,12 +12,6 @@ import type { BestRecording } from "~/lib/species-detail.ts";
 
 const PLOT_CLASS = "min-h-32 flex-1";
 
-/**
- * The single cleanest clip this station has of the species -- its
- * highest-confidence detection -- in the app's spectrogram player, with when it
- * was heard and its score alongside the controls. Sits beside the
- * detection-history heat map, the plot taking whatever height that row has.
- */
 export function BestRecordingCard({
 	recording,
 	speciesName,
@@ -57,10 +51,6 @@ export function BestRecordingCard({
 	);
 }
 
-/**
- * The card before its recording arrives: the player's own skeleton, with the
- * date and pill shelled at the end of its controls row.
- */
 export function BestRecordingCardSkeleton({
 	className = "",
 }: {

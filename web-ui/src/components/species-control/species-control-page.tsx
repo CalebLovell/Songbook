@@ -38,19 +38,12 @@ import {
 } from "./species-control-table.tsx";
 import { SpeciesControlTools } from "./species-control-tools.tsx";
 
-// Shared by the page and its skeleton, so the two are one shape.
 const TOOLBAR_CLASS =
 	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-(--page-gap)";
 const SEARCH_CLASS = "@min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
 const TABLE_CARD_CLASS =
 	"@container feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
 
-/**
- * The page before the catalog arrives: the masthead and toolbar as
- * themselves (inert until there is something to act on), and the table as
- * its own skeleton -- the real header over a page of loading rows and the
- * pager.
- */
 export function SpeciesControlPageSkeleton({
 	search,
 }: {
@@ -88,8 +81,6 @@ export function SpeciesControlPageSkeleton({
 				<SpeciesControlTable
 					rows={null}
 					page={search.page}
-					// The installed catalog runs to thousands of species, which is
-					// what sets the pager's width.
 					pageCount={130}
 					selected={new Set()}
 					sort={search.sort}
@@ -125,12 +116,9 @@ type ProposedDialog =
 	  }
 	| { kind: "reset" };
 
-// Each status's button wears its badge's ink, so the bar reads as the four
-// verdicts the Status column shows; the tint comes in on hover.
 const BULK_STATUS_ACTIONS: Array<{
 	status: SpeciesStatus;
 	label: string;
-	/** What a narrow bar shows, so all four fit beside the count on a phone. */
 	short: string;
 	className: string;
 }> = [
@@ -163,13 +151,6 @@ const BULK_STATUS_ACTIONS: Array<{
 	},
 ];
 
-/**
- * The detections table's selection bar, with the four statuses where its
- * Delete sits: the count, a clear, then the verdicts to apply. It only shows
- * once species are picked, so there are no dead buttons. Narrow, it spans
- * the footer and the statuses go by their short names, so all four fit on a
- * phone; the pager drops to the line below.
- */
 export function SpeciesSelectionBar({
 	count,
 	onClear,
@@ -451,12 +432,6 @@ export function SpeciesControlPage({
 	}
 
 	return (
-		// Fills `main` exactly, so the header, toolbar and the card's pager hold
-		// their place and only the rows move. `h-full` measures against `main`,
-		// which the shell already bounds to the viewport. The table card has a
-		// 320px floor, though, and `min-h-fit` lets the page grow past `main` to
-		// keep it: on a short screen or zoomed right in, the page scrolls rather
-		// than squeezing the rows down to nothing.
 		<div className="page-wrap flex h-full min-h-fit flex-col gap-(--page-gap) py-4">
 			<div className="@container shrink-0 space-y-(--page-gap)">
 				<PageHeaderCard
@@ -490,9 +465,6 @@ export function SpeciesControlPage({
 				</div>
 			</div>
 
-			{/* With nothing to list, the site's standard empty card: a titled
-			    header band and one line, rather than the table's frame around a
-			    bare sentence. */}
 			{pagedRows.length === 0 ? (
 				<section
 					aria-label="Installed species"
@@ -502,9 +474,6 @@ export function SpeciesControlPage({
 					<EmptyNote>{EMPTY.filter.speciesControlSearch}</EmptyNote>
 				</section>
 			) : (
-				/* The table card: its header band, rows and footer run out to its
-			   edges and take its padding as their own inset, so the right padding
-			   is the narrower card edge and there is none at the bottom. */
 				<section
 					aria-label="Installed species"
 					className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
@@ -539,9 +508,6 @@ export function SpeciesControlPage({
 			)}
 
 			{unresolvedCount > 0 ? (
-				// Keeps its natural height but never more than it is owed: the page no
-				// longer scrolls, so a long list has to scroll inside its own card
-				// rather than pushing the table's pager off the bottom.
 				<section
 					aria-label="Unmatched list entries"
 					className="feature-card flex max-h-64 shrink-0 flex-col rounded-md p-4"

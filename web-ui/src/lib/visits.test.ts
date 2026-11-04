@@ -64,7 +64,6 @@ test("clusters each species independently", () => {
 		{ comName: "American Robin", timestamp: "2026-07-25 09:00:00" },
 	];
 
-	// Robin: one morning visit plus a later one. Cardinal: a single visit.
 	assert.equal(countVisitsBySpecies(moments), 3);
 });
 

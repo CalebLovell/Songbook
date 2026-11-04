@@ -18,37 +18,19 @@ import { timestampToMillis } from "~/lib/visits.ts";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Everything before the rolling 24-hour window the rest of the page uses. */
 const isBeforeWindow = sql`${detectedAt} < datetime('now', '-24 hours', 'localtime')`;
 
-/** Which 24-hour slice back from now a detection falls in: 0 is the window
-    itself, 1 the 24 hours before it, and so on. The Live page's "days". */
 const daySlice = sql<number>`cast(julianday('now', 'localtime') - julianday(${detectedAt}) as integer)`;
 
 export type LiveHighlights = {
-	/** False for a station that has never recorded anything -- the hero card
-	    above already says so, far more plainly than this card could. */
 	hasAnyDetections: boolean;
 	highlights: Highlight[];
-	/** The rules they were judged by, for the card's info tip. */
 	thresholds: HighlightThresholds;
 };
 
-/**
- * The last 24 hours' highlights, by the same rules -- the same function -- the
- * timeline's Highlights card applies to a Day: each 24-hour slice back from
- * now stands in for a calendar day.
- *
- * Deliberately not part of getNowSnapshot: the Live page repolls that every
- * ten seconds, and none of these judgements can change that fast. This runs
- * from the route loader alone, which is also what keeps its full-table scans
- * off the polling path.
- */
 export const getLiveHighlights = createServerFn({ method: "GET" }).handler(
 	async (): Promise<LiveHighlights> => {
 		const settings = await readHighlightThresholds();
-		// One clock read for every age in the card, so two lines can never
-		// disagree about how long a bird has been away.
 		const nowMs = Date.now();
 		const longest = Math.max(
 			1,
@@ -67,8 +49,6 @@ export const getLiveHighlights = createServerFn({ method: "GET" }).handler(
 					.from(detections)
 					.where(isLast24h)
 					.groupBy(detections.Com_Name),
-				// Life before the window, per species: how often it has been heard and
-				// when it was last heard.
 				db
 					.select({
 						comName: detections.Com_Name,
@@ -86,7 +66,6 @@ export const getLiveHighlights = createServerFn({ method: "GET" }).handler(
 					.from(detections)
 					.where(isLast24h)
 					.groupBy(sql`strftime('%H', ${detections.Time})`),
-				// The window and the longest lookback as 24-hour slices, per species.
 				db
 					.select({
 						slice: daySlice,
@@ -98,9 +77,6 @@ export const getLiveHighlights = createServerFn({ method: "GET" }).handler(
 						sql`${detections.Date} >= date('now', ${`-${longest + 1} days`}, 'localtime') and ${detectedAt} >= datetime('now', ${`-${longest + 1} days`}, 'localtime')`,
 					)
 					.groupBy(daySlice, detections.Com_Name),
-				// Every 24-hour slice before the window each species was heard in,
-				// back to the station's first: what a Regular streak is counted
-				// against.
 				db
 					.select({ slice: daySlice, comName: detections.Com_Name })
 					.from(detections)
@@ -154,7 +130,6 @@ export const getLiveHighlights = createServerFn({ method: "GET" }).handler(
 		const hourCounts = Array<number>(24).fill(0);
 		for (const row of hourRows) hourCounts[Number(row.hour)] = row.count;
 
-		// Slice 1 first: the 24 hours before the window, then the 24 before that.
 		const oldestSlice = Math.max(0, ...streakRows.map((row) => row.slice));
 		const daysBefore = Array.from(
 			{ length: oldestSlice },

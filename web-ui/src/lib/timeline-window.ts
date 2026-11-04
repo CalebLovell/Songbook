@@ -1,25 +1,11 @@
-// Calendar windows for the timeline page. Pure date math on "YYYY-MM-DD" day
-// strings -- no db imports -- so the period switcher and the server loader can
-// share one definition of what "the week of..." means. All arithmetic runs in
-// UTC on date-only values, which keeps a window's edges from sliding when the
-// browser and the station disagree about the local zone.
-
 import { stationToday } from "~/lib/station-time.ts";
 import type { TimelinePeriod } from "~/lib/timeline-periods.ts";
 
-/**
- * The value a period's picker round-trips through the URL:
- * day "2026-07-28", week "2026-W31" (ISO, Monday-based, matching
- * `<input type="week">`), month "2026-07", year "2026". "all" has no anchor.
- */
 export type TimelineAnchor = string;
 
 export type TimelineWindow = {
-	/** Inclusive first calendar day, "YYYY-MM-DD". */
 	start: string;
-	/** Inclusive last calendar day, "YYYY-MM-DD". */
 	end: string;
-	/** Human label for headings and empty states, e.g. "July 2026". */
 	label: string;
 };
 
@@ -30,7 +16,6 @@ const ANCHOR_PATTERNS: Record<TimelinePeriod, RegExp> = {
 	week: /^\d{4}-W\d{2}$/,
 	month: /^\d{4}-\d{2}$/,
 	year: /^\d{4}$/,
-	// Never parsed; "all" spans everything the station has.
 	all: /^$/,
 };
 
@@ -58,10 +43,6 @@ const ORDINAL_SUFFIX: Partial<Record<Intl.LDMLPluralRule, string>> = {
 	few: "rd",
 };
 
-/**
- * A UTC date with an ordinal day, e.g. "October 20th" -- or "Oct 20th" with
- * `short`, which keeps a week's two ends from spelling a month out twice.
- */
 function spelledDay(date: Date, { short = false } = {}): string {
 	const day = date.getUTCDate();
 	const suffix = ORDINAL_SUFFIX[ORDINAL.select(day)] ?? "th";
@@ -69,10 +50,6 @@ function spelledDay(date: Date, { short = false } = {}): string {
 	return `${month} ${day}${suffix}`;
 }
 
-/**
- * A "YYYY-MM-DD" day spelled out in full, e.g. "October 20th, 2026" -- or
- * "Oct 20th, 2026" with `short`.
- */
 export function spelledDate(day: string, { short = false } = {}): string {
 	const date = utcDate(day);
 	return `${spelledDay(date, { short })}, ${date.getUTCFullYear()}`;
@@ -90,18 +67,12 @@ function shiftDays(day: string, delta: number): string {
 	return dayString(new Date(utcDate(day).getTime() + delta * DAY_MS));
 }
 
-/** Monday of the ISO week containing `day`. */
 function isoWeekMonday(day: string): Date {
 	const date = utcDate(day);
-	// getUTCDay() is Sunday-based; ISO weeks start Monday.
 	const offset = (date.getUTCDay() + 6) % 7;
 	return new Date(date.getTime() - offset * DAY_MS);
 }
 
-/**
- * The ISO week anchor for a day. The week belongs to whichever year holds its
- * Thursday, so the last days of December can land in week 1 of the next year.
- */
 function isoWeekAnchor(day: string): TimelineAnchor {
 	const monday = isoWeekMonday(day);
 	const thursday = new Date(monday.getTime() + 3 * DAY_MS);
@@ -115,11 +86,9 @@ function isoWeekAnchor(day: string): TimelineAnchor {
 	return `${year}-W${String(week).padStart(2, "0")}`;
 }
 
-/** Monday of the week an ISO anchor names, inverting {@link isoWeekAnchor}. */
 function isoWeekAnchorMonday(anchor: TimelineAnchor): Date {
 	const year = Number(anchor.slice(0, 4));
 	const week = Number(anchor.slice(6));
-	// Jan 4th is always in ISO week 1, so its Monday anchors the year.
 	const week1Monday = isoWeekMonday(`${year}-01-04`);
 	return new Date(week1Monday.getTime() + (week - 1) * 7 * DAY_MS);
 }
@@ -128,9 +97,6 @@ export function isValidAnchor(period: TimelinePeriod, anchor: string): boolean {
 	if (period === "all") return true;
 	if (!ANCHOR_PATTERNS[period].test(anchor)) return false;
 
-	// The shape is right; reject values that name a day or week that doesn't
-	// exist ("2026-02-31", "2026-W53" in a 52-week year) by round-tripping them
-	// through the calendar and requiring the same string back.
 	switch (period) {
 		case "day": {
 			const parsed = utcDate(anchor);
@@ -158,24 +124,14 @@ const SHORT_MONTH = new Intl.DateTimeFormat("en-US", {
 	timeZone: "UTC",
 });
 
-/**
- * The anchor as the timeline's date stepper names it -- "Sep 23rd, 2026",
- * "Week 39, 2026", "Sep 2026", "2026" -- shorter than the browser's own picker
- * text ("09/23/2026", "September 2026"). `compact` squeezes the one word that
- * can give, "Week" to "Wk", for a phone.
- */
 export function shortAnchorLabel(
 	period: Exclude<TimelinePeriod, "all">,
 	anchor: TimelineAnchor,
 	{ compact = false }: { compact?: boolean } = {},
 ): string {
-	// A Daily address that isn't a date at all still draws its toolbar (the page
-	// says what's wrong with it below), so the label shows it as written rather
-	// than failing to spell a day that doesn't exist.
 	if (!isValidAnchor(period, anchor)) return anchor;
 	switch (period) {
 		case "day":
-			// Spelled the way the masthead title is, so the two always agree.
 			return spelledDate(anchor, { short: true });
 		case "week":
 			return `${compact ? "Wk" : "Week"} ${Number(anchor.slice(6))}, ${anchor.slice(0, 4)}`;
@@ -186,7 +142,6 @@ export function shortAnchorLabel(
 	}
 }
 
-/** The anchor for the period containing `day`, used to snap between periods. */
 export function anchorForDay(
 	period: TimelinePeriod,
 	day: string,
@@ -205,21 +160,13 @@ export function anchorForDay(
 	}
 }
 
-/** The anchor for the period containing today, the default when none is set. */
 export function currentAnchor(
 	period: TimelinePeriod,
 	now: Date = new Date(),
 ): TimelineAnchor {
-	// The station's today, not the viewer's: a visitor in another zone still
-	// lands on the day the station is living through.
 	return anchorForDay(period, stationToday(now));
 }
 
-/**
- * The inclusive day range an anchor covers, plus the label that names it.
- * "all" has no anchor to resolve and returns null -- callers skip the date
- * filter and fall back to their own wording.
- */
 export function windowFor(
 	period: "all",
 	anchor: TimelineAnchor,
@@ -255,7 +202,6 @@ export function windowFor(
 		}
 		case "month": {
 			const start = `${anchor}-01`;
-			// Day 0 of the next month is the last day of this one.
 			const year = Number(anchor.slice(0, 4));
 			const month = Number(anchor.slice(5, 7));
 			const end = dayString(new Date(Date.UTC(year, month, 0)));
@@ -272,61 +218,38 @@ export function windowFor(
 	}
 }
 
-/**
- * The first day of the calendar period immediately before the one `anchor`
- * names, at the same granularity: the day before for "day", the Monday a week
- * back for "week", the first of last month, the first of last year. Null for
- * "all", which has no period before it. Stepped back repeatedly to find the
- * stretch a window's highlights compare it with (see precedingWindows).
- */
 export function previousPeriodStart(
 	period: TimelinePeriod,
 	anchor: TimelineAnchor,
 ): string | null {
 	const window = windowFor(period, anchor);
 	if (!window) return null;
-	// A day one step before this window's start lands in the previous period;
-	// resolving that day back to a window gives the period's own first day.
 	const dayInPrevPeriod = shiftDays(window.start, -1);
 	return (
 		windowFor(period, anchorForDay(period, dayInPrevPeriod))?.start ?? null
 	);
 }
 
-/**
- * The anchor one whole period before (-1) or after (1) `anchor`, at the same
- * granularity, whether or not anything was heard there: what the date
- * stepper's arrows move to.
- */
 export function stepAnchor(
 	period: Exclude<TimelinePeriod, "all">,
 	anchor: TimelineAnchor,
 	direction: -1 | 1,
 ): TimelineAnchor {
 	const window = windowFor(period, anchor);
-	// A day just past either edge of the window lies in the neighbouring period.
 	const edge = direction < 0 ? window.start : window.end;
 	return anchorForDay(period, shiftDays(edge, direction));
 }
 
-/** Calendar days from `start` to `end` inclusive; zero or less when `end` comes
-    first. */
 export function daysInRange(start: string, end: string): number {
 	return (
 		Math.round((utcDate(end).getTime() - utcDate(start).getTime()) / DAY_MS) + 1
 	);
 }
 
-/** `day` moved `delta` days, as a day string. */
 export function addDays(day: string, delta: number): string {
 	return shiftDays(day, delta);
 }
 
-/**
- * The `count` whole periods just before the one `anchor` names, nearest first:
- * the stretch a window's highlights call "usual". Empty for "all", which has
- * nothing before it.
- */
 export function precedingWindows(
 	period: TimelinePeriod,
 	anchor: TimelineAnchor,

@@ -12,17 +12,7 @@ import { SITE_NAME } from "~/lib/page-title.ts";
 import { messageForThrown, UNLOCK_MESSAGES } from "~/lib/unlock-messages.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 
-/**
- * The station's sign-in form, its own card under the Account masthead.
- * Gated pages redirect there rather than locking in place, and `onUnlock` is
- * how the page sends you on to the one you were headed for.
- */
-export function UnlockGate({
-	onUnlock,
-}: {
-	/** Runs once the session is live and the router has picked it up. */
-	onUnlock?: () => void;
-}) {
+export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 	const unlock = useServerFn(unlockFn);
 	const router = useRouter();
 	const [password, setPassword] = useState("");
@@ -30,10 +20,7 @@ export function UnlockGate({
 	const [pending, setPending] = useState(false);
 	const field = useRef<HTMLInputElement>(null);
 
-	// Focused from an effect rather than with `autoFocus`, which React does not
-	// apply when hydrating a server-rendered page -- the attribute alone worked
-	// on a client-side transition to this screen and silently did nothing on a
-	// full page load, which is the more common way to arrive here.
+	// An effect, not `autoFocus`: React doesn't apply that attribute when hydrating.
 	useEffect(() => {
 		field.current?.focus();
 	}, []);
@@ -56,9 +43,6 @@ export function UnlockGate({
 				return;
 			}
 			setError(UNLOCK_MESSAGES[result.reason]);
-			// The station changed under this page -- its password was removed or
-			// its file broke since the page loaded. Refetching swaps the form for
-			// the card that explains it.
 			if (result.reason === "not-set-up" || result.reason === "misconfigured") {
 				forgetUnlockStatus();
 				await router.invalidate();
@@ -78,17 +62,7 @@ export function UnlockGate({
 			onSubmit={onSubmit}
 		>
 			<CardHeader as="h2" titleId="unlock-title" title={SIGN_IN_CARD_TITLE} />
-			{/* The same two-column field grid the settings cards use, so the
-					    field is the width of a Station or Storage field rather than a
-					    password box stretched across the whole content column. */}
 			<div className="grid gap-4 sm:grid-cols-2">
-				{/* There is no username -- the station has one password -- but a
-				    password manager files a login under one, and a form with only a
-				    password left them unsure what they were saving. A fixed,
-				    read-only name gives them that. It's the public site name, not
-				    the station's own SITE_NAME: that one is only readable once
-				    signed in, and renaming the station would orphan saved logins.
-				    The server never sees it. */}
 				<div className="space-y-1.5 sm:col-start-1">
 					<label
 						htmlFor="station-username"
@@ -106,12 +80,6 @@ export function UnlockGate({
 						className="bg-[var(--meadow)] text-muted-foreground hover:bg-[var(--meadow)] hover:text-muted-foreground"
 					/>
 				</div>
-				{/* Laid out like the settings cards' `Field`, but with the hint
-				    outside the label and referenced by `aria-describedby`. Nesting
-				    it, as `Field` does, folds the whole hint into the field's
-				    accessible name -- a screen reader would announce "Station
-				    password Set on the Pi with scripts/set_web_ui_password.sh"
-				    as the name of the box. */}
 				<div className="space-y-1.5 sm:col-start-1">
 					<label
 						htmlFor="station-password"
@@ -140,8 +108,6 @@ export function UnlockGate({
 				</div>
 			</div>
 
-			{/* Button first, on the left under the fields it submits, with any
-			    failure beside it. Full size, like every Account page action. */}
 			<div className="flex flex-wrap items-center gap-3">
 				<Button
 					type="submit"
@@ -151,9 +117,6 @@ export function UnlockGate({
 				>
 					{pending ? "Signing in…" : "Sign in"}
 				</Button>
-				{/* Dev server only: signs in with the password it gave its own
-				    station, through the same request the form makes. Dropped from
-				    the production build. */}
 				{import.meta.env.DEV ? (
 					<Button
 						type="button"

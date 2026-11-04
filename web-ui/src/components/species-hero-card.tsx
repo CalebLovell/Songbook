@@ -7,52 +7,16 @@ import { SpeciesImage } from "~/components/species-image.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { useCanListen } from "~/lib/use-can-listen.ts";
 
-/**
- * The Today page's masthead shape: portrait on the left, and a content column
- * that reads name, scientific name, how long ago, then when and how
- * confidently.
- */
 export const HERO_CARD_SHELL = "feature-card rounded-md p-4";
 
-/**
- * Portrait and content sit in their own grid rather than in the card itself, so
- * anything the card unfolds below -- a share summary, say -- is a sibling of
- * that row. Centring the portrait against the whole card instead would walk the
- * bird down the page every time the panel opened.
- */
-//
-// The bird page's profile card (PROFILE_CARD_CLASS) copies this geometry, so a
-// bird keeps its place going from this hero to its own page: a 9.5rem portrait
-// column inside the card's 1rem padding, the bird centred in it, and a row at
-// least 7.75rem (124px) tall -- the taller of the two cards' text -- so both
-// cards stand 158px whichever text they hold.
 const HERO_CARD_ROW =
 	"grid items-center gap-(--page-gap) sm:min-h-[7.75rem] sm:grid-cols-[9.5rem_minmax(0,1fr)]";
 
-/**
- * Indented past the portrait column and the gap after it -- 9.5rem + the page
- * gap -- so what unfolds lines up with the text above it rather than starting
- * under the bird. Below `sm` the row is one column and there is nothing to
- * clear.
- */
 const HERO_CARD_FOOTER = "sm:pl-[calc(9.5rem+var(--page-gap))]";
 
-/**
- * The portrait's slot: 120px, the bird page's portrait height, so a bird is
- * drawn the same size on the hero and on its own page, and the card stands
- * about 150px -- the text beside it fills that height rather than floating in
- * a taller one. The illustration, the loading shell and the empty station's
- * nest all take it, so the card is one height whichever it shows.
- */
 export const HERO_PORTRAIT_SLOT =
 	"flex h-30 w-full shrink-0 items-center justify-center";
 
-/**
- * The top-right controls (the Live pill, say) share the title's line beside
- * the portrait. Below `sm` the portrait stacks on top, which would leave them
- * under the bird next to the title, so there the card gives them a row of
- * their own above the portrait instead, and this copy hides.
- */
 export const HERO_ACTIONS_CLASS = "max-sm:hidden";
 
 export function HeroCardShell({
@@ -66,12 +30,9 @@ export function HeroCardShell({
 }: {
 	label: string;
 	portrait: ReactNode;
-	/** Below `sm`, the top-right controls' own row above the portrait. Beside
-	    it, the content column places them; see HERO_ACTIONS_CLASS. */
 	actions?: ReactNode;
 	className?: string;
 	style?: CSSProperties;
-	/** Unfolds beneath the portrait row, aligned with the content column. */
 	footer?: ReactNode;
 	children: ReactNode;
 }) {
@@ -83,9 +44,6 @@ export function HeroCardShell({
 			<div className={HERO_CARD_ROW}>
 				{portrait}
 
-				{/* Beside the portrait the column runs its full height -- the name
-				    level with the bird's head, the last row with its feet -- with
-				    whatever is left between them, not pooled above and below. */}
 				<div className="flex min-w-0 flex-col gap-2.5 max-[400px]:gap-2 sm:justify-between sm:self-stretch">
 					{children}
 				</div>
@@ -104,16 +62,6 @@ export function HeroPortrait({
 	comName: string;
 }) {
 	return (
-		// Centred, not left-aligned: the illustrations range from 0.81 to 1.49 in
-		// aspect, so object-contain leaves up to 37px of slack in the column. Left
-		// alignment pools all of it into the gutter before the text; centring
-		// splits it. Sizing the column to the bird instead would move the text's
-		// left edge per species, which the Today hero would jump through on every
-		// poll.
-		// Sized and cropped like the bird page's portrait -- HERO_PORTRAIT_SLOT,
-		// cropped to the painted bird rather than its whole canvas -- so going
-		// from this hero to the bird's own page keeps the bird the same size
-		// instead of jumping by a third.
 		<div className={`${HERO_PORTRAIT_SLOT} overflow-hidden`}>
 			<SpeciesImage
 				imageUrl={imageUrl}
@@ -143,19 +91,13 @@ export function SpeciesHeroCard({
 	label: string;
 	comName: string;
 	sciName: string;
-	/** Links the title to the bird page. */
 	speciesSlug?: string;
 	imageUrl: string | null;
-	/** The moss line: "5 minutes ago". */
 	relativeTime: string;
-	/** The moment that reading is of, e.g. "Sep 29, 2026, 4:13 PM" -- the date
-	    always rides along, since "3:30 PM" alone can't say which day. */
 	heardAt: string;
 	confidence: number | null;
 	audioUrl: string | null;
-	/** Top-right controls, e.g. the bird page's eBird link. */
 	actions?: ReactNode;
-	/** Unfolds beneath the card's row -- what `actions` opens, if anything. */
 	footer?: ReactNode;
 	className?: string;
 	style?: CSSProperties;
@@ -170,12 +112,8 @@ export function SpeciesHeroCard({
 			actions={actions}
 			footer={footer}
 		>
-			{/* Title and actions share a line, so the column starts level with the
-			    top of the portrait. */}
 			<div className="flex flex-wrap items-start justify-between gap-3 max-[400px]:gap-2">
 				<div className="min-w-0">
-					{/* Moss set on the heading, not inherited from the anchor: the title
-					    reads the same whether or not it links anywhere. */}
 					<h1 className="display-title font-bold text-2xl text-[var(--moss)] sm:text-3xl">
 						{speciesSlug ? (
 							<Link
@@ -198,9 +136,6 @@ export function SpeciesHeroCard({
 				<p className="font-semibold text-[var(--moss)] text-lg">
 					{relativeTime}
 				</p>
-				{/* Only the phrase is muted: set on the row, the colour leaked into
-				    the outline button (which inherits its text colour), leaving it
-				    greyer than the same button everywhere else. */}
 				<div className="tabular-data mt-1 flex flex-wrap items-center gap-2 text-sm">
 					<span className="text-muted-foreground">last heard {heardAt}</span>
 					<ConfidencePill confidence={confidence} />
@@ -217,19 +152,11 @@ export function SpeciesHeroCard({
 	);
 }
 
-/**
- * SpeciesHeroCard before its bird arrives: the same rows in the same type,
- * each a skeleton bar, and skeletons the exact size of the pill and the play
- * button. Built from the card's own line heights rather than bars of a
- * guessed height, so the card is the same height loading and loaded and the
- * page never shifts.
- */
 export function SpeciesHeroCardShell({
 	label,
 	actions,
 }: {
 	label: string;
-	/** As on SpeciesHeroCard -- drawn as itself, since it needs no data. */
 	actions?: ReactNode;
 }) {
 	return (
@@ -237,8 +164,6 @@ export function SpeciesHeroCardShell({
 			label={label}
 			actions={actions}
 			portrait={
-				// The portrait's whole slot, as HeroPortrait sizes it -- the space the
-				// painting is given, however much of it a bird fills.
 				<div className={HERO_PORTRAIT_SLOT}>
 					<ShellBar className="size-full rounded-md" />
 				</div>
@@ -249,12 +174,6 @@ export function SpeciesHeroCardShell({
 	);
 }
 
-/**
- * The content column's shell on its own. A card that stands in for the bird
- * (an empty station, say) can lay this down invisibly beneath its own text,
- * so it holds the same height the shell and the bird do and nothing below it
- * moves when the data lands.
- */
 export function HeroTextShell({ actions }: { actions?: ReactNode }) {
 	const canListen = useCanListen();
 	return (

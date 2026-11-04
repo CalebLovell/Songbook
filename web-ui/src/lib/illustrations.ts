@@ -6,27 +6,12 @@ import {
 } from "~/lib/illustrations-new.ts";
 import { REFERENCE_PHOTOS } from "~/lib/reference-photos.ts";
 
-// The kachō-e style illustrations painted with tools/illustrate
-// (public/illustrations-new/, listed in illustrations-new.ts). A species
-// without one shows its CC0 reference photo (reference-photos.ts), and
-// without that the generic bird glyph (see SpeciesImage).
-
-/**
- * "perched" reads clearly at thumbnail size, so it stays the default for
- * lists; "flight" is for the large hero slots where the spread wings have room.
- */
 export type IllustrationPose = "perched" | "flight";
 
 function slugify(sciName: string): string {
 	return sciName.trim().toLowerCase().replaceAll(/\s+/g, "-");
 }
 
-/**
- * The species' picture, or null when it has none: its painting, else its
- * reference photo. A species painted perched only shows that pose in the
- * flight slot too; a photo has one pose and serves both. `photos` is a
- * parameter only so tests can inject entries.
- */
 export function illustrationUrlFor(
 	sciName: string,
 	pose: IllustrationPose = "perched",
@@ -38,17 +23,10 @@ export function illustrationUrlFor(
 	return `/illustrations-new/${slug}${flight ? "-2" : ""}.png`;
 }
 
-/** True for a hotlinked reference photo, false for one of our paintings. */
 export function isPhotoUrl(url: string): boolean {
 	return url.startsWith("https://");
 }
 
-/**
- * Where the animal sits on an illustration's square canvas, as [x, y, width,
- * height] in canvas pixels -- or null for anything that isn't one of ours.
- * The canvases leave each animal a different margin on purpose (so lists keep
- * a finch and a nuthatch at a like size); a large slot crops to this instead.
- */
 export function paintedBoundsFor(imageUrl: string): PaintedBounds | null {
 	const stem = imageUrl.match(/^\/illustrations-new\/([a-z0-9-]+)\.png$/)?.[1];
 	return (stem && PAINTED_BOUNDS[stem]) || null;

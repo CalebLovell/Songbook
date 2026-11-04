@@ -14,12 +14,6 @@ import { useId } from "react";
 
 import { useUpdateOffered } from "~/lib/use-update-offered.ts";
 
-/**
- * The site's nav, shared by the desktop sidebar and the mobile drawer.
- *
- * `onNavigate` lets the drawer close itself on a tap; the desktop sidebar
- * passes nothing, since it never needs dismissing.
- */
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 	const linkProps = {
 		className: "sidebar-link",
@@ -28,19 +22,11 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 	};
 
 	const { auth } = useRouteContext({ from: "__root__" });
-	// The body renders in both the desktop column and the drawer, so the label
-	// ids have to be unique per copy.
 	const id = useId();
 	const offered = useUpdateOffered(auth.unlocked);
 
 	return (
 		<div className="flex flex-1 flex-col px-3">
-			{/* The pages for browsing sit up top, and the station's working pages
-			    together under their own label, then Account and Settings at the
-			    foot. A visitor never sees Manage or Settings -- Account is their
-			    way in, and signing in is what makes them appear. Detections lives under Manage though it isn't gated,
-			    so a visitor reaches it only by URL or the site search. Each label
-			    is the nav's accessible name too. */}
 			<nav
 				className="mt-1 flex flex-col gap-0.5"
 				aria-labelledby={`${id}-explore`}
@@ -50,9 +36,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					<Activity className="sidebar-icon" aria-hidden="true" />
 					Live Feed
 				</Link>
-				{/* One entry for every scope: a day, a week, a year, all of it. The
-				    period control on the page is what used to be three separate nav
-				    entries, so listing them again here would undo the merge. */}
 				<Link
 					to="/timeline"
 					activeOptions={{ includeSearch: false }}
@@ -77,9 +60,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					aria-labelledby={`${id}-manage`}
 				>
 					<SectionLabel id={`${id}-manage`}>Manage</SectionLabel>
-					{/* The search-bearing links keep their defaults and
-					    `activeOptions={{ includeSearch: false }}`: without it the link stops
-					    reading as active as soon as paging or sorting changes the URL. */}
 					<Link
 						to="/detections"
 						search={{
@@ -106,11 +86,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 				</nav>
 			) : null}
 
-			{/* Set apart at the foot of the sidebar: `mt-auto` pushes it down on a
-			    tall viewport and leaves it last in the flow on a short one. Account
-			    is open to everyone -- a visitor signs in there, an owner locks up
-			    there -- and Species Control and Settings join it once unlocked. Its label is "Station",
-			    which a visitor sees over Account alone too. */}
 			<nav
 				className="mt-auto flex flex-col gap-0.5 pt-4"
 				aria-labelledby={`${id}-station`}
@@ -148,10 +123,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 	);
 }
 
-/**
- * A small moss dot saying the station has a release waiting, on the Settings
- * link and the menu bar's button. The label is for screen readers and hover.
- */
 export function UpdateDot({
 	label,
 	className = "",
@@ -169,20 +140,12 @@ export function UpdateDot({
 	);
 }
 
-/**
- * A group's label: the kicker's size, weight and colour, but in its own case,
- * set near the left between hairlines: a short lead-in, then one running out
- * to the nav's right edge.
- */
 function SectionLabel({ id, children }: { id: string; children: string }) {
 	return (
 		<h2
 			id={id}
 			className="m-0 -mx-3 flex items-center gap-2 pb-2 font-bold text-[0.69rem] text-[var(--kicker)] leading-none"
 		>
-			{/* The lines run out past the nav's inset to the card's edges, like the
-			    divider under the wordmark; the leading one is that inset longer,
-			    so the label itself stays put. */}
 			<span aria-hidden="true" className="h-px w-6 bg-[var(--line)]" />
 			{children}
 			<span aria-hidden="true" className="h-px flex-1 bg-[var(--line)]" />

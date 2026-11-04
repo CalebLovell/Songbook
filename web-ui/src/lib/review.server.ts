@@ -31,21 +31,14 @@ export type ReviewCandidate = {
 	audioUrl: string;
 	audioAvailable: boolean;
 	speciesLink: SpeciesLink | null;
-	/** The bundled illustration, or null for the generic bird glyph. */
 	imageUrl: string | null;
 };
 export type ReviewPage = {
-	/** One-based; held to the pages that exist. */
 	page: number;
 	pageSize: number;
-	/** Strict lifetime-count cutoff applied to this queue. */
 	rareSpeciesMax: number;
-	/** Recordings meeting the review criteria, of which `candidates` is a page. */
 	total: number;
-	/** How many distinct species those recordings span. */
 	speciesTotal: number;
-	/** Whether the station has recorded anything at all, so an empty queue can
-	    say which of the two it is: nothing recorded, or nothing to review. */
 	hasAnyDetections: boolean;
 	candidates: ReviewCandidate[];
 };
@@ -64,18 +57,6 @@ const defaultFileOperations: ReviewFileOperations = {
 	rm,
 };
 
-/**
- * Our own table, not BirdNET-Pi's. It exists because `detections` cannot grow a
- * column: both writers (scripts/utils/reporting.py and scripts/seed_test_data.py)
- * INSERT positionally with no column list, so a thirteenth column would stop the
- * station recording. Keeping review state alongside instead leaves their SQL --
- * and BirdNET's own confidence scores -- exactly as they were.
- *
- * Keyed on the detection's identity rather than its rowid: SQLite hands deleted
- * rowids out to later inserts, so a rowid-keyed record could eventually attach
- * itself to an unrelated new detection and mark it reviewed before anyone
- * listened to it.
- */
 const CREATE_REVIEWS_TABLE = `CREATE TABLE IF NOT EXISTS reviews (
   Date TEXT NOT NULL,
   Time TEXT NOT NULL,
@@ -87,7 +68,6 @@ const CREATE_REVIEWS_TABLE = `CREATE TABLE IF NOT EXISTS reviews (
   PRIMARY KEY (Date, Time, Com_Name, File_Name)
 )`;
 
-/** Matches a `reviews` row to the `detections` row it describes. */
 const REVIEW_MATCHES_DETECTION =
 	"r.Date = d.Date AND r.Time = d.Time AND r.Com_Name = d.Com_Name AND r.File_Name = d.File_Name";
 
@@ -95,11 +75,6 @@ export function ensureReviewsTable(database: DatabaseSync) {
 	database.exec(CREATE_REVIEWS_TABLE);
 }
 
-/**
- * Reads run against a read-only handle and must work on a station that has
- * never reviewed anything, so the table is only joined once it exists rather
- * than being created on the read path.
- */
 export function reviewsTableExists(database: DatabaseSync): boolean {
 	return (
 		database
@@ -110,12 +85,6 @@ export function reviewsTableExists(database: DatabaseSync): boolean {
 	);
 }
 
-/**
- * The whole queue in one clause: a species the station barely hears, on a
- * recording BirdNET was not already sure about, that nobody has signed off yet.
- * Reviewing a confident call from a bird the station logs hundreds of times a
- * year tells nobody anything, so none of the three is optional.
- */
 function rareAndUnsure(reviewed: boolean): string {
 	const unreviewed = reviewed
 		? ` AND NOT EXISTS (SELECT 1 FROM reviews r WHERE ${REVIEW_MATCHES_DETECTION})`
@@ -148,11 +117,7 @@ export function loadReviewPage(
 		)
 		.get(rareSpeciesMax);
 	const total = Number(totals?.n ?? 0);
-	// Clearing the last rows of the last page leaves the URL on a page that no
-	// longer exists; show the one before it rather than an empty queue.
 	const page = Math.min(search.page, Math.max(1, Math.ceil(total / pageSize)));
-	// Rarest species first, then weakest recording: the bird you have heard once
-	// is the one where a mistake matters most.
 	const rows = database
 		.prepare(
 			`${queue} ORDER BY lifetimeCount ASC, comName ASC, confidence IS NOT NULL, confidence ASC, date DESC, time DESC LIMIT ? OFFSET ?`,
@@ -237,13 +202,6 @@ type ReviewedRow = {
 	fileName: string;
 };
 
-/**
- * Signs a detection off. `INSERT OR REPLACE` rather than a plain insert so
- * confirming something twice -- two tabs, a double click -- is not an error.
- * `confidence` is BirdNET's own score, recorded as it stood at review time;
- * nothing writes back to `detections.Confidence`, which is the point of the
- * whole table.
- */
 function recordReview(
 	database: DatabaseSync,
 	row: ReviewedRow,
@@ -265,7 +223,6 @@ function recordReview(
 		);
 }
 
-/** Drops any sign-off for a detection that no longer exists under that identity. */
 function forgetReview(database: DatabaseSync, row: ReviewedRow) {
 	if (!reviewsTableExists(database)) return;
 	database
@@ -343,8 +300,6 @@ export async function recategorizeDetection(
 			)
 			.run(species.sciName, species.comName, fileName, rowId);
 		if (result.changes !== 1) throw new Error("Detection was not updated");
-		// Signed off under the identity it now has, and any sign-off filed under
-		// the old name dropped, so re-identifying twice leaves one record.
 		forgetReview(database, row);
 		recordReview(
 			database,
@@ -385,8 +340,6 @@ export async function deleteDetectionDirectly(
 	const result = database
 		.prepare("DELETE FROM detections WHERE rowid=?")
 		.run(rowId);
-	// Otherwise the sign-off outlives the detection, and a future recording that
-	// lands on the same date, time, species and filename inherits it.
 	forgetReview(database, row);
 	const references = Number(
 		database

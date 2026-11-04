@@ -30,8 +30,6 @@ export const Route = createFileRoute("/review")({
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
 	loaderDeps: ({ search }) => search,
-	// Deferred: the page renders at once (see Deferred), and the queue fills
-	// in when it arrives.
 	loader: ({ deps }) => ({
 		queue: Promise.all([
 			getReviewPage({ data: deps }),
@@ -43,7 +41,6 @@ export const Route = createFileRoute("/review")({
 
 function Review() {
 	const { queue } = Route.useLoaderData();
-	// Whether the queue on screen is the latest, to hold the buttons busy.
 	const settled = useSettled(queue);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
@@ -80,18 +77,12 @@ function Review() {
 					{error}
 				</p>
 			) : null}
-			{/* Keyed on the search, so a new page of the queue drops to its shell
-			    at once. An action's refetch keeps the same key: the router runs it
-			    in a transition, which holds the queue on screen until the new one
-			    is in -- and holds the buttons busy until then too. */}
 			<Deferred
 				key={JSON.stringify(search)}
 				promise={queue}
 				shell={<ReviewWorkflowSkeleton />}
 			>
 				{(loaded) => (
-					// Keyed by page so a new page starts on its first bird with
-					// nothing skipped.
 					<ReviewWorkflow
 						key={loaded.page.page}
 						page={loaded.page}

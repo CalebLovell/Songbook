@@ -12,55 +12,28 @@ import { compactCount } from "~/lib/number-format.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 
-/**
- * One species' day, as the grid draws it. Both callers carry more than this --
- * the timeline its eBird links, the day page its recordings -- so they narrow
- * to the fields the grid actually reads.
- */
 export type SpeciesHourRow = {
 	comName: string;
 	imageUrl: string | null;
-	/** 24 counts, midnight first. */
 	hourCounts: number[];
 	totalDetections: number;
-	/** The station had never recorded this species before the window opened. */
 	isNew: boolean;
-	/** The day a New bird was first recorded. Null unless isNew. */
 	firstHeard: string | null;
-	/** Back after time away before this window. */
 	isReturned: boolean;
-	/** Heard only a handful of times ever at this station. */
 	isRare: boolean;
 	isConsistent: boolean;
-	/** How much of the window a Regular bird filled ("every day this week"). */
 	regularNote: string | null;
 	away: string | null;
-	/** How many times its usual rate, when heard far more than usual. */
 	vocal: VocalJump | null;
 };
 
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 
-// The heat map never scrolls sideways, each species is always one row -- name
-// and count, then its 24 hours beside them -- and the hour squares never
-// shrink: 24 fixed 1.75rem columns, each holding a square 1.5rem tile.
-//
-// So the names are what give way. They soak up whatever the hours leave and
-// truncate to fit, down to about 8rem. A card too narrow for that beside the
-// full 42rem of hours (under 56rem -- a phone, or a smaller laptop once the
-// sidebar takes its share) drops the hours entirely, and the names and counts
-// alone carry the ranking. Measured against the card, not the viewport, since
-// the sidebar eats a varying share of the screen.
-//
-// Per-row flex rather than two side-by-side panels: every row shares the one
-// card width, so the name and hour columns still line up down the list.
 const ROW_LAYOUT = "flex items-center";
 
 const LABEL_LAYOUT =
 	"grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 max-[400px]:gap-2 @min-[56rem]/card:pr-6";
 
-// The bird's slot. Its right margin tops the row's gap-2 up to --page-gap, so
-// the space after the bird matches the row's inset before it.
 const BIRD_BOX_CLASS =
 	"me-[calc(var(--page-gap)-0.5rem)] flex size-6 shrink-0 items-center justify-center";
 
@@ -68,10 +41,6 @@ const HOURS_LAYOUT = "hidden flex-none @min-[56rem]/card:block";
 
 const HOUR_GRID_COLUMNS = "repeat(24, 1.75rem)";
 
-// An hour with no detections: a whisper of moss rather than an outlined box,
-// so the columns still read but a quiet bird's row doesn't become a line of
-// empty frames. Kept well under the 20% of the lightest heat level, so an
-// empty hour never passes for a quiet one.
 const EMPTY_CELL_COLOR =
 	"color-mix(in oklab, var(--moss) 4%, var(--paper-raised))";
 
@@ -82,15 +51,6 @@ function hourTickParts(hour: number): { number: string; meridiem: string } {
 	return { number: String(hour - 12), meridiem: "p" };
 }
 
-/**
- * The species x hour grid on the timeline page. A left panel ranks the species
- * by total detections, name and count; the heatmap to its right shades every
- * cell on one scale, topped by the busiest hour of any species in the window,
- * so a quiet bird reads as quiet next to a loud one (see heatShare).
- *
- * It always fits the card: the hours shrink before they would scroll, and on a
- * phone they drop away. See ROW_LAYOUT.
- */
 export function SpeciesByHourCard({
 	rows,
 	emptyMessage,
@@ -100,11 +60,7 @@ export function SpeciesByHourCard({
 }: {
 	rows: SpeciesHourRow[];
 	emptyMessage: string;
-	/** A way out of an empty window, set on its own line under the message. */
 	emptyAction?: ReactNode;
-	/** The window's headline figures, set beside the kicker -- the timeline
-	 * page's detections/species readout. Omitted by callers that show the card
-	 * on its own. */
 	summary?: ReactNode;
 	className?: string;
 }) {
@@ -120,17 +76,6 @@ export function SpeciesByHourCard({
 				<div
 					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${isEmpty ? "mb-(--page-gap)" : ""}`}
 				>
-					{/* "Activity" -- identical to the grid view's kicker -- so the summary
-					    beside it sits at the same x in both bodies and doesn't jump when
-					    the view toggle swaps one card for the other. Not "Species": the
-					    summary already says "N species" right beside it. The masthead
-					    subtitle carries the by-hour vs. how-often distinction. */}
-					{/* Under 480px this wrapper steps aside (`contents`) so the kicker
-					    and the summary wrap: the kicker on the first line, the summary
-					    on its own below it. See WindowSummary on the timeline page. */}
-					{/* Exactly the kicker's own line box, so the kicker sits where every
-					    other card's title does. The summary centres on it and overhangs
-					    by a hair; a quiet window with none doesn't move it. */}
 					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 						<div className="island-kicker shrink-0">Activity</div>
 						{summary}
@@ -143,26 +88,9 @@ export function SpeciesByHourCard({
 						{emptyAction ? <div className="mt-3">{emptyAction}</div> : null}
 					</>
 				) : (
-					// px-1/-mx-1 give the row links' focus ring room at the sides.
 					<div className="-mx-1 px-1">
-						{/* The header: the count column's label, set exactly like the hour
-						    numbers, beside the hour ticks. It sits straight under the card's
-						    header band, its labels centred in a strip as tall as a bird row
-						    (py-2 around the 16px ticks, 32px), so it reads as the table's
-						    header row between two hairlines. */}
 						<HeaderRow />
 
-						{/* Hairlines run wall to wall across the card, one above every
-						    bird -- the first included, so the header is ruled off from the
-						    list. The list reaches out through the card's padding (the
-						    wrapper's px-1 and -mx-1 cancel) and each row pads its content
-						    back in, so only the rule spans the full width. Both use
-						    --page-gap, not a fixed 16px: that is what the card's p-4
-						    resolves to at every width, including the phone override in
-						    styles.css. The card trims its bottom padding to a sliver (pb-1!,
-						    important so that same override can't restore the full gap), so
-						    the card's own border closes the list like one more rule, just
-						    off the last bird. */}
 						<div className="-mx-(--page-gap) [&>*]:px-(--page-gap)">
 							{rows.map((row) => (
 								<SpeciesHourRowView
@@ -179,8 +107,6 @@ export function SpeciesByHourCard({
 	);
 }
 
-/** The table's header row: the count column's label beside the hour ticks.
-    Needs no data, so the skeleton draws it as itself. */
 function HeaderRow() {
 	return (
 		<div className={`${ROW_LAYOUT} py-2`}>
@@ -204,9 +130,6 @@ function HeaderRow() {
 	);
 }
 
-/**
- * One hour's tick: its number, with a small a/p.
- */
 function HourTick({ hour }: { hour: number }) {
 	const { number, meridiem } = hourTickParts(hour);
 	return (
@@ -219,11 +142,6 @@ function HourTick({ hour }: { hour: number }) {
 	);
 }
 
-/**
- * One species: bird, name and its flags, then its detection count for the
- * window, then its hours beside it. The flags follow the name, so they read
- * as belonging to the bird rather than to the count.
- */
 function SpeciesHourRowView({
 	row,
 	heatMax,
@@ -233,8 +151,6 @@ function SpeciesHourRowView({
 }) {
 	return (
 		<div className={`${ROW_LAYOUT} border-[var(--line)] border-t`}>
-			{/* Only the name links, as on the grid's tiles: a row-wide link swallowed
-			    every tap, so on a phone the flags' tooltips could never open. */}
 			<div className={`h-8 ${LABEL_LAYOUT}`}>
 				<div className="flex min-w-0 items-center gap-2">
 					<div className={BIRD_BOX_CLASS}>
@@ -252,8 +168,6 @@ function SpeciesHourRowView({
 					>
 						{row.comName}
 					</Link>
-					{/* The name gives way before the flags: they keep their size and
-					    the name truncates beside them. */}
 					<div className="flex shrink-0 items-center gap-2">
 						<SpeciesFlagPills
 							isNew={row.isNew}
@@ -268,8 +182,6 @@ function SpeciesHourRowView({
 					</div>
 				</div>
 
-				{/* Every row's count ends at the same edge, so the digits stack in a
-				    straight line down the list. */}
 				<span className="count-figure text-right">
 					{row.totalDetections.toLocaleString()}
 				</span>
@@ -282,25 +194,12 @@ function SpeciesHourRowView({
 	);
 }
 
-/**
- * The row's 24 cells, each scaled against this row's own busiest hour so the
- * shape of the day reads regardless of the bird's overall volume.
- */
-function HeatRow({
-	row,
-	heatMax,
-}: {
-	row: SpeciesHourRow;
-	/** The busiest hour of any species in the window: one scale for all rows. */
-	heatMax: number;
-}) {
+function HeatRow({ row, heatMax }: { row: SpeciesHourRow; heatMax: number }) {
 	return (
 		<div
 			className="grid items-center"
 			style={{ gridTemplateColumns: HOUR_GRID_COLUMNS }}
 		>
-			{/* Driven by the hour list rather than the counts, so each cell is keyed
-			    by the hour it stands for instead of its position in the array. */}
 			{HOURS.map((hour) => {
 				const count = row.hourCounts[hour] ?? 0;
 				return (
@@ -315,10 +214,6 @@ function HeatRow({
 							color: heatInk(count, heatMax),
 						}}
 					>
-						{/* A zero reads as an empty cell: printing the digit 24 times a
-						    row would bury the counts that matter under noise. Past three
-						    digits the count shortens (1.2k, 300k) to fit the square; the
-						    exact figure stays in the label. */}
 						{count > 0 ? compactCount(count) : null}
 					</div>
 				);
@@ -329,12 +224,6 @@ function HeatRow({
 
 const NAME_WIDTHS = ["w-40", "w-28", "w-36", "w-32", "w-44", "w-24"];
 
-/**
- * The card before its rows arrive, built from the card's own pieces: the
- * header band (with the caller's summary in it), the header row as
- * itself, then rows of the real height -- the bird's square, bars for the
- * name and the count, and the 24 hour cells as soft tiles.
- */
 export function SpeciesByHourCardSkeleton({
 	summary,
 	rows = 15,

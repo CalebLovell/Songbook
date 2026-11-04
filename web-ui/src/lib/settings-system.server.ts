@@ -45,12 +45,6 @@ const defaultRunner: SettingsCommandRunner = (executable, args, stdin) =>
 		if (stdin !== undefined) child.stdin?.end(stdin);
 	});
 
-/**
- * The services that have to be bounced before a card's values are the ones
- * BirdNET is actually running. Omit the card for the whole set at once -- what
- * a reset needs, and one restart rather than bouncing birdnet_analysis four
- * times over as each card is written.
- */
 export function servicesFor(card?: SettingsCardKind): string[] {
 	return card
 		? [...SERVICES[card]]
@@ -64,12 +58,6 @@ function skipRequested(context: SettingsSystemContext) {
 	);
 }
 
-/**
- * Restarts a card's services, or every resettable card's between them. This is
- * both the tail of a save and the whole of the Restart control the UI offers
- * when that tail failed -- retrying is the same command, so it is the same
- * code path rather than a second one that could drift from it.
- */
 export async function restartServices(
 	card?: SettingsCardKind,
 	context: SettingsSystemContext = {},

@@ -32,8 +32,6 @@ function poolOf(count: number): PoolSpecies[] {
 	);
 }
 
-// A predictable stand-in for Math.random: always picks the first element of
-// whatever it is asked about, which keeps the shuffles a no-op.
 const alwaysZero = () => 0;
 
 test("builds a full round of questions from a large enough pool", () => {

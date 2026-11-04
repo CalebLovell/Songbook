@@ -36,12 +36,6 @@ const MONTH_LABELS = [
 	"Dec",
 ];
 
-/**
- * The twelve calendar months, zero-filled, from rows bucketed by two-digit
- * month ("01".."12") with every year folded together. A fixed twelve-point
- * axis is the point of the chart: the seasons read at a glance only if a quiet
- * January still takes up as much room as a busy May.
- */
 export function buildMonthlyTrend(rows: TrendBucketCount[]): TrendPoint[] {
 	const countByBucket = new Map(rows.map((row) => [row.bucket, row.count]));
 
@@ -82,12 +76,6 @@ export function rankingBarPercent(count: number, maximum: number): number {
 	return Math.max(2, Math.round((count / maximum) * 100));
 }
 
-/**
- * Collapses per-species hour counts (each a 24-length array, midnight first)
- * into one detections-by-hour series for a window. Lets any timeline window
- * feed DetectionsByHourCard, not just the day and all-time views that carry a
- * ready-made HourActivity.
- */
 export function hourActivityFromRows(
 	rows: { hourCounts: number[] }[],
 ): HourActivity[] {

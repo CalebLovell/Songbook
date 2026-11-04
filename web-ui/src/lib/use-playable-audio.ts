@@ -1,19 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
-// The browser's native <audio src> loading doesn't reliably reach this app's
-// dynamic audio route (some Sec-Fetch-Dest-specific behavior in this dev
-// stack), but a plain fetch() always does -- so fetch it ourselves and play
-// from a local blob instead.
-//
-// The fetch is shared: a spectrogram and its player ask for the same clip, and
-// a handful of recent clips stay cached so replaying one doesn't refetch it.
 const CACHE_SIZE = 12;
 const clipCache = new Map<string, Promise<Blob>>();
 
+// Fetched rather than <audio src>: native loading doesn't reliably reach the
+// dynamic audio route, while fetch() does.
 export function fetchAudioBlob(audioUrl: string): Promise<Blob> {
 	const cached = clipCache.get(audioUrl);
 	if (cached) {
-		// Re-insert so the Map's order tracks recency.
 		clipCache.delete(audioUrl);
 		clipCache.set(audioUrl, cached);
 		return cached;
@@ -22,7 +16,6 @@ export function fetchAudioBlob(audioUrl: string): Promise<Blob> {
 		if (!response.ok) throw new Error("Failed to fetch audio");
 		return response.blob();
 	});
-	// A failed fetch isn't kept, so the next attempt tries again.
 	pending.catch(() => clipCache.delete(audioUrl));
 	clipCache.set(audioUrl, pending);
 	while (clipCache.size > CACHE_SIZE) {
@@ -33,30 +26,20 @@ export function fetchAudioBlob(audioUrl: string): Promise<Blob> {
 	return pending;
 }
 
-/** Drops every fetched clip, for signing out: those the gate let through only
- *  while signed in must not go on playing from memory afterwards. */
 export function forgetFetchedClips() {
 	clipCache.clear();
 }
 
-// One clip at a time across the whole app: starting a call pauses whichever
-// one was already playing, rather than letting two rows talk over each other.
 let playingClip: HTMLAudioElement | null = null;
 
-/**
- * Call from the tap that asks for a clip, before fetching it. iOS Safari lets
- * an element start sound only from inside a tap, and by the time the clip has
- * arrived the tap is over, so its play() is refused -- the first tap on a slow
- * phone did nothing. A play() during the tap lifts that for the element for
- * good; the pause() straight after keeps this one from sounding or counting.
- */
+// iOS Safari only lets an element start sound inside a tap, and a slow clip arrives
+// after the tap ends. A play() and pause() during the tap unlock the element for good.
 export function primeForPlayback(audio: HTMLAudioElement | null) {
 	if (!audio || audio.src) return;
 	audio.play().catch(() => {});
 	audio.pause();
 }
 
-/** Call as `audio` starts playing: pauses whichever clip had the floor. */
 export function claimPlayback(audio: HTMLAudioElement | null) {
 	if (playingClip && playingClip !== audio) playingClip.pause();
 	playingClip = audio;
@@ -76,7 +59,6 @@ export function usePlayableAudio(audioUrl: string | null) {
 		};
 	}, []);
 
-	/** Fetches the clip and hands it to the <audio> once; true when it's ready. */
 	function load(): Promise<boolean> {
 		const audio = audioRef.current;
 		if (!audio || !audioUrl) return Promise.resolve(false);

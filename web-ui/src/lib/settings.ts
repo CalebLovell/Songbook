@@ -80,11 +80,6 @@ export const resetSettingsFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
 	.handler(() => resetSettings());
 
-/**
- * The card names the services to bounce, so a stale Detection card does not
- * take the recorder down with it. Validated against the known cards rather
- * than trusted: this ends in an argument list to `systemctl restart`.
- */
 export const restartStationFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
 	.validator(

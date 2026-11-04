@@ -37,9 +37,6 @@ const PERIOD_ICONS: Record<
 	all: InfinityIcon,
 };
 
-// The native input that fits each granularity. Chromium renders week and month
-// as real pickers; elsewhere they degrade to text fields holding the same
-// "2026-W31" / "2026-07" values, which still round-trip correctly.
 const PICKER_TYPES: Record<Exclude<TimelinePeriod, "all">, string> = {
 	day: "date",
 	week: "week",
@@ -54,15 +51,6 @@ const PICKER_LABELS: Record<Exclude<TimelinePeriod, "all">, string> = {
 	year: "Year",
 };
 
-/**
- * The single time control for the timeline page: how wide a window to look
- * through, and which one.
- *
- * This is the whole reason Today, Timeline, Stats and the day review are one
- * page rather than four. Each of them was a fixed scope with its own way of
- * moving through time; here the scope is a control, and the page underneath
- * changes to suit it.
- */
 export function PeriodToolbar({
 	period,
 	anchor,
@@ -77,16 +65,10 @@ export function PeriodToolbar({
 	window: TimelineWindow | null;
 	lastActiveDay: string | null;
 	stationRange: { first: string; last: string } | null;
-	/** How the window is drawn, set just before the date it draws. */
 	viewSwitch?: React.ReactNode;
 	onChange: (next: { period?: TimelinePeriod; date?: string }) => void;
 }) {
 	const pickPeriod = (next: TimelinePeriod) => {
-		// Carry the spot in history across the switch, anchored on the last day of
-		// the current window that holds detections. Using the window's start
-		// instead would drop Yearly onto January 1st and land the user in a dead
-		// month; falling back to it only matters when the current window is empty
-		// anyway.
 		const carried = lastActiveDay ?? window?.start;
 		onChange({
 			period: next,
@@ -96,13 +78,7 @@ export function PeriodToolbar({
 	};
 
 	return (
-		// One row, the date field shrinking first as it narrows. Under 480px the
-		// three no longer fit without cutting the date short, so it takes a full
-		// row of its own beneath the period and the view switch.
 		<div className="flex items-center justify-between gap-(--page-gap) max-[480px]:flex-wrap">
-			{/* Five joined segments need about 710px of row beside the picker, and a
-			    segmented control can't wrap without breaking its own shape -- so
-			    below 800px the same choice becomes a dropdown. */}
 			<PeriodSelect period={period} onPick={pickPeriod} />
 			<div className="hidden min-[800px]:block">
 				<ToggleGroup
@@ -125,9 +101,6 @@ export function PeriodToolbar({
 				</ToggleGroup>
 			</div>
 
-			{/* The view switch and date picker on the right, the date holding the
-			    far edge. "all" has no window to pick, so the switch takes the edge
-			    itself and the period switcher stays pinned left. */}
 			<div className="flex min-w-0 flex-1 items-center justify-end gap-(--page-gap) max-[480px]:contents">
 				{viewSwitch}
 				{period !== "all" ? (
@@ -143,12 +116,6 @@ export function PeriodToolbar({
 	);
 }
 
-/**
- * The period switcher on a narrow screen: a native select dressed like the
- * date field beside it -- the same box, border, card surface and hover --
- * with the chosen period's icon in front, as its tab would show it, and a
- * chevron marking it as a dropdown. Native so a phone opens its own picker.
- */
 function PeriodSelect({
 	period,
 	onPick,
@@ -159,8 +126,6 @@ function PeriodSelect({
 	const Icon = PERIOD_ICONS[period];
 	return (
 		<div className="relative shrink-0 min-[800px]:hidden">
-			{/* Under 400px the icon goes too: the row needs its width for the
-			    longest window name ("Sep 23rd, 2026") beside it. */}
 			<Icon
 				className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 max-[400px]:hidden"
 				aria-hidden="true"
@@ -185,18 +150,6 @@ function PeriodSelect({
 	);
 }
 
-/**
- * The date side of the toolbar: one bordered control, the steps joined to
- * either end by hairlines, around the window's short name ("Sep 2026") rather
- * than the browser's own picker text ("September 2026"), which is wider and
- * reads differently in every browser. The steps move one window at a time,
- * quiet ones included, as far as you like either way.
- *
- * Clicking the name opens the native picker for the granularity, laid
- * invisibly over it -- or, for a year, a native list of the station's years.
- * Fills the row beside the period menu, up to 16rem -- never a fixed width, so
- * it gives way rather than pushing past the page edge on a narrow phone.
- */
 function WindowStepper({
 	period,
 	anchor,
@@ -210,8 +163,6 @@ function WindowStepper({
 }) {
 	const label = PICKER_LABELS[period];
 	const nativePicker = useNativePicker(PICKER_TYPES[period]);
-	// The arrows walk one window at a time, quiet ones included, with no limit
-	// either way: a window ahead or before the station is just a quiet one.
 	const valid = isValidAnchor(period, anchor);
 	const prevTarget = valid ? stepAnchor(period, anchor, -1) : null;
 	const nextTarget = valid ? stepAnchor(period, anchor, 1) : null;
@@ -227,9 +178,6 @@ function WindowStepper({
 				onPick={onPick}
 			/>
 			<div className="relative flex min-w-0 flex-1 items-center justify-center px-1 pointer-coarse:text-base text-sm">
-				{/* Both lengths render and the width picks one: "Week" squeezes to
-				    "Wk" under 400px, and the calendar mark in front of the name shows
-				    only where there's room for it. */}
 				<Calendar
 					className="mr-2 size-4 shrink-0 text-muted-foreground max-[400px]:hidden"
 					aria-hidden="true"
@@ -256,22 +204,13 @@ function WindowStepper({
 				) : nativePicker ? (
 					<input
 						aria-label={label}
-						// iOS Safari gives date fields a minimum width of their own;
-						// stripping its native look lets the overlay fit the label.
 						className={`${overlay} min-w-0 appearance-none text-base`}
 						type={PICKER_TYPES[period]}
 						value={anchor}
-						// A desktop browser only opens its calendar from the field's own
-						// little button, which is invisible here -- so a click anywhere on
-						// the name asks for the picker outright. Touch browsers open it on
-						// tap regardless; where showPicker is missing or refuses, the
-						// field still takes focus as before.
 						onClick={(event) => {
 							try {
 								event.currentTarget.showPicker?.();
-							} catch {
-								// Not allowed here (e.g. not a user gesture); nothing to do.
-							}
+							} catch {}
 						}}
 						onChange={(event) => {
 							if (isValidAnchor(period, event.target.value)) {
@@ -291,13 +230,6 @@ function WindowStepper({
 	);
 }
 
-/**
- * Whether this browser draws a real picker for the input type. Where it
- * doesn't -- iOS Safari has no week picker -- the input falls back to a text
- * field, which laid invisibly over the label would take typing you can't see;
- * the stepper then drops it and steps with its arrows alone. Assumed true until
- * mounted, so the server render matches the common case.
- */
 function useNativePicker(type: string): boolean {
 	const [supported, setSupported] = useState(true);
 	useEffect(() => {
@@ -308,11 +240,6 @@ function useNativePicker(type: string): boolean {
 	return supported;
 }
 
-/**
- * The years the year list offers, newest first: the station's, this year, and
- * the one showing, plus a year either side. A native list can't run forever,
- * so the arrows are what reach further out.
- */
 function pickableYears(
 	anchor: TimelineAnchor,
 	stationRange: { first: string; last: string } | null,
@@ -328,7 +255,6 @@ function pickableYears(
 	return Array.from({ length: to - from + 1 }, (_, i) => String(to - i));
 }
 
-/** One end of the joined stepper, divided from the name by a hairline. */
 function JoinedStep({
 	direction,
 	label,

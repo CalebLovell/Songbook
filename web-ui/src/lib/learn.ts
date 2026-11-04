@@ -18,13 +18,8 @@ import {
 import { readHighlightThresholds } from "~/lib/settings-config.server.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 
-// A weak detection is usually a smear of wind or traffic that happens to score
-// as a bird -- unfair to quiz someone on. Only species whose best recording
-// the analyzer felt good about become questions.
 const MINIMUM_CLIP_CONFIDENCE = 0.65;
 
-/** Every species' all-time detection count, weak ones included -- what makes
-    a species a regular or rare here. */
 function allTimeDetections(): Map<string, number> {
 	const rows = sqlite
 		.prepare(
@@ -34,8 +29,6 @@ function allTimeDetections(): Map<string, number> {
 	return new Map(rows.map((row) => [row.comName, row.detections]));
 }
 
-// Common, uncommon and rare split the station's species between them, so
-// together they cover exactly what "all" does.
 function inPool(
 	pool: LearnPool,
 	species: PoolSpecies,
@@ -48,11 +41,6 @@ function inPool(
 	);
 }
 
-/**
- * Each species' best recording -- the same clip every page plays it by, still
- * on disk -- as a quiz entry. Only species whose best clip clears the
- * confidence floor make it in.
- */
 function playableSpecies(): PoolSpecies[] {
 	return [...bestRecordings(sqlite, extractedDir()).values()]
 		.filter((clip) => (clip.confidence ?? 0) >= MINIMUM_CLIP_CONFIDENCE)
@@ -60,7 +48,6 @@ function playableSpecies(): PoolSpecies[] {
 			comName: clip.comName,
 			sciName: clip.sciName,
 			speciesSlug: comNameToSlug(clip.comName),
-			// The bundled illustration, or null for the generic bird glyph.
 			imageUrl: illustrationUrlFor(clip.sciName),
 			clips: [
 				{
@@ -73,10 +60,6 @@ function playableSpecies(): PoolSpecies[] {
 		}));
 }
 
-/**
- * Fills in each choice's station totals. Scoped to the round's own species, so
- * it's one grouped query over a dozen or so names, not the whole table.
- */
 function addSpeciesStats(round: LearnRound): LearnRound {
 	const names = [
 		...new Set(
@@ -116,16 +99,8 @@ function addSpeciesStats(round: LearnRound): LearnRound {
 
 export type LearnRoundData = {
 	round: LearnRound;
-	/**
-	 * Whether the station has recorded anything at all. An empty pool is not the
-	 * same as an empty station, and only the latter should drop the pool
-	 * switcher -- switching pools is the fix for the former.
-	 */
 	hasAnyDetections: boolean;
-	/** How many species each pool can quiz on: those with a clip still on
-	    disk, so what the game actually picks from, not the whole life list. */
 	poolCounts: Record<LearnPool, number>;
-	/** Records or fewer that make a species rare, as the owner set it. */
 	rareMax: number;
 };
 

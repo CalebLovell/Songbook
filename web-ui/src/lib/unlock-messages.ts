@@ -2,7 +2,6 @@ import type { UnlockResult } from "./auth.server.ts";
 
 type FailureReason = Extract<UnlockResult, { ok: false }>["reason"];
 
-/** What the sign-in form says for each way the station can turn it down. */
 export const UNLOCK_MESSAGES: Record<FailureReason, string> = {
 	invalid: "That password is not right.",
 	throttled: "Too many attempts. Wait a few minutes and try again.",
@@ -18,12 +17,6 @@ export const UNREACHABLE_MESSAGE =
 export const STATION_ERROR_MESSAGE =
 	"Something went wrong on the station. Try again; if it keeps happening, its log says why.";
 
-/**
- * For a sign-in request that threw instead of answering. `fetch` rejects with a
- * TypeError only when no response arrived at all; anything else is the station
- * answering with an error, and calling that "unreachable" sends the owner off
- * checking their Wi-Fi for a problem on the Pi.
- */
 export function messageForThrown(cause: unknown) {
 	return cause instanceof TypeError
 		? UNREACHABLE_MESSAGE

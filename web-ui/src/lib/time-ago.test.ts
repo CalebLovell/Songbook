@@ -26,8 +26,6 @@ test("labels minutes, hours and days", () => {
 	assert.equal(formatTimeAgo(2 * DAY), "2 days ago");
 });
 
-// The visit log reaches back over a species' whole history, so the scale has to
-// keep reading well past the Today page's 24-hour window.
 test("labels months and years for older visits", () => {
 	assert.equal(formatTimeAgo(45 * DAY), "1 month ago");
 	assert.equal(formatTimeAgo(3 * MONTH), "3 months ago");

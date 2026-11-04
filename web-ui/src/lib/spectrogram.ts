@@ -1,11 +1,5 @@
 export type Rgb = [number, number, number];
 
-/**
- * Piecewise-linear color ramp across evenly-spaced `stops`. Kept pure and
- * stop-agnostic so callers can pass the site's own tokens (resolved from CSS
- * variables, so it adapts to the theme) and the mapping stays unit-testable
- * without a DOM. `t` is clamped to [0, 1]; `stops` must hold at least two.
- */
 export function rampColor(stops: Rgb[], t: number): Rgb {
 	const clamped = t < 0 ? 0 : t > 1 ? 1 : t;
 	const segments = stops.length - 1;

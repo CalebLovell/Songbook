@@ -3,12 +3,8 @@ import { hourLabel } from "~/lib/time-ago.ts";
 
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 
-// Only the eight three-hour marks get a label; 24 would ring the tiny chart in
-// noise. Each names the hour whose bar sits above it.
 const TICK_HOURS = [0, 3, 6, 9, 12, 15, 18, 21] as const;
 
-// A non-zero hour never drops below this share of the chart height, so a quiet
-// hour next to the dawn chorus reads as "a little" rather than vanishing.
 const MIN_BAR_PERCENT = 8;
 
 function tickParts(hour: number): { number: string; meridiem: string } {
@@ -18,20 +14,6 @@ function tickParts(hour: number): { number: string; meridiem: string } {
 	return { number: String(hour - 12), meridiem: "p" };
 }
 
-/**
- * One bird's day as a compact 24-hour column chart: midnight at the left,
- * 11pm at the right. Each bar's height is its share of *this bird's* busiest
- * hour, so the shape of the day reads regardless of how loud the bird is
- * overall. Its colour is the heat map's ramp on that same linear per-bird
- * share, so colour tracks height: the bird's own peak is full moss and an hour
- * at half the peak is half-way along the ramp. (The heat map's log share would
- * push nearly every bar of a loud bird to full moss.) Each
- * tile only compares a bird with itself, so a shared scale would just leave
- * quiet birds uniformly pale. (The list view's heat map, which sets every bird
- * side by side, keeps the shared scale.) A non-zero hour always shows at least a sliver; a silent hour is a faint
- * baseline stub. Plots the same series as the page's species-by-hour heatmap,
- * offered here beside each bird's portrait rather than in a ranked grid.
- */
 export function SpeciesHourBars({
 	comName,
 	hourCounts,
@@ -42,7 +24,6 @@ export function SpeciesHourBars({
 	className?: string;
 }) {
 	const max = Math.max(...hourCounts, 0);
-	// A bird with nothing in the window has no shape to draw.
 	if (max === 0) return null;
 
 	const peakHour = hourCounts.reduce(
@@ -87,7 +68,6 @@ export function SpeciesHourBars({
 	);
 }
 
-/** The bars' a/p tick row. Needs no data, so the skeleton draws it as itself. */
 function HourBarTicks() {
 	return (
 		<div className="mt-1 flex">
@@ -116,9 +96,6 @@ function HourBarTicks() {
 	);
 }
 
-/** Soft bars in a rough day's shape, rising from dawn and easing off after
-    dusk, over the real tick row: the chart's exact footprint while its counts
-    are on their way. */
 const SKELETON_BAR_HEIGHTS = [
 	8, 8, 8, 8, 12, 40, 80, 100, 90, 70, 60, 55, 50, 45, 45, 50, 60, 70, 55, 30,
 	12, 8, 8, 8,

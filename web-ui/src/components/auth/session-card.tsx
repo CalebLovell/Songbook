@@ -10,15 +10,8 @@ import { SESSION_IDLE_DAYS } from "~/lib/auth-limits.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 import { forgetFetchedClips } from "~/lib/use-playable-audio.ts";
 
-/** The Sign-in card's title, the same signed in or out: its body says which
- *  way this browser stands, not its name. */
 export const SIGN_IN_CARD_TITLE = "Sign-in";
 
-/**
- * The Account page's Sign-in card while this browser is signed in. Sign in,
- * sign out, nothing more: managing the password is done on the Pi, never
- * from a page the internet can reach.
- */
 export function SessionCard() {
 	const lock = useServerFn(lockFn);
 	const router = useRouter();

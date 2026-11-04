@@ -3,14 +3,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { GlyphChip } from "~/components/glyph-chip.tsx";
 import { Hint } from "~/components/ui/hint.tsx";
 
-/**
- * One pill. Every pill -- confidence, New, Returned, Rare, Vocal -- shares this
- * size, radius and weight so a cluster reads as one family; only the tint and
- * the optional icon set them apart. The height is fixed at the Highlights
- * badge's 26px, so the two match at any text size. A `tooltip` explains what
- * the pill means on hover. `iconOnly` draws just the glyph as a GlyphChip, the
- * label kept for screen readers -- the tooltip then carries the name.
- */
 export function Pill({
 	icon: Icon,
 	label,

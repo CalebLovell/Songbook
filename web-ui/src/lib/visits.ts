@@ -1,12 +1,3 @@
-// BirdNET-Pi writes one row per 3-second analysis window, so a bird that sings
-// for two minutes leaves dozens of rows behind. A "visit" folds those back into
-// the single arrival a person standing outside would actually have witnessed:
-// consecutive detections of one species collapse into one visit, and a silence
-// longer than the gap threshold starts a new one.
-//
-// Deliberately pure rather than a SQL window function -- the clustering rule is
-// the part worth testing, and 24 hours of timestamps is a few hundred rows.
-
 export const VISIT_GAP_MINUTES = 15;
 
 export type DetectionMoment = {
@@ -14,12 +5,10 @@ export type DetectionMoment = {
 	timestamp: string;
 };
 
-/** Parses SQLite's "YYYY-MM-DD HH:MM:SS" as a local-time instant. */
 export function timestampToMillis(timestamp: string): number {
 	return new Date(timestamp.replace(" ", "T")).getTime();
 }
 
-/** The inverse: a Date as SQLite's local-time "YYYY-MM-DD HH:MM:SS". */
 export function localTimestamp(date: Date): string {
 	const pad = (value: number) => String(value).padStart(2, "0");
 	return (
@@ -28,7 +17,6 @@ export function localTimestamp(date: Date): string {
 	);
 }
 
-/** Counts visits within a single species' detection timestamps. */
 export function countVisits(
 	timestamps: string[],
 	gapMinutes: number = VISIT_GAP_MINUTES,
@@ -47,11 +35,6 @@ export function countVisits(
 	return visits;
 }
 
-/**
- * Total visits across every species in `moments`. Each species is clustered
- * independently -- a chickadee and a cardinal singing in the same minute are
- * two visits, not one.
- */
 export function countVisitsBySpecies(
 	moments: DetectionMoment[],
 	gapMinutes: number = VISIT_GAP_MINUTES,
@@ -70,18 +53,11 @@ export function countVisitsBySpecies(
 	return total;
 }
 
-/** One species' unbroken stretch of detections, oldest moment first. */
 export type Visit<Moment extends DetectionMoment> = {
 	comName: string;
 	moments: Moment[];
 };
 
-/**
- * The visits themselves rather than their count, newest first -- ranked by
- * each visit's latest detection, so a bird still singing stays at the top.
- * Species are clustered independently, as in countVisitsBySpecies, so a visit
- * interleaved with another species' calls stays one visit.
- */
 export function groupVisits<Moment extends DetectionMoment>(
 	moments: Moment[],
 	gapMinutes: number = VISIT_GAP_MINUTES,

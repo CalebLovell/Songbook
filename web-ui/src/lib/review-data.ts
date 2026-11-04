@@ -1,7 +1,6 @@
 import { commonNameSafe } from "~/lib/audio.ts";
 
 export type ReviewSearch = { page: number };
-/** Queue rows per page: ten 54px rows fill the rail beside the recording. */
 export const REVIEW_PAGE_SIZE = 10;
 export type SpeciesOption = { sciName: string; comName: string };
 

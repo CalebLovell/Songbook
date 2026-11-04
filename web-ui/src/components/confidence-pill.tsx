@@ -5,11 +5,6 @@ import {
 	formatConfidence,
 } from "~/lib/confidence.ts";
 
-/**
- * BirdNET's score as a tiered pill -- the one confidence pill everywhere, for a
- * single detection or (with `average`) a species' mean across detections. Its
- * tooltip says what the number means and which tier it falls in.
- */
 export function ConfidencePill({
 	confidence,
 	average = false,

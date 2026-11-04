@@ -9,7 +9,6 @@ import {
 	INITIAL_CLIP_STATE,
 } from "~/lib/clip-player-machine.ts";
 
-/** Runs events from the start and returns the status after each one. */
 function walk(...types: ClipEvent["type"][]): ClipStatus[] {
 	let state = INITIAL_CLIP_STATE;
 	return types.map((type) => {

@@ -15,7 +15,6 @@ import { safeNext } from "~/lib/require-unlocked.ts";
 
 export const Route = createFileRoute("/account")({
 	head: () => ({ meta: [{ title: pageTitle("Account") }] }),
-	// Where a gated page sent you from, so signing in can take you back.
 	validateSearch: (search: Record<string, unknown>): { next?: string } => {
 		const next = safeNext(search.next);
 		return next ? { next } : {};
@@ -23,14 +22,6 @@ export const Route = createFileRoute("/account")({
 	component: Account,
 });
 
-/**
- * Where this browser signs in to the station and out again -- the sidebar's
- * account row lands here, and so does any gated page opened while locked.
- *
- * Not itself gated: it is the way through the gate. Signing in after a gated
- * page sent you here goes on to that page; signing in from the account row
- * swaps the sign-in card for the session card in place.
- */
 function Account() {
 	const { auth } = useRouteContext({ from: "__root__" });
 	const { next } = Route.useSearch();
@@ -38,8 +29,6 @@ function Account() {
 
 	return (
 		<div className="page-wrap space-y-(--page-gap) py-4">
-			{/* The masthead stays the same whatever the state; where this
-			    browser stands is the card's job beneath it. */}
 			<PageHeaderCard
 				icon={UserRound}
 				title={PAGE_HEADERS.account.title}

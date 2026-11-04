@@ -85,9 +85,6 @@ const rtspStreamSchema = z
 		return protocol === "rtsp:" || protocol === "rtsps:";
 	}, "Use an rtsp:// or rtsps:// URL");
 
-// Accepts either the raw textarea text or the split lines the form already
-// holds. Both normalize the same way: blank lines are how anyone types a list,
-// and rejecting a trailing newline as "not a URL" was the form's own doing.
 const rtspStreamsSchema = z.preprocess((value) => {
 	const lines = typeof value === "string" ? value.split(/\r?\n/) : value;
 	if (!Array.isArray(lines)) return value;
@@ -166,12 +163,6 @@ export const reviewSettingsSchema = z.object({
 		.default(DEFAULT_REVIEW_RARE_SPECIES_MAX),
 });
 
-/**
- * The Highlights card's rules, as the station owner tunes them: the day-scale
- * knobs only. The week, month and year lookbacks stay fixed (see
- * `thresholdsFromSettings`), since a "10 weeks" setting would read as nonsense
- * beside "10 days".
- */
 export const highlightSettingsSchema = z.object({
 	rareMax: z.number().int().min(1).max(1000),
 	returnedDays: z.number().int().min(2).max(90),
@@ -180,9 +171,6 @@ export const highlightSettingsSchema = z.object({
 	vocalRatio: z.number().finite().min(1.5).max(20),
 });
 
-/** Whether the nightly timer installs new releases by itself
-    (AUTOMATIC_UPDATE). Not part of a reset: it is a choice about the station,
-    not a tuning value with a right answer. */
 export const updateSettingsSchema = z.object({ automatic: z.boolean() });
 
 export type StationSettings = z.infer<typeof stationSettingsSchema>;
@@ -223,17 +211,6 @@ export type SettingsPageData = SettingsByKind & {
 	supportedTimezones: string[];
 };
 
-/**
- * What a fresh install writes, per scripts/install_config.sh -- the values a
- * reset returns the station to, and the values the read path falls back on for
- * a key its config never carried, so the two cannot drift apart.
- *
- * Station is absent on purpose. Its four fields have no static default: the
- * installer takes the name from the hostname, the coordinates from a network
- * geolocation guess, and the timezone from the host. Blanking them would put
- * the station at 0,0 and quietly wreck geographic species filtering, with the
- * real coordinates gone.
- */
 export const SETTINGS_DEFAULTS = {
 	detection: {
 		model: "BirdNET_GLOBAL_6K_V2.4_Model_FP16",
@@ -272,7 +249,6 @@ export const SETTINGS_DEFAULTS = {
 	},
 } satisfies Omit<SettingsByKind, "station" | "updates">;
 
-/** The cards a reset covers, in the order they appear on the page. */
 export const RESETTABLE_CARDS = [
 	"detection",
 	"privacy",

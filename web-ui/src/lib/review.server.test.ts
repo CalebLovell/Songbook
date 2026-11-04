@@ -48,11 +48,6 @@ function fixture() {
 	return database;
 }
 
-/**
- * Six species spanning a station's range: three under the rarity cut (1, 2 and
- * 3 lifetime detections), one sitting exactly on it (10), and two well clear of
- * it. Every detection is weak unless the caller says otherwise.
- */
 function bandedFixture() {
 	const database = new DatabaseSync(":memory:");
 	database.exec(
@@ -89,8 +84,6 @@ test("the queue holds only rarely heard species, rarest first", async () => {
 	mkdirSync(audio, { recursive: true });
 	writeFileSync(path.join(audio, "Cedar_Waxwing-0.mp3"), "audio");
 	const page = loadReviewPage(database, root, { page: 1 }, undefined, 50);
-	// Dark-eyed Junco sits exactly on the cut at 10, so it is out -- as are the
-	// common feeder birds, however weak their recordings.
 	assert.deepEqual(
 		[...new Set(page.candidates.map((row) => row.comName))],
 		["Cedar Waxwing", "Common Loon", "Barred Owl"],
@@ -113,7 +106,6 @@ test("the queue pages in order, and a page past the end falls back", async () =>
 		second.candidates.map((row) => row.rowId),
 		all.candidates.slice(4).map((row) => row.rowId),
 	);
-	// Six rows are two pages of four, so page 9 shows page 2.
 	assert.equal(
 		loadReviewPage(database, root, { page: 9 }, undefined, 4).page,
 		2,
@@ -124,7 +116,6 @@ test("the queue pages in order, and a page past the end falls back", async () =>
 test("an empty queue says whether the station has recorded anything", async () => {
 	const database = bandedFixture();
 	const root = await mkdtemp(path.join(tmpdir(), "birdnet-review-empty-"));
-	// A threshold of 1 queues nothing: no species has fewer than one detection.
 	const nothingQueued = loadReviewPage(database, root, { page: 1 }, 1, 50);
 	assert.equal(nothingQueued.total, 0);
 	assert.equal(nothingQueued.hasAnyDetections, true);
@@ -154,8 +145,6 @@ test("configured rarity changes the queue at a strict boundary", async () => {
 
 test("a recording BirdNET was already sure about stays out of the queue", async () => {
 	const database = bandedFixture();
-	// Raised in place rather than inserted: an extra row would change the Loon's
-	// lifetime total, which is the other half of what puts it in the queue.
 	database
 		.prepare(
 			"UPDATE detections SET Confidence=0.95 WHERE File_Name='Common_Loon-0.mp3'",
@@ -168,7 +157,6 @@ test("a recording BirdNET was already sure about stays out of the queue", async 
 		false,
 	);
 	assert.equal(page.total, 5);
-	// The Loon is still queued -- only that one confident recording dropped out.
 	assert.equal(page.speciesTotal, 3);
 	database.close();
 });
@@ -176,8 +164,6 @@ test("a recording BirdNET was already sure about stays out of the queue", async 
 test("signing off records a review without touching BirdNET's score", () => {
 	const database = fixture();
 	correctDetection(database, 1);
-	// The whole reason the sidecar table exists: averages elsewhere in the app
-	// read this column, so review must not inflate it.
 	assert.equal(
 		database.prepare("SELECT Confidence FROM detections WHERE rowid=1").get()
 			?.Confidence,
@@ -227,8 +213,6 @@ test("deleting a detection takes its review with it", async () => {
 	assert.ok(row);
 	correctDetection(database, row.rowId);
 	await deleteDetectionDirectly(database, root, row.rowId);
-	// Left behind, this would silently sign off the next recording that landed
-	// on the same date, time, species and filename.
 	assert.equal(database.prepare("SELECT COUNT(*) n FROM reviews").get()?.n, 0);
 	database.close();
 });
@@ -283,13 +267,11 @@ test("recategorizing a shared recording copies assets for the selected row", asy
 	assert.equal(readFileSync(newAudio, "utf8"), "shared audio");
 	assert.equal(existsSync(`${oldAudio}.png`), true);
 	assert.equal(existsSync(`${newAudio}.png`), true);
-	// Re-identified, not re-scored: the confidence is still what BirdNET said.
 	assert.equal(
 		database.prepare("SELECT Confidence FROM detections WHERE rowid=1").get()
 			?.Confidence,
 		0.4,
 	);
-	// Filed under the name it now carries, so it stays out of the queue.
 	const review = database
 		.prepare("SELECT Com_Name, File_Name, action FROM reviews")
 		.get();

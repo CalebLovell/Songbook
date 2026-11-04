@@ -133,8 +133,6 @@ test("addresses that go quiet are dropped, so the map stays bounded", async () =
 	const clock = { value: 1_000 };
 	const { statePath, throttle } = await makeThrottle(clock);
 
-	// An attacker rotating source addresses -- exactly what the global ceiling
-	// anticipates -- must not leave a permanent entry behind for each one.
 	for (let attempt = 0; attempt < 200; attempt += 1) {
 		await throttle.recordFailure(`203.0.113.${attempt % 250}`);
 		clock.value += 10_000;
@@ -158,8 +156,6 @@ test("an active lockout survives pruning driven by other addresses", async () =>
 	}
 	assert.equal((await throttle.check("203.0.113.7")).allowed, false);
 
-	// Other addresses failing -- each of which triggers a prune -- must not
-	// clear a lockout that is still running.
 	for (let attempt = 0; attempt < 50; attempt += 1) {
 		await throttle.recordFailure(`198.51.100.${attempt}`);
 	}

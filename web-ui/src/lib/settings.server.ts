@@ -51,9 +51,7 @@ async function currentTimezone() {
 	try {
 		const configured = (await readFile("/etc/timezone", "utf8")).trim();
 		if (configured) return configured;
-	} catch {
-		// Non-Debian and development hosts fall back to the runtime timezone.
-	}
+	} catch {}
 	return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
@@ -109,13 +107,6 @@ export async function loadSettingsPageData(
 	}
 }
 
-/**
- * The one thing the reader needs to know, in the words they would use for it:
- * the value is stored, BirdNET has not picked it up yet, and a restart is what
- * does. Whether the restart was declined by the environment or attempted and
- * refused is a distinction only this file cares about -- both leave the station
- * running the old value, and both are fixed by the same button.
- */
 const SAVED_NEEDS_RESTART = "Saved. Restart BirdNET for this to take effect.";
 const RESET_NEEDS_RESTART =
 	"Reset to defaults. Restart BirdNET for this to take effect.";
@@ -137,7 +128,6 @@ async function saveSettings<K extends SettingsCardKind>(
 			dependencies.settingsPath ?? resolveSettingsPath(),
 		);
 	} catch (error) {
-		// The reader gets the plain sentence; the cause goes to the journal.
 		console.error(`[settings] saving ${kind} failed:`, error);
 		throw new Error("Settings could not be saved.");
 	}
@@ -243,17 +233,6 @@ export type SettingsResetResult = {
 	message: string;
 };
 
-/**
- * Returns every card but Station to its install default. Station is left alone
- * deliberately -- see `SETTINGS_DEFAULTS`, which has no entry for it.
- *
- * Cards are written one at a time rather than in a single pass because each
- * still goes through its own schema on the way out; a value that cannot be
- * parsed stops the reset before it touches the file. Nothing is rolled back if
- * a later write fails, so the file is left part-reset and the caller is told
- * plainly -- the alternative, a staged rewrite of birdnet.conf, would risk the
- * lines this UI does not own.
- */
 export async function resetSettings(
 	dependencies: SettingsServerDependencies = {},
 ): Promise<SettingsResetResult> {
@@ -289,11 +268,6 @@ export type RestartResult = {
 	message: string;
 };
 
-/**
- * Retries the restart a save could not finish. Named for what the reader asked
- * for rather than for systemd: from the page it is "the new settings are not
- * live yet, make them live", and the services involved are this file's problem.
- */
 export async function restartStation(
 	card?: SettingsCardKind,
 	dependencies: SettingsServerDependencies = {},
@@ -309,9 +283,6 @@ export async function restartStation(
 				status: "restarted",
 				message: "Restarted. Your settings are live.",
 			};
-		// Two different nothings, and saying the wrong one is a lie: a card with
-		// no services really is live already, but a restart the environment
-		// declined has left the station on its old values.
 		return action.skipped
 			? {
 					status: "restart-skipped",
@@ -323,8 +294,6 @@ export async function restartStation(
 					message: "Nothing needed restarting — this setting was already live.",
 				};
 	} catch {
-		// Deliberately no systemctl output: it can carry paths and unit detail,
-		// and this reaches a browser.
 		throw new Error(
 			"BirdNET could not be restarted. Your settings are saved and will apply the next time it starts.",
 		);

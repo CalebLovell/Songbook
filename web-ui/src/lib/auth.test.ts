@@ -3,9 +3,6 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-// Importing these confirms every gated symbol still exists and type-checks as
-// a server function -- if a name below gets renamed or removed, this file
-// fails to load before the assertions even run.
 import {
 	isUnauthorizedError,
 	requireUnlocked,
@@ -37,14 +34,6 @@ import {
 	saveSpeciesControl,
 } from "./species-control.ts";
 
-// @tanstack/react-start's `.handler(...)` does not retain a `.options`
-// property on the server function it returns (confirmed against the
-// installed 1.168.x line: the returned callable only carries `method` and
-// `__executeServer`), and server functions cannot be invoked outside a
-// request context in this test runner. So instead of runtime reflection,
-// this asserts the wiring the same way a reviewer would: each gated
-// function's own source must chain `.middleware([requireUnlocked])` between
-// `createServerFn(...)` and `.handler(...)`.
 function sourceOf(relativePath: string) {
 	return readFileSync(
 		fileURLToPath(new URL(relativePath, import.meta.url)),
@@ -64,8 +53,6 @@ function assertGated(source: string, name: string) {
 }
 
 test("every gated server function carries requireUnlocked", () => {
-	// Referenced so the imports above are not flagged as unused -- their
-	// presence is itself part of the assertion (see comment above).
 	void requireUnlocked;
 	void saveSpeciesControl;
 	void resetSettingsFn;
@@ -119,18 +106,13 @@ test("every gated server function carries requireUnlocked", () => {
 		assertGated(reviewSource, name);
 	}
 
-	// Lives outside the three gated feature modules, which is exactly how it
-	// was missed the first time round.
 	assertGated(sourceOf("./health.ts"), "getStationHealth");
 
-	// Same trap: detections.ts is mostly read paths for a public page, so its
-	// one destructive export shipped ungated.
 	assertGated(sourceOf("./detections.ts"), "deleteDetections");
 });
 
 test("the gate's refusal is recognised after losing its class", () => {
 	assert.equal(isUnauthorizedError(new UnauthorizedError()), true);
-	// What reaches the browser: a plain Error carrying the same message.
 	assert.equal(
 		isUnauthorizedError(new Error(new UnauthorizedError().message)),
 		true,

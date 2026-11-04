@@ -15,14 +15,6 @@ import { useLiveAudio } from "~/lib/use-live-audio.ts";
 
 const STREAM_URL = "/api/live-stream";
 
-/**
- * Live listening for the station's feed. Gated: a locked station doesn't see
- * the card at all, and never opens the (also-gated) stream. Unlocked, it plays the
- * proxied Icecast MP3 through a WebAudio graph and paints a scrolling
- * spectrogram in the site palette. It sits in the Live page's side rail, so
- * it keeps to a short waterfall and one button, with gain and compression
- * tucked behind the settings glyph.
- */
 export function LiveAudioCard({ unlocked }: { unlocked: boolean }) {
 	if (!unlocked) return null;
 	return <PlayerPanel />;
@@ -33,8 +25,6 @@ function CardShell({
 	status,
 }: {
 	children: React.ReactNode;
-	/** Short note pinned opposite the kicker. It shares the kicker's line (and
-	    never exceeds its height), so showing it doesn't shift the card. */
 	status?: React.ReactNode;
 }) {
 	return (
@@ -68,8 +58,6 @@ function PlayerPanel() {
 		<CardShell status={isOffline ? "Stream unavailable" : null}>
 			<LiveWaterfall analyser={live.analyser} active={isPlaying} />
 
-			{/* Laid out like the spectrogram player's controls: a square outline
-			    play button, then a quiet readout where a clip shows its time. */}
 			<div className="mt-(--page-gap) flex items-center gap-2">
 				<Button
 					type="button"
@@ -138,9 +126,6 @@ function PlayerPanel() {
 				</Popover.Root>
 			</div>
 
-			{/* The graph reads samples from this element; it carries no controls of
-			    its own. src is set in the hook on first play so a locked/idle
-			    visitor never opens the proxy connection. */}
 			{/* biome-ignore lint/a11y/useMediaCaption: a live station feed has no captions track */}
 			<audio
 				ref={live.audioRef}
@@ -156,8 +141,6 @@ function PlayerPanel() {
 
 const SPECTROGRAM_HEIGHT = 112;
 
-/** Scrolling waterfall: one new column per frame at the right edge, prior image
-    shifted left. Colors come from the live tokens so it tracks the theme. */
 function LiveWaterfall({
 	analyser,
 	active,
@@ -173,8 +156,6 @@ function LiveWaterfall({
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
 
-		// Paper to moss, the same ramp as every clip's spectrogram, so the live
-		// feed and a saved call read as one kind of picture.
 		const styles = getComputedStyle(canvas);
 		const background = readRgb(
 			styles.getPropertyValue("--paper"),
@@ -193,11 +174,9 @@ function LiveWaterfall({
 			raf = requestAnimationFrame(draw);
 			const w = canvas.width;
 			const h = canvas.height;
-			// Shift everything one column left, then draw the new column at the edge.
 			ctx.drawImage(canvas, -1, 0);
 			analyser.getByteFrequencyData(data);
 			for (let y = 0; y < h; y++) {
-				// Low frequencies at the bottom, like the reference spectrogram.
 				const bin = Math.floor(((h - 1 - y) / h) * bins);
 				const magnitude = data[bin] / 255;
 				const [r, g, b] = rampColor(stops, magnitude);
@@ -221,7 +200,6 @@ function LiveWaterfall({
 	);
 }
 
-/** Parses `#rrggbb` (the raw form our palette tokens use) to an Rgb triple. */
 function readRgb(value: string, fallback: Rgb): Rgb {
 	const hex = value.trim().replace("#", "");
 	if (hex.length !== 6) return fallback;

@@ -1,10 +1,3 @@
-/**
- * The site's name as a picture: "Songbook" set in Fraunces, its letters
- * outlined to paths so no font loads, with the two o's of "book" drawn as an
- * open book -- bark cover, cream pages -- and two sand notes rising out of it.
- * The letters and page edges take the text color. Sized in ems, so it scales
- * with the font size of wherever it sits.
- */
 export function SongbookWordmark({ className = "" }: { className?: string }) {
 	return (
 		<svg

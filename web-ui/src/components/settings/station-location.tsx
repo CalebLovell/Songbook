@@ -9,11 +9,6 @@ import {
 	MODAL_TITLE_CLASS,
 } from "~/components/ui/confirm-dialog.tsx";
 
-/**
- * birdnet.conf asks for four decimal places, which is roughly 11 metres -- past
- * that the extra digits do nothing for species filtering and only pin down the
- * household more precisely than the setting needs.
- */
 const COORDINATE_PLACES = 4;
 
 function round(value: number) {
@@ -28,11 +23,6 @@ type State =
 	| { kind: "found"; coordinates: Coordinates; accuracy: number | null }
 	| { kind: "error"; message: string };
 
-/**
- * Browsers only expose geolocation in a secure context, and a station reached
- * over plain http at a LAN address is not one -- a common way to reach this
- * page. Saying so beats a permission prompt that never appears.
- */
 function unavailableReason(): string | null {
 	if (typeof window === "undefined") return null;
 	if (!window.isSecureContext)
@@ -50,15 +40,6 @@ function describe(error: GeolocationPositionError): string {
 	return "Finding your location took too long. Try again.";
 }
 
-/**
- * Fills the Station card's coordinates from the browser's own location. It
- * offers the reading first and applies it only once accepted: the number it
- * replaces is one nobody can retype from memory, and a device indoors can be
- * kilometres out.
- *
- * The values are written into the form, not saved -- the card still saves on
- * its own Save button, like every other change made to it.
- */
 export function StationLocation({
 	current,
 	onApply,

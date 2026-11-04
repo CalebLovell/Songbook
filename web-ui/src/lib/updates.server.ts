@@ -10,11 +10,6 @@ import {
 	type UpdateState,
 } from "./updates-data.ts";
 
-/**
- * Where install_web_ui.sh keeps releases and the updater's status files. Set
- * by the birdnet_web_ui service; unset in a development checkout, which has no
- * updater to drive.
- */
 function updateDirectory() {
 	return process.env.BIRDNET_UPDATE_DIR;
 }
@@ -38,39 +33,24 @@ export async function loadUpdateState(
 	return parseUpdateState(installed, status);
 }
 
-/** The two things the card can ask of the updater, as the units that do them. */
 const UNITS = {
 	check: "birdnet_update_check.service",
 	install: "birdnet_update_now.service",
 } as const;
 
-/**
- * Starts the updater and returns at once: `--no-block` hands the run to
- * systemd, so an update that restarts this very server isn't cut off with it.
- * The card follows along by polling the status file.
- */
 export async function startUpdater(action: keyof typeof UNITS): Promise<void> {
 	if ((await runUnit(UNITS[action], ["--no-block"])) !== 0)
 		throw new Error("The updater could not start.");
 }
 
-/**
- * Asks GitHub for the newest release and answers once it knows. A check never
- * restarts this server, so it can be waited on; the updater's own sentence
- * ("Up to date.", "Version v1.9.0 is available.", or what went wrong) comes
- * back in the state's message. A check that fails partway exits non-zero but
- * has written why to the status file, so the state is returned either way.
- */
 export async function checkForUpdates(): Promise<UpdateState> {
 	await runUnit(UNITS.check, []);
 	return loadUpdateState();
 }
 
-/** Starts a unit and resolves with systemctl's exit code. */
+// Doesn't check BIRDNET_SKIP_SYSTEM_ACTIONS: a web UI beside another BirdNET-Pi sets
+// that to spare the other project's services, but still updates itself.
 function runUnit(unit: string, flags: string[]): Promise<number> {
-	// Not BIRDNET_SKIP_SYSTEM_ACTIONS: a web UI beside another BirdNET-Pi sets
-	// that to keep its hands off the other project's services, but still
-	// updates itself (see scripts/install_updater_beside.sh).
 	if (!updateDirectory())
 		return Promise.reject(
 			new Error("This copy of the web UI isn't managed by the updater."),

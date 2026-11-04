@@ -4,30 +4,15 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { cn } from "~/lib/utils.ts";
 
-/** How far the finger travels per pixel the indicator moves. */
 const RESISTANCE = 0.5;
-/** Indicator travel past which letting go refreshes. */
 const THRESHOLD = 64;
-/** Indicator travel it can't be pulled beyond. */
 const MAX_PULL = 96;
-/** Where the indicator rests while the page refreshes. */
 const REST = 56;
-/** Shortest spin, so a quick answer still reads as a refresh. */
 const MIN_SPIN_MS = 600;
 const SIZE = 36;
 
 type Phase = "idle" | "pulling" | "refreshing" | "settling";
 
-/**
- * Pull down from the top of the page to reload it, on touch screens only.
- *
- * Wraps the shell's scrolling `main` (#app-scroll) -- the window never scrolls,
- * so the browser's own pull-to-refresh never fires. A pull re-runs every
- * loader on the page through `router.invalidate()`, then waits for the
- * deferred promises those loaders hand back, so the spinner stops when the
- * fresh data has landed rather than when the loaders merely returned. Parts
- * rendered through Deferred keep their content up meanwhile.
- */
 export function PullToRefresh({ children }: { children: ReactNode }) {
 	const router = useRouter();
 	const wrapperRef = useRef<HTMLDivElement>(null);
@@ -61,9 +46,6 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 			const dx = touch.clientX - start.x;
 			const dy = touch.clientY - start.y;
 			if (!engaged) {
-				// Decided on the first move: a sideways or upward swipe is left to
-				// the page. Waiting any longer would let the browser start a scroll,
-				// after which the move can no longer be held back.
 				if (dy <= 0 || Math.abs(dx) > dy) {
 					start = null;
 					return;
@@ -98,7 +80,6 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 		}
 
 		wrapper.addEventListener("touchstart", onTouchStart, { passive: true });
-		// Not passive: an engaged pull holds the page still under the finger.
 		wrapper.addEventListener("touchmove", onTouchMove, { passive: false });
 		wrapper.addEventListener("touchend", onTouchEnd);
 		wrapper.addEventListener("touchcancel", onTouchEnd);
@@ -154,11 +135,6 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 	);
 }
 
-/**
- * Whether anything between the touch and the page's scroller -- the scroller
- * included -- is scrolled down, in which case a downward drag is a scroll
- * back up rather than a pull.
- */
 function scrolledAbove(target: EventTarget | null, scroller: HTMLElement) {
 	let node = target instanceof Element ? target : null;
 	while (node) {
@@ -169,7 +145,6 @@ function scrolledAbove(target: EventTarget | null, scroller: HTMLElement) {
 	return false;
 }
 
-/** Re-runs the page's loaders and waits for the deferred data they return. */
 async function refreshPage(router: AnyRouter) {
 	await router.invalidate();
 	const pending = router.state.matches.flatMap((match) =>

@@ -10,7 +10,6 @@ import {
 	saveGame,
 } from "~/lib/learn-saved-game.ts";
 
-// Node has no sessionStorage, so each test gets a fresh in-memory stand-in.
 function memoryStorage(): Storage {
 	const items = new Map<string, string>();
 	return {

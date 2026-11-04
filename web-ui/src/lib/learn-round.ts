@@ -1,20 +1,13 @@
-// Pure round assembly and scoring for the Learn quiz. Randomness arrives as an
-// injected `random` so the tests can drive it deterministically, and nothing
-// here touches the db -- learn.ts gathers the pool, this file shapes it into a
-// round.
-
 import { audioUrlFor } from "~/lib/audio.ts";
 
 export const QUESTIONS_PER_ROUND = 10;
 export const CHOICES_PER_QUESTION = 4;
 
-/** Points awarded by how many guesses a question took; nothing after these. */
 export const POINTS_BY_ATTEMPT = [3, 1] as const;
 
 export type PoolClip = {
 	date: string;
 	fileName: string;
-	/** "YYYY-MM-DD HH:MM:SS", local, as stored by BirdNET-Pi. */
 	detectedAt: string;
 	confidence: number | null;
 };
@@ -32,18 +25,11 @@ export type LearnChoice = {
 	sciName: string;
 	speciesSlug: string;
 	imageUrl: string | null;
-	/**
-	 * Station-wide totals for the species, filled in by the loader. Deliberately
-	 * nothing about the clip itself -- its time or confidence on every card
-	 * would point straight at the answer.
-	 */
 	detections: number;
-	/** "YYYY-MM-DD" of the species' first detection, or null if unknown. */
 	firstHeard: string | null;
 };
 
 export type LearnQuestion = {
-	/** Stable per question, so the audio player remounts between questions. */
 	id: string;
 	audioUrl: string;
 	detectedAt: string;
@@ -55,7 +41,6 @@ export type LearnQuestion = {
 export type LearnRound = {
 	id: string;
 	questions: LearnQuestion[];
-	/** How many distinct species the chosen pool offered. */
 	speciesInPool: number;
 };
 
@@ -85,11 +70,6 @@ function toChoice(species: PoolSpecies): LearnChoice {
 	};
 }
 
-/**
- * Draws the round's answer species. Shuffling and taking from the front spreads
- * the questions over as many different species as the pool allows; only once
- * every species has had a turn does a reshuffled pass start repeating them.
- */
 function drawAnswers(
 	species: PoolSpecies[],
 	questionCount: number,
@@ -133,21 +113,17 @@ export function buildRound(
 	);
 
 	return {
-		// Changes every round, so the page can key the game on it and reset all
-		// of its in-progress state when a fresh round arrives.
 		id: `${Date.now().toString(36)}-${Math.floor(random() * 1e6).toString(36)}`,
 		questions,
 		speciesInPool: playable.length,
 	};
 }
 
-/** 3 points for a clean answer, 1 for a second try, nothing after that. */
 export function pointsForAttempt(attempt: number): number {
 	return POINTS_BY_ATTEMPT[attempt - 1] ?? 0;
 }
 
 export type QuestionResult = {
-	/** How many guesses it took to land on the right species. */
 	attempts: number;
 };
 
@@ -156,7 +132,6 @@ export type RoundScore = {
 	maxScore: number;
 	firstTry: number;
 	answered: number;
-	/** Longest run of consecutive first-try answers. */
 	bestStreak: number;
 };
 
@@ -186,7 +161,6 @@ export function scoreRound(results: QuestionResult[]): RoundScore {
 	};
 }
 
-/** A light bit of end-screen flavor, keyed off first-try accuracy. */
 export function roundVerdict({ firstTry, answered }: RoundScore): string {
 	if (answered === 0) return "No birds yet.";
 	const ratio = firstTry / answered;

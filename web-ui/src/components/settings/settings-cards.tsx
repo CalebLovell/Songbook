@@ -52,31 +52,14 @@ export type SettingsSavers = {
 	updates?: Saver<UpdateSettings>;
 };
 
-/**
- * Bounces the services behind one card, retrying what its save could not do.
- * Omit the card to bring the whole set back at once, which is what a reset --
- * having rewritten every card -- needs.
- */
 export type SettingsRestarter = (
 	card?: SettingsCardKind,
 ) => Promise<{ message: string }>;
 
-/**
- * Compared by value, not by identity: every keystroke rebuilds the values
- * object, so a reference check would call a card dirty for typing a character
- * and deleting it again. These are flat objects of primitives and one string
- * array, always rebuilt by spreading the previous one, so key order is stable
- * and serializing them is a sound equality test.
- */
 function unchanged<T>(a: T, b: T) {
 	return JSON.stringify(a) === JSON.stringify(b);
 }
 
-/**
- * Reports a card's save as one toast that changes in place: a spinner while it
- * runs, then how it went. Keyed on the card, so saving the same card twice
- * replaces its toast rather than stacking a second one.
- */
 function useCardSave<T>(
 	title: string,
 	initial: T,
@@ -85,15 +68,8 @@ function useCardSave<T>(
 ) {
 	const toastId = `settings-${title}`;
 	const [values, setValues] = useState(initial);
-	// What the station currently holds, as far as this card knows: the values it
-	// loaded with, or the ones it last saved. Save has nothing to do until the
-	// form differs from this.
 	const [saved, setSaved] = useState(initial);
 	const [saving, setSaving] = useState(false);
-	// The card's values are on disk but BirdNET is still running the old ones.
-	// Both save outcomes that mean this -- the restart was refused, or the
-	// environment declined to try -- are the same situation to the reader, and
-	// the same button fixes them.
 	const [needsRestart, setNeedsRestart] = useState(false);
 
 	async function submit() {
@@ -103,16 +79,11 @@ function useCardSave<T>(
 		try {
 			const result = await save(values);
 			setValues(result.values);
-			// The station now holds what it just accepted -- which is the parsed
-			// form of what was sent, so trimmed text and coerced numbers count as
-			// saved rather than leaving the card looking dirty straight after.
 			setSaved(result.values);
 			const pending =
 				result.status === "saved-action-failed" ||
 				result.status === "saved-restart-skipped";
 			setNeedsRestart(pending);
-			// A pending restart stays up until it is read: the Restart button it
-			// explains sits beside Save with no words of its own.
 			if (pending) {
 				toast.warning(result.message, { id: toastId, duration: 10_000 });
 			} else {
@@ -139,8 +110,6 @@ function useCardSave<T>(
 			setNeedsRestart(false);
 			toast.success(result.message, { id: toastId });
 		} catch (error) {
-			// The values are still saved -- only the restart failed -- so the card
-			// keeps offering the button rather than dropping back to a clean state.
 			toast.warning(
 				error instanceof Error
 					? error.message
@@ -158,29 +127,18 @@ function useCardSave<T>(
 		setValues,
 		submit,
 		dirty,
-		// A failed save leaves the card dirty, so the button stays live to retry.
 		saveDisabled: saving || !dirty,
 		needsRestart: needsRestart && restart !== undefined,
 		applyNow,
 	};
 }
 
-/** Renders the footer's restart control, or nothing when nothing is pending. */
 function restartControl(form: { needsRestart: boolean; applyNow: () => void }) {
 	return form.needsRestart ? (
 		<RestartButton onRestart={async () => form.applyNow()} />
 	) : undefined;
 }
 
-/**
- * One setting as a row: what it is on the left -- label, then a line on what it
- * does -- and the control on the right, every control the same width so they
- * line up down the card. Rows are parted by hairlines; on a phone the control
- * drops beneath its label.
- *
- * Labelled by id rather than by wrapping: the info tip and the timezone hint
- * carry buttons, and a label around those would hand its click to them.
- */
 function Field({
 	label,
 	hint,
@@ -191,8 +149,6 @@ function Field({
 	label: string;
 	hint?: ReactNode;
 	info?: ReactNode;
-	/** A row that shows a value rather than holding a control, so its name is
-	    plain text, not a label pointing at nothing. */
 	readOnly?: boolean;
 	children: ReactNode;
 }) {
@@ -227,13 +183,9 @@ function Field({
 
 const FieldContext = createContext({ id: "", labelId: "" });
 
-/** Number fields drop the browser's spin arrows: they crowd a short value
-    and sit on top of the unit. */
 const NO_SPINNER =
 	"[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
 
-/** The row's text or number box, with its unit ("s", "%") set inside the
-    right edge so a bare figure never has to explain itself in the hint. */
 function FieldInput({
 	unit,
 	className = "",
@@ -262,8 +214,6 @@ function FieldInput({
 	);
 }
 
-/** A native select in the site's control dress: the same box as the inputs,
-    with the chevron the timeline and bird list selects use. */
 function FieldSelect({ children, ...props }: ComponentProps<"select">) {
 	const { id } = useContext(FieldContext);
 	return (
@@ -283,7 +233,6 @@ function FieldSelect({ children, ...props }: ComponentProps<"select">) {
 	);
 }
 
-/** A choice between a few named options, as the moss segmented control. */
 function FieldChoice<T extends string>({
 	value,
 	options,
@@ -302,8 +251,6 @@ function FieldChoice<T extends string>({
 			className="w-full"
 			value={value}
 			onValueChange={(next) => {
-				// Clicking the selected segment again would clear it; a setting
-				// always has a value.
 				if (next) onChange(next as T);
 			}}
 		>
@@ -320,12 +267,6 @@ function FieldChoice<T extends string>({
 	);
 }
 
-/**
- * A number input reports NaN while it is empty -- mid-edit, or cleared outright.
- * Storing that would hand React an invalid `value` and strand the field, so the
- * last good number is held until a real one is typed; `required` plus the input's
- * own min/max still block a submit while the box reads empty.
- */
 function numberOr(event: ChangeEvent<HTMLInputElement>, fallback: number) {
 	const parsed = event.target.valueAsNumber;
 	return Number.isNaN(parsed) ? fallback : parsed;
@@ -343,9 +284,7 @@ export function SettingsCards({
 	data: SettingsPageData;
 	savers: SettingsSavers;
 	restarter?: SettingsRestarter;
-	/** How full the recordings disk is now; null leaves the figure out. */
 	diskUsedPercent?: number | null;
-	/** What the updater last reported; null while it loads. */
 	updates?: UpdateState | null;
 	onCheckUpdates?: () => Promise<UpdateState>;
 	onInstallUpdate?: () => Promise<void>;
@@ -353,8 +292,6 @@ export function SettingsCards({
 	const restartFor = (card: SettingsCardKind): CardRestarter | undefined =>
 		restarter ? () => restarter(card) : undefined;
 	return (
-		// One card per row, always. Side by side, cards of unequal height left
-		// ragged gaps and no reliable reading order down the page.
 		<div className="space-y-(--page-gap)">
 			<StationCard
 				initial={data.station}
@@ -498,8 +435,6 @@ function StationCard({
 					</>
 				}
 			>
-				{/* A text field over a datalist rather than a select: ~400 zones
-				    are a long scroll, and typing any part of a name finds it. */}
 				<FieldInput
 					list="station-timezones"
 					autoComplete="off"
@@ -519,12 +454,6 @@ function StationCard({
 	);
 }
 
-/**
- * Offers this browser's own timezone when it differs from the station's -- the
- * likeliest way a station ends up on the wrong clock is a zone picked once and
- * never checked against where it actually sits. Read after mount, since the
- * server can't know the viewer's zone and guessing would break hydration.
- */
 function BrowserTimezoneHint({
 	timezone,
 	onUse,
@@ -540,8 +469,6 @@ function BrowserTimezoneHint({
 		);
 	}, []);
 
-	// The skeleton's timezone is a placeholder, so it has nothing to compare;
-	// a loaded station on the browser's own zone shows no hint either.
 	if (
 		skeleton ||
 		!browserTimezone ||
@@ -847,9 +774,6 @@ function AudioCard({
 								form.setValues({
 									...form.values,
 									rtspStreams,
-									// Removing streams would otherwise leave the live-player
-									// index pointing past the end of the list, and the save
-									// would fail on a selector the card no longer shows.
 									livestreamIndex: Math.min(
 										form.values.livestreamIndex,
 										Math.max(0, rtspStreams.filter(Boolean).length - 1),
@@ -886,7 +810,6 @@ function AudioCard({
 	);
 }
 
-/** The RTSP list: the input's box, grown to a few lines of monospace URLs. */
 function FieldTextarea(props: ComponentProps<"textarea">) {
 	const { id } = useContext(FieldContext);
 	return (
@@ -948,9 +871,6 @@ function RecordingCard({
 					onChange={(event) =>
 						form.setValues({
 							...form.values,
-							// Blank is a real choice here -- it hands the backend
-							// default back -- so NaN becomes null rather than being
-							// held at the last number.
 							extractionLength: Number.isNaN(event.target.valueAsNumber)
 								? null
 								: event.target.valueAsNumber,
@@ -1082,10 +1002,6 @@ function StorageCard({
 	);
 }
 
-/**
- * How rare a species has to be for its detections to land in the Review
- * queue. Nothing to restart -- the queue is judged by it on its next load.
- */
 function ReviewSettingsCard({
 	initial,
 	save,
@@ -1124,11 +1040,6 @@ function ReviewSettingsCard({
 	);
 }
 
-/**
- * What earns a bird each line on the Highlights card (Live page and
- * timeline). Only the day-scale knobs: a week or month view keeps its own
- * fixed lookback. Nothing to restart -- the next page load judges by these.
- */
 function HighlightsSettingsCard({
 	initial,
 	save,
@@ -1230,12 +1141,6 @@ function ago(iso: string) {
 	return formatTimeAgo(Date.now() - new Date(iso).getTime());
 }
 
-/**
- * The station's software: what it runs, what GitHub last offered, and whether
- * it installs new releases by itself. Checking and installing are handed to the
- * updater (scripts/update_birdnet.sh) through systemd and followed by polling
- * its status file, since an install restarts this server mid-way.
- */
 function UpdatesSettingsCard({
 	initial,
 	save,
@@ -1251,8 +1156,6 @@ function UpdatesSettingsCard({
 }) {
 	const form = useCardSave("Updates", initial, save);
 	const [confirming, setConfirming] = useState(false);
-	// The version this tab's code came with. Once the station reports another,
-	// the code here is the old one, and the reader is offered a reload.
 	const [loadedVersion, setLoadedVersion] = useState<string | null>(null);
 	const installed = updates?.installed ?? null;
 	useEffect(() => {
@@ -1267,9 +1170,6 @@ function UpdatesSettingsCard({
 		installed !== null &&
 		installed.version !== loadedVersion;
 
-	// Held here rather than read from the status file: a check is over in a
-	// second or two, quicker than the page polls, so "checking" there is
-	// rarely seen.
 	const [checking, setChecking] = useState(false);
 
 	async function run(
@@ -1453,13 +1353,8 @@ function UpdatesSettingsCard({
 	);
 }
 
-/** True inside SettingsCardsSkeleton, for the odd piece that has to know. */
 const SkeletonContext = createContext(false);
 
-/** Laid out against, never shown: every value is blanked by the skeleton's
-    styles. Station has no static default, so it gets a stand-in -- placed
-    somewhere real, since 0, 0 is the one location the card warns about, and
-    the warning would make the skeleton taller than any loaded card. */
 const SKELETON_DATA: SettingsPageData = {
 	...SETTINGS_DEFAULTS,
 	station: { siteName: "", latitude: 45, longitude: -75, timezone: "UTC" },
@@ -1468,13 +1363,6 @@ const SKELETON_DATA: SettingsPageData = {
 	updates: { automatic: true },
 };
 
-/**
- * The six cards before the configuration arrives -- the real cards, so every
- * header, label and hint is itself and in place, laid out on placeholder
- * values that the wrapper's styles blank: each field is a soft shell of its
- * own size with nothing showing through it. Inert, so none of it can be
- * focused or saved.
- */
 export function SettingsCardsSkeleton() {
 	return (
 		<div inert aria-busy="true" className="settings-skeleton">

@@ -4,13 +4,6 @@ import type { StationStatus } from "~/lib/station-status.ts";
 const PILL_CLASS =
 	"flex w-fit shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 font-semibold text-[10px] uppercase tracking-[0.14em]";
 
-/**
- * The station's state, set in the Live page's hero: live (recording and
- * analysing -- the moss pill with its pulsing dot), offline (a service has
- * stopped -- muted, the dot still), or unknown (the server can't ask).
- *
- * Borrows the confidence pills' shape so it reads as part of the same family.
- */
 export function LivePill({ status }: { status: StationStatus }) {
 	if (status === "live") {
 		return (
@@ -41,7 +34,6 @@ export function LivePill({ status }: { status: StationStatus }) {
 	);
 }
 
-/** The pill before the station's status arrives: a shell of its size. */
 export function LivePillSkeleton() {
 	return (
 		<ShellSized className="rounded-full">

@@ -4,8 +4,6 @@ import test from "node:test";
 
 import { resolveDetectionClipPath } from "./detection-file-path.server.ts";
 
-// An absolute root on whichever OS runs the tests: a literal "C:\clips" is
-// a relative name on Linux, so CI resolved it beneath the working directory.
 const root = path.resolve("clips");
 
 test("resolves a detection clip beneath the extracted root", () => {

@@ -126,7 +126,6 @@ test("only a species' best recording counts as one", () => {
 		isBestRecording(database, root, clip("2026-10-19", "recent.wav")),
 		false,
 	);
-	// The right file under another species' folder, or another day, is not it.
 	assert.equal(
 		isBestRecording(
 			database,

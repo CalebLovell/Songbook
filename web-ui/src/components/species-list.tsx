@@ -11,17 +11,9 @@ export type SpeciesListItem = {
 	sciName: string;
 	count: number;
 	imageUrl: string | null;
-	/** Precomputed slug when the caller already has one; derived otherwise. */
 	speciesSlug?: string;
 };
 
-/**
- * The ranked species list card, kept for ranked lists like "Top species" /
- * "Rarest species", so every ranked list on the site reads as the same
- * object. Bars scale against the leader of their own list
- * rather than a global maximum, which keeps the rare list legible instead of
- * flattening it against the far larger counts of the common birds.
- */
 export function SpeciesList({
 	title,
 	species,
@@ -32,9 +24,7 @@ export function SpeciesList({
 	title: string;
 	species: SpeciesListItem[];
 	emptyMessage?: string;
-	/** Defaults to the title; set it when the card needs more context. */
 	ariaLabel?: string;
-	/** Extra shell classes, e.g. a min-height so cards line up in a grid. */
 	className?: string;
 }) {
 	const maximum = Math.max(...species.map((item) => item.count), 0);
@@ -59,11 +49,6 @@ export function SpeciesList({
 	);
 }
 
-/**
- * A ranked species row: thumbnail, name, count, and a bar scaled against the
- * leader rather than the total, so the shape of the list reads at a glance even
- * when one species dominates.
- */
 function SpeciesListRow({
 	item,
 	maximum,

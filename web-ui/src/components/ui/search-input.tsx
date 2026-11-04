@@ -9,10 +9,6 @@ type SearchInputProps = Omit<React.ComponentProps<"input">, "value"> & {
 	onClear: () => void;
 };
 
-// Shared search field so every list page gets the same behaviour: it fills the
-// row up to its sibling filters, and the X only appears once there is
-// something to clear. The sidebar's site search and the review dialog draw the
-// same magnifier at the same inset, so every search box in the app reads alike.
 function SearchInput({
 	className,
 	value,

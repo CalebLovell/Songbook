@@ -190,8 +190,6 @@ test("reset returns every card but Station to its defaults", async () => {
 	});
 	assert.deepEqual(page.review, { rareSpeciesMax: 10 });
 
-	// The two things a reset must not touch: the station's own identity, and
-	// every unrelated line of the file.
 	assert.equal(page.station.siteName, "Backyard");
 	assert.equal(page.station.latitude, 41.1);
 	assert.equal(page.station.longitude, -93.2);
@@ -246,8 +244,6 @@ test("a save that cannot restart says so in the reader's terms", async () => {
 		{ privacyThreshold: 2 },
 		{ settingsPath: file, skipSystemActions: true },
 	);
-	// A refused restart and a declined one leave the station in the same place,
-	// so they read identically -- the difference is ours, not the reader's.
 	assert.equal(
 		refused.message,
 		"Saved. Restart BirdNET for this to take effect.",
@@ -271,8 +267,6 @@ test("a card with nothing to restart just saves", async () => {
 		},
 		{ settingsPath: file, skipSystemActions: true },
 	);
-	// Storage is read per operation, so it is live the moment it is written --
-	// offering a restart here would be asking for a pointless interruption.
 	assert.equal(saved.status, "saved");
 	assert.equal(saved.message, "Saved.");
 });
@@ -313,13 +307,10 @@ test("restarting distinguishes nothing to do from a declined restart", async () 
 	const runner = async () => {
 		commands++;
 	};
-	// Storage has no services, so it genuinely is already live.
 	const nothing = await restartStation("storage", { runner });
 	assert.equal(nothing.status, "nothing-to-restart");
 	assert.match(nothing.message, /already live/);
 
-	// Detection does, and a declined restart leaves it on the old values --
-	// reporting that as "nothing needed restarting" would be false.
 	const declined = await restartStation("detection", {
 		runner,
 		skipSystemActions: true,
@@ -340,7 +331,6 @@ test("a failed restart explains the consequence without exposing systemctl", asy
 		}),
 		(error: Error) => {
 			assert.doesNotMatch(error.message, /systemctl exposed output/);
-			// The reader's real question after a failed restart: are my settings gone?
 			assert.match(error.message, /saved/i);
 			return true;
 		},

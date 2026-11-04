@@ -65,8 +65,6 @@ export const getDetectionStats = createServerFn({ method: "GET" }).handler(
 	},
 );
 
-// No Lat/Lon: the table is public, and the station's coordinates are where
-// its owner lives.
 export type DetectionTableRow = Omit<Detection, "Lat" | "Lon"> & {
 	rowId: number;
 };
@@ -76,10 +74,6 @@ export type DetectionPage = {
 	total: number;
 };
 
-// The detections table is paginated on the server, so we can't fuzzy-match rows
-// in the browser the way the species grid does. Instead we run the same Fuse
-// config over the (small) distinct species list and turn the query into an
-// explicit list of names for SQL to filter on.
 async function fuzzySpeciesNames(query: string): Promise<string[]> {
 	const names = await db
 		.selectDistinct({
@@ -95,9 +89,6 @@ async function fuzzySpeciesNames(query: string): Promise<string[]> {
 	return fuse.search(query).map((result) => result.item.comName);
 }
 
-// A query like "93" or "93%" also matches rows whose confidence rounds to that
-// percent — the same number the table renders. Fuzzy matching makes no sense
-// for a number, so this is an exact match on the displayed value.
 function confidencePercent(query: string): number | null {
 	const match = /^(\d{1,3})\s*%?$/.exec(query.trim());
 	if (!match) return null;
@@ -117,7 +108,6 @@ async function detectionFilters(search: DetectionWorkspaceSearch) {
 				sql`CAST(ROUND(${detections.Confidence} * 100) AS INTEGER) = ${percent}`,
 			);
 		}
-		// No match of either kind must yield zero rows, not "no filter".
 		filters.push(clauses.length > 0 ? or(...clauses) : sql`1 = 0`);
 	}
 	if (search.minConfidence !== undefined) {
@@ -230,9 +220,7 @@ function readSelectedDetections(rowIds: number[]): SelectedDetection[] {
 	} catch (error) {
 		try {
 			writable.exec("ROLLBACK");
-		} catch {
-			// The transaction may not have started if opening or preparation failed.
-		}
+		} catch {}
 		throw error;
 	} finally {
 		writable.close();
@@ -287,10 +275,6 @@ async function deleteUnreferencedClips(
 	return { deletedFiles, missingFiles, failedFiles };
 }
 
-// Gated: this drops rows from the detections database and unlinks the audio
-// files behind them, which is as destructive as anything in Review or Settings.
-// The page it is called from is public -- browsing detections needs no password
-// -- so the boundary has to sit here on the mutation rather than on the route.
 export const deleteDetections = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
 	.validator(
@@ -319,8 +303,6 @@ export type LifeListCard = {
 	comName: string;
 	sciName: string;
 	allTimeCount: number;
-	// Detections bucketed by hour of day (length 24), so the bird page can
-	// fold these across a search result to name its most active hour.
 	hourCounts: number[];
 	lastDetected: string;
 	audioUrl: string | null;
@@ -330,10 +312,6 @@ export type LifeListCard = {
 
 export const getLifeListCards = createServerFn({ method: "GET" }).handler(
 	async (): Promise<LifeListCard[]> => {
-		// One pass over the table, grouped down to species-and-hour: the hour
-		// groups add up to the species' total, and the latest one holds its most
-		// recent detection. Every pass over a years-deep table is costly, and the
-		// alternative -- every row sent here to be folded -- costs more still.
 		const groups = await db
 			.select({
 				comName: detections.Com_Name,

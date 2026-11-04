@@ -88,9 +88,6 @@ test("updates only Station assignments and preserves the document", async () => 
 	assert.deepEqual(await readdir(path.dirname(file)), ["birdnet.conf"]);
 });
 
-// /etc/birdnet/birdnet.conf is a link into the user's checkout, in a directory
-// only root can write. The temp file has to go beside the real file, and the
-// link has to survive the rename.
 test("saves through a symlinked config into the real file", async (t) => {
 	const real = await fixtureConfig("CONFIDENCE=0.7\n");
 	const linkDirectory = await mkdtemp(path.join(tmpdir(), "birdnet-etc-"));
@@ -124,8 +121,6 @@ test("appends the Review setting once and defaults older files", async () => {
 });
 
 test("appends any key an older config never carried", async () => {
-	// The read path defaults a missing key and shows it, so the write path has
-	// to be able to put it back -- otherwise the card is unsaveable.
 	const file = await fixtureConfig("BIRDWEATHER_ID=keep-me\n");
 	await writeSettingsCard(
 		"storage",

@@ -100,8 +100,6 @@ test("normalizes RTSP lines and validates the selected live stream", () => {
 });
 
 test("normalizes RTSP streams the form has already split into lines", () => {
-	// The textarea sends its split lines, so a trailing newline arrives as a
-	// blank entry rather than as text the schema can re-split.
 	const settings = parseSettingsCard("audio", {
 		mode: "rtsp",
 		recordingDevice: "default",

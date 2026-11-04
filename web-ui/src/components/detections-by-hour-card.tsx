@@ -26,7 +26,6 @@ import { hourLabel } from "~/lib/time-ago.ts";
 
 const EVEN_HOURS = Array.from({ length: 12 }, (_, index) => index * 2);
 
-/** The header's info icon, for a page that explains the chart. */
 function HourInfo({ info }: { info?: ReactNode }) {
 	return info ? (
 		<InfoTip label="Detections by hour" size="default">
@@ -35,10 +34,6 @@ function HourInfo({ info }: { info?: ReactNode }) {
 	) : null;
 }
 
-/**
- * Detections bucketed by hour of day, midnight to midnight: every detection of
- * the species on its page, the selected window's on the timeline.
- */
 export function DetectionsByHourCard({
 	activity,
 	emptyMessage = EMPTY.station.detections,
@@ -46,18 +41,12 @@ export function DetectionsByHourCard({
 	className = "",
 }: {
 	activity: HourActivity[];
-	/** What the card says when every hour is zero. */
 	emptyMessage?: string;
-	/** The explanation behind the header's info icon. Without it, no icon. */
 	info?: ReactNode;
 	className?: string;
 }) {
-	// Two of these can share a page in principle; a scoped id keeps the
-	// gradients from colliding.
 	const fillId = useId();
 
-	// buildHourActivity always returns all 24 hours, so an empty chart is one
-	// where every hour is zero rather than one with no points at all.
 	const isEmpty = activity.every((point) => point.count === 0);
 
 	if (isEmpty) {
@@ -84,18 +73,10 @@ export function DetectionsByHourCard({
 			</CardHeader>
 
 			<div className="mt-(--page-gap) min-h-0 flex-1">
-				{/* `minHeight` is not decoration: ResponsiveContainer measures its own
-			    box, and `height: 100%` inside a card sized by `min-h-72` resolves
-			    against an indefinite height -- so it measures zero and draws
-			    nothing unless a parent grid row happens to stretch the card to a
-			    definite height. The floor makes the chart render wherever the card
-			    is put, and it still grows past it when a row does stretch. */}
 				<ResponsiveContainer width="100%" height="100%" minHeight={220}>
 					<AreaChart
 						data={activity}
 						margin={CHART_MARGIN}
-						// Not a tab stop: a click or tap would ring the whole chart in a
-						// focus outline. Screen readers get the hidden table below.
 						accessibilityLayer={false}
 						aria-hidden
 					>
@@ -113,8 +94,6 @@ export function DetectionsByHourCard({
 							stroke="var(--muted-foreground)"
 							fontSize={12}
 							tickLine={false}
-							// Every other hour where the card is wide enough; on a narrow
-							// one recharts drops whichever labels would collide.
 							ticks={EVEN_HOURS}
 							interval="preserveStart"
 						/>
@@ -123,8 +102,6 @@ export function DetectionsByHourCard({
 							fontSize={12}
 							tickLine={false}
 							allowDecimals={false}
-							// Auto rather than a fixed width: a busy station's five-digit
-							// counts were being clipped to their trailing digits.
 							width="auto"
 						/>
 						<ChartTooltip
@@ -136,8 +113,6 @@ export function DetectionsByHourCard({
 							)}
 							cursor={{ fill: "var(--sage)", fillOpacity: 0.2 }}
 						/>
-						{/* The wash under the line, not a series of its own: it plots the
-						    same counts, so left in the tooltip it listed every value twice. */}
 						<Area
 							dataKey="count"
 							tooltipType="none"
@@ -169,7 +144,6 @@ export function DetectionsByHourCard({
 	);
 }
 
-/** The chart card before its counts arrive (see ShellChartCard). */
 export function DetectionsByHourCardSkeleton({
 	info,
 	className = "",

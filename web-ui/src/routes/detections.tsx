@@ -32,32 +32,22 @@ export const Route = createFileRoute("/detections")({
 	head: () => ({ meta: [{ title: pageTitle("Detections") }] }),
 	validateSearch: (search) => normalizeDetectionWorkspaceSearch(search),
 	loaderDeps: ({ search }) => search,
-	// Deferred: the page and its filters render at once (see Deferred), and
-	// the table fills in when its page of rows arrives.
 	loader: ({ deps }) => ({ page: getDetectionsPage({ data: deps }) }),
 	component: Detections,
 });
 
-// Shared by the loaded table's card and its skeleton's.
 const TABLE_CARD_CLASS =
 	"feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
 
 function Detections() {
 	const { page: pagePromise } = Route.useLoaderData();
-	// The rows on screen, for the bits of the page outside the table that
-	// count them; null until the first page is in.
 	const settled = useSettled(pagePromise);
 	const page = settled?.current ? settled.value : null;
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 	const router = useRouter();
-	// The delete path is gated on the server, so a locked visitor could only ever
-	// reach a refusal through it. The button and the checkboxes that feed it come
-	// off entirely rather than sitting there offering something that cannot work.
 	const { auth } = useRouteContext({ from: "__root__" });
 	const canDelete = auth.unlocked;
-	// Clips can carry voices from around the station: signed out, the
-	// Recording column comes off too, and the server refuses the clip anyway.
 	const canListen = auth.unlocked;
 	const runDeletion = useServerFn(deleteDetections);
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -103,12 +93,6 @@ function Detections() {
 	}
 
 	return (
-		// The page fills `main` exactly, so the header, filters and the card's
-		// pager all hold their place and only the rows move. `h-full` measures
-		// against `main`, which the shell has already bounded to the viewport.
-		// The table card has a 320px floor, though, and `min-h-fit` lets the page
-		// grow past `main` to keep it: on a short screen or zoomed right in, the
-		// page scrolls rather than squeezing the rows down to nothing.
 		<div className="page-wrap flex h-full min-h-fit flex-col gap-(--page-gap) py-4">
 			<div className="shrink-0 space-y-(--page-gap)">
 				<PageHeaderCard
@@ -126,10 +110,6 @@ function Detections() {
 				/>
 			</div>
 
-			{/* A new search, filter, sort or page keeps the current card up for a
-			    moment: most answers land inside it and swap straight in, rather
-			    than flashing the table's shell between two results on every
-			    keystroke. A slow one still drops to the shell. */}
 			<Deferred
 				promise={pagePromise}
 				shellAfterMs={SHELL_DELAY_MS}
@@ -147,15 +127,11 @@ function Detections() {
 			>
 				{(loaded) =>
 					loaded.total === 0 ? (
-						// Nothing to list: a plain titled card with one line, sized to
-						// its content rather than holding a table's header and pager.
 						<section
 							aria-label="Detections"
 							className="feature-card shrink-0 rounded-md p-4"
 						>
 							<CardHeader title="Detections" />
-							{/* Unfiltered and still empty: the station has never recorded
-							    anything. Otherwise the filters emptied it. */}
 							<EmptyNote>
 								{isFiltered
 									? EMPTY.filter.detectionsFilters
@@ -163,10 +139,6 @@ function Detections() {
 							</EmptyNote>
 						</section>
 					) : (
-						/* Takes the leftover height, so only the rows scroll.
-						   `overflow-hidden` clips the table's header band, which runs
-						   out to the card's top-left edge, to the card's rounded corner
-						   -- square, it painted over the border's curve there. */
 						<section
 							aria-label="Detections"
 							className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
@@ -200,8 +172,6 @@ function Detections() {
 	);
 }
 
-/** The table card as the loaded page draws it, holding the table's own
-    skeleton (see DetectionsTable with no page). */
 function DetectionsTableShell({
 	search,
 	canDelete,

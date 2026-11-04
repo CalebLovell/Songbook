@@ -18,16 +18,12 @@ export const Route = createFileRoute("/species-control")({
 	validateSearch: normalizeSpeciesControlWorkspaceSearch,
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
-	// Deferred: the page renders at once (see Deferred), and the species fill
-	// in when they arrive.
 	loader: () => ({ page: getSpeciesControlPage() }),
 	component: SpeciesControlRoute,
 });
 
 function SpeciesControlRoute() {
 	const { page } = Route.useLoaderData();
-	// Held, not suspended on, so a committed change's refetch never unmounts
-	// the workspace mid-edit.
 	const settled = useSettled(page);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();

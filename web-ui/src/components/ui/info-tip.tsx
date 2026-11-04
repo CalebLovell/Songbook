@@ -9,11 +9,8 @@ import {
 	MODAL_TITLE_CLASS,
 } from "~/components/ui/confirm-dialog.tsx";
 
-/** Words a title leaves lowercase, unless one comes first. */
 const TITLE_SMALL_WORDS = new Set(["a", "an", "and", "by", "of", "or", "the"]);
 
-/** "Detections by hour" as a title: "Detections by Hour". Hyphens split words
-    too, so "Species-frequency" reads "Species-Frequency". */
 function titleCase(label: string) {
 	return label
 		.split(/([\s-]+)/)
@@ -25,39 +22,16 @@ function titleCase(label: string) {
 		.join("");
 }
 
-/** The dialog is portalled out of the page's DOM but not out of its React
-    tree, so its events would still reach the card, table header or label the
-    icon sits in, and its keys the page's own shortcuts. */
 function stopAtDialog(event: SyntheticEvent) {
 	event.stopPropagation();
 }
 
-/**
- * An explanation a reader can ask for, so a control can stay uncluttered
- * without going unexplained -- the info icon every explanation in the app goes
- * through. Hovering only outlines the icon, like any outline button; clicking
- * or tapping opens the explanation in a centered modal over the dimmed page,
- * until the close button, a click outside it or Escape lets it go.
- *
- * The click's default is prevented because the icon sometimes sits inside a
- * field's label, which would otherwise pull focus into the control it labels;
- * that is also why the dialog is opened here rather than by its trigger, which
- * stands aside for a prevented click.
- */
 export function InfoTip({
 	label,
 	size = "sm",
 	children,
 }: {
-	/** What's being explained, in sentence case: the modal's title sets it in
-	    title case and adds "Information". */
 	label: string;
-	/** `default` is a 16px glyph on a 28px target for a card's header, pulled
-	    out so the glyph sits 12px from the card's edge -- under 400px, where
-	    the card's padding halves to 8px, only as far as lines the glyph up with
-	    that padding, or the target would overhang the card; `sm` is a 14px
-	    glyph on a 24px target for a field's label, pulled out so the outline
-	    takes up no room in the line. */
 	size?: "sm" | "default";
 	children: ReactNode;
 }) {

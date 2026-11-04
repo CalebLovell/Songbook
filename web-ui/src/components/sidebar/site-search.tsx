@@ -33,12 +33,8 @@ import {
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { cn } from "~/lib/utils.ts";
 
-/** `gated` pages, like the Settings cards, are left out for a visitor -- the
- *  sidebar does not list them either. */
 type PageEntry = SearchPage & { icon: LucideIcon; gated?: boolean };
 
-/** Labels and icons match the sidebar's own, so a page is found by the name
- * and glyph you already know it by. */
 const PAGES: PageEntry[] = [
 	{ label: "Live Feed", to: "/live", icon: Activity },
 	{ label: "Timeline", to: "/timeline", icon: CalendarRange },
@@ -61,11 +57,6 @@ type Result =
 	| { kind: "page"; page: PageEntry }
 	| { kind: "setting"; setting: SettingsIndexEntry; field?: string };
 
-/**
- * Loaded on first focus rather than on mount: the sidebar is on every page, and
- * most visits never search. Held for the rest of the session after that -- a
- * species heard for the first time mid-visit can wait for the next page load.
- */
 function useSearchSpecies() {
 	const [species, setSpecies] = useState<SearchSpecies[] | null>(null);
 	const requested = useRef(false);
@@ -77,7 +68,6 @@ function useSearchSpecies() {
 			.then(setSpecies)
 			.catch((cause) => {
 				console.error(cause);
-				// Let the next focus try again.
 				requested.current = false;
 			});
 	}
@@ -85,7 +75,6 @@ function useSearchSpecies() {
 	return { species: species ?? [], load };
 }
 
-/** Typing "/" anywhere outside a text field jumps into search. */
 function useSlashShortcut(input: React.RefObject<HTMLInputElement | null>) {
 	useEffect(() => {
 		function onKeyDown(event: KeyboardEvent) {
@@ -97,8 +86,6 @@ function useSlashShortcut(input: React.RefObject<HTMLInputElement | null>) {
 			) {
 				return;
 			}
-			// The mobile drawer renders a second copy of the sidebar; only the one
-			// actually on screen should take the shortcut.
 			if (!input.current?.offsetParent) return;
 			event.preventDefault();
 			input.current.focus();
@@ -108,14 +95,6 @@ function useSlashShortcut(input: React.RefObject<HTMLInputElement | null>) {
 	}, [input]);
 }
 
-/**
- * The sidebar's site-wide search: species the station has heard, the site's
- * pages, and the cards on Settings -- by title or by any field inside them.
- *
- * A combobox rather than a search page: every result is a place to go, so the
- * list only has to get you there. The popover is portalled so it can overhang
- * the sidebar card instead of being clipped by its scroll box.
- */
 export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 	const navigate = useNavigate();
 	const input = useRef<HTMLInputElement>(null);
@@ -149,7 +128,6 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 		];
 	}, [query, species, auth.unlocked]);
 
-	// A fresh query starts the highlight back at its best match.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: reset on query change
 	useEffect(() => setActive(0), [query]);
 
@@ -227,9 +205,6 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 						onKeyDown={onKeyDown}
 						className="pr-9 pl-9 [&::-webkit-search-cancel-button]:hidden"
 					/>
-					{/* The same X as `SearchInput`, at the same inset. mousedown, not
-					    click, so the field never blurs: clearing leaves you in it,
-					    ready to type the next query. */}
 					{query ? (
 						<button
 							type="button"
@@ -254,8 +229,6 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 					sideOffset={-6}
 					alignOffset={8}
 					collisionPadding={16}
-					// Focus stays in the field: the list is driven from the keyboard
-					// through `aria-activedescendant`, never focused itself.
 					onOpenAutoFocus={(event) => event.preventDefault()}
 					onCloseAutoFocus={(event) => event.preventDefault()}
 					className="z-50 w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-[var(--line)] bg-[var(--paper-raised)] py-1 shadow-[0_6px_18px_color-mix(in_oklab,var(--ink)_8%,transparent)]"
@@ -277,8 +250,6 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 									role="option"
 									aria-selected={index === active}
 									tabIndex={-1}
-									// mousedown, not click: the field's blur would close the
-									// list before a click ever landed.
 									onMouseDown={(event) => {
 										event.preventDefault();
 										go(result);
@@ -358,8 +329,6 @@ function ResultBody({ result }: { result: Result }) {
 		);
 	}
 
-	// The matched field beside the card's name, so "latitude" lands on a row
-	// that says why Station came up.
 	const Icon = result.setting.icon;
 	return (
 		<>

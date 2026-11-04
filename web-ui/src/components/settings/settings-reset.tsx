@@ -5,11 +5,6 @@ import { Button } from "~/components/ui/button.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { toast } from "~/components/ui/toaster.tsx";
 
-/**
- * Returns the station to its install defaults. Destructive and immediate, so it
- * asks first and spells out both halves of what it does -- the cards it
- * rewrites, and the one it deliberately leaves alone.
- */
 export function SettingsReset({ onReset }: { onReset: () => Promise<void> }) {
 	const [open, setOpen] = useState(false);
 	const [busy, setBusy] = useState(false);
@@ -20,7 +15,6 @@ export function SettingsReset({ onReset }: { onReset: () => Promise<void> }) {
 			await onReset();
 			setOpen(false);
 		} catch {
-			// The dialog stays open, so trying again is one click away.
 			toast.error("Settings could not be reset.", {
 				id: "settings-reset",
 				description: "The station is unchanged.",

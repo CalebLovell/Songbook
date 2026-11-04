@@ -31,10 +31,4 @@ function ButtonAnchor({
 	);
 }
 
-/**
- * An in-app link that looks like a `Button` -- any variant, size and icon --
- * with the router's typed `to`, `params` and `search`. Use it wherever a button
- * navigates rather than acts, instead of wrapping a `Link` in `Button asChild`
- * by hand.
- */
 export const ButtonLink = createLink(ButtonAnchor);

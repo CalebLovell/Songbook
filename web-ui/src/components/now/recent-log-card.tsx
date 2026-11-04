@@ -15,8 +15,6 @@ import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
 import { VISIT_GAP_MINUTES } from "~/lib/visits.ts";
 
-// Shared with the skeleton below, which is built from the same pieces so the
-// card is the same shape loading and loaded.
 const CARD_CLASS = "@container feature-card flex flex-col rounded-md p-4";
 const ROW_CLASS =
 	"flex items-center @min-[26rem]:gap-3 gap-2 px-(--page-gap) py-1.75";
@@ -31,9 +29,6 @@ const FOOTER_CLASS =
 const FOOTER_LINK_CLASS =
 	"inline-flex items-center gap-1 text-muted-foreground text-xs no-underline hover:text-foreground hover:underline";
 
-/** The visit log's header band: a full-width hairline under a 45px strip,
-    the info tip held right. Needs no data, so the skeleton draws it as
-    itself. */
 function RecentLogHeader() {
 	return (
 		<CardHeader title="Recent activity">
@@ -55,13 +50,9 @@ function RecentLogHeader() {
 	);
 }
 
-/** The visit log's footer: a hairline across the card's full width, the
-    card's one link held right. Needs no data either. */
 function RecentLogFooter() {
 	return (
 		<div className={FOOTER_CLASS}>
-			{/* The log is a rolling 24 hours; the calendar day, hour by hour, is
-			    the Timeline's Daily view, which opens on today. */}
 			<Link to="/timeline" className={FOOTER_LINK_CLASS}>
 				All of today
 				<ArrowRight aria-hidden className="size-3" />
@@ -70,12 +61,6 @@ function RecentLogFooter() {
 	);
 }
 
-/**
- * The card before its first snapshot: the header as itself, then a full
- * log's rows built from the real row's pieces -- a thumbnail-sized square, a
- * bar on each of the name's two lines, the time column, and shells the exact
- * size of the pill and the play button -- over the footer as itself.
- */
 export function RecentLogCardSkeleton() {
 	const canListen = useCanListen();
 	return (
@@ -125,33 +110,14 @@ export function RecentLogCardSkeleton() {
 	);
 }
 
-/** Names come in all lengths; so do their bars. */
 const NAME_WIDTHS = ["w-36", "w-28", "w-44", "w-32", "w-40"];
 
-/**
- * The window's newest visits, most recently heard first, set like the bird
- * page's visit log: a header band, hairline-divided rows bled to the card's
- * edges, a footer that links on to today's Timeline, and a layout that answers to
- * the card's own width rather than the screen's -- the card spans the page on
- * a phone and takes the wider track beside the rail at lg.
- *
- * A row is a visit, not a detection: BirdNET-Pi writes one row per 3-second
- * window, so a singing robin would otherwise bury everything else under forty
- * copies of itself. The row says how many detections it folds up and the span
- * they cover, and plays the most confident one.
- *
- * It shows the newest RECENT_LIMIT visits and no more: the page is a glance
- * at what's been around, so rather than paging through the window, the
- * footer hands the rest of the day to the Timeline.
- */
 export function RecentLogCard({
 	recent,
 	generatedAt,
 	freshKeys,
 }: {
-	/** The newest visits, from the polled snapshot. */
 	recent: RecentVisit[];
-	/** When the snapshot was built, which the ages are measured from. */
 	generatedAt: string;
 	freshKeys: Set<string>;
 }) {
@@ -173,14 +139,6 @@ export function RecentLogCard({
 						return (
 							<li
 								key={visit.key}
-								// Under 26rem the row can't hold the names, a time column,
-								// the pill and a labelled button side by side, so the age
-								// and time take the binomial's line and the button drops its
-								// label. Two lines either way, so the row keeps its height.
-								//
-								// The dividers run out to the card's edges and the row's own
-								// padding hands the page gap back, so the content lines up
-								// with the header's.
 								className={`${ROW_CLASS} ${freshKeys.has(visit.key) ? "flash-in" : ""}`}
 							>
 								<SpeciesThumbnail
@@ -241,7 +199,6 @@ export function RecentLogCard({
 				</ul>
 			)}
 
-			{/* An empty window means an empty today, so there's nothing to link on to. */}
 			{recent.length > 0 ? <RecentLogFooter /> : null}
 		</section>
 	);

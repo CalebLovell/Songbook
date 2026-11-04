@@ -9,18 +9,8 @@ export type LiveAudioState =
 
 const MIN_GAIN_PERCENT = 100;
 const MAX_GAIN_PERCENT = 400;
-/** A dead stream rejects almost instantly; holding "connecting" this long means
-    a retry visibly tries before it reports failure again. */
 const MIN_CONNECTING_MS = 800;
 
-/**
- * Owns the Web Audio graph behind the live panel:
- *   MediaElementSource -> Gain -> [Compressor] -> Analyser -> destination
- * The graph is built lazily on the first play() (browsers require a user
- * gesture to start an AudioContext, and a locked/idle visitor should never
- * open one). Compression is toggled by re-linking Gain to either the
- * compressor or straight to the analyser.
- */
 export function useLiveAudio(streamUrl: string) {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const ctxRef = useRef<AudioContext | null>(null);
@@ -32,16 +22,12 @@ export function useLiveAudio(streamUrl: string) {
 	const [gainPercent, setGainPercentState] = useState(MIN_GAIN_PERCENT);
 	const [compression, setCompressionState] = useState(false);
 	const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
-	// True from a failure until audio actually plays, so a retry in progress can
-	// still read as a retry rather than a first connect.
 	const [hasFailed, setHasFailed] = useState(false);
 	const connectStartedAt = useRef(0);
 	const failTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
 		undefined,
 	);
 
-	// Reports "offline", but never sooner than MIN_CONNECTING_MS after the
-	// attempt began, so the spinner doesn't just flicker.
 	const fail = useCallback(() => {
 		clearTimeout(failTimer.current);
 		const wait = connectStartedAt.current + MIN_CONNECTING_MS - Date.now();
@@ -56,8 +42,6 @@ export function useLiveAudio(streamUrl: string) {
 		failTimer.current = setTimeout(goOffline, wait);
 	}, []);
 
-	// Rebuilds the Gain -> (Compressor?) -> Analyser links for the current
-	// compression setting. Analyser -> destination is wired once at build time.
 	const relink = useCallback((withCompression: boolean) => {
 		const gain = gainRef.current;
 		const compressor = compressorRef.current;
@@ -104,19 +88,13 @@ export function useLiveAudio(streamUrl: string) {
 		connectStartedAt.current = Date.now();
 		setState("connecting");
 		try {
-			// iOS routes Web Audio through the ringer, so the silent switch would
-			// mute the feed; asking for the playback session (Safari 17+) doesn't.
 			const session = (navigator as { audioSession?: { type: string } })
 				.audioSession;
 			if (session) session.type = "playback";
 			ensureGraph();
-			// Assigning src here (not in markup) keeps a locked/idle visitor from
-			// ever opening the gated proxy connection. After a failure the element
-			// is stuck in its error state, so a retry reloads the source.
 			if (!audio.src) audio.src = streamUrl;
 			else if (audio.error) audio.load();
-			// Both start inside the tap: iOS Safari refuses a play() that only
-			// runs once an awaited resume() has settled.
+			// Both start inside the tap: iOS Safari refuses a play() after an awaited resume().
 			await Promise.all([ctxRef.current?.resume(), audio.play()]);
 		} catch {
 			fail();
@@ -141,8 +119,6 @@ export function useLiveAudio(streamUrl: string) {
 		[relink],
 	);
 
-	// Locking the phone or switching apps suspends the context on iOS while the
-	// element plays on, so coming back left a "Live" feed with no sound.
 	useEffect(() => {
 		const onVisible = () => {
 			const ctx = ctxRef.current;
@@ -158,10 +134,6 @@ export function useLiveAudio(streamUrl: string) {
 		return () => {
 			clearTimeout(failTimer.current);
 			ctxRef.current?.close();
-			// Null the refs so a remount rebuilds the graph rather than reusing a
-			// closed context. Harmless today (no StrictMode, and PlayerPanel mounts
-			// once), but it keeps ensureGraph's `if (ctxRef.current) return` guard
-			// honest if either changes.
 			ctxRef.current = null;
 			gainRef.current = null;
 			compressorRef.current = null;
@@ -184,9 +156,6 @@ export function useLiveAudio(streamUrl: string) {
 			setState("playing");
 			setHasFailed(false);
 		},
-		// A failed load fires "pause" right after "error"; while connecting (the
-		// button is out of service then) it is that, not the listener, so the
-		// pending failure stands.
 		onPause: () =>
 			setState((s) => (s === "offline" || s === "connecting" ? s : "paused")),
 		onError: fail,

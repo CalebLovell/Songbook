@@ -64,8 +64,6 @@ test("a password can be set over a corrupt file, since that is when it is needed
 	assert.equal(verifyPassword("swifts-over-the-creek", after.hash), true);
 });
 
-// Neither state needs a live request: both answer before any cookie or client
-// address is read.
 test("an unset station is locked and says so, for status and for unlock", async () => {
 	await useFixtureAuthFile();
 	assert.deepEqual(await readUnlockStatus(), {

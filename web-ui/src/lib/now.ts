@@ -15,14 +15,7 @@ import {
 	type Visit,
 } from "~/lib/visits.ts";
 
-// Every figure on the Today page reads from one rolling 24-hour window rather
-// than the calendar day, so no two cards can disagree -- and so the page still
-// shows a full night of activity when someone checks it at 1am.
 export const detectedAt = sql<string>`datetime(${detections.Date} || ' ' || ${detections.Time})`;
-// The bare Date bound comes first and is what the Date/Time index can seek on:
-// wrapped in datetime() the columns hide from it, and every "24-hour" query
-// would read the station's whole history. It keeps yesterday whole; the
-// exact cutoff then trims it.
 export const isLast24h = sql`${detections.Date} >= date('now', '-1 day', 'localtime') and datetime(${detections.Date} || ' ' || ${detections.Time}) >= datetime('now', '-24 hours', 'localtime')`;
 
 export type NowSummary = {
@@ -30,15 +23,12 @@ export type NowSummary = {
 };
 
 export type CurrentBird = {
-	/** Same form as a RecentDetection's key, so the page can tell a new hero
-	    bird from one it has already shown. */
 	key: string;
 	comName: string;
 	sciName: string;
 	speciesSlug: string;
 	imageUrl: string | null;
 	detectedAt: string;
-	/** Age at query time, so the first paint already knows the right state. */
 	ageMs: number;
 	confidence: number | null;
 	audioUrl: string | null;
@@ -49,49 +39,28 @@ export type CurrentBird = {
 	allTimeCount: number;
 };
 
-/**
- * One visit in the log: a species' unbroken stretch of detections (see
- * visits.ts), so a robin singing for twenty minutes is one row, not forty.
- */
 export type RecentVisit = {
-	/** The species and the visit's first detection, so it stays put as the
-	    visit grows and the page can tell a newly arrived row from one it has
-	    already shown. */
 	key: string;
 	comName: string;
 	sciName: string;
 	speciesSlug: string;
 	imageUrl: string | null;
-	/** The visit's first and latest detections, "YYYY-MM-DD HH:MM:SS". */
 	firstAt: string;
 	lastAt: string;
-	/** Age of the latest detection at query time. */
 	ageMs: number;
 	detections: number;
-	/** The visit's most confident detection, and that detection's recording --
-	    the one worth playing. */
 	confidence: number | null;
 	audioUrl: string | null;
 };
 
 export type NowSnapshot = {
-	/** When the server built this snapshot, as "YYYY-MM-DD HH:MM:SS" local. */
 	generatedAt: string;
-	/** The newest detection of the last 24 hours, or null when the window is
-	    empty -- the page is about the last day, and an older bird is not news. */
 	current: CurrentBird | null;
-	/** Whether the station has ever recorded anything, so an empty window can
-	    tell a quiet day from a station that has yet to hear its first bird. */
 	hasAnyDetections: boolean;
 	summary: NowSummary;
-	/** The window's visits, most recently heard first, less the one the hero
-	    is showing: each bird sits in one place at a time, and moves down into
-	    the log when the next arrives. */
 	recent: RecentVisit[];
 };
 
-/** Rows in the log beneath the hero. The page is a glance at what's been
-    around; the rest of the day is the Timeline's. */
 export const RECENT_LIMIT = 10;
 
 type LatestRow = {
@@ -113,9 +82,8 @@ async function buildCurrentBird(
 	withAudio: boolean,
 ): Promise<CurrentBird> {
 	const isSameSpecies = sql`${detections.Com_Name} = ${latest.comName}`;
-	// The same test with the unary + that keeps SQLite off the Com_Name index:
-	// inside the window, the Date/Time index narrows to a day's rows, where the
-	// species index would read every detection of a common bird ever made.
+	// The unary + keeps SQLite off the Com_Name index, so the Date/Time index narrows
+	// the window instead of reading every detection of a common bird.
 	const inWindowSameSpecies = and(
 		isLast24h,
 		sql`+${detections.Com_Name} = ${latest.comName}`,
@@ -131,8 +99,6 @@ async function buildCurrentBird(
 			})
 			.from(detections)
 			.where(inWindowSameSpecies),
-		// Confidence is averaged over the species' whole history rather than the
-		// window, so one lone detection today doesn't stand in for the species.
 		db
 			.select({
 				allTimeCount: count(),
@@ -181,7 +147,6 @@ const detectionColumns = {
 	fileName: detections.File_Name,
 };
 
-/** The newest detection of the last 24 hours, if there was one. */
 async function getLatestRow(): Promise<LatestRow | undefined> {
 	const [latest] = await db
 		.select(detectionColumns)
@@ -200,12 +165,6 @@ async function hasAnyDetections(): Promise<boolean> {
 	return row !== undefined;
 }
 
-/**
- * Every detection in the window, folded into visits, newest first. `log` is
- * the same list less the visit the hero is showing -- the one whose latest
- * detection is the hero's own. A day of detections is a few thousand rows at
- * most, so clustering them on each poll stays cheap.
- */
 async function getWindowVisits(heroKey: string | undefined) {
 	const rows: WindowRow[] = (
 		await db.select(detectionColumns).from(detections).where(isLast24h)
@@ -219,7 +178,6 @@ async function getWindowVisits(heroKey: string | undefined) {
 	return { rows, visits, log };
 }
 
-/** The log's rows, newest first, aged against `generatedAtMs`. */
 function buildRecentVisits(
 	log: Visit<WindowRow>[],
 	generatedAtMs: number,
@@ -253,15 +211,10 @@ function buildRecentVisits(
 
 export const getNowSnapshot = createServerFn({ method: "GET" }).handler(
 	async (): Promise<NowSnapshot> => {
-		// Read the clock once, so every age in the snapshot is measured from the
-		// same instant and the client can re-base them all off one offset.
 		const generatedAtDate = new Date();
 		const generatedAtMs = generatedAtDate.getTime();
 
-		// Everything, the hero included, is bounded to the last 24 hours: a bird
-		// heard two days ago leaves the page to its quiet state instead.
 		const latest = await getLatestRow();
-		// Signed out, the page plays nothing: its clips aren't best recordings.
 		const withAudio = await canHearEveryClip();
 		const [current, window, anyDetections] = await Promise.all([
 			latest ? buildCurrentBird(latest, generatedAtMs, withAudio) : null,

@@ -64,10 +64,8 @@ test("a day maps to the anchor of the period containing it", () => {
 });
 
 test("week anchors follow the ISO year, not the calendar year", () => {
-	// Dec 31 2025 is a Wednesday, so its week's Thursday lands in 2026.
 	assert.equal(anchorForDay("week", "2025-12-31"), "2026-W01");
 	assert.equal(windowFor("week", "2026-W01").start, "2025-12-29");
-	// Jan 1 2027 is a Friday, leaving it in the last week of 2026.
 	assert.equal(anchorForDay("week", "2027-01-01"), "2026-W53");
 });
 
@@ -82,7 +80,6 @@ test("every day of a week resolves to the same anchor", () => {
 		"2026-08-02",
 	].map((day) => anchorForDay("week", day));
 	assert.deepEqual(new Set(anchors), new Set(["2026-W31"]));
-	// The next day starts a new week rather than extending this one.
 	assert.equal(anchorForDay("week", "2026-08-03"), "2026-W32");
 });
 
@@ -94,7 +91,6 @@ test("an anchor round-trips back to itself through its window", () => {
 });
 
 test("the current anchor uses the station's calendar day", () => {
-	// The test runner stands in for the station, so its zone is the station's.
 	const noon = new Date(2026, 6, 28, 12, 0, 0);
 	assert.equal(currentAnchor("day", noon), "2026-07-28");
 	assert.equal(currentAnchor("week", noon), "2026-W31");
@@ -112,31 +108,25 @@ test("anchors are validated against their period's shape", () => {
 	assert.equal(isValidAnchor("year", "2026"), true);
 	assert.equal(isValidAnchor("year", "26"), false);
 	assert.equal(isValidAnchor("day", "2026-13-45"), false);
-	// Shapes that parse but name a day or week the calendar doesn't have.
 	assert.equal(isValidAnchor("day", "2026-02-31"), false);
 	assert.equal(isValidAnchor("month", "2026-13"), false);
 	assert.equal(isValidAnchor("week", "2026-W53"), true);
 	assert.equal(isValidAnchor("week", "2025-W53"), false);
-	// "all" ignores whatever is left in the URL from another period.
 	assert.equal(isValidAnchor("all", "2026-W31"), true);
 });
 
 test("the previous period starts one whole period back", () => {
 	assert.equal(previousPeriodStart("day", "2026-05-25"), "2026-05-24");
-	// Week of May 11 (2026-W20) sits after the week starting May 4.
 	assert.equal(previousPeriodStart("week", "2026-W20"), "2026-05-04");
 	assert.equal(previousPeriodStart("month", "2026-05"), "2026-04-01");
 	assert.equal(previousPeriodStart("year", "2026"), "2025-01-01");
-	// All time has no period before it, so nothing can have "returned".
 	assert.equal(previousPeriodStart("all", ""), null);
 });
 
 test("the previous period crosses month, year and ISO-week boundaries", () => {
-	// First of the month steps back into the prior month's first day.
 	assert.equal(previousPeriodStart("day", "2026-03-01"), "2026-02-28");
 	assert.equal(previousPeriodStart("month", "2026-01"), "2025-12-01");
 	assert.equal(previousPeriodStart("year", "2025"), "2024-01-01");
-	// Week 1 of 2026 (starts 2025-12-29) follows the last week of 2025.
 	assert.equal(previousPeriodStart("week", "2026-W01"), "2025-12-22");
 });
 
@@ -152,7 +142,6 @@ test("stepping crosses month, year and ISO-week boundaries", () => {
 	assert.equal(stepAnchor("day", "2026-02-28", 1), "2026-03-01");
 	assert.equal(stepAnchor("day", "2026-01-01", -1), "2025-12-31");
 	assert.equal(stepAnchor("month", "2026-12", 1), "2027-01");
-	// 2026 has 53 ISO weeks; the one after its last is week 1 of 2027.
 	assert.equal(stepAnchor("week", "2026-W53", 1), "2027-W01");
 	assert.equal(stepAnchor("week", "2026-W01", -1), "2025-W52");
 });

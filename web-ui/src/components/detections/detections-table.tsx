@@ -48,30 +48,13 @@ import { shortAnchorLabel } from "~/lib/timeline-window.ts";
 import { cn } from "~/lib/utils.ts";
 
 type DetectionsTableProps = {
-	/**
-	 * The rows, or null while they load: the table then draws itself as its
-	 * own skeleton -- the real header (its sorts work from the URL alone), a
-	 * page of rows whose cells are shells of what each column holds, and the
-	 * real footer -- so loading and loaded are one shape to the pixel.
-	 */
 	page: DetectionPage | null;
 	search: DetectionWorkspaceSearch;
 	onSearchChange: (search: DetectionWorkspaceSearch) => void;
 	rowSelection: RowSelectionState;
 	onRowSelectionChange: OnChangeFn<RowSelectionState>;
-	/**
-	 * Whether the station is unlocked. Selection exists only to feed the delete
-	 * button, and deleting is gated on the server -- so a locked visitor gets no
-	 * checkboxes rather than a column that leads to a refusal.
-	 */
 	canDelete: boolean;
-	/**
-	 * Whether every clip may play. A detection's clip can carry voices from
-	 * around the station, so a signed-out visitor gets no Recording column at
-	 * all -- the server would refuse the clip anyway.
-	 */
 	canListen: boolean;
-	/** Opens the page's delete confirmation for the selected rows. */
 	onDeleteSelected: () => void;
 };
 
@@ -80,51 +63,10 @@ type DetectionsFiltersProps = Pick<
 	"search" | "onSearchChange"
 >;
 
-// Three widths of the one table, keyed to the card rather than the viewport
-// (the sidebar changes how much of the viewport the card gets). Narrowest, a
-// row is only what a detection *is*: the bird, when, and its clip -- a long
-// species name ends in an ellipsis, the moment stacks its time over its day,
-// and the clip's button drops its label. From 36rem the confidence joins and those three go
-// back to one line; from 54rem the scientific name joins too. Past what a row
-// needs the scrollport still scrolls sideways rather than squeeze anything.
-//
-// Only the two ends are pinned: the shared selection column, and Recording,
-// held to the width of the button it carries so it stays a tidy right edge
-// rather than a widening gutter. Everything between them shares the rest of
-// the width equally (see the grid on the <Table> below), never narrower than
-// what it holds.
-//
-// The pinned widths sit on the header cells rather than a <colgroup> to keep a
-// column's sizing next to the header that names it.
-// `pr-3` rather than `pr-0`: the body scrolls under a vertical scrollbar pinned
-// to the container's right edge, and flush-right the recording button sat hard
-// against it. The gap gives the column room to breathe without widening it into
-// a gutter -- it eats into the fixed 8rem, it does not add to it.
-//
-// The rows run out to the card's left edge (see the <Table> below), so the
-// card's inset moves into the first column: it replaces the cell's own 8px, so
-// the first column's content sits exactly the card's padding in. That padding
-// is the page gap -- 16px, or 8px on the smallest phones -- so every offset
-// here reads the variable rather than a number.
-//
-// The space between columns follows it too: each cell keeps `--cell-gap`
-// either side -- half the page gap, never under 6px -- so neighbours sit 16px
-// apart, or 12px on the smallest phones. The select column is the padding, the
-// checkbox and one cell gap, so the box sits that same full gap from the
-// row number.
 const FIRST_COLUMN_CLASSES = "pl-(--page-gap)";
 const CELL_GAP = "px-(--cell-gap)";
-// The rows run out to the card's right edge as well, so the last column takes
-// the card's padding as its own inset -- the mirror of the first column.
-// Less whatever a classic scrollbar's gutter already leaves at that edge, as
-// `.page-wrap` does, so the right inset doesn't come out a scrollbar wider
-// than the left.
 const AUDIO_EDGE =
 	"pr-[max(calc(var(--spacing)*1),calc(var(--page-gap)-var(--scrollbar-w,0px)))]";
-// Which columns sit out at which width. Hidden, a cell leaves the grid's flow
-// entirely, and the grid's own column list (on the <Table>) drops its track.
-// Without the Recording column, the last column showing takes the card's
-// padding instead: Recorded on the narrow row, Confidence from 36rem.
 const LAST_EDGE_WITHOUT_AUDIO: Record<string, string> = {
 	recorded: `${AUDIO_EDGE} @min-[36rem]:pr-(--cell-gap)`,
 	confidence: AUDIO_EDGE,
@@ -142,26 +84,13 @@ const HEADER_CLASSES: Record<string, string> = {
 const CELL_CLASSES: Record<string, string> = {
 	index: "text-center",
 	species: "min-w-0 truncate",
-	// Narrow, the stacked time and day sit against the play button, under the
-	// right-aligned sort menu; one line again, they read left to right.
 	recorded: "text-right @min-[36rem]:text-left",
 	audio: AUDIO_EDGE,
 };
 
-// A row spans every column of the table's grid and takes its tracks as its own,
-// so its fill runs the full width and its cells centre on its height the way
-// `align-middle` did in a real table row.
 const GRID_ROW = "col-span-full grid grid-cols-subgrid items-center";
 
-// The grid's column list at each width, as custom properties the <Table>'s
-// container-query classes pick between -- one list per width, since a hidden
-// column has to leave the list as well as the row. Species may shrink below its
-// name at the narrow widths, where it truncates; at the widest every column
-// holds its content on one line and the four between the ends share the rest.
-// On the smallest phones (under 400px) the name holds its full width again and
-// the scrollport scrolls sideways, rather than cutting it to a few letters.
 function gridColumns(canDelete: boolean, canListen: boolean): CSSProperties {
-	// The row number follows the checkbox at every width, sized to its widest.
 	const lead = canDelete ? "max-content max-content " : "max-content ";
 	const audio = canListen ? " max-content" : "";
 	const fill = "minmax(max-content, 1fr)";
@@ -177,8 +106,6 @@ function recordedLabel(row: DetectionTableRow): string {
 	return formatDateTime(row.Date, row.Time);
 }
 
-// The narrow row splits `recordedLabel` in two -- a clock time the eye can
-// compare down the column, over the day it belongs to.
 function clockLabel(row: DetectionTableRow): string {
 	return formatDateTime(row.Date, row.Time).split(", ").at(-1) ?? row.Time;
 }
@@ -187,9 +114,6 @@ function dayLabel(row: DetectionTableRow): string {
 	return formatDate(row.Date);
 }
 
-// The recording button's word shows from a 36rem table; narrower, the button
-// is just its speaker glyph, so it squares up to the 28px row button rather
-// than keeping the label's side padding -- width the species name needs.
 const LISTEN_LABEL = "hidden @min-[36rem]:inline";
 const LISTEN_SQUARE = "@max-[36rem]:w-7 @max-[36rem]:px-0";
 
@@ -200,11 +124,6 @@ const SORT_LABELS: Record<DetectionWorkspaceSort, string> = {
 	confidence: "Confidence",
 };
 
-// One bordered control for the whole range, built like the timeline's window
-// stepper: segments joined by hairlines, each showing the date in the station's
-// short form ("Sep 24, 2026") rather than the browser's own `mm/dd/yyyy` field
-// text. The arrow between the ends stands in for "From" and "To", which the
-// inputs still carry as their accessible names.
 function DateRangeFilter({
 	from,
 	to,
@@ -242,8 +161,6 @@ function DateRangeFilter({
 				showIcon
 				onChange={(value) => onChange({ from, to: value })}
 			/>
-			{/* One clear for the pair. Always rendered, and dimmed while there is
-			    nothing to clear, so setting a date never shifts the row. */}
 			<button
 				type="button"
 				aria-label="Clear date range"
@@ -258,12 +175,6 @@ function DateRangeFilter({
 	);
 }
 
-/**
- * One end of the range: the date as text, with the native date input laid
- * invisibly over it so a phone still opens its own picker and `min`/`max` still
- * hold the ends in order. The label's floor fits the longest date, so picking
- * one never resizes the control.
- */
 function DateSegment({
 	label,
 	value,
@@ -280,11 +191,7 @@ function DateSegment({
 	onChange: (value: string | undefined) => void;
 }) {
 	return (
-		// Stacked, each date takes half the row and centres in it, and a long
-		// date truncates rather than pushing the clear button out of the box.
 		<div className="relative flex min-w-0 @min-[38rem]:flex-none flex-1 items-center @min-[38rem]:justify-start justify-center gap-2 @min-[38rem]:px-3 px-2 pointer-coarse:text-base text-sm transition-colors hover:bg-accent">
-			{/* Under 400px the calendar mark goes, as on the timeline's stepper --
-			    the row needs its width for the dates themselves. */}
 			{showIcon ? (
 				<Calendar
 					className="size-4 shrink-0 text-muted-foreground max-[400px]:hidden"
@@ -303,15 +210,10 @@ function DateSegment({
 				value={value ?? ""}
 				min={min}
 				max={max}
-				// A desktop browser only opens its calendar from the field's own
-				// little button, which is invisible here -- so a click anywhere on
-				// the segment asks for the picker outright.
 				onClick={(event) => {
 					try {
 						event.currentTarget.showPicker?.();
-					} catch {
-						// Not allowed here (e.g. not a user gesture); nothing to do.
-					}
+					} catch {}
 				}}
 				onChange={(event) => onChange(event.target.value || undefined)}
 			/>
@@ -319,13 +221,6 @@ function DateSegment({
 	);
 }
 
-/**
- * What the footer shows once rows are ticked: one bordered control, the pager's
- * twin, with the count set the way the pager sets its page -- the number in
- * the foreground, the word muted -- then a clear and the delete, each its own
- * segment behind a hairline. Clay is kept to the one word that destroys
- * something.
- */
 function SelectionBar({
 	count,
 	onClear,
@@ -341,9 +236,6 @@ function SelectionBar({
 			aria-label="Selected detections"
 			className="flex h-8.5 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
-			{/* Narrow, the words go and the count and the trash glyph carry it,
-			    so the bar fits one row beside the pager; screen readers still get
-			    "selected" and the button's full name. */}
 			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
 				<span className="tabular-data font-semibold text-foreground">
 					{count}
@@ -380,8 +272,6 @@ export function DetectionsFilters({
 		onSearchChange({ ...search, ...change });
 	}
 
-	// Local state keeps typing responsive; the URL (and the Fuse search it
-	// drives on the server) only updates after a short debounce.
 	const [queryInput, setQueryInput] = useState(search.species ?? "");
 	useEffect(() => setQueryInput(search.species ?? ""), [search.species]);
 
@@ -390,12 +280,7 @@ export function DetectionsFilters({
 	}, 200);
 
 	return (
-		// The container and the layout it drives cannot be the same element -- a
-		// container query only sees descendants, so `@container` here and
-		// `@min-[38rem]:flex-row` on the child.
 		<div className="@container">
-			{/* The page gap between the search and the date range, stacked or
-			    side by side: the one spacing the app keeps between its controls. */}
 			<div className="flex @min-[38rem]:flex-row flex-col @min-[38rem]:items-center @min-[38rem]:justify-between gap-(--page-gap)">
 				<SearchInput
 					aria-label="Search detections"
@@ -412,8 +297,6 @@ export function DetectionsFilters({
 						updateSearch({ page: 1, species: undefined });
 					}}
 				/>
-				{/* Stacked, the range takes the full width under the search, its two
-				    dates splitting it; side by side it is only as wide as it needs. */}
 				<div className="@min-[38rem]:w-auto w-full">
 					<DateRangeFilter
 						from={search.from}
@@ -426,7 +309,6 @@ export function DetectionsFilters({
 	);
 }
 
-/** Stand-in rows for the skeleton: the cells never read them. */
 const SKELETON_ROWS = Array.from(
 	{ length: 100 },
 	() => ({}) as DetectionTableRow,
@@ -435,12 +317,6 @@ const SKELETON_ROWS = Array.from(
 const SPECIES_WIDTHS = ["w-36", "w-28", "w-40", "w-32", "w-24"];
 const SCIENTIFIC_WIDTHS = ["w-40", "w-32", "w-44", "w-36", "w-28"];
 
-/**
- * One cell of a loading row: a shell of whatever its column holds, in the
- * column's own type and at its own size -- the checkbox's square, the index
- * dot, the names' lines, the recorded time (two lines narrow, one wide), the
- * pill and the recording button.
- */
 function SkeletonCell({
 	columnId,
 	row,
@@ -571,9 +447,6 @@ export function DetectionsTable({
 		enableHiding: false,
 	};
 
-	// Row numbers count on across pages rather than restarting at 1, so a row's
-	// number says where it sits in the whole filtered list -- the same dots as
-	// the species visit log's.
 	const firstIndex = (search.page - 1) * search.pageSize + 1;
 	const lastIndex = firstIndex + (page?.rows.length ?? search.pageSize) - 1;
 	const indexColumn: ColumnDef<DetectionTableRow> = {
@@ -595,8 +468,6 @@ export function DetectionsTable({
 
 	const audioColumn: ColumnDef<DetectionTableRow> = {
 		id: "audio",
-		// Narrow, the column is a lone speaker glyph per row and needs no
-		// heading to explain it; the name stays for screen readers.
 		header: () => (
 			<span className="sr-only @min-[36rem]:not-sr-only">Recording</span>
 		),
@@ -633,8 +504,6 @@ export function DetectionsTable({
 					onSort={sortBy}
 				/>
 			),
-			// Styled to match the species name in the stats page's top-species rows,
-			// hover underline included, so a species link reads the same everywhere.
 			cell: ({ row }) => (
 				<Link
 					to="/birds/$comName"
@@ -657,8 +526,6 @@ export function DetectionsTable({
 					onSort={sortBy}
 				/>
 			),
-			// Not a link: the common name in the row already goes to the species
-			// page, and two links to the same place in one row is just noise.
 			cell: ({ row }) => (
 				<em className="text-[var(--bark)]">{row.original.Sci_Name}</em>
 			),
@@ -747,56 +614,18 @@ export function DetectionsTable({
 		state: { rowSelection },
 	});
 
-	// Unknown while loading, and a busy station's run to many pages: that is
-	// what sets the stepper's width, so the skeleton's pager is sized for it.
 	const pageCount = page
 		? Math.max(1, Math.ceil(page.total / search.pageSize))
 		: 1000;
 	const selectedCount = Object.values(rowSelection).filter(Boolean).length;
 	return (
-		// A column, not a stack: the scrollport takes the leftover height so the
-		// rows are the only thing that scrolls, and the pager below stays put.
-		// `min-h-0` is what lets it shrink -- a flex child defaults to
-		// `min-height: auto` and would otherwise push the pager off the page.
-		// No gap: the rows scroll directly beneath the pager's top rule, so the
-		// footer reads as the edge of the scrollport rather than floating over it.
 		<div className="@container flex min-h-0 flex-1 flex-col">
-			{/* `-ml-(--page-gap) pl-0` pulls the scrollport out through the card's
-			    left padding, so the zebra fill and the header's band run to the card's
-			    edge; the first column carries that inset instead. `-mt-4` does the
-			    same at the top: the header band meets the card's top edge and its
-			    cells take the 16px as padding, so the labels sit exactly the card's
-			    4 units down rather than that plus half a centred 40px row. */}
-			{/* Only the rows scroll: the header sits above the scrollport rather
-			    than stuck to the top of it, so the scrollbar runs beside the rows
-			    and stops at the column labels. That takes the header out of the
-			    rows' scroll box, and a table can't share column widths across two
-			    of them -- so the table is laid out as a grid, and the header, the
-			    body and every row are subgrids of its columns. Species through
-			    Confidence share the width equally, never below what they hold;
-			    the ends take what they carry. The display change drops the
-			    elements' native table roles in some browsers, so they are given
-			    back explicitly.
-
-			    Both halves reserve the scrollbar's gutter, so the header's last
-			    column lines up with the body's whether or not a classic scrollbar
-			    is showing. Sideways, the whole grid scrolls once the columns no
-			    longer fit. */}
 			<Table
 				role="table"
 				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:grid-cols-(--cols-xs)"
 				style={gridColumns(canDelete, canListen)}
 				containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
-				{/* A hairline under the header, the footer's rule mirrored, so the
-				    rows are framed top and bottom by the same line running the card's
-				    full width. It sits on the rowgroup rather than the row (the base
-				    `[&_tr]:border-b` is switched off). The band is a row's height --
-				    44px and the rule -- with its labels centred in it, so the header,
-				    every row and the footer are one size. It keeps the body's
-				    scrollbar gutter so its headings sit over their columns -- except
-				    narrow, where one sort menu spans them and the gutter would only
-				    leave an empty strip at its right. */}
 				<TableHeader
 					role="rowgroup"
 					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
@@ -827,10 +656,6 @@ export function DetectionsTable({
 											)}
 								</TableHead>
 							))}
-							{/* Narrow, the labels give way to one sort menu spanning the
-							    columns after the checkbox: three bare headings over three
-							    columns said little, and two of the four sorts belong to
-							    columns this width does not show. */}
 							<TableHead
 								role="columnheader"
 								className={cn(
@@ -838,8 +663,6 @@ export function DetectionsTable({
 									canDelete
 										? "col-[2/-1]"
 										: `col-[1/-1] ${FIRST_COLUMN_CLASSES}`,
-									// The header drops the scrollbar gutter at this width, so
-									// the menu takes the card's full padding at the right.
 									"pr-(--page-gap)",
 								)}
 							>
@@ -860,13 +683,6 @@ export function DetectionsTable({
 						</TableRow>
 					))}
 				</TableHeader>
-				{/* TODO(audit 18): the body scrolls inside the card, so a 100-row page
-				    shows a second scrollbar nested in the page's own. Let the page
-				    scroll instead; also add a jump-to-page control (the pager only
-				    steps, across 1,000+ pages) and species / confidence filters
-				    beside the search and dates. */}
-				{/* No empty row here: the page renders its own empty card instead of
-				    this table, so the header, footer and pager come off with it. */}
 				<TableBody
 					role="rowgroup"
 					aria-busy={skeleton || undefined}
@@ -878,15 +694,6 @@ export function DetectionsTable({
 							key={row.id}
 							role="row"
 							data-state={row.getIsSelected() && "selected"}
-							// Plain card-white rows split by the shared row's hairline -- the
-							// same idiom as the Now page's recent log and the species visit
-							// log. Selection is a conditional class rather than stacking
-							// `data-[state=selected]:` over the fill, so intent wins over
-							// Tailwind's own ordering. The shared row's height is a floor
-							// here, not a fixed height, and the body's `auto-rows-max`
-							// lets each track grow to it: otherwise the scrolling body
-							// held every row at 41px and the narrow two-line time
-							// spilled over the rules.
 							className={cn(
 								GRID_ROW,
 								"h-auto min-h-[calc(2.5rem+1px)]",
@@ -897,9 +704,6 @@ export function DetectionsTable({
 								<TableCell
 									key={cell.id}
 									role="cell"
-									// Narrow, the stacked time and day make the row two lines
-									// deep; a little more air above and below keeps them off
-									// the rules.
 									className={cn(
 										CELL_GAP,
 										"@max-[36rem]:py-2.5",
@@ -917,23 +721,6 @@ export function DetectionsTable({
 				</TableBody>
 			</Table>
 
-			{/* The footer carries what acts on the rows: the selection on the left,
-			    once there is one, and the pager on the right. Delete lives here
-			    rather than among the filters -- it is an action on the rows just
-			    picked, and with nothing picked there is nothing to show at all, so
-			    no dead button. The selection comes first; the range and pager
-			    follow as one group, so a wrapped band puts the selection above
-			    and keeps the range on the pager's row, `ml-auto` holding the
-			    pager right.
-			    The footer is a row's height too -- its 32px controls, 6px either
-			    side and the rule -- so header, rows and footer are one size. It
-			    owns the space
-			    down to the card's edge; the card drops its bottom padding for it.
-			    A hairline sets it off from the rows: the header gets away without
-			    one because the first row is always a zebra row, but the last row
-			    in view is as often white, and then the footer ran straight into
-			    it. The rule runs the card's full width, out through its side
-			    padding like the rows, which the footer takes back as its own. */}
 			<div className="-mr-(--card-edge) -ml-(--page-gap) flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-(--page-gap) border-t py-1.5 pr-(--card-edge) pl-(--page-gap) text-sm">
 				{canDelete && selectedCount > 0 ? (
 					<SelectionBar

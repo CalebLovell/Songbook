@@ -70,8 +70,6 @@ import type { TrendPoint } from "~/lib/trend.ts";
 import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
 
-// The station's year, not the viewer's: they differ for a few hours around New
-// Year when the two sit in different zones.
 const CURRENT_YEAR = Number(stationToday().slice(0, 4));
 const MIN_YEAR = 2000;
 const DEFAULT_YEAR = CURRENT_YEAR;
@@ -92,7 +90,6 @@ const speciesDetailSearchSchema = z.object({
 		.max(CURRENT_YEAR)
 		.default(DEFAULT_YEAR)
 		.catch(DEFAULT_YEAR),
-	/** Visit log page, 1 = newest. Clamped to the bird's last page on render. */
 	visits: z.coerce.number().int().min(1).default(1).catch(1),
 });
 
@@ -101,22 +98,7 @@ export const Route = createFileRoute("/birds/$comName")({
 	search: {
 		middlewares: [stripSearchParams({ year: DEFAULT_YEAR, visits: 1 })],
 	},
-	// The visit page is deliberately not a dep: paging the log fetches just
-	// that page, rather than rerunning every query on the page. The loader still
-	// reads it so a deep link to page 40 server-renders page 40.
 	loaderDeps: ({ search }) => ({ year: search.year }),
-	// The detail is deferred: the page renders at once (see Deferred) and fills
-	// in when it arrives. Which means an unknown slug can't be thrown as the
-	// router's not-found -- the loader has returned long before anyone knows --
-	// so the page renders its not-found card in place instead. The name lookup
-	// below is the exception: a slug that names no bird at all is known before
-	// the page renders, so that one is the router's not-found, and the server
-	// answers 404 rather than a page of placeholders.
-	//
-	// The bird's name alone is awaited, so the tab is titled the moment the page
-	// switches and never shows a stand-in first. A name this browser already
-	// built a link from needs no trip at all -- any click from a list; otherwise
-	// it's one small lookup, run alongside the detail.
 	loader: async ({ params, deps, location }) => {
 		const result = getSpeciesDetail({
 			data: {
@@ -129,20 +111,15 @@ export const Route = createFileRoute("/birds/$comName")({
 			comNameForSlug(params.comName) ??
 			(await getBirdName({ data: params.comName }));
 		if (!comName) {
-			// Not shown, so its answer (or failure) goes nowhere.
 			result.catch(() => {});
 			throw notFound();
 		}
-		// Remembered, so a new year or a return visit skips the lookup.
 		comNameToSlug(comName);
 		return { result, comName };
 	},
 	head: ({ loaderData }) => ({
 		meta: [{ title: pageTitle(loaderData?.comName ?? "Bird") }],
 	}),
-	// Only the name is awaited, and it's quick: hold the page being left while
-	// it comes rather than showing a pending view (the router's default here is
-	// to show one at once -- see router.tsx). A slow one still gets the shell.
 	pendingMs: 1000,
 	pendingComponent: BirdPendingShell,
 	notFoundComponent: SpeciesNotFound,
@@ -176,9 +153,6 @@ function buildHeatMap(history: TrendPoint[]): {
 	const lastDate = dateForBucket(history[history.length - 1].bucket);
 	const start = new Date(firstDate);
 	start.setDate(start.getDate() - start.getDay());
-	// The grid pads leftwards to a Sunday so the weekday rows line up, but it is
-	// never padded past the trend's last bucket -- which is today for the current
-	// year -- so no square ever stands for a day that hasn't happened.
 	const end = lastDate;
 	const weeks: HeatMapWeek[] = [];
 	const seenMonths = new Set<string>();
@@ -213,8 +187,6 @@ function BirdPage() {
 	const { result } = Route.useLoaderData();
 	const { year } = Route.useSearch();
 
-	// Keyed on the year, the one search the loader reruns for, so a new year
-	// drops the page to its shell at once rather than holding the old one.
 	return (
 		<Deferred
 			key={year}
@@ -245,12 +217,6 @@ function BirdResult({
 	return <SpeciesDetailView detail={result.detail} />;
 }
 
-/**
- * The whole page before the bird arrives, laid out as the page lays it out,
- * every card its own skeleton of the loaded card's shape: the profile, the
- * year's heat map (its weekday labels and legend as themselves), Best
- * recording, the two charts and the visit log.
- */
 function SpeciesDetailShell({ year }: { year: number }) {
 	return (
 		<div className="@container/bird page-wrap pb-4">
@@ -259,9 +225,6 @@ function SpeciesDetailShell({ year }: { year: number }) {
 				aria-label="Bird profile"
 				className={PROFILE_CARD_CLASS}
 			>
-				{/* The loaded card's own portrait slot and text column, so the
-				    shell stands exactly as tall and wide as the bird that
-				    replaces it; the bar fills the slot, as the Live hero's does. */}
 				<div className={PROFILE_PORTRAIT_CLASS}>
 					<ShellBar className="size-full rounded-md" />
 				</div>
@@ -327,7 +290,6 @@ function SpeciesDetailShell({ year }: { year: number }) {
 						</div>
 					</div>
 					<div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 max-[400px]:mt-2">
-						{/* The real line carries count figures, which set its height. */}
 						<ShellText
 							className="w-56 text-xs"
 							barClassName="w-full"
@@ -353,14 +315,7 @@ function SpeciesDetailShell({ year }: { year: number }) {
 	);
 }
 
-/** Weeks the heat map draws for a year: Sunday-aligned columns across Jan 1
-    to Dec 31, or, for the year under way, across the 365 days to today (the
-    rolling year getYearTrend returns for it). */
 function weeksInYear(year: number): number {
-	// Midnights, as buildHeatMap's buckets are: measuring to the current time
-	// of day counted an extra day, and now and then an extra week column --
-	// which widened the heat map's column and shifted the page on load.
-	// The station's today, as the server's rolling year counts it.
 	const [todayYear, todayMonth, todayDay] = stationToday()
 		.split("-")
 		.map(Number);
@@ -372,14 +327,12 @@ function weeksInYear(year: number): number {
 		year === CURRENT_YEAR
 			? new Date(end.getFullYear(), end.getMonth(), end.getDate() - 364)
 			: new Date(year, 0, 1);
-	// Columns from the Sunday on or before `start` through the week holding `end`.
 	const sunday = new Date(start);
 	sunday.setDate(sunday.getDate() - sunday.getDay());
 	const span = Math.round((end.getTime() - sunday.getTime()) / 86_400_000);
 	return Math.floor(span / 7) + 1;
 }
 
-/** The visit log's rows, as the loaded log draws them (see VisitLogCard). */
 function VisitLogSkeleton() {
 	const canListen = useCanListen();
 	return (
@@ -429,8 +382,6 @@ function VisitLogSkeleton() {
 									variant="ghost"
 									label="Visit log pages"
 									page={1}
-									// A heard bird's log runs to many pages, which is what
-									// sets the stepper's width.
 									pageCount={100}
 									onPageChange={() => {}}
 								/>
@@ -443,13 +394,6 @@ function VisitLogSkeleton() {
 	);
 }
 
-/**
- * A bird the installed model knows about that this station has never heard.
- * Not an error card: it is the same profile hero a heard bird opens with --
- * portrait, name, eBird link -- with "not heard yet" where the last-heard line
- * would be, because someone arriving here is usually waiting on exactly this
- * species rather than recovering from a typo.
- */
 function UndetectedSpecies({
 	comName,
 	sciName,
@@ -494,11 +438,6 @@ function UndetectedSpecies({
 	);
 }
 
-/**
- * The slug matched no bird the installed classifier can even emit. Like the
- * profile it stands in for, it carries no "All Birds" masthead -- this is a
- * bird's page, so the card is the page and owns its h1.
- */
 function SpeciesNotFound() {
 	const { comName } = Route.useParams();
 
@@ -524,18 +463,12 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 	const { year, visits: visitsPage } = Route.useSearch();
 	const navigate = Route.useNavigate();
 	const { weeks, maximum } = buildHeatMap(detail.history);
-	// A year of weeks is wider than a phone, so the grid scrolls inside its card.
-	// For the current year the right edge is today, so start there; a past year
-	// starts at January like reading a calendar.
 	const heatScrollRef = useRef<HTMLDivElement>(null);
-	// `detail.history` is the trigger, not an input: the year in the URL changes
-	// before the loader brings that year's grid, so it re-aims once it lands.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: re-aim trigger
 	useEffect(() => {
 		const el = heatScrollRef.current;
 		if (el) el.scrollLeft = year === CURRENT_YEAR ? el.scrollWidth : 0;
 	}, [year, detail.history]);
-	// Only the heat map is year-scoped; the charts below it cover all time.
 	const selectYear = (next: number) =>
 		navigate({
 			search: (prev) => ({ ...prev, year: next }),
@@ -554,13 +487,6 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 			<div className="@container/bird page-wrap pb-4">
 				<SummaryCard detail={detail} />
 
-				{/* Two columns only once the page is wide enough (80rem) for a full
-				    year of heat map (~920px card) beside the 20rem column; any
-				    narrower and the side column squeezes the heat map into a
-				    scroller, so stack instead. One column uses `minmax(0,1fr)`
-				    rather than the implicit `auto` track: an auto track sizes to the
-				    heat map's min-content, which pushed every card off a phone
-				    screen instead of letting the heat map scroll inside its card. */}
 				<div className={COLUMNS_CLASS}>
 					<section
 						aria-label="Detection history"
@@ -576,10 +502,6 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 							</div>
 						</CardHeader>
 
-						{/* The weekday labels sit outside the scroller, so they stay put
-						    while a phone scrolls through the weeks. The month row is a
-						    fixed 12px (plus its 4px margin) so the labels' pt-4 lines Sun
-						    up with the first row of squares. */}
 						<div className="mt-(--page-gap) flex gap-2">
 							<WeekdayLabels />
 							<div
@@ -588,9 +510,6 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 							>
 								<div className="w-max">
 									<div className="mb-1 flex h-3 gap-1 leading-3">
-										{/* A label in the last column hangs leftwards over the
-										    empty cells before it; hanging right would widen the
-										    scroller past the squares and force a scrollbar. */}
 										{weeks.map((week, index) => (
 											<div
 												key={`month-${week.days[0].date.toISOString()}`}
@@ -620,8 +539,6 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 								</div>
 							</div>
 						</div>
-						{/* The bird's all-time tally on the left, the legend held right;
-						    the tally wraps above the legend when they can't share a line. */}
 						<div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 max-[400px]:mt-2">
 							<StationRecord detail={detail} />
 							<HeatLegend />
@@ -633,11 +550,6 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 						speciesName={detail.comName}
 					/>
 
-					{/* The hour/month charts and the visit log share the same two
-					    columns as the row above -- one grid, so the heat map and the
-					    charts line up on the left and Best recording and the visit log
-					    line up on the right. min-w-0 lets the charts conform to the
-					    left track rather than widen it. */}
 					<div className="grid min-w-0 @min-[80rem]/bird:grid-rows-2 gap-(--page-gap)">
 						<DetectionsByHourCard
 							activity={detail.hourActivity}
@@ -651,8 +563,6 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 						/>
 					</div>
 
-					{/* Keyed by bird so moving to another species starts its log
-					    back at page one instead of carrying the old page number. */}
 					<VisitLogCard
 						key={detail.comName}
 						comName={detail.comName}
@@ -672,10 +582,8 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 	);
 }
 
-/** Samples of the continuous ramp for the "Less … More" key. */
 const LEGEND_SHARES = [0, 0.25, 0.5, 0.75, 1] as const;
 
-/** The "Less … More" key. Needs no data, so the skeleton draws it as itself. */
 function HeatLegend() {
 	return (
 		<div className="ml-auto flex items-center gap-1 text-[10px] text-muted-foreground">
@@ -692,8 +600,6 @@ function HeatLegend() {
 	);
 }
 
-/** The heat map's row labels, outside its scroller. Drawn as themselves by
-    the skeleton too. */
 function WeekdayLabels() {
 	return (
 		<div className="flex w-7 shrink-0 flex-col gap-1 pt-4 text-[9px] text-muted-foreground leading-3">
@@ -708,11 +614,8 @@ function WeekdayLabels() {
 	);
 }
 
-// Shared by the loaded page and its skeleton, so the two are one shape.
 const PROFILE_CARD_CLASS =
 	"feature-card mt-(--page-gap) grid overflow-hidden rounded-md sm:grid-cols-[11.5rem_minmax(0,1fr)]";
-// The profile card's portrait slot and text column, shared by SummaryCard and
-// its loading shell so the two never drift apart.
 const PROFILE_PORTRAIT_CLASS =
 	"flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4";
 const PROFILE_TEXT_CLASS =
@@ -721,9 +624,6 @@ const COLUMNS_CLASS =
 	"mt-(--page-gap) grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-(--page-gap)";
 const VISIT_LOG_CLASS = "flex min-w-0 flex-col min-h-[420px]";
 const VISIT_LOG_SHORT_CLASS = "flex min-w-0 flex-col self-start";
-// No bottom padding: the footer band runs to the card's bottom edge, or, with
-// no visits, the empty note keeps its own. (Important, to beat the phone-width
-// `.feature-card.p-4` padding rule.)
 const VISIT_LOG_CARD_CLASS =
 	"@container feature-card flex flex-1 flex-col rounded-md p-4 pb-0!";
 const VISIT_LOG_HEADER_CLASS =
@@ -735,18 +635,12 @@ const VISIT_ROW_BUTTON = {
 	labelClassName: "@min-[26rem]:inline hidden",
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
-// The header's 45px: its rule, then 6px either side of the 32px controls.
 const VISIT_LOG_FOOTER_CLASS =
 	"-mx-(--page-gap) mt-auto flex min-h-[45px] shrink-0 flex-wrap items-center gap-(--page-gap) border-t px-(--page-gap) py-1.5";
 
 const SWATCH =
 	"size-3 rounded-[3px] border border-[var(--line)] transition-[outline] hover:z-10 hover:outline hover:outline-2 hover:outline-[var(--hover-line)] hover:outline-offset-1";
 
-/**
- * One square of the contribution grid. Every day links into that day's
- * Timeline, quiet days included: a day without this bird still has the rest
- * of the station's detections to read.
- */
 function HeatMapDay({
 	date,
 	point,
@@ -762,8 +656,6 @@ function HeatMapDay({
 	const label = `${dateLabel}: ${count.toLocaleString()} ${noun}`;
 	const fill = { backgroundColor: heatColor(count, maximum) };
 
-	// Inside the link the swatch is decoration: the link already carries the
-	// label, and repeating it would have a screen reader read the day twice.
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
@@ -783,36 +675,14 @@ function HeatMapDay({
 	);
 }
 
-/**
- * The species masthead: the portrait, and beside it the name, when it was last
- * heard and the eBird link. Just the bird -- its all-time figures sit under
- * the detection history, and the recording lives in the visit log below.
- */
 function SummaryCard({ detail }: { detail: SpeciesDetail }) {
-	// The once-a-second age tick lives here, not on the page: ticking the page
-	// re-rendered every heat-map square and chart each second, a ~90ms stall
-	// that made anything animating on it (a spectrogram's playhead) stutter.
 	const offsetMs = useAgeOffset(detail.generatedAt);
-	// The most recent visit is the same detection as `lastDetected`, and it is the
-	// only one carrying a server-measured age, so the relative label agrees with
-	// the visit log instead of drifting.
 	const lastVisit = detail.recentVisits[0];
 	const lastHeard = lastVisit
 		? formatTimeAgo(lastVisit.ageMs + offsetMs)
 		: formatHeardDate(detail.lastDetected.date);
 	return (
 		<section aria-label="Bird profile" className={PROFILE_CARD_CLASS}>
-			{/* The portrait's own column -- above the text on a phone, where the
-			    column becomes a band, and beside it from sm up. Either way the
-			    bird is centred in its column, so a narrow painting doesn't sit
-			    hard left with a gap pooled between it and the name. A fixed
-			    120px bird, as on the Live hero (HERO_PORTRAIT_SLOT), so the
-			    illustration's own size never sets the card's and the bird keeps
-			    one size between the two pages. */}
-			{/* From sm, the Live hero's geometry (HERO_CARD_ROW): an 11.5rem
-			    column is its 9.5rem portrait column plus the 1rem padding either
-			    side, and the 120px bird's slot is centred in the card's height
-			    so the bird sits exactly where it does there. */}
 			<div className={PROFILE_PORTRAIT_CLASS}>
 				<SpeciesImage
 					imageUrl={detail.imageUrl}
@@ -822,9 +692,6 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 				/>
 			</div>
 
-			{/* Beside the portrait the rows run the card's full height -- the
-			    name level with the bird's head, the eBird link with its feet --
-			    rather than a block centred with space pooled above and below. */}
 			<div className={PROFILE_TEXT_CLASS}>
 				<div className="min-w-0">
 					<h1 className="display-title font-bold text-2xl text-[var(--moss)] sm:text-3xl">
@@ -833,7 +700,6 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 					<p className="text-[var(--bark)] text-xs italic">{detail.sciName}</p>
 				</div>
 
-				{/* Only the moments are bold; the phrasing around them stays muted. */}
 				<p className="tabular-data text-muted-foreground text-sm">
 					Last heard{" "}
 					<span className="font-semibold text-foreground">{lastHeard}</span>
@@ -856,8 +722,6 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 						</>
 					) : null}
 				</p>
-				{/* Every row of the column on one even step; the eBird link takes its
-				    own row under the last-heard line rather than the card's far edge. */}
 				<SpeciesActions
 					speciesLink={detail.speciesLink}
 					comName={detail.comName}
@@ -868,11 +732,6 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 	);
 }
 
-/**
- * The bird's whole record at this station, under its heat map: how many times
- * it has been detected, and how many days from its first detection to its
- * latest. All-time, whichever year the heat map is showing.
- */
 function StationRecord({ detail }: { detail: SpeciesDetail }) {
 	const days = daysBetween(detail.firstDetected.date, detail.lastDetected.date);
 
@@ -893,8 +752,6 @@ function StationRecord({ detail }: { detail: SpeciesDetail }) {
 	);
 }
 
-/** Days from the first detection to the last, counting both ends: a bird heard
- * on a single day has one day on record. Null when either date is missing. */
 function daysBetween(first: string, last: string): number | null {
 	if (!first || !last) return null;
 	const start = Date.parse(`${first}T00:00:00Z`);
@@ -907,13 +764,6 @@ function formatHeardDate(date: string): string {
 	return date ? formatDate(date) : "—";
 }
 
-/**
- * Every visit this species has ever made, newest first, a page at a time. The
- * page lives in the URL (`?visits=`); the loader brings page one (which the
- * hero also reads) and whichever page the URL opened on, and every other page
- * is fetched on demand -- so the log reaches the very first detection, across
- * every year rather than just the heat map's, one page of rows at a time.
- */
 function VisitLogCard({
 	comName,
 	totalVisits,
@@ -929,13 +779,9 @@ function VisitLogCard({
 	page: number;
 	onPageChange: (page: number) => void;
 }) {
-	// Signed out, a visit plays nothing -- the best recording above is the
-	// species' one public clip.
 	const canListen = useCanListen();
 	const fetchVisits = useServerFn(getSpeciesVisits);
 	const pageCount = visitPageCount(totalVisits);
-	// A URL past the last page (the bird's history is shorter than the link
-	// remembers) shows the last page rather than an empty log.
 	const page = Math.min(requestedPage, pageCount);
 	const [fetched, setFetched] = useState<Record<number, VisitPage>>({});
 	const current =
@@ -944,8 +790,6 @@ function VisitLogCard({
 			: page === loadedPage.page
 				? loadedPage
 				: fetched[page];
-	// Until the next page lands the previous one stays up, dimmed, so paging
-	// never collapses the card to nothing.
 	const [held, setHeld] = useState(current ?? firstPage);
 	useEffect(() => {
 		if (current) setHeld(current);
@@ -966,21 +810,12 @@ function VisitLogCard({
 
 	const loading = !current;
 	const visits = shown.visits;
-	// Each row's place in the bird's whole history, 1 = newest, so the number
-	// keeps counting across pages.
 	const firstIndex = (shown.page - 1) * VISITS_PAGE_SIZE + 1;
 	const lastIndex = firstIndex + visits.length - 1;
 
 	return (
 		<section
 			aria-label="Visit log"
-			// A container, because the log's width depends on the grid track it
-			// lands in more than on the screen: it gets ~18rem both on a phone and
-			// in the right-hand column at lg, and the whole content width between.
-			//
-			// A log that fits on one page hugs its rows: stretched to the charts'
-			// height beside it, a short log would end in a block of empty card.
-			// Paged logs keep the full height so the stepper never jumps.
 			className={pageCount > 1 ? VISIT_LOG_CLASS : VISIT_LOG_SHORT_CLASS}
 		>
 			<div
@@ -995,9 +830,6 @@ function VisitLogCard({
 				) : (
 					<ul
 						aria-busy={loading}
-						// On the smallest phones (under 400px) every row holds its
-						// full content, one track as wide as the widest row, and the
-						// list scrolls sideways instead of cutting the day short.
 						className={`row-well -mx-(--page-gap) grow divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
 					>
 						{visits.map((visit, i) => {
@@ -1007,24 +839,10 @@ function VisitLogCard({
 								<li
 									key={`${visit.date}-${visit.time}`}
 									aria-label={`${heardAt}${visit.confidence != null ? `, ${formatConfidence(visit.confidence)} confidence` : ""}`}
-									// 7px rather than the usual 10px, so ten rows take the
-									// height nine used to and the card doesn't grow.
-									//
-									// The moment it was heard over how long ago that was: two
-									// lines at every width. Under 26rem the button drops its
-									// label to make room.
-									//
-									// The dividers run out to the card's edges (the list
-									// bleeds through the card's padding), and the row's own
-									// padding hands that page gap back (the card's own padding, which
-									// halves on the smallest phones) so the content lines up with
-									// the header and footer and never pokes past the card's border.
 									className={VISIT_ROW_CLASS}
 								>
 									<IndexDot index={firstIndex + i} widest={lastIndex} />
 									<div className="min-w-0 flex-1 text-sm">
-										{/* The day links to its Timeline, like the detections
-										    table's Recorded column and the heat map's squares. */}
 										<Link
 											to="/timeline"
 											search={{ period: "day", date: visit.date }}
@@ -1056,10 +874,6 @@ function VisitLogCard({
 					</ul>
 				)}
 
-				{/* The header's twin: the same full-width hairline and the same 45px
-			    band, so the log is bookended evenly. Which visits these are on the
-			    left, the stepper held right, and the list's well pushing it to the
-			    card's bottom on a short last page. */}
 				{visits.length > 0 ? (
 					<div className={VISIT_LOG_FOOTER_CLASS}>
 						<div className={PAGE_ROW_CLASS}>

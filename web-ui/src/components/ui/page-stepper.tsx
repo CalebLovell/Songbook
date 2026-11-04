@@ -3,10 +3,6 @@ import type * as React from "react";
 import { useEffect, useState } from "react";
 import { cn } from "~/lib/utils.ts";
 
-/**
- * The page a typed entry asks for, held to the pages that exist -- or null when
- * it names no page at all, so the field can fall back to the current one.
- */
 export function parsePageInput(
 	value: string,
 	pageCount: number,
@@ -16,25 +12,6 @@ export function parsePageInput(
 	return Math.min(Math.max(page, 1), Math.max(1, pageCount));
 }
 
-/**
- * Paging as one bordered control, built like the detections date range and the
- * timeline's window stepper: segments joined by hairlines rather than a row of
- * loose buttons: the step back, the page itself, and the step forward.
- *
- * The page is a field, not a label: type any page and Enter (or leaving the
- * field) goes there, clamped to the pages that exist; Escape puts back the
- * current one. A list of every page would be 2,788 options on a busy station.
- *
- * The height of the search box, date range and sort menu, so a
- * table's footer carries controls the same size as the ones above it. The
- * page field's type goes up to 16px under a finger, as every field's does, so
- * a phone doesn't zoom in on it.
- *
- * `ghost` is the same stepper for a card's footer, where the card already draws
- * the lines: no box and no hairlines, just arrows that outline on hover like the
- * info icon. `outline` is for a page's bare ground, where the box is all that
- * holds the control together.
- */
 export function PageStepper({
 	page,
 	pageCount,
@@ -62,16 +39,7 @@ export function PageStepper({
 		onPageChange(next);
 	}
 
-	// The page reads as plain text -- "1 of 1,394" -- with no box around the
-	// number. The field is exactly as wide as the number in it, so the words
-	// always sit together, and the whole line centres in its segment. The
-	// segment's floor is that line at its widest, so paging never moves the
-	// arrows. Widths are counted rather than measured: `tabular-data` pins each
-	// digit to 1ch, a group separator is under half that, and "of" with its
-	// spaces is about 2.4ch.
 	const pageTotal = pageCount.toLocaleString();
-	// The field holds bare digits while it is edited and shows them grouped
-	// like any other number ("1,394"), matching the total beside it.
 	const shown = draft ? Number(draft).toLocaleString() : "";
 
 	return (
@@ -122,19 +90,6 @@ export function PageStepper({
 	);
 }
 
-/**
- * The stepper's partner at the other end of a footer: which rows the page
- * holds, as bare text at the stepper's height rather than in a box of its own,
- * so it fits beside the pager on the narrowest phone. A table's footer gives
- * just the rows ("1–50") -- the stepper beside it already says how far the
- * pages run -- and under 360px, where the pair at its widest ("83,401–83,452"
- * beside "835 of 835") no longer fits a row, it steps aside and leaves the
- * stepper alone at the right. A footer that needs it adds the total and a noun
- * ("1–24 of 78 species"), and then it always shows.
- *
- * `card` is for a footer on the page's bare ground, with no card around it: the
- * range wears the pager's white box.
- */
 export function PageRange({
 	first,
 	last,
@@ -145,10 +100,8 @@ export function PageRange({
 }: {
 	first: number;
 	last: number;
-	/** The total and its noun -- the singular used when the total is one. */
 	total?: { count: number; noun: [singular: string, plural: string] };
 	card?: boolean;
-	/** Anything said after the range, like what a search filtered it from. */
 	children?: React.ReactNode;
 	className?: string;
 }) {
@@ -181,39 +134,22 @@ export function PageRange({
 	);
 }
 
-/**
- * A table footer's range and stepper held together, so when the footer wraps
- * around a selection's actions the two stay on one row under them. Sized from
- * its content (`flex-auto`, not `flex-1`'s zero basis) so it drops below the
- * actions whole rather than squeezing in beside them; it grows into the row's
- * spare width with the stepper pushed right.
- */
 export const PAGE_ROW_CLASS =
 	"flex min-w-0 flex-auto flex-wrap items-center gap-(--page-gap)";
 
-/** A table footer's range stepping aside under 360px; its loading shell too. */
 export const PAGE_RANGE_NARROW_HIDDEN = "max-[359px]:hidden";
 
-/** PageRange's line, for a loading shell to hold the same shape. */
 export const PAGE_RANGE_CLASS =
 	"flex h-8 pointer-coarse:h-9 min-w-0 items-center whitespace-nowrap text-muted-foreground text-sm";
 
-/** PageRange's white box when `card` is set, for a loading shell to match. */
 export const PAGE_RANGE_CARD_CLASS =
 	"rounded-md border border-input bg-card px-3";
 
-/**
- * How wide a formatted number sets in `tabular-data`, in ch: a full ch per
- * digit and a little under half one per separator, plus a hair of slack so the
- * field never clips its own last digit.
- */
 function numberWidth(formatted: string): number {
 	const digits = formatted.replace(/\D/g, "").length;
 	return digits + (formatted.length - digits) * 0.45 + 0.1;
 }
 
-/** One end of the stepper: split from the page by a hairline, or, as a ghost,
-    standing alone with the info icon's hover. */
 function StepButton({
 	direction,
 	variant,

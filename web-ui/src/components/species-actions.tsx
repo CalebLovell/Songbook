@@ -8,16 +8,9 @@ type SpeciesActionsProps = {
 	audioUrl?: string | null;
 	speciesLink: SpeciesLink | null;
 	comName: string;
-	/** `compact` for the Birds grid's cards (SPECIES_ACTION_BUTTON); `sm` is
-	    the 28px link under a bird's name on its own page, as on Review. */
 	size?: "compact" | "sm";
 };
 
-/**
- * The pair's size: the compact 24px buttons where a pointer aims at them, and
- * below `sm` -- a phone -- the 28px `sm` size, an easier tap. Exported for the
- * skeletons that stand in for these buttons.
- */
 export const SPECIES_ACTION_BUTTON = {
 	size: "xs",
 	className:
@@ -48,8 +41,6 @@ function SpeciesActions({
 					{...sizing}
 				/>
 			)}
-			{/* eBird for birds, iNaturalist for the frogs, insects and mammals;
-			    sound classes like Dog or Engine have no page, so no button. */}
 			{speciesLink && (
 				<Button variant="outline" {...sizing} icon={ExternalLink} asChild>
 					<a

@@ -33,30 +33,16 @@ import {
 } from "~/lib/learn-round.ts";
 import { FRESH_PROGRESS, type GameProgress } from "~/lib/learn-saved-game.ts";
 
-/**
- * The quiz itself: play a clip, pick the bird, keep going until the round is
- * done. The round's progress lives here, starting from `initialProgress` and
- * reported through `onProgressChange` so the page can save it; the page starts
- * a fresh round by giving this component a new `key`.
- */
-// Shared by the game and its skeleton, so the two are one shape. The single
-// narrow track is minmax(0,1fr), not the implicit auto, so a long name
-// truncates instead of stretching the card past the screen.
 const QUIZ_GRID_CLASS =
 	"grid grid-cols-[minmax(0,1fr)] @3xl/quiz:grid-cols-[minmax(0,1fr)_24rem] @7xl/quiz:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-(--page-gap)";
 const GAME_CARD_CLASS =
 	"@container/game feature-card flex min-w-0 flex-col gap-(--page-gap) rounded-md p-4";
 const GAME_HEADER_CLASS =
 	"-mx-(--page-gap) -mt-(--page-gap) flex min-h-[45px] flex-wrap items-center justify-between gap-x-2 border-b px-(--page-gap) py-2";
-// Equal rows: a name that wraps to two lines makes its row taller, and every
-// other card stretches to match rather than reading as a smaller button.
 const CHOICES_CLASS =
 	"grid min-w-0 @xl/game:grid-cols-2 grid-cols-1 auto-rows-fr gap-4 max-[400px]:gap-2";
 const CHOICE_CLASS =
 	"@container/choice flex items-center gap-4 rounded-md border px-4 py-2 text-left max-[400px]:gap-2 max-[400px]:px-2";
-// Always tall enough for a two-line name over the Latin one (snug base or sm
-// lines, plus a 16px xs line), so a choice is the same height whatever bird it
-// holds and the grid doesn't change size from one question to the next.
 const CHOICE_TEXT_CLASS =
 	"flex min-h-[calc(2*1.375rem+1rem)] min-w-0 flex-1 flex-col justify-center @max-[20rem]/choice:min-h-[calc(2*1.203125rem+1rem)]";
 const RAIL_CLASS = "feature-card @3xl/quiz:flex hidden flex-col rounded-md p-4";
@@ -66,13 +52,8 @@ const RAIL_ROW_CLASS =
 	"flex min-h-[54px] items-center gap-3 px-(--page-gap) py-1.75";
 const RAIL_FOOTER_CLASS =
 	"-mx-(--page-gap) mt-auto -mb-(--page-gap) flex items-baseline justify-between gap-2 border-t px-(--page-gap) py-3";
-// The game's footer under the choices, with no rule above it: just the Next
-// button, at the right, as tall as itself from the start.
 const GAME_FOOTER_CLASS = "flex min-h-8 items-center justify-end";
 
-/** How to play, behind the header's info icon. Its one figure from the
-    station, the rare cutoff, falls back to the default, so the skeleton can
-    draw it as itself. */
 function GameInfo({
 	rareMax = HIGHLIGHT_THRESHOLDS.rareMax,
 }: {
@@ -105,13 +86,6 @@ function GameInfo({
 	);
 }
 
-/**
- * The game before its round arrives, built from the game's own pieces: the
- * quiz card -- its header, the pip track a narrow card shows, the clip's
- * spectrogram slot with the play button's circle, four choices at their real
- * size, and the info icon and footer as themselves -- beside the round's
- * rail of numbered rows and its score.
- */
 export function LearnGameSkeleton() {
 	return (
 		<div className="@container/quiz">
@@ -212,11 +186,6 @@ export function LearnGameSkeleton() {
 	);
 }
 
-/**
- * The game with no round to deal: the same two cards under the same names as
- * the game and its skeleton, each saying what's missing instead of showing a
- * clip or a tally.
- */
 export function LearnGameEmpty({ message }: { message: string }) {
 	return (
 		<div className="@container/quiz">
@@ -252,18 +221,12 @@ export function LearnGame({
 }: {
 	round: LearnRound;
 	rareMax: number;
-	/** Where to pick the round up, for a game resumed from a save. */
 	initialProgress?: GameProgress;
-	/** Called with every change of progress, the starting point included. */
 	onProgressChange?: (progress: GameProgress) => void;
 	onPlayAgain: () => void;
 	isLoadingNextRound: boolean;
-	/** True while a dialog is over the game, e.g. the page's new-round
-	    confirmation: its keys are held off so they can't answer behind it. */
 	isPaused?: boolean;
 }) {
-	// One object rather than a state per field, so the whole of it can be
-	// saved and handed back as it was.
 	const [progress, setProgress] = useState(initialProgress);
 	const { index, wrongGuesses, isSolved, results, isFinished } = progress;
 
@@ -313,8 +276,6 @@ export function LearnGame({
 		}));
 	}, [isSolved, index, round.questions.length]);
 
-	// Number keys pick a bird, Enter moves on -- the round is a rhythm of
-	// listen/answer/next, and reaching for the mouse each time interrupts it.
 	useEffect(() => {
 		if (isFinished || isPaused) return;
 
@@ -346,16 +307,6 @@ export function LearnGame({
 	}
 
 	return (
-		// Game card on the left, the round so far in a card of its own on the
-		// right. Once the page is too narrow for both, the rail card drops out
-		// and the score and pip track above the clip stand in for it. Both keep
-		// their natural height -- the rail stops where its rows do.
-		//
-		// On a wide page the split copies the bird page's: its left track is
-		// the year heat map's natural width (914px), the right one takes the rest
-		// with a 20rem floor. So the game sits at the heat map's width and the
-		// rail at the visit log's, and the two pages read as one system. Past
-		// 38rem the rail stops growing and the game takes the extra instead.
 		<div className="@container/quiz">
 			<div className={QUIZ_GRID_CLASS}>
 				<section aria-label="Bird call quiz" className={GAME_CARD_CLASS}>
@@ -414,8 +365,6 @@ export function LearnGame({
 					</fieldset>
 
 					<div className={GAME_FOOTER_CLASS}>
-						{/* Always there, out of service until the bird is named, so the
-						    footer keeps one layout through the whole question. */}
 						{index + 1 >= round.questions.length ? (
 							<Button
 								size="default"
@@ -426,8 +375,6 @@ export function LearnGame({
 								See your score
 							</Button>
 						) : (
-							// Trailing, unlike the leading icons elsewhere: the arrow is
-							// pointing at where the button takes you.
 							<Button
 								size="default"
 								icon={ArrowRight}
@@ -453,15 +400,6 @@ export function LearnGame({
 	);
 }
 
-/**
- * The round so far, one row per bird, in the Live page's recent-activity idiom:
- * a header band, hairline-split rows that run to the card's edges, and a
- * footer band holding the score. Answered birds show who they were, how the
- * guess went, when the clip was recorded and a replay button; the current bird
- * is marked; the rest wait as numbered blanks. Only shown once the card is
- * wide enough to give it a column of its own; narrower, the pip track above
- * the clip stands in.
- */
 function RoundRail({
 	questions,
 	results,
@@ -493,9 +431,6 @@ function RoundRail({
 						<li
 							key={question.id}
 							aria-current={isCurrent ? "step" : undefined}
-							// 54px like the recent-activity rows: the 40px thumbnail and
-							// 7px either side. Blank rows hold the same height, so the
-							// card doesn't grow as the round fills in.
 							className={`${RAIL_ROW_CLASS} ${isCurrent ? "bg-[var(--row-selected)]" : ""}`}
 						>
 							<RailDot
@@ -509,7 +444,6 @@ function RoundRail({
 									question={question}
 								/>
 							) : isCurrent ? (
-								// An empty frame where the bird's picture lands once it's named.
 								<>
 									<span
 										aria-hidden="true"
@@ -584,7 +518,6 @@ function AnsweredRailRow({
 	);
 }
 
-/** The bird's number, coloured like its choice card: green first try, red after. */
 function RailDot({
 	position,
 	attempts,
@@ -611,19 +544,12 @@ function RailDot({
 	);
 }
 
-/**
- * Georgia only has old-style figures: 0-2 sit at x-height, 3-5/7/9 hang
- * below the baseline and 6/8 rise above it, so centring the line box leaves
- * the ink off-centre. Measured at 11px (ascent 10, descent 2), this is how
- * far to shift a number so its ink sits in the middle of the 20px dot.
- */
 function digitNudge(label: string) {
 	const top = /[68]/.test(label) ? 9 : 6;
 	const bottom = /[34579]/.test(label) ? 2 : 0;
 	return (top - bottom) / 2 - 3.75;
 }
 
-/** One pip per question: filled as answers land, outlined for what's left. */
 function ProgressTrack({
 	total,
 	results,
@@ -685,8 +611,6 @@ function ChoiceButton({
 			type="button"
 			onClick={onSelect}
 			disabled={state !== "open"}
-			// A container so the art can give way to the name when two choices
-			// share a row on a mid-sized screen, instead of the name truncating.
 			className={`${CHOICE_CLASS} ${CHOICE_STYLES[state]}`}
 		>
 			<span className="tabular-data w-4 shrink-0 text-center text-muted-foreground text-xs">
@@ -694,8 +618,6 @@ function ChoiceButton({
 			</span>
 			<ChoiceThumbnail choice={choice} size="lg" />
 			<span className={CHOICE_TEXT_CLASS}>
-				{/* Two lines before it truncates: "Yellow-rumped Warbler" wraps
-				    rather than losing the half that tells it apart. */}
 				<span className="line-clamp-2 font-medium @max-[20rem]/choice:text-sm leading-snug">
 					{choice.comName}
 				</span>
@@ -703,8 +625,6 @@ function ChoiceButton({
 					{choice.sciName}
 				</span>
 			</span>
-			{/* The mark's slot is held from the start: a tick or cross arriving
-			    mid-question would otherwise narrow the name and rewrap it. */}
 			<span className="size-4 shrink-0">
 				{state === "correct" ? (
 					<Check className="size-4 text-[var(--moss)]" />
@@ -770,10 +690,8 @@ function RoundSummary({
 	return (
 		<section
 			aria-label="Round results"
-			// One gap between every block, the game card's: 16px, 8px on a phone.
 			className="@container feature-card rise-in flex flex-col gap-(--page-gap) rounded-md p-4"
 		>
-			{/* The score alone, written the way the rail's footer wrote it. */}
 			<CardHeader title="Round complete">
 				<span className="tabular-data text-sm">
 					<strong className="font-semibold">{score.score}</strong> of{" "}
@@ -781,9 +699,6 @@ function RoundSummary({
 				</span>
 			</CardHeader>
 
-			{/* Rows run to the card's edges and start right under the header's
-			    hairline, as the rail's do, so their content sits on the card's own
-			    16px inset instead of a second one inside it. */}
 			<ol className="-mx-(--page-gap) -mt-(--page-gap)">
 				{questions.map((question, position) => {
 					const result = results[position];
@@ -795,8 +710,6 @@ function RoundSummary({
 					return (
 						<li
 							key={question.id}
-							// 54px like the rail's rows and recent activity's: the 40px
-							// thumbnail and 7px either side.
 							className="flex items-center gap-4 px-(--page-gap) py-1.75 odd:bg-[var(--meadow)] max-[400px]:gap-2"
 						>
 							<ChoiceThumbnail choice={answer} />
@@ -819,8 +732,6 @@ function RoundSummary({
 							<RecordingButton
 								audioUrl={question.audioUrl}
 								speciesName={answer.comName}
-								// The full Listen button where the card has room, the
-								// recent log's 24px square where it doesn't.
 								labelClassName="@min-[26rem]:inline hidden"
 								className="@min-[26rem]:w-auto w-6 @min-[26rem]:px-2.5 px-0"
 							/>
@@ -829,11 +740,7 @@ function RoundSummary({
 				})}
 			</ol>
 
-			{/* A footer band: the rows run straight into its hairline, and its
-			    contents keep the card's standard 16px on every side. */}
 			<div className="-mx-(--page-gap) -mt-(--page-gap) -mb-(--page-gap) flex items-center justify-between gap-4 border-t p-(--page-gap) max-[400px]:gap-2">
-				{/* Wraps within itself on a phone rather than pushing the button
-				    onto a line of its own: the two stay across from each other. */}
 				<span className="tabular-data min-w-0 text-sm">
 					You named <strong className="font-semibold">{score.firstTry}</strong>{" "}
 					of <strong className="font-semibold">{score.answered}</strong> species

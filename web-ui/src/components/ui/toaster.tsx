@@ -10,13 +10,6 @@ import { type ExternalToast, Toaster as Sonner, toast } from "sonner";
 
 export { toast };
 
-/**
- * A destructive action that went through -- detections deleted, lists cleared,
- * every device signed out. It worked, but it took something away, so it wears
- * clay like the button that asked for it rather than success's moss. Sonner has
- * no such type; this is a success toast with the destructive tone laid over it
- * (`.toast-destructive` in styles.css).
- */
 export function destructiveToast(message: string, data?: ExternalToast) {
 	return toast.success(message, {
 		...data,
@@ -25,16 +18,6 @@ export function destructiveToast(message: string, data?: ExternalToast) {
 	});
 }
 
-/**
- * The one place an action reports back once it has finished -- a deletion, a
- * save, a restart. Mounted once in the root document, so a result never has to
- * find room for itself in the layout of the page that caused it.
- *
- * Unstyled sonner, dressed as a `feature-card`: 4px radius, Georgia, a hairline
- * border. Each outcome has its own tone so it reads before the words do: moss
- * for done, sand and bark for done-with-a-catch, clay for failed. Neutral news
- * (info, a save still running) stays on plain white with the `--line` border.
- */
 export function Toaster() {
 	return (
 		<Sonner

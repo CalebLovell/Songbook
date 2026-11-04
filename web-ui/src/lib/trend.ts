@@ -11,8 +11,6 @@ import type { StatsPeriod } from "~/lib/stats-periods.ts";
 
 export type { TrendPoint };
 
-// Rolling windows (not calendar-day boundaries) keep the year view stable
-// around midnight and across timezone changes.
 const PERIOD_HOURS: Record<StatsPeriod, number | null> = {
 	year: 365 * 24,
 	all: null,
@@ -84,8 +82,6 @@ async function daysSinceEarliestDetection(extraFilter?: SQL): Promise<number> {
 	return Math.min(MAX_ALL_TIME_DAYS, Math.max(1, diffDays));
 }
 
-/** Detections-over-time trend, optionally narrowed by an extra SQL filter
- * (e.g. a single species) on top of the period's rolling time window. */
 export async function getTrend(
 	period: StatsPeriod,
 	extraFilter?: SQL,
@@ -135,12 +131,6 @@ export async function getCalendarYearTrend(
 	}));
 }
 
-/**
- * Detections by calendar month across all time -- every May on record counted
- * together -- so the chart shows a species' seasons rather than one year's.
- * Passing a filter scopes the counts without narrowing the axis, so a species
- * that only turns up in spring still shows the empty months it was absent for.
- */
 export async function getMonthlyTrend(
 	extraFilter?: SQL,
 ): Promise<TrendPoint[]> {
@@ -156,8 +146,6 @@ export async function getMonthlyTrend(
 	return buildMonthlyTrend(rows satisfies TrendBucketCount[]);
 }
 
-/** Every calendar year this station (or one species) recorded something in,
- * newest first -- the years a year selector is allowed to offer. */
 export async function getDetectionYears(extraFilter?: SQL): Promise<number[]> {
 	const yearExpr = sql<number>`cast(substr(${detections.Date}, 1, 4) as integer)`;
 	const query = db.select({ year: yearExpr }).from(detections);

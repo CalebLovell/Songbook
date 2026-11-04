@@ -1,6 +1,3 @@
-// Pure metadata, no server-only imports -- safe for client components (e.g.
-// the period switcher) to import directly, unlike timeline.ts which touches
-// the db. Mirrors the split used by stats-periods.ts / trend.ts.
 export const TIMELINE_PERIODS = [
 	"day",
 	"week",

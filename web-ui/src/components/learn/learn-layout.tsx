@@ -27,7 +27,6 @@ export const LEARN_POOL_ICONS: Record<
 	all: InfinityIcon,
 };
 
-/** Species each pool can quiz on, or null until the first round arrives. */
 type PoolCounts = Record<LearnPool, number> | null;
 
 export function LearnPoolSelector({
@@ -39,16 +38,10 @@ export function LearnPoolSelector({
 	pool: LearnPool;
 	poolCounts: PoolCounts;
 	onPoolChange: (pool: LearnPool) => void;
-	/** Starts the pool's round over; the button is left out while there's no
-	    round to start over. */
 	onNewRound?: () => void;
 }) {
 	return (
-		// The pool on the left, starting it over on the right.
 		<div className="mt-(--page-gap) flex items-center justify-between gap-(--page-gap)">
-			{/* Joined segments want about 520px, and a segmented control can't
-			    wrap without breaking its own shape -- so below 640px the same choice
-			    becomes a dropdown, as the timeline's period and the species sort do. */}
 			<PoolSelect
 				pool={pool}
 				poolCounts={poolCounts}
@@ -76,12 +69,6 @@ export function LearnPoolSelector({
 				</ToggleGroup>
 			</div>
 			{onNewRound ? (
-				// The toggles' height and side padding, so it reads as one of the
-				// row's controls rather than a wider call to action. Where the row
-				// is tight it drops to its icon, a square: on the narrowest
-				// phones beside the pool menu, and from 640px, where the toggles
-				// take over, until 768px gives them room for the label too. The
-				// label stays for screen readers.
 				<Button
 					variant="outline"
 					size="lg"
@@ -96,31 +83,14 @@ export function LearnPoolSelector({
 	);
 }
 
-/**
- * How many species a pool picks from, as a small round pill after its label.
- * A fixed 20px tall, so it sits inside the 34px segment without making it any
- * taller, and with a line box that full height: the count's Georgia figures
- * are old-style and dip below the baseline, so a tighter line lets them spill
- * out of the pill. A faint ink wash on the other segments; on the chosen one
- * a white wash under white figures, strong enough to read on the dark fill
- * without the glare of a solid white pill.
- */
 function PoolCount({ count }: { count: number | undefined }) {
 	return (
 		<span className="count-figure inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground/8 in-data-[state=on]:bg-primary-foreground/20 px-1.5 in-data-[state=on]:text-primary-foreground! leading-5">
-			{/* Nearly two digits wide while loading: most pools land at two, so
-			    the pill barely moves when the count arrives. */}
 			{count === undefined ? <ShellFigure className="w-[1.6ch]!" /> : count}
 		</span>
 	);
 }
 
-/**
- * The pool switcher on a narrow screen: a native select dressed like the
- * timeline's period menu -- the same box, border, card surface and hover,
- * the chosen pool's icon in front, a chevron marking it as a dropdown. Native
- * so a phone opens its own picker.
- */
 function PoolSelect({
 	pool,
 	poolCounts,
@@ -145,8 +115,6 @@ function PoolSelect({
 			>
 				{LEARN_POOLS.map((option) => (
 					<option key={option} value={option}>
-						{/* A native option holds only text, so its count rides along
-						    in parentheses where the segments draw a pill. */}
 						{poolCounts
 							? `${LEARN_POOL_LABELS[option]} (${poolCounts[option]})`
 							: LEARN_POOL_LABELS[option]}

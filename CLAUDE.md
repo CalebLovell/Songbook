@@ -6,6 +6,8 @@ The web UI lives in `web-ui/` (Vite + React + TanStack Start). Code in
 Follow `web-ui/DESIGN.md` for any UI work: its color tokens, type, spacing and
 component rules.
 
+Don't add comments to `web-ui/src`: name things well and put durable rules in `web-ui/DESIGN.md`. The only exceptions are tool directives and a one- or two-line present-tense "why" where correct code looks wrong.
+
 ## Previewing the app
 
 - Start/open the app with the preview browser's launch config named `web-ui`

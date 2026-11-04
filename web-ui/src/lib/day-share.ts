@@ -9,11 +9,6 @@ import type { ShareCard } from "~/lib/share-card.ts";
 
 const HOURS = 24;
 
-/**
- * One calendar day shaped for the share card -- the day page's counterpart to
- * getShareCard's rolling window. Kept out of getDayReview so nobody pays for
- * its queries unless they open the panel.
- */
 export const getDayShareCard = createServerFn({ method: "GET" })
 	.validator(z.string().refine(isDayId, "Not a date"))
 	.handler(async ({ data: date }): Promise<ShareCard> => {

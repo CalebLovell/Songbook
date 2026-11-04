@@ -61,11 +61,7 @@ const DEFAULT_SEARCH = {
 	page: 1,
 };
 
-// Search/sort/page all live in the URL (not component state), so filtering
-// is shareable/bookmarkable and survives back/forward navigation.
 const speciesSearchSchema = z.object({
-	// Coerced: search terms are not quoted in the URL, so a numeric one
-	// ("?q=1080") parses back as a number and a bare z.string() would drop it.
 	q: z.coerce.string().default(DEFAULT_SEARCH.q).catch(DEFAULT_SEARCH.q),
 	sort: z
 		.enum(SORT_KEYS)
@@ -90,14 +86,11 @@ export const Route = createFileRoute("/birds/")({
 		middlewares: [stripSearchParams(DEFAULT_SEARCH)],
 	},
 	component: Species,
-	// Deferred: the page renders at once and its parts fill in as the life
-	// list arrives (see Deferred).
 	loader: () => ({ cards: getLifeListCards() }),
 });
 
 const PAGE_SIZE = 24;
 
-// Shared by the real grid and its skeleton, so the two are one shape.
 const GRID_CLASS =
 	"grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-(--page-gap)";
 const CARD_CLASS =
@@ -116,9 +109,6 @@ function Species() {
 				description={<LifeListSummary cards={cards} />}
 			/>
 
-			{/* Drawn at once: what you search and how you sort live in the URL,
-			    not the life list. Kept on an empty station too, so the page holds
-			    the shape its loading state promised. */}
 			<SpeciesControls />
 
 			<Deferred promise={cards} shell={<SpeciesGridShell />}>
@@ -128,10 +118,6 @@ function Species() {
 	);
 }
 
-/** The station's own tally, for the header -- derived from the whole life list,
-    never the search: the header describes the station, and only the grid
-    below answers the query. The sentence is there from the first frame; only
-    its two figures wait on the life list. */
 function LifeListSummary({ cards }: { cards: Promise<LifeListCard[]> }) {
 	const settled = useSettled(cards);
 	const loaded = settled?.value ?? null;
@@ -151,14 +137,10 @@ function LifeListSummary({ cards }: { cards: Promise<LifeListCard[]> }) {
 	);
 }
 
-/** The search box and the sort, which read and write the URL alone. */
 function SpeciesControls() {
 	const { q: search, sort, reverse } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
-	// Local state keeps typing responsive; the URL (and the Fuse search it
-	// drives) only updates after a short debounce, so back/forward history
-	// doesn't get a new entry on every keystroke.
 	const [queryInput, setQueryInput] = useState(search);
 	useEffect(() => setQueryInput(search), [search]);
 
@@ -169,9 +151,6 @@ function SpeciesControls() {
 		});
 	}, 200);
 
-	// A new sort starts in its natural direction; the direction button flips
-	// whichever sort is current. Both go back to page one, since the page you
-	// were on no longer holds the same species.
 	const pickSort = (next: SortKey) =>
 		navigate({
 			search: (prev) => ({ ...prev, sort: next, reverse: false, page: 1 }),
@@ -184,9 +163,6 @@ function SpeciesControls() {
 		});
 
 	return (
-		// One row at every width: the search takes what the sort leaves. The
-		// three sort tabs need about 340px beside a usable search box, so below
-		// 640px the same choice becomes a dropdown.
 		<div className="flex items-center gap-(--page-gap)">
 			<SearchInput
 				aria-label="Filter birds"
@@ -206,8 +182,6 @@ function SpeciesControls() {
 					});
 				}}
 			/>
-			{/* The same two controls at every width -- which sort, then its
-			    direction -- as a dropdown on a phone and tabs from 640px. */}
 			<SortSelect
 				sort={sort}
 				reverse={reverse}
@@ -224,11 +198,6 @@ function SpeciesControls() {
 	);
 }
 
-/**
- * A full page of species cards and the footer, each built from the real
- * card's pieces: the count line, the bird's slot, the two name lines, shells
- * the size of its two buttons, and the last-heard line.
- */
 function SpeciesGridShell() {
 	return (
 		<div aria-busy="true" className="flex flex-1 flex-col gap-(--page-gap)">
@@ -257,7 +226,6 @@ function SpeciesGridShell() {
 	);
 }
 
-/** A card's small print: the word after its count, and when it was last heard. */
 const CARD_NOTE_CLASS = "text-[11px] text-muted-foreground leading-none";
 
 const NAME_WIDTHS = ["w-36", "w-28", "w-40", "w-32"];
@@ -277,8 +245,6 @@ function SpeciesCardSkeleton({ index }: { index: number }) {
 					/>
 				</div>
 			</div>
-			{/* The whole slot, not a bird-sized patch: the slot is the space the
-			    painting is given, however much of it a bird fills. */}
 			<div className="relative min-h-40 w-full flex-1">
 				<ShellBar className="absolute inset-0 rounded-md" />
 			</div>
@@ -398,20 +364,9 @@ const SORT_META: Record<
 > = {
 	count: { label: "Total", icon: BarChart3 },
 	recent: { label: "Recent", icon: Clock },
-	// "Name" rather than the tab's "Alphabetical": a native select is as wide as
-	// its widest option, and the search box beside it needs that width more.
-	// Not "A–Z" either -- the direction button can flip it to Z first.
 	alpha: { label: "Name", icon: ArrowDownAZ },
 };
 
-/**
- * The grid's footer: what the page holds on the left and the stepper held
- * right, set on the page itself like the masthead above the grid -- no card,
- * no band, and no sort phrase, since the sort tabs already say it. Shown
- * on a single page too, so the page keeps one shape as a search narrows it,
- * and held to the bottom of the page (`mt-auto` in the page's full-height
- * column) so a short last page doesn't pull it up under the grid.
- */
 function SpeciesFooter({
 	first,
 	last,
@@ -456,13 +411,6 @@ function SpeciesFooter({
 	);
 }
 
-/**
- * The sort on a narrow screen: a native select dressed like the timeline's
- * period menu -- the same box, border, card surface and hover, the chosen
- * sort's icon in front -- with the direction joined to its right end by a
- * hairline, the way the timeline's date stepper joins its arrows -- the same
- * direction button the tabs carry from 640px.
- */
 function SortSelect({
 	sort,
 	reverse,
@@ -478,7 +426,6 @@ function SortSelect({
 	return (
 		<div className="flex h-8.5 pointer-coarse:h-9 shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] sm:hidden">
 			<div className="relative">
-				{/* Under 400px the icon goes: the search box needs the width more. */}
 				<Icon
 					className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 max-[400px]:hidden"
 					aria-hidden="true"
@@ -509,12 +456,6 @@ function SortSelect({
 	);
 }
 
-/**
- * The sort from 640px: which order, as three joined tabs, with the direction
- * joined to their right end -- the same button the phone's dropdown carries.
- * Picking a tab only picks the sort; clicking the active one does nothing, so
- * the direction lives in one place instead of hiding behind a second click.
- */
 function SortTabs({
 	sort,
 	reverse,
@@ -542,7 +483,6 @@ function SortTabs({
 						<ToggleGroupItem
 							key={key}
 							value={key}
-							// Square where the direction button joins on.
 							className="data-[spacing=0]:last:rounded-r-none"
 						>
 							<Icon className="size-4" />
@@ -560,11 +500,6 @@ function SortTabs({
 	);
 }
 
-/**
- * Flips the current sort. Every sort starts in its natural order -- biggest,
- * newest, or A first -- and reversing it flips the arrow. Not a chevron: beside the
- * dropdown's own chevron it would read as a second dropdown.
- */
 function DirectionButton({
 	reverse,
 	onReverse,
@@ -583,7 +518,6 @@ function DirectionButton({
 			title={reverse ? "Reversed" : "Reverse order"}
 			onClick={onReverse}
 			className={cn(
-				// Reversed wears the selected sort's green, so it reads as on.
 				"flex shrink-0 items-center justify-center border-input bg-card transition-colors hover:bg-accent hover:text-accent-foreground aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground",
 				className,
 			)}
@@ -600,11 +534,6 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 		<div
 			className={`${CARD_CLASS} feature-card-link has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2`}
 		>
-			{/* The whole-card link is an invisible overlay pinned to the card's
-			    edges, so its own focus ring would land under `overflow-hidden` and
-			    never be seen. Instead the card wears the ring on the overlay's
-			    behalf -- scoped to [data-card-link] so focusing the Bird Call
-			    button or the eBird link inside doesn't light the whole card too. */}
 			<Link
 				to="/birds/$comName"
 				params={{ comName: comNameToSlug(card.comName) }}
@@ -617,20 +546,12 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 					<div className="tabular-data font-semibold text-foreground text-lg leading-none">
 						{card.allTimeCount.toLocaleString()}
 					</div>
-					{/* Not "total": that word belongs to the station's own figure
-					    above the grid, which this card's count is one share of. */}
 					<div className={CARD_NOTE_CLASS}>
 						{card.allTimeCount === 1 ? "detection" : "detections"}
 					</div>
 				</div>
 			</div>
 
-			{/* The bird takes whatever height the row leaves over, so the count
-			    stays pinned to the top, the name block to the bottom, and no card
-			    shows a blank band when a neighbour in its row runs taller. The image
-			    sits in an absolute layer so its native size can't stretch the card.
-			    Positioning lifts it over the whole-card link, so it lets clicks
-			    through to that link. */}
 			<div className="pointer-events-none relative min-h-40 w-full flex-1">
 				<div className="absolute inset-0 flex items-center justify-center overflow-hidden">
 					<SpeciesImage

@@ -26,14 +26,8 @@ import {
 	windowFor,
 } from "~/lib/timeline-window.ts";
 
-/**
- * Calendar windows, not rolling ones: "Weekly" means a specific Mon-Sun week
- * the picker names, so the page can be stepped through history rather than
- * only ever showing the trailing N hours.
- */
 export type TimelineRequest = {
 	period: TimelinePeriod;
-	/** Ignored when the period is "all". See {@link TimelineAnchor}. */
 	anchor: TimelineAnchor;
 };
 
@@ -44,80 +38,27 @@ export type TimelineRow = {
 	speciesLink: SpeciesLink | null;
 	totalDetections: number;
 	hourCounts: number[];
-	/**
-	 * The station had never recorded this species before the window opened, so
-	 * this window is where it first arrived. Always false on "all time", where
-	 * every species is trivially first heard inside the window.
-	 */
 	isNew: boolean;
-	/** The day a New species was first recorded, "YYYY-MM-DD" -- its first day
-	    in this window. Null unless isNew. */
 	firstHeard: string | null;
-	/**
-	 * Heard before the window, with only a handful of records ever (the
-	 * station's Rare threshold). Never on a first-ever arrival, and never on
-	 * "all time", whose list is every species' lifetime count already.
-	 */
 	isRare: boolean;
-	/** Heard every day of the lookback and the window -- or, for a year or all
-	    time, on most of its days. See lib/highlights-data.ts. */
 	isConsistent: boolean;
-	/** How much of the window a Regular bird filled: "14 of 18 hours", "every
-	    day this week", "93% of days". Null unless isConsistent. */
 	regularNote: string | null;
-	/** Heard before, silent for the whole lookback, back in the window. */
 	isReturned: boolean;
-	/** How long the species was away before this window heard it again, in
-	    the window's own unit ("3 weeks"). Null unless isReturned. */
 	away: string | null;
-	/** Heard far more than its usual daily rate over the lookback. Null
-	    otherwise. Every flag stacks: a bird carries all it qualifies for. */
 	vocal: VocalJump | null;
 };
 
 export type TimelineData = {
 	rows: TimelineRow[];
-	/** What the window is worth remarking on -- see lib/highlights-data.ts. */
 	highlights: Highlight[];
-	/** The resolved window, or null on "all time". */
 	window: TimelineWindow | null;
-	/**
-	 * Anchors for the nearest neighbouring windows that actually hold
-	 * detections, which an empty window offers as its way out. Null when there
-	 * is nothing further in that direction. (The step arrows don't use these:
-	 * they walk one window at a time, quiet ones included.)
-	 */
 	prevAnchor: TimelineAnchor | null;
 	nextAnchor: TimelineAnchor | null;
-	/**
-	 * The day a period switch re-anchors on: the latest one inside this window
-	 * that holds detections, or the nearest one outside it when the window is
-	 * empty. Anchoring on the window's own start instead would drop Yearly onto
-	 * January 1st -- a dead month for most stations -- so the switch follows the
-	 * data. Null only when the station has never recorded anything.
-	 */
 	lastActiveDay: string | null;
-	/**
-	 * First and last day the station ever recorded, used to bound the picker.
-	 * Null when it has never recorded anything.
-	 */
 	stationRange: { first: string; last: string } | null;
-	/**
-	 * Whether the station has ever recorded anything, regardless of the selected
-	 * window. An empty window is not the same as an empty station -- the page
-	 * needs the difference so it only hides the switcher when there is genuinely
-	 * nothing to switch to.
-	 */
 	hasAnyDetections: boolean;
 };
 
-/**
- * Where a window sits in the station's history: what it can step to, what a
- * period switch should re-anchor on, and how far the picker may range. Every
- * period-scoped view needs this, including the day view -- which loads its
- * body from `day.ts` and would otherwise have no way to draw the toolbar
- * above it -- so it lives on its own rather than inside the rows query.
- */
 export type TimelineNav = Pick<
 	TimelineData,
 	| "window"
@@ -133,9 +74,6 @@ export async function loadTimelineNav(
 	window: TimelineWindow | null,
 ): Promise<TimelineNav> {
 	const [[neighbours], [stationBounds]] = await Promise.all([
-		// The nearest recorded day on either side of the window (what an empty
-		// window points to) and the latest one inside it (what a period switch
-		// re-anchors on), in a single pass over the dates.
 		window
 			? db
 					.select({
@@ -163,10 +101,6 @@ export async function loadTimelineNav(
 		window,
 		prevAnchor: neighbours.prev ? anchorForDay(period, neighbours.prev) : null,
 		nextAnchor: neighbours.next ? anchorForDay(period, neighbours.next) : null,
-		// Preferring what's inside the window keeps the switch where the user is
-		// looking; the neighbours only stand in for an empty window, so changing
-		// granularity can't strand them somewhere with nothing to show. "All
-		// time" spans everything, making the station's last day its own.
 		lastActiveDay: window
 			? (neighbours.inside ?? neighbours.next ?? neighbours.prev)
 			: stationBounds.last,
@@ -178,12 +112,6 @@ export async function loadTimelineNav(
 	};
 }
 
-/**
- * Plain-function form, so `timeline-page.ts` can compose the rows with the extra
- * queries a period needs without paying for a second round trip. The station's
- * highlight thresholds come in from there, since reading the station config is
- * server-only work this module doesn't import.
- */
 export async function loadTimelineData({
 	period,
 	anchor,
@@ -198,8 +126,6 @@ export async function loadTimelineData({
 		: undefined;
 	const today = dayIdFor(new Date());
 
-	// Whole periods before the window, as many as the longest lookback any rule
-	// asks for -- and at least the one just before, for the up/down line.
 	const longest = Math.max(
 		1,
 		lookbackFor(settings.goneQuiet, period),
@@ -226,9 +152,6 @@ export async function loadTimelineData({
 					detections.Sci_Name,
 					sql`strftime('%H', ${detections.Time})`,
 				),
-			// Every day from the start of the longest lookback to the window's end,
-			// per species: the evidence every highlight rule reads. All time takes
-			// every day there is.
 			db
 				.select({
 					date: detections.Date,
@@ -245,10 +168,6 @@ export async function loadTimelineData({
 						: undefined,
 				)
 				.groupBy(detections.Date, detections.Com_Name),
-			// The last day each species was heard before this window opened. A
-			// species missing from this list is one the window introduced; the
-			// rest have a history to have been away from or gone quiet against.
-			// "All time" has no "before".
 			window
 				? db
 						.select({
@@ -259,8 +178,6 @@ export async function loadTimelineData({
 						.where(lt(detections.Date, window.start))
 						.groupBy(detections.Com_Name)
 				: Promise.resolve([]),
-			// Lifetime detection count per species, ignoring the window: what makes
-			// a species a rare visitor here at all.
 			db
 				.select({
 					comName: detections.Com_Name,
@@ -268,8 +185,6 @@ export async function loadTimelineData({
 				})
 				.from(detections)
 				.groupBy(detections.Com_Name),
-			// Every day before this one each species was heard on, back to the
-			// station's first: what a Day's Regular streak is counted against.
 			period === "day" && window
 				? db
 						.select({ date: detections.Date, comName: detections.Com_Name })
@@ -310,8 +225,6 @@ export async function loadTimelineData({
 		return days;
 	};
 
-	// The window's days run through today at the latest; all time's start at
-	// the station's first.
 	const windowStart = window?.start ?? nav.stationRange?.first ?? today;
 	const windowEnd = window && window.end < today ? window.end : today;
 	const windowDays = daysOf(windowStart, windowEnd);
@@ -391,11 +304,6 @@ export async function loadTimelineData({
 	};
 }
 
-/**
- * Every day before `start`, nearest first, back to the station's first: the
- * species heard on each. A day with no row at all comes back as an empty set
- * -- the station recording nothing then.
- */
 function daysHeardBefore(
 	start: string,
 	rows: { date: string; comName: string }[],

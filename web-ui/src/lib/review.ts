@@ -16,7 +16,6 @@ import {
 } from "~/lib/review-data.ts";
 import { readReviewRareSpeciesMax } from "~/lib/settings.server.ts";
 
-/** A detections row, as every Review action names the one it acts on. */
 const rowIdSchema = z.object({ rowId: z.number().int().positive() });
 
 export const getReviewPage = createServerFn({ method: "GET" })

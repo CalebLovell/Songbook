@@ -417,8 +417,6 @@ export async function saveSpeciesControlLists(
 			excluded: new Set(parsedInput.excluded),
 			whitelisted: new Set(parsedInput.whitelisted),
 		};
-		// Enforce the runtime precedence on the privileged side too. A crafted
-		// request cannot leave contradictory lines that the UI itself prevents.
 		for (const sciName of effectiveLists.excluded) {
 			effectiveLists.custom.delete(sciName);
 			effectiveLists.whitelisted.delete(sciName);
@@ -579,9 +577,7 @@ export async function deleteSpeciesHistory(
 		} catch (error) {
 			try {
 				opened.database.exec("ROLLBACK");
-			} catch {
-				// The original error is more useful if SQLite already rolled back.
-			}
+			} catch {}
 			throw error;
 		}
 

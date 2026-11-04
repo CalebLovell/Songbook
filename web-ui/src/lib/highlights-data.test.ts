@@ -16,11 +16,8 @@ import {
 	MAX_NAMED_BIRDS,
 } from "./highlights-data.ts";
 
-/** A short-memory station, so the tallies below stay readable: three days
-    back for Live and Day, two weeks for a week. */
 const settings: HighlightThresholds = {
 	...HIGHLIGHT_THRESHOLDS,
-	// A Day's Regular streak of four days, this one included.
 	consistent: { ...HIGHLIGHT_THRESHOLDS.consistent, streakDays: 4 },
 	goneQuiet: { days: 3, weeks: 2, months: 3 },
 	returned: { days: 3, weeks: 2, months: 3 },
@@ -30,7 +27,6 @@ const settings: HighlightThresholds = {
 const day = (entries: Record<string, number>): DayTally =>
 	new Map(Object.entries(entries));
 
-/** `n` whole days before a Day window, each the same tally. */
 const daysBefore = (n: number, entries: Record<string, number>) =>
 	Array.from({ length: n }, () => [day(entries)]);
 
@@ -49,8 +45,6 @@ function evidence(
 		window: [day({ Robin: 5 })],
 		inProgress: false,
 		before,
-		// Unless a test says otherwise, the days a streak is counted back
-		// through are just the periods it gave.
 		daysBefore: before.map(
 			(unit) => new Set(unit.flatMap((tally) => Array.from(tally.keys()))),
 		),
@@ -170,7 +164,6 @@ test("a day's regular is on a streak, counted to its start", () => {
 		window: [day({ Robin: 5, Wren: 2 })],
 		daysBefore: [
 			...Array.from({ length: 40 }, () => new Set(["Robin", "Wren"])),
-			// A day the station recorded nothing is stepped over.
 			new Set<string>(),
 			new Set(["Robin"]),
 			new Set(["Jay"]),
@@ -201,15 +194,12 @@ test("a week's or month's regular is heard on every day it recorded", () => {
 			day({ Robin: 2 }),
 		],
 	});
-	// The day the station was down doesn't count against it.
 	assert.equal(flags.get("Robin")?.isConsistent, true);
 	assert.equal(flags.get("Robin")?.regularNote, "every day this week");
 	assert.equal(flags.get("Wren")?.isConsistent, false);
 });
 
 test("a year or all time is regular on over 90% of its days", () => {
-	// Twenty recorded days -- a Jay on each -- with the Robin on 19 and the
-	// Wren on 18.
 	const yearDays = Array.from({ length: 20 }, (_, i) =>
 		day({
 			Jay: 1,
@@ -223,7 +213,6 @@ test("a year or all time is regular on over 90% of its days", () => {
 		before: [[day({})]],
 	});
 	assert.equal(flags.get("Robin")?.isConsistent, true);
-	// 18 of 20 is exactly 90%, not over it.
 	assert.equal(flags.get("Wren")?.isConsistent, false);
 	assert.deepEqual(line(highlights, "consistent"), {
 		kind: "consistent",
@@ -287,7 +276,6 @@ test("a rare bird back after a silence is rare, never returned", () => {
 });
 
 test("vocal needs the ratio, the detections and the presence", () => {
-	// Usual is 2 a day on every one of the three days; the window heard 30.
 	const loud = judge({
 		window: [day({ Robin: 30 })],
 		before: daysBefore(3, { Robin: 2 }),
@@ -312,8 +300,6 @@ test("vocal needs the ratio, the detections and the presence", () => {
 	});
 	assert.equal(few.flags.get("Robin")?.vocal, null);
 
-	// Heard on one of three recorded days, under a 50% presence bar: an
-	// arrival, not a regular gone loud.
 	const arrival = judge(
 		{
 			window: [day({ Robin: 5, Jay: 40 })],

@@ -18,17 +18,6 @@ function emptyState(): ThrottleState {
 	return { ips: Object.create(null), global: { failures: 0, windowStart: 0 } };
 }
 
-/**
- * Drops addresses that have gone quiet. Without this the map only ever grows:
- * the very attacker the global ceiling anticipates -- one rotating through
- * source addresses -- would add a permanent entry per address, in memory and in
- * the state file on disk, forever.
- *
- * An address is kept while it is still serving a backoff, or while its last
- * failure is recent enough that the escalating ladder should still apply to it.
- * Past that it is indistinguishable from a first-time caller, which is what it
- * effectively is.
- */
 function prune(ips: Record<string, IpState>, now: number) {
 	const kept: Record<string, IpState> = Object.create(null);
 	for (const key of Object.keys(ips)) {
@@ -40,12 +29,6 @@ function prune(ips: Record<string, IpState>, now: number) {
 	return kept;
 }
 
-/** `JSON.parse` (and object literals) produce plain objects backed by
- *  `Object.prototype`, so a client address of `__proto__` would otherwise
- *  write to the prototype instead of creating an own property. Rebuild the
- *  map onto a `null`-prototype object and drop any dangerous key names --
- *  including ones from a state file already on disk -- so the address
- *  string can never reach the prototype chain. */
 function sanitizeIps(ips: unknown): Record<string, IpState> {
 	const safe: Record<string, IpState> = Object.create(null);
 	if (!ips || typeof ips !== "object") return safe;
@@ -59,9 +42,6 @@ function sanitizeIps(ips: unknown): Record<string, IpState> {
 			Number.isFinite(value.failures) &&
 			Number.isFinite(value.until)
 		) {
-			// `seen` was added after the first release of this file; an entry
-			// without it is treated as last seen now, so it ages out from here
-			// rather than being dropped or kept forever.
 			safe[key] = {
 				failures: value.failures as number,
 				until: value.until as number,
@@ -72,11 +52,6 @@ function sanitizeIps(ips: unknown): Record<string, IpState> {
 	return safe;
 }
 
-/**
- * Counters are held in memory and mirrored to disk, because the Settings page
- * can restart this service -- an attacker who could reset the throttle by
- * triggering a restart would have no throttle at all.
- */
 export class UnlockThrottle {
 	readonly #statePath: string;
 	readonly #now: () => number;
@@ -94,9 +69,6 @@ export class UnlockThrottle {
 				ips?: unknown;
 				global?: ThrottleState["global"];
 			};
-			// `global` is validated field by field rather than trusted for being
-			// present: a state file holding `{"global":"x"}` would otherwise turn
-			// every counter into NaN and silently disable the ceiling.
 			const global = parsed.global as Partial<ThrottleState["global"]>;
 			this.#state = {
 				ips: sanitizeIps(parsed.ips),
@@ -112,8 +84,6 @@ export class UnlockThrottle {
 						: { failures: 0, windowStart: 0 },
 			};
 		} catch {
-			// Missing or unreadable state must not lock anyone out; the worst case
-			// is that an attacker gets one fresh window.
 			this.#state = emptyState();
 		}
 		return this.#state;
@@ -122,30 +92,17 @@ export class UnlockThrottle {
 	async #save(state: ThrottleState) {
 		this.#state = state;
 		try {
-			// 0600 like the auth file beside it: this records client addresses
-			// and the timing of unlock attempts, which no other local account
-			// has any business reading.
 			await writeFile(this.#statePath, JSON.stringify(state), {
 				encoding: "utf8",
 				mode: 0o600,
 			});
-		} catch {
-			// Disk full or read-only: keep throttling from memory rather than
-			// turning a logging problem into a lockout.
-		}
+		} catch {}
 	}
 
 	async check(ip: string) {
 		const state = await this.#load();
 		const now = this.#now();
 
-		// The global ceiling exists to stop an attacker who rotates source
-		// addresses from evading the per-address backoff -- but that attacker is
-		// necessarily coming from off-LAN. Applying the shared counter to local
-		// clients too would hand any remote attacker a trivial way to lock the
-		// station owner out of their own Pi: keep failing from rotating public
-		// addresses and the owner's home-network requests get refused right
-		// alongside them.
 		const inWindow = now - state.global.windowStart < GLOBAL_WINDOW_MS;
 		if (
 			!isPrivateAddress(ip) &&
@@ -169,9 +126,6 @@ export class UnlockThrottle {
 		const state = await this.#load();
 		const now = this.#now();
 
-		// Only off-LAN failures feed the shared counter -- the owner mistyping
-		// their own password on the home network must never push the global
-		// ceiling closer to locking the whole station out.
 		if (!isPrivateAddress(ip)) {
 			if (now - state.global.windowStart >= GLOBAL_WINDOW_MS) {
 				state.global = { failures: 0, windowStart: now };

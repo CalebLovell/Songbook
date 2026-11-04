@@ -131,8 +131,6 @@ export async function readSettingsPageValues(
 				"RECORDING_LENGTH",
 				defaults.recording.recordingLength,
 			),
-			// Blank is the documented way to ask for the backend's own 6 seconds,
-			// so an empty key stays null rather than being filled in here.
 			extractionLength: extraction
 				? integerValue(values, "EXTRACTION_LENGTH", 6)
 				: null,
@@ -283,15 +281,6 @@ function assignmentsFor<K extends SettingsCardKind>(
 	}
 }
 
-/**
- * Rewrites in place, appending a key the file has never carried. Appending is
- * the same promise the read path already makes: `readSettingsPageValues` fills a
- * missing key with a default and shows it, so refusing to write it back would
- * leave a card displaying a value it cannot save -- which is what a station
- * installed before a key existed (REVIEW_RARE_SPECIES_MAX, say) would hit.
- * Every other line of the file, including secrets this UI never reads, is left
- * exactly as it was.
- */
 function replaceAssignments(text: string, assignments: Record<string, string>) {
 	let updated = text;
 	for (const [key, value] of Object.entries(assignments)) {
@@ -312,9 +301,6 @@ export async function writeSettingsCard<K extends SettingsCardKind>(
 	settingsPath = resolveSettingsPath(),
 ) {
 	const assignments = assignmentsFor(kind, values);
-	// BirdNET-Pi installs /etc/birdnet/birdnet.conf as a link into the user's
-	// checkout, and /etc/birdnet is root's: write beside the real file, which
-	// also keeps the link a link.
 	settingsPath = await realpath(settingsPath);
 	const source = await readFile(settingsPath, "utf8");
 	const sourceStat = await stat(settingsPath);
@@ -349,11 +335,6 @@ export async function readReviewRareSpeciesMax(
 	}
 }
 
-/**
- * The Highlights card's rules as this station has tuned them. A missing or
- * unreadable config -- or a value out of range -- falls back to the defaults
- * rather than failing the Live page or the timeline over a judgement call.
- */
 export async function readHighlightThresholds(
 	settingsPath = resolveSettingsPath(),
 ): Promise<HighlightThresholds> {
@@ -391,11 +372,6 @@ export async function readHighlightThresholds(
 	}
 }
 
-/**
- * The station's own name (`SITE_NAME`), trimmed, or "" when unset or the config
- * can't be read. Shown to every visitor under the sidebar's wordmark; only
- * Settings, where it's edited, is gated.
- */
 export async function readSiteName(settingsPath = resolveSettingsPath()) {
 	try {
 		const values = parseBirdnetConfig(await readFile(settingsPath, "utf8"));

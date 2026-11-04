@@ -32,15 +32,8 @@ export type Visit = {
 	confidence: number | null;
 	audioUrl?: string | null;
 };
-/**
- * A visit the log renders as "4:13 AM / 27 minutes ago". The age is measured
- * on the server, the same way the Today page measures its rows, so both sides of
- * hydration render an identical label from identical data.
- */
 export type RecentVisit = Visit & { ageMs: number };
 
-/** The species' best recording (see best-recording.server.ts), featured with
- * a spectrogram. */
 export type BestRecording = {
 	date: string;
 	time: string;
@@ -58,26 +51,15 @@ export type SpeciesDetail = {
 	firstDetected: Visit;
 	lastDetected: Visit;
 	averageConfidence: number | null;
-	/** Per-day counts for the selected year, which the heat map draws. */
 	history: TrendPoint[];
-	/** Every detection by calendar month, all years folded together. */
 	detectionTrend: TrendPoint[];
-	/** Every detection by hour of day, like the stats page's chart. */
 	hourActivity: HourActivity[];
-	/** The single cleanest clip still on disk -- highest confidence, all-time. */
 	bestRecording: BestRecording | null;
 	recentVisits: RecentVisit[];
-	/** When the visit ages were measured, for `useAgeOffset` to advance them. */
 	generatedAt: string;
-	/** The visit log page the URL asked for, clamped to the pages that exist,
-	 * so a deep link server-renders the right rows. */
 	visitLog: VisitPage;
 };
 
-// The slug drops punctuation, so it cannot be turned back into a common name by
-// string surgery. Instead the station's distinct names -- a few hundred at most
-// -- are slugged and matched, which also means a name we haven't anticipated the
-// punctuation of still resolves.
 async function resolveComName(slug: string): Promise<string | null> {
 	const rows = await db
 		.selectDistinct({ comName: detections.Com_Name })
@@ -92,8 +74,6 @@ function byComName(comName: string) {
 	return sql`${detections.Com_Name} = ${comName}`;
 }
 
-/** Every detection of this species by hour of day, scoped exactly like the
- * stats page's chart so the two read the same way. */
 async function getHourActivity(
 	filter: ReturnType<typeof byComName>,
 ): Promise<HourActivity[]> {
@@ -111,16 +91,13 @@ async function getHourActivity(
 	);
 }
 
-/** Visits per page of the visit log. */
 export const VISITS_PAGE_SIZE = 10;
 
-/** One page of this species' visits, newest first, aged against `now`. */
 async function getVisitPage(
 	comName: string,
 	page: number,
 	now: Date,
 ): Promise<RecentVisit[]> {
-	// Signed out, a visit carries no clip: only the best recording plays.
 	const withAudio = await canHearEveryClip();
 	const rows = await db
 		.select({
@@ -152,7 +129,6 @@ export type VisitPage = {
 	generatedAt: string;
 };
 
-/** How many visit-log pages a species with `total` detections fills. */
 export function visitPageCount(total: number): number {
 	return Math.max(1, Math.ceil(total / VISITS_PAGE_SIZE));
 }
@@ -161,11 +137,6 @@ function toPageNumber(page: number): number {
 	return Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1;
 }
 
-/**
- * A later page of the visit log. The detail loader already carries page one,
- * so this only runs when someone steps back through the species' history --
- * which reaches all the way to its first detection, not just the selected year.
- */
 export const getSpeciesVisits = createServerFn({ method: "GET" })
 	.validator(
 		z
@@ -184,28 +155,11 @@ export const getSpeciesVisits = createServerFn({ method: "GET" })
 		};
 	});
 
-/**
- * What a `/birds/$comName` slug turned out to name.
- *
- * `undetected` is the interesting one: a bird the installed classifier knows
- * about but this station has never heard. That is a legitimate page -- you can
- * reasonably go looking for a bird you are still waiting on -- and reporting it
- * as an error would be a lie.
- */
 export type SpeciesDetailResult =
 	| { status: "detected"; detail: SpeciesDetail }
 	| { status: "undetected"; comName: string; sciName: string }
 	| { status: "unknown" };
 
-/**
- * The bird a slug names according to the model's labels, or null.
- *
- * `loadInstalledSpeciesCatalog` throws when the model directory or the
- * localisation file cannot be read. That is swallowed on purpose: a station
- * with a broken model install should still tell someone their species URL
- * matched nothing, rather than escalating a typo into a claim that the whole
- * station is down. Species Control is the page that reports a broken catalog.
- */
 async function resolveCatalogSpecies(
 	slug: string,
 ): Promise<CatalogSpecies | null> {
@@ -217,8 +171,6 @@ async function resolveCatalogSpecies(
 	}
 }
 
-/** Both misses -- an unresolvable name and a name with zero rows -- ask the
- * catalog the same question, so they share one path. */
 async function missToResult(slug: string): Promise<SpeciesDetailResult> {
 	const known = await resolveCatalogSpecies(slug);
 	if (!known) return { status: "unknown" };
@@ -229,10 +181,6 @@ async function missToResult(slug: string): Promise<SpeciesDetailResult> {
 	};
 }
 
-/**
- * Just the name a bird-page slug stands for -- heard here or only in the
- * model's catalog -- so the page can title the tab before its detail lands.
- */
 export const getBirdName = createServerFn({ method: "GET" })
 	.validator(z.string().max(200))
 	.handler(
@@ -245,7 +193,6 @@ export const getBirdName = createServerFn({ method: "GET" })
 export type SpeciesDetailInput = {
 	comNameSlug: string;
 	year: number;
-	/** Which page of the visit log to include alongside page one. */
 	visitsPage?: number;
 };
 
@@ -323,8 +270,6 @@ export const getSpeciesDetail = createServerFn({ method: "GET" })
 				getYearTrend(year, filter),
 				getMonthlyTrend(filter),
 				getHourActivity(filter),
-				// Page one is already in hand as `recentVisits`; only a deeper page
-				// costs a second query.
 				logPage === 1 ? null : getVisitPage(comName, logPage, generatedAtDate),
 			]);
 			const generatedAt = localTimestamp(generatedAtDate);

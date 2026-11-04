@@ -5,28 +5,15 @@ import { fetchAudioBlob } from "~/lib/use-playable-audio.ts";
 
 const FFT_SIZE = 1024;
 const HOP = 256;
-// Bird calls live well below the Nyquist of a 48kHz clip, so the top of the
-// spectrum is mostly empty. Capping the drawn range at 15kHz spends the card's
-// height on the part of the signal that actually carries the call.
 const MAX_HZ = 15000;
-// Magnitudes are mapped from this dB window onto paper->moss. Anything quieter
-// than the floor reads as blank paper; the ceiling is where the ink saturates.
 const DB_FLOOR = -95;
 const DB_CEIL = -25;
 
-// Endpoints of the colour ramp, matching the detection-history heat map: near
-// -white paper for silence, deep moss for the loudest bins.
 const PAPER: [number, number, number] = [251, 253, 246];
 const MOSS: [number, number, number] = [32, 59, 20];
 
 type RenderState = "loading" | "ready" | "empty";
 
-/**
- * A frequency-vs-time spectrogram of a single clip, drawn client-side from the
- * decoded audio -- no server-rendered PNGs and no audio toolchain on the host.
- * The canvas is sized to the STFT grid (frames x bins) and stretched to fit by
- * CSS, so the browser's image smoothing does the interpolation for free.
- */
 export function Spectrogram({
 	audioUrl,
 	className,
@@ -35,9 +22,7 @@ export function Spectrogram({
 }: {
 	audioUrl: string;
 	className?: string;
-	/** Called with the clip's length in seconds once it's decoded. */
 	onDecoded?: (seconds: number) => void;
-	/** Laid over the whole plot once it's drawn -- a player's playhead. */
 	children?: ReactNode;
 }) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -64,8 +49,6 @@ export function Spectrogram({
 
 			const context = new AudioCtx();
 			try {
-				// The player fetches the same clip; the shared cache makes it one
-				// request between them.
 				const blob = await fetchAudioBlob(audioUrl);
 				const buffer = await context.decodeAudioData(await blob.arrayBuffer());
 				if (cancelled) return;
@@ -89,10 +72,6 @@ export function Spectrogram({
 		<div
 			className={`relative overflow-hidden rounded-md border border-[var(--line)] bg-[var(--paper)] ${className ?? ""}`}
 		>
-			{/* Absolutely positioned so the canvas' own intrinsic size (frames x
-			    bins) never contributes to layout height -- otherwise `w-full`
-			    stretches its width and the aspect ratio balloons the card. This
-			    lets the card take its height from its neighbour instead. */}
 			<canvas
 				ref={canvasRef}
 				role="img"
@@ -130,7 +109,6 @@ function paint(canvas: HTMLCanvasElement, buffer: AudioBuffer): void {
 		Math.ceil((MAX_HZ / (sampleRate / 2)) * nyquistBin),
 	);
 
-	// Precompute a Hann window so frame edges don't smear across the spectrum.
 	const window = new Float32Array(FFT_SIZE);
 	for (let i = 0; i < FFT_SIZE; i += 1) {
 		window[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (FFT_SIZE - 1));
@@ -157,7 +135,6 @@ function paint(canvas: HTMLCanvasElement, buffer: AudioBuffer): void {
 			const mag = Math.hypot(real[bin], imag[bin]) / FFT_SIZE;
 			const db = 20 * Math.log10(mag + 1e-9);
 			const level = clamp01((db - DB_FLOOR) / (DB_CEIL - DB_FLOOR));
-			// Row 0 is the top of the canvas, so low frequencies go to the bottom.
 			const y = maxBin - 1 - bin;
 			const pixel = (y * frameCount + frame) * 4;
 			image.data[pixel] = lerp(PAPER[0], MOSS[0], level);

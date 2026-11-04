@@ -26,13 +26,6 @@ import {
 } from "./auth-session.server.ts";
 import { UnlockThrottle } from "./auth-throttle.server.ts";
 
-/**
- * - `ready`: a password is set; `unlocked` says whether this browser has it.
- * - `not-set-up`: no password yet, so nobody can sign in until the owner sets
- *   one on the Pi.
- * - `misconfigured`: the password file exists but can't be read or trusted.
- *   Locked, and the owner needs the service log to see why.
- */
 export type StationAuthState = "ready" | "not-set-up" | "misconfigured";
 export type UnlockStatus = { unlocked: boolean; state: StationAuthState };
 export type UnlockResult =
@@ -47,8 +40,6 @@ type LoadedAuth =
 	| { state: "ready"; auth: AuthFile }
 	| { state: "not-set-up" | "misconfigured" };
 
-/** The one place a broken password file is logged, with the reason, so the
- *  page can say "see the log" and the log has something in it. */
 async function loadAuth(): Promise<LoadedAuth> {
 	try {
 		const auth = await readAuthFile();
@@ -60,10 +51,6 @@ async function loadAuth(): Promise<LoadedAuth> {
 	}
 }
 
-// Lazy so the throttle's state path is resolved on first use, not at module
-// import time -- resolving eagerly at module scope would bake in whatever
-// BIRDNET_AUTH_CONF happened to be set (or not) before tests or the
-// password-setting CLI get a chance to set it.
 let throttle: UnlockThrottle | undefined;
 function getThrottle() {
 	if (!throttle) {
@@ -74,13 +61,6 @@ function getThrottle() {
 	return throttle;
 }
 
-/**
- * Trusting `x-forwarded-for` unconditionally would let an attacker mint a fresh
- * address per attempt and walk straight through the throttle; ignoring it behind
- * a tunnel would collapse every client onto one address and let one attacker
- * lock the owner out. So it is honoured only when the deployment says so, and
- * then only the part the proxy wrote (`forwardedClientAddress`).
- */
 function resolveClientIp() {
 	if (process.env.WEB_UI_TRUSTED_PROXY) {
 		const forwarded = forwardedClientAddress(getRequestHeaders());
@@ -89,15 +69,6 @@ function resolveClientIp() {
 	return getRequestIP();
 }
 
-/**
- * Every caller whose address cannot be determined shares this one throttle
- * bucket, and it is deliberately not a private address, so those callers are
- * also subject to the global ceiling. That is the safe direction -- an
- * unidentifiable client is treated as remote -- but it does mean that on a
- * deployment where the address is never available, one attacker's failures
- * throttle everyone. Setting `WEB_UI_TRUSTED_PROXY` correctly is what avoids
- * that.
- */
 const UNKNOWN_CLIENT = "unknown";
 
 function issueSession(auth: AuthFile) {
@@ -105,9 +76,6 @@ function issueSession(auth: AuthFile) {
 		httpOnly: true,
 		sameSite: "lax",
 		path: "/",
-		// Cannot be set over plain HTTP or the cookie is dropped outright, which
-		// would break LAN use today. HTTPS is a deployment prerequisite before
-		// exposing the station -- see the spec.
 		secure: getRequestProtocol() === "https",
 		maxAge: COOKIE_MAX_AGE_SECONDS,
 	});
@@ -115,21 +83,16 @@ function issueSession(auth: AuthFile) {
 
 export async function readUnlockStatus(): Promise<UnlockStatus> {
 	const loaded = await loadAuth();
-	// Anything but a readable, set password is locked -- never open.
 	if (loaded.state !== "ready") return { unlocked: false, state: loaded.state };
 	const { auth } = loaded;
 	const token = getCookie(UNLOCK_COOKIE_NAME);
 	const unlocked = verifySessionToken(auth, token);
-	// Sliding renewal: a verified request a day or more after the token was
-	// issued pushes the expiry back out.
 	if (unlocked && token && sessionNeedsRenewal(token)) issueSession(auth);
 	return { unlocked, state: "ready" };
 }
 
 export async function attemptUnlock(password: string): Promise<UnlockResult> {
 	const loaded = await loadAuth();
-	// Nothing to guess against, so these skip the throttle: a failure here
-	// says nothing about the password.
 	if (loaded.state !== "ready") return { ok: false, reason: loaded.state };
 	const { auth } = loaded;
 	const client = resolveClientIp() ?? UNKNOWN_CLIENT;
@@ -154,7 +117,3 @@ export async function attemptUnlock(password: string): Promise<UnlockResult> {
 export function clearSession() {
 	deleteCookie(UNLOCK_COOKIE_NAME, { path: "/" });
 }
-
-// `changePassword` lives in `auth-file.server.ts`,
-// alongside the file format it rewrites, so the password-setting CLI can use
-// it without pulling in this module's request-scoped helpers.

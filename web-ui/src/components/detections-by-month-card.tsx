@@ -18,15 +18,8 @@ import { CHART_MARGIN, X_AXIS_HEIGHT } from "~/lib/chart-style.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import type { TrendPoint } from "~/lib/stats-data.ts";
 
-/**
- * Below this chart width the twelve three-letter months run into each other
- * (12px Georgia needs ~26px a label, plus the y-axis), so each shortens to its
- * initial: J F M A M J J A S O N D. The tooltip and the data table keep the
- * full names, so the initials are never the only way to tell the Js apart.
- */
 const INITIALS_BELOW_PX = 380;
 
-/** The header's info icon. */
 function MonthInfo() {
 	return (
 		<InfoTip label="Detections by month" size="default">
@@ -40,20 +33,10 @@ function MonthInfo() {
 	);
 }
 
-/**
- * The bird page's detections-by-month chart: every detection on record,
- * each calendar month summed across the years, so it shows the bird's seasons.
- *
- * Bars rather than the line the by-hour card uses: twelve months are discrete
- * buckets to be compared against each other, not a continuous cycle to trace
- * the shape of. A line between them implies readings in the gaps that do not
- * exist.
- */
 export function DetectionsByMonthCard({
 	trend,
 	className = "",
 }: {
-	/** The twelve calendar months, zero-filled, all years folded together. */
 	trend: TrendPoint[];
 	className?: string;
 }) {
@@ -63,8 +46,6 @@ export function DetectionsByMonthCard({
 	return (
 		<section
 			aria-label="Detections by month"
-			// The min-height reserves room for the chart; with only a line of text
-			// in the card it would just be empty space.
 			className={`feature-card flex flex-col rounded-md p-4 ${isEmpty ? "" : "min-h-72"} ${className}`}
 		>
 			<CardHeader title="Detections by month">
@@ -75,12 +56,6 @@ export function DetectionsByMonthCard({
 				<EmptyNote>{EMPTY.station.detections}</EmptyNote>
 			) : (
 				<div className="mt-(--page-gap) min-h-0 flex-1">
-					{/* `minHeight` is not decoration: ResponsiveContainer measures its own
-				    box, and `height: 100%` inside a card sized by `min-h-72` resolves
-				    against an indefinite height -- so it measures zero and draws
-				    nothing unless a parent grid row happens to stretch the card to a
-				    definite height. The floor makes the chart render wherever the card
-				    is put, and it still grows past it when a row does stretch. */}
 					<ResponsiveContainer
 						width="100%"
 						height="100%"
@@ -89,16 +64,9 @@ export function DetectionsByMonthCard({
 					>
 						<BarChart
 							data={trend}
-							// Not a tab stop: a click or tap would ring the whole chart in a
-							// focus outline. Screen readers get the hidden table below.
 							accessibilityLayer={false}
 							aria-hidden
-							// No extra right margin for "Dec": each label is centred in its
-							// month's band, so the last one sits half a band in from the edge.
 							margin={CHART_MARGIN}
-							// Twelve discrete buckets, not a continuous signal: a fifth of
-							// each band goes to the gap so no two months' fills touch, and
-							// the cap keeps the bars from turning into slabs on a wide card.
 						>
 							<CartesianGrid stroke="var(--line)" vertical={false} />
 							<XAxis
@@ -118,25 +86,13 @@ export function DetectionsByMonthCard({
 								fontSize={12}
 								tickLine={false}
 								allowDecimals={false}
-								// Auto rather than a fixed width: a busy station's five-digit
-								// counts were being clipped to their trailing digits.
 								width="auto"
 							/>
 							<ChartTooltip
 								content={(props) => <ChartValueTooltip {...props} />}
-								// The band, not the bar: a cursor sized to the mark makes the
-								// hover target smaller than the thing being pointed at.
 								cursor={{ fill: "var(--sage)", fillOpacity: 0.2 }}
 							/>
-							{/* One series, so no legend -- the kicker above names it. The
-							    rounded corners are on the data end only; the baseline end
-							    stays square so each bar reads as sitting on zero.
-
-							    No enter animation: recharts 3.10 grows a bar from zero
-							    height and, in this chart, never finishes -- every bar stays
-							    at zero and the shape is dropped entirely, which is a blank
-							    card. The line charts animate because they interpolate along
-							    a path rather than out of a collapsed rectangle. */}
+							{/* Animation stays off: recharts never finishes a bar's enter animation here, leaving a blank card. */}
 							<Bar
 								dataKey="count"
 								isAnimationActive={false}
@@ -157,7 +113,6 @@ export function DetectionsByMonthCard({
 	);
 }
 
-/** The chart card before its counts arrive (see ShellChartCard). */
 export function DetectionsByMonthCardSkeleton({
 	className = "",
 }: {

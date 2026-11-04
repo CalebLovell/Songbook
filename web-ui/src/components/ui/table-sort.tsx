@@ -8,15 +8,6 @@ import {
 
 type SortDirection = "asc" | "desc";
 
-/**
- * A narrow table's header: which column orders the rows and which way, as one
- * joined control in the family of the pager and the date range -- a native
- * menu (so a phone opens its own picker) and the direction beside it. Shared by
- * the detections and species control tables. It sits inside the column
- * header's row rather than the toolbar, so it stands 28px, a step under the
- * search box, at every pointer. Under a finger its type stays 16px, as every
- * field's does, so a phone doesn't zoom in when it opens.
- */
 export function SortMenu<Sort extends string>({
 	label,
 	sorts,
@@ -27,32 +18,22 @@ export function SortMenu<Sort extends string>({
 	onSort,
 	onFlip,
 }: {
-	/** The menu's accessible name, e.g. "Sort detections by". */
 	label: string;
 	sorts: readonly Sort[];
 	labels: Record<Sort, string>;
 	sort: Sort;
 	direction: SortDirection;
-	/** Turned away from the column's natural order (names A to Z, the newest
-	    or biggest first). */
 	reversed: boolean;
 	onSort: (sort: Sort) => void;
 	onFlip: () => void;
 }) {
-	// The All Birds sort's toggle, so every direction button reads the same:
-	// the wide-to-narrow glyph in a column's natural order, flipped and in the
-	// selected green once reversed.
 	const DirectionIcon = reversed ? ArrowUpNarrowWide : ArrowDownWideNarrow;
 	return (
-		// Held to the right edge, over the columns it orders, rather than hard
-		// against the checkbox.
 		<div className="ml-auto flex h-7 w-fit overflow-hidden rounded-md border border-input bg-card font-normal pointer-coarse:text-base text-sm">
 			<div className="relative flex">
 				<select
 					aria-label={label}
 					value={sort}
-					// Picking a column sorts by it as clicking its heading does; the
-					// arrow beside it is for turning that around.
 					onChange={(event) =>
 						sort !== event.target.value && onSort(event.target.value as Sort)
 					}
@@ -83,7 +64,6 @@ export function SortMenu<Sort extends string>({
 	);
 }
 
-/** A sortable column heading: its name and an arrow, faint until it is active. */
 export function SortButton<Sort extends string>({
 	label,
 	sort,

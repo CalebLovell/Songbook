@@ -16,7 +16,6 @@ import {
 } from "./settings-cards.tsx";
 import { SettingsReset } from "./settings-reset.tsx";
 
-/** A reset that stored its values without getting BirdNET onto them. */
 type ResetOutcome = { message: string; needsRestart: boolean };
 
 export function SettingsPage({
@@ -31,26 +30,15 @@ export function SettingsPage({
 }: {
 	data: SettingsPageData;
 	savers?: SettingsSavers;
-	/** Omit to leave the disk figure out of the Storage card. */
 	health?: StationHealth;
-	/** Resolves with what to report. Omit to hide the reset control. */
 	onReset?: () => Promise<ResetOutcome>;
-	/** Bounces a card's services. Omit to hide every restart control. */
 	onRestart?: SettingsRestarter;
-	/** What the updater last reported; null while it loads. */
 	updates?: UpdateState | null;
 	onCheckUpdates?: () => Promise<UpdateState>;
 	onInstallUpdate?: () => Promise<void>;
 }) {
-	// A reset that stored the defaults but could not get BirdNET onto them
-	// leaves the Restart button beside Reset until it has done so.
 	const [needsRestart, setNeedsRestart] = useState(false);
 
-	// Each card seeds its own state from `data` once, so a reset that only
-	// refetched would leave six forms showing the values it just discarded.
-	// Keying on the loaded values themselves remounts them when -- and only
-	// when -- new ones actually arrive; a counter bumped alongside the refetch
-	// races it, and remounts against data that has not landed yet.
 	const loadedValues = JSON.stringify([
 		data.station,
 		data.detection,
@@ -78,8 +66,6 @@ export function SettingsPage({
 										const toastId = "settings-reset";
 										toast.loading("Restarting BirdNET…", { id: toastId });
 										try {
-											// No card: a reset touched every one of them, so the
-											// whole set comes back together.
 											const result = await onRestart(undefined);
 											setNeedsRestart(false);
 											toast.success(result.message, { id: toastId });
@@ -126,11 +112,6 @@ export function SettingsPage({
 	);
 }
 
-/**
- * The page before the configuration arrives: the masthead as itself, the
- * reset control drawn but inert, and the six cards as
- * their own skeleton (see SettingsCardsSkeleton).
- */
 export function SettingsPageSkeleton() {
 	return (
 		<div className="page-wrap space-y-(--page-gap) py-4">

@@ -1,22 +1,15 @@
 import Fuse from "fuse.js";
 
-/** One species the station has heard, as the sidebar search knows it. */
 export type SearchSpecies = { comName: string; sciName: string; count: number };
 
-/** A nav destination search can jump to. `to` is the route path. */
 export type SearchPage = { label: string; to: string };
 
-/**
- * A Settings card: found by its title, the labels of its fields, or a few
- * extra words that no label says.
- */
 export type SearchSetting = {
 	title: string;
 	fields: string[];
 	keywords?: string[];
 };
 
-/** A matched card, and the field that matched when it was not the title. */
 export type SettingMatch<S extends SearchSetting = SearchSetting> = {
 	setting: S;
 	field?: string;
@@ -34,10 +27,6 @@ export type SiteSearchResults<
 const MAX_SPECIES = 6;
 const MAX_SETTINGS = 4;
 
-/**
- * Every word of the query starts some word of `text`, so "min conf" finds
- * "Minimum confidence" and "full" finds "Disk-full action".
- */
 function matchesWords(text: string, needles: string[]): boolean {
 	const words = text.toLowerCase().split(/[\s-]+/);
 	return needles.every((needle) =>
@@ -45,15 +34,6 @@ function matchesWords(text: string, needles: string[]): boolean {
 	);
 }
 
-/**
- * What the sidebar's search shows for a query. Pure, so the matching can be
- * tested without a station behind it.
- *
- * Species use the same Fuse settings as the Birds page and the detections
- * filter, so a name found here is one those pages will find too. Pages and
- * settings are short fixed lists, so a plain word-prefix match is enough and
- * never surprises: "set" finds Settings, "s" finds Birds and Settings.
- */
 export function searchSite<P extends SearchPage, S extends SearchSetting>(
 	query: string,
 	species: readonly SearchSpecies[],

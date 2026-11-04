@@ -123,3 +123,132 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   No animation between the two: shells show from the first frame and content
   replaces them in place.
 - **Chart tooltip**: one line, "6 AM — 1,284 detections", only the bucket bold.
+  Pointer-only.
+- **Charts**: hidden from assistive tech and not tab stops; `ChartDataTable`
+  gives screen readers every value. Axes are zero-filled (always 24 hours, 12
+  months). A `ResponsiveContainer` needs a `minHeight` floor or it can measure
+  zero and draw nothing; count axes use `width="auto"` so five digits aren't
+  clipped. One series, no legend. A ranked list's bars scale to its own leader.
+- **Heat maps**: the timeline's has one line per species and 24 fixed 1.75rem
+  columns that never shrink, stack or scroll. Names truncate to make room, and a
+  card under 56rem drops the hours. A zero is an empty cell with no digit. The
+  bird page's year grid scrolls inside its card on a phone, opens on today for
+  the current year, and never draws a day still to come. Hour bars on a species
+  tile are the one exception to the shared heat scale: they compare a bird only
+  with itself, as a linear share of its own peak.
+- **Tables** (Detections, Species Control): one grid with the header, body and
+  rows as subgrids, so only the rows scroll and the columns still align. Header,
+  rows and footer stand the same height. Width follows the card: under 36rem one
+  sort menu replaces the headings, 36rem and 54rem each bring columns back. Only
+  the selection column (2.5rem) and the last column are pinned; the rest share
+  the width. Row numbers count on across pages (`IndexDot`). Selection actions
+  appear in the footer once something is ticked, never as dead buttons, and
+  signed-out visitors get neither checkboxes nor a Recording column.
+- **Segmented controls** never wrap. Where the segments no longer fit they become
+  a native select in the same control dress, so a phone opens its own picker.
+- **Date controls** show the house format with the native input laid invisibly
+  over it, and a click calls `showPicker`. Where a browser has no real picker for
+  the type, the overlay comes off and the arrows do the work.
+- **Touch type**: fields use 16px under `pointer-coarse`, so iOS doesn't zoom on
+  focus. This keys off the pointer, not the viewport width.
+- **Flags** (New, Rare, Vocal, Returned, Regular) stack, render as glyph pills
+  with their name in the tooltip, and share a tint with the Highlights line of
+  the same name. Their tints never reuse the confidence scale.
+- **Recordings**: `RecordingButton` where only a button fits, `SpectrogramPlayer`
+  where there's room. One clip sounds at a time across the app. Accessible names
+  name the bird, except in the quiz, where that would give the answer away. Give
+  the player a `key` per clip; it moves the playhead by `transform` written to the
+  DOM, never through React state. Spectrograms draw in the browser, capped at
+  15kHz, on the same paper-to-moss ramp as the live feed.
+- **Confirmations** all use `ConfirmDialog`: full-size buttons, an icon on each,
+  Escape cancels. Both are `type="button"` because the dialog often sits inside
+  the form it guards.
+- **Explanations**: `InfoTip` opens a modal from the info icon. `Hint` is the hover
+  tooltip, and a tap opens it too.
+- **Outcomes** arrive as toasts, never as a status line or coloured stripe on a
+  card. A destructive action that succeeded wears clay, not moss.
+
+## Layout
+
+- The shell is pinned to the viewport and only `main` (`#app-scroll`) scrolls, with
+  its scrollbar gutter always reserved. Scroll reset targets `main` and
+  `[data-scroll-reset]`; a control that reshapes a view in place passes
+  `resetScroll: false`.
+- The sidebar takes its column from `xl` (1280px), the narrowest window that still
+  fits the timeline's full heat map beside it. Below that the menu bar stands in.
+- Anything in a variable-width track responds to its card through container
+  queries, not the viewport.
+- Grids holding long names use `minmax(0,1fr)` or `grid-cols-1`, never the implicit
+  auto track, so a name truncates instead of widening the page.
+- Cards are titled with `CardHeader`, a 45px band. Bands, hairlines and rows bleed
+  through the card's padding and pad back in with `--page-gap`, never a fixed 16px.
+- Mastheads stand `--masthead-h`, level with the sidebar's wordmark band. Their
+  words come from `lib/page-headers.ts`.
+- The Live hero and the bird page's profile share one geometry (a 120px portrait
+  centred in a 9.5rem column), so a bird keeps its size and place between them.
+- Empty wording comes from `lib/empty-messages.ts`: name what's missing and stop.
+  A card keeps its title whether full or empty.
+
+## Behaviour
+
+- **Navigation never waits on the server.** `beforeLoad` uses the browser's last
+  unlock answer and refreshes it behind the click (`lib/unlock-status.ts`).
+- **The URL holds the view**: search, sort, page, period, date. Typed filters
+  debounce into it. The search parser is JSON, so any schema that can receive a
+  numeric-looking string coerces it (`z.coerce.string()`). A page past the last
+  shows the last. Search-bearing nav links set `includeSearch: false`.
+- **Time**: detection timestamps are the station's wall clock with no zone and are
+  printed as written. "Today" is the station's today (`lib/station-time.ts`), not
+  the viewer's. Dates are pinned to en-US and window arithmetic runs in UTC on day
+  strings. Ages are measured on the server from one clock reading per snapshot;
+  `useAgeOffset` stays 0 through hydration and only moves them forward.
+- **Hydration**: the first client render matches the server's. Browser-only values
+  (the viewer's zone, sessionStorage, picker support) are read after mount, and
+  focus is set from an effect.
+- **Polling**: one request at a time, none in a hidden tab, and an answer older
+  than the latest is dropped. Full-table reads such as Highlights run from the route
+  loader, never on a poll. SQLite is synchronous, so a slow query holds the whole
+  server; time filters keep a bare `Date` bound the index can seek on.
+- **Timeline**: every real day draws the normal page, whether quiet, ahead or before
+  the station. The arrows walk one window at a time with no limit, and a period
+  switch re-anchors on the latest day in the window with detections. Only a Daily
+  address that isn't a date replaces the page. An empty station keeps its controls.
+- **Live** is bounded to a rolling 24 hours. Log rows are visits (`lib/visits.ts`),
+  and a bird sits in the hero or the log, not both.
+- **Highlights**: the rules are pure and shared by Live and Timeline
+  (`lib/highlights-data.ts`), with thresholds and their guide together in
+  `lib/highlight-thresholds.ts`. A day with no recordings means the station was
+  down: it is skipped, not held against a bird.
+- **Rare** has one meaning, the owner's `rareMax`, for the Rare flag and the quiz
+  pools alike. Pools split by familiarity, never by time. Nothing on a question may
+  point at its answer, and a loader rerun never swaps the round being played.
+- **Settings**: a save writes the config, then restarts the card's services. A
+  refused and a declined restart read the same, and the card keeps offering Restart
+  until the values are live. Reset leaves the Station card alone.
+
+## Data and security
+
+- **`detections` can't grow a column**: BirdNET-Pi's writers INSERT positionally, so
+  a new column stops the station recording. Review state lives in `reviews`, keyed
+  on date, time, species and file (rowids get recycled), created on first write and
+  never on a read path. Review never writes to `detections.Confidence`, and a
+  sign-off is removed with its detection.
+- **The gate is on the server.** Route checks only decide what renders; every gated
+  server function chains `requireUnlocked`. Any failure to read auth means locked,
+  never open.
+- **Clips can carry voices.** Signed out, only each species' best recording plays,
+  enforced in `/api/audio`. Audio responses are `private, no-cache`, and fetched
+  clips are forgotten on sign-out.
+- **Public reads never carry `Lat` or `Lon`**: the coordinates are the owner's home.
+- **Passwords**: there is no default. The file is written temp-then-rename at 0600,
+  the CLI reads stdin and never argv, and an unreadable file is an error, not "unset".
+- **Client addresses** come from proxy headers only under `WEB_UI_TRUSTED_PROXY`, and
+  then only `CF-Connecting-IP` or the last `X-Forwarded-For` hop. Only off-LAN
+  failures feed the global throttle, so a remote attacker can't lock the owner out.
+- **`birdnet.conf`**: write through a temp file beside the real file, which keeps the
+  symlink a symlink. Leave every other line untouched and append a missing key.
+- **`systemctl`**: service names are validated against the known cards and its output
+  never reaches the browser. Updates start with `--no-block`, since an install
+  restarts this server.
+- **Client bundles**: modules imported by client code stay free of server imports,
+  with pure metadata split out (`timeline-periods.ts`, `learn-pools.ts`).

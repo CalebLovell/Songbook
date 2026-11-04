@@ -3,7 +3,6 @@ import { test } from "node:test";
 
 import { stationToday } from "~/lib/station-time.ts";
 
-// 04:50 UTC on Oct 30th: still the 29th in Chicago, already the 30th in Paris.
 const lateEvening = new Date("2026-10-30T04:50:00Z");
 
 test("today is the station's calendar day, whatever the viewer's zone", () => {

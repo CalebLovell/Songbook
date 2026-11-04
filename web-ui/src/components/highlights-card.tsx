@@ -31,20 +31,6 @@ import type {
 } from "~/lib/highlights-data.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 
-/**
- * A window's highlights, as field notes: one plain sentence per highlight, led
- * by a glyph, with its figures in bold and any birds it's about named in the
- * sentence. The same card on the Live page (the last 24 hours) and the
- * timeline (the selected window) -- the lines arrive already judged by the
- * shared rules in lib/highlights-data.ts, so this only decides how they read.
- * The New, Rare, Consistent, Returned and Vocal notes take the same glyphs as
- * those flags' pills on the species rows.
- *
- * Every bird note is only written when it has something to say, so a quiet
- * window gets a visibly shorter card. The info tip in the corner says what
- * every line means for the period on screen; each line's glyph explains just
- * its own on hover.
- */
 export function HighlightsCard({
 	highlights,
 	emptyMessage,
@@ -52,18 +38,9 @@ export function HighlightsCard({
 	thresholds,
 	className = "",
 }: {
-	/** Empty for a window with no detections, which gets the empty note; null
-	    while they are still being judged, which holds their place with soft
-	    bars until they arrive. */
 	highlights: Highlight[] | null;
-	/** What a quiet window's card says -- the same line the page's other cards
-	    show, so they all report an empty window alike. */
 	emptyMessage: string;
-	/** The window the lines were judged for, so the info tip can explain them
-	    in its terms. Without it the card has no info tip. */
 	period?: HighlightPeriod;
-	/** The station's own rules, so the info tip describes what was actually
-	    applied. The defaults stand in while they load. */
 	thresholds?: HighlightThresholds;
 	className?: string;
 }) {
@@ -96,11 +73,6 @@ export function HighlightsCard({
 	);
 }
 
-/**
- * Where the lines will land, built from the lines' own markup: the glyph's
- * circle and a bar on the line of text, in the notes' type. Four one-line
- * notes.
- */
 const PENDING_NOTES = [["w-4/5"], ["w-1/3"], ["w-3/4"], ["w-3/5"]];
 
 function PendingNotes() {
@@ -130,9 +102,6 @@ function PendingNotes() {
 	);
 }
 
-/** What each line on the card means for this period -- the basics, from the
-    same thresholds the rules use -- each led by the glyph it wears on the
-    card, so the two read as one key. */
 function HighlightsInfo({ guide }: { guide: HighlightGuideEntry[] }) {
 	return (
 		<InfoTip label="Highlights" size="default">
@@ -155,11 +124,6 @@ function HighlightsInfo({ guide }: { guide: HighlightGuideEntry[] }) {
 
 type SpeciesLine = Extract<Highlight, { kind: SpeciesHighlightKind }>;
 
-// Every line's glyph wears a tint: the species-row badge's own for the lines
-// that share a badge's name, and for the rest -- which have no badge -- a hue
-// of their own that no badge uses: olive for up, a light red for down,
-// sunrise orange for the busiest hour, slate for gone quiet. An unchanged count
-// keeps the neutral icon well.
 const UP_TINT: CSSProperties = {
 	backgroundColor: "color-mix(in oklab, #6b8a3a 22%, var(--paper-raised))",
 	color: "#3d5220",
@@ -183,8 +147,6 @@ const LINE_TINTS: Record<
 	},
 };
 
-// Each line leads with its badge's own name, so the card and the species
-// rows say the same thing: "2 rare", "1 gone quiet", "4 vocal".
 const SPECIES_NOTES: Record<
 	SpeciesHighlightKind,
 	{ icon: LucideIcon; lead: (line: SpeciesLine) => string }
@@ -200,8 +162,6 @@ const SPECIES_NOTES: Record<
 	vocal: { icon: AudioLines, lead: () => "vocal" },
 };
 
-/** A kind's glyph and tint for the guide. The activity line's change with its
-    direction; the guide shows it going up, in the line's tint. */
 function guideGlyph(kind: Highlight["kind"]): {
 	icon: LucideIcon;
 	badge: CSSProperties;
@@ -217,7 +177,6 @@ function HighlightNote({
 	tip,
 }: {
 	highlight: Highlight;
-	/** The guide's entry for this line, shown on its glyph. */
 	tip?: HighlightGuideEntry;
 }) {
 	switch (highlight.kind) {
@@ -241,10 +200,6 @@ function HighlightNote({
 	}
 }
 
-/**
- * "Up 42% from last week: 240 more detections." Always written when the
- * period before recorded anything, whatever the size of the change.
- */
 function ActivityNote({
 	highlight,
 	tip,
@@ -290,14 +245,9 @@ function ActivityNote({
 	);
 }
 
-/** One highlight: its glyph, then the sentence, hairlines between notes. */
-/** A note's row, shared with the pending shell so the two are one shape. The
-    rows sit in NOTES_CLASS's full-bleed list, so each pads itself back in and
-    its hairline runs to the card's edges. */
 const NOTE_CLASS =
 	"flex items-center gap-2.5 border-[var(--line)] border-t px-(--page-gap) py-2.5 text-[13px] leading-normal first:border-t-0 first:pt-1.5 last:pb-0 max-[400px]:gap-2";
 
-/** The notes' list, pulled out through the card's padding like CardHeader. */
 const NOTES_CLASS = "-mx-(--page-gap) mt-2";
 
 function Note({
@@ -307,11 +257,7 @@ function Note({
 	children,
 }: {
 	icon: LucideIcon;
-	/** The line's tint (see LINE_TINTS); without one the glyph sits in the
-	    neutral icon well. */
 	badge?: CSSProperties;
-	/** What this line means, shown on hovering or focusing its glyph. Without
-	    one the glyph is plain decoration. */
 	tip?: HighlightGuideEntry;
 	children: ReactNode;
 }) {
@@ -338,12 +284,6 @@ function Note({
 	);
 }
 
-/**
- * The birds a note is about, by name alone, as a sentence would list them:
- * "Wood Thrush, Veery and Cedar Waxwing", or past the named few, "... and 3
- * more". The figures behind each (its run, its time away) stay in the share
- * text; the card keeps to names.
- */
 function BirdNames({
 	birds,
 	total,
@@ -369,8 +309,6 @@ function BirdNames({
 	);
 }
 
-/** A figure inside a note's sentence, set as a count so it reads like the
- * page's other numbers. */
 function Figure({ children }: { children: ReactNode }) {
 	return <span className="count-figure">{children}</span>;
 }

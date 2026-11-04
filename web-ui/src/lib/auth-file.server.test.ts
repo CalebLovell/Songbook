@@ -65,8 +65,6 @@ test("a file left by the old shipped default reads as no password set", async ()
 });
 
 test("an unreadable file is a config error, not an unset password", async () => {
-	// A directory where the file should be: readFile fails with EISDIR, the
-	// same branch a permissions error takes.
 	const file = await fixtureDir();
 	await assert.rejects(() => readAuthFile(file), AuthConfigError);
 });

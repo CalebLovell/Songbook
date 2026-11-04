@@ -29,14 +29,6 @@ const HIGHLIGHTS_EMPTY = EMPTY.window.last24Hours;
 export const Route = createFileRoute("/live")({
 	head: () => ({ meta: [{ title: pageTitle("Live") }] }),
 	component: Live,
-	// The highlights ride the loader alone. They are judged against a fortnight
-	// of history and cannot change inside a ten-second poll, so pulling them
-	// here keeps their full-table scans off the polling path.
-	//
-	// Both are deferred -- returned as promises, not awaited -- so the page
-	// renders the moment it is opened and each card fills in as its data lands:
-	// the 24-hour snapshot quickly, the Highlights (which read the station's
-	// whole history) after it.
 	loader: ({ context }) => ({
 		snapshot: getNowSnapshot(),
 		status: getStationStatus(),
@@ -45,11 +37,6 @@ export const Route = createFileRoute("/live")({
 	}),
 });
 
-/**
- * Keys that arrived since the previous poll, held just long enough for the
- * flash-in highlight to play. Keys travel as a joined signature so the effect
- * compares by value -- a fresh array of identical keys arrives on every poll.
- */
 function useFreshKeys(keys: string[]): Set<string> {
 	const signature = keys.join("|");
 	const seenRef = useRef(new Set(keys));
@@ -84,8 +71,6 @@ function Live() {
 		initialSnapshot,
 		POLL_INTERVAL_MS,
 	);
-	// Its own call and its own pace: whether the station is running changes
-	// rarely, and asking systemd is the one costly part of it.
 	const { data: status } = usePolledData(
 		() => getStationStatus(),
 		initialStatus,
@@ -104,10 +89,6 @@ function Live() {
 	);
 }
 
-/**
- * The page before its first snapshot: the hero and the log as shells in their
- * real places, and the Listen card -- which needs no data -- as itself.
- */
 function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
 	return (
 		<div className="page-wrap py-4">
@@ -140,14 +121,10 @@ function LiveBody({
 	snapshot: NowSnapshot;
 	highlights: Promise<LiveHighlights>;
 	unlocked: boolean;
-	/** The station's status pill, or its shell until that arrives. */
 	pill: ReactNode;
 }) {
 	const freshKeys = useFreshKeys(snapshot.recent.map((row) => row.key));
 
-	// The hero is left out of the log, so each tracks its own arrivals: a new
-	// bird flashes in the hero, and the one it replaced flashes again as it
-	// lands at the top of the log.
 	const heroKey = snapshot.current?.key;
 	const freshHeroKeys = useFreshKeys(heroKey ? [heroKey] : []);
 	const heroIsNew = heroKey !== undefined && freshHeroKeys.has(heroKey);
@@ -162,10 +139,6 @@ function LiveBody({
 				pill={pill}
 			/>
 
-			{/* `grid-cols-1` rather than a bare `grid`: the implicit track it would
-			    fall back to is sized to max-content, so a long species name in the
-			    log pushes the whole page wider than the phone it is on. On a phone
-			    the log leads, with Listen and Highlights stacked below it. */}
 			<div className="mt-(--page-gap) grid grid-cols-1 items-start gap-(--page-gap) lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
 				<RecentLogCard
 					recent={snapshot.recent}
@@ -176,8 +149,6 @@ function LiveBody({
 				<div className="grid grid-cols-1 gap-(--page-gap)">
 					<LiveAudioCard unlocked={unlocked} />
 
-					{/* Drawn even for a station that has never recorded anything, with
-					    the same empty line as the log beside it. */}
 					<Deferred
 						promise={highlights}
 						shell={

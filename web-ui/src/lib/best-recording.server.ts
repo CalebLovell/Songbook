@@ -4,11 +4,6 @@ import type { DatabaseSync } from "node:sqlite";
 import { commonNameSafe } from "~/lib/audio.ts";
 import { resolveDetectionClipPath } from "~/lib/detection-file-path.server.ts";
 
-// A species' best recording is the one rule every page plays it by -- the bird
-// page's feature, the life list's play button, every Learn question: its
-// highest-confidence clip, ties broken toward the most recent. BirdNET-Pi's
-// cleanup job can take that file off disk, so a few runners-up come along in
-// the same order to stand in for it, and the first one still on disk wins.
 const CANDIDATE_CLIPS_PER_SPECIES = 10;
 
 export type BestRecording = {
@@ -20,11 +15,6 @@ export type BestRecording = {
 	fileName: string;
 };
 
-/**
- * One window-function query takes every species' candidates in a single pass,
- * best first within each species. `comName` narrows it to one species, for the
- * bird page.
- */
 function candidateClips(
 	database: DatabaseSync,
 	comName?: string,
@@ -53,12 +43,6 @@ function candidateClips(
 	return rows as BestRecording[];
 }
 
-/**
- * Each species' best recording still on disk, keyed by common name. Rows
- * arrive best first within a species, so the first survivor wins and the
- * runners-up behind it are never stat-ed -- usually one check per species. A
- * species whose candidates are all gone has no entry.
- */
 export function bestRecordings(
 	database: DatabaseSync,
 	extractedRoot: string,
@@ -77,12 +61,6 @@ export function bestRecordings(
 	return best;
 }
 
-/**
- * Whether the clip at By_Date/<date>/<speciesDir>/<fileName> is its species'
- * best recording right now -- the only clips a signed-out visitor may hear.
- * The folder is the common name made path-safe, so the detection is looked up
- * by date and file and its species' best compared against it.
- */
 export function isBestRecording(
 	database: DatabaseSync,
 	extractedRoot: string,

@@ -13,11 +13,6 @@ const COPY = {
 	},
 } as const;
 
-/**
- * Takes the sign-in form's place on the Account page while signing in can't
- * work at all, so the owner sees what to fix rather than a form that refuses
- * every password.
- */
 export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 	const { title, body } = COPY[state];
 	return (
@@ -25,8 +20,6 @@ export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 			aria-labelledby="station-not-ready"
 			className="feature-card flex flex-col gap-(--page-gap) rounded-md p-(--page-gap)"
 		>
-			{/* The Sign-in card's own title, as when the form or the session
-			    shows: the state goes in the body, not the name. */}
 			<CardHeader
 				as="h2"
 				titleId="station-not-ready"

@@ -6,17 +6,8 @@ import { detections } from "~/db/schema.ts";
 import { isLast24h } from "~/lib/now.ts";
 import type { ShareCard } from "~/lib/share-card.ts";
 
-/**
- * The Today page's rolling 24 hours, shaped for the share card.
- *
- * Kept apart from getNowSnapshot deliberately: that snapshot re-fetches every
- * ten seconds, and the queries below have no business riding along on every
- * poll. This runs once, when the panel is first opened.
- *
- * The body sits inside .handler() rather than in a named function passed to it:
- * an exported function is a live reference the client build cannot erase, and
- * it would drag this module's database import into the browser bundle.
- */
+// Inline in .handler(): a named function stays a live reference the client build
+// can't erase, which pulls this module's database import into the browser.
 export const getShareCard = createServerFn({ method: "GET" }).handler(
 	async (): Promise<ShareCard> => {
 		const generatedAt = new Date();

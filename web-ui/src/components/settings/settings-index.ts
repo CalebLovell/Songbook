@@ -15,18 +15,10 @@ import type { SearchSetting } from "~/lib/site-search.ts";
 
 export type SettingsIndexEntry = SearchSetting & { icon: LucideIcon };
 
-/** The anchor a card is reachable at: "Audio input" is `/settings#audio-input`. */
 export function settingsCardId(title: string): string {
 	return title.toLowerCase().replaceAll(" ", "-");
 }
 
-/**
- * The Settings cards as the sidebar search knows them: each card's title and
- * icon, the labels of the fields inside it, and a few words people reach for
- * that no label says ("microphone", "disk"). Kept apart from the cards so the
- * sidebar can import it without pulling in the forms; the settings page test
- * checks every title here still names a card.
- */
 export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 	{
 		title: "Station",

@@ -21,9 +21,6 @@ export type DetectionWorkspaceSearch = {
 	to?: string;
 };
 
-// Where each column starts when first picked: names A to Z, the newest and
-// the most confident first. Picking the column already sorted by turns it
-// around instead.
 export const DETECTION_DEFAULT_DIRECTION: Record<
 	DetectionWorkspaceSort,
 	SortDirection
@@ -69,8 +66,6 @@ export function normalizeDetectionWorkspaceSearch(
 		? (input.sort as DetectionWorkspaceSort)
 		: "recorded";
 	const direction = input.direction === "asc" ? "asc" : "desc";
-	// A numeric query ("93") round-trips through the URL as a number, so coerce
-	// before trimming or it would be dropped as a non-string.
 	const rawSpecies =
 		typeof input.species === "number"
 			? String(input.species)

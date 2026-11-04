@@ -40,37 +40,22 @@ import type { ReviewCandidate, ReviewPage } from "~/lib/review.server.ts";
 import { REVIEW_PAGE_SIZE, type SpeciesOption } from "~/lib/review-data.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 
-/** A queue row's height: the 40px thumbnail and 7px above and below it. */
 const ROW_HEIGHT_PX = 54;
 
-// Shared by the workflow and its skeleton, so the two are one shape. The
-// single narrow track is minmax(0,1fr), not the implicit auto, so a long name
-// truncates instead of stretching the card past the screen.
 const REVIEW_GRID_CLASS =
 	"grid grid-cols-[minmax(0,1fr)] @3xl/review:grid-cols-[minmax(0,1fr)_24rem] @7xl/review:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-(--page-gap)";
-// The evidence spectrogram: taller than the quiz's, since here its detail is
-// the point.
 const REVIEW_PLOT_CLASS = "h-56 max-sm:h-40";
 const UNDER_REVIEW_CLASS =
 	"feature-card flex flex-col gap-(--page-gap) rounded-md p-4";
-// The name sits up by the portrait's top edge rather than floating in its
-// middle, with a little air before the binomial, so the pair fills the
-// portrait's height instead of huddling at its centre.
 const IDENTITY_ROW_CLASS = "flex items-start gap-(--page-gap)";
-// Name, binomial and the eBird link stacked tight, so the three stand no
-// taller than the portrait beside them.
 const IDENTITY_TEXT_CLASS = "flex min-w-0 flex-1 flex-col items-start";
 const NAME_CLASS =
 	"display-title font-bold text-2xl leading-[1.15] sm:text-3xl";
 const EBIRD_LINK_CLASS = "mt-1";
 const PORTRAIT_CLASS =
 	"flex size-20 shrink-0 items-center justify-center overflow-hidden max-[400px]:size-14";
-// The verdict buttons' band, bled to the card's edges like the queue's pager.
 const ACTIONS_FOOTER_CLASS =
 	"-mx-(--page-gap) -mb-(--page-gap) flex flex-wrap items-center gap-(--page-gap) border-t px-(--page-gap) py-3";
-// Delete as a tonal button -- a pale clay fill with clay text -- rather than a
-// solid block: the confirm dialog's own Delete stays solid, so the card's
-// button only opens the question.
 const DELETE_BUTTON_CLASS =
 	"bg-[color-mix(in_oklab,var(--clay)_14%,var(--paper-raised))] text-destructive hover:bg-[color-mix(in_oklab,var(--clay)_22%,var(--paper-raised))] hover:text-destructive";
 const QUEUE_CARD_CLASS = "@container feature-card flex flex-col rounded-md p-4";
@@ -84,14 +69,6 @@ const QUEUE_FOOTER_CLASS =
 
 const NAME_WIDTHS = ["w-36", "w-28", "w-40", "w-32"];
 
-/**
- * The workflow before its queue arrives, built from its own pieces: the
- * recording under review -- its header band with a shell the size of the
- * eBird link, the portrait's square, bars for its name and binomial, the
- * clip's slot with the play button and the heard line's shells, and its three
- * action buttons as themselves, disabled -- beside a full page of queue rows
- * and the pager.
- */
 export function ReviewWorkflowSkeleton() {
 	return (
 		<div className="@container/review">
@@ -157,8 +134,6 @@ export function ReviewWorkflowSkeleton() {
 				>
 					<div className={QUEUE_HEADER_CLASS}>
 						<div className="island-kicker">In the queue</div>
-						{/* One digit wide, as the site's other loading figures: the real
-						    count grows out of it rather than a wide bar shrinking. */}
 						<ShellText
 							className="count-figure w-[1ch]"
 							barClassName="right-0 left-auto w-full"
@@ -218,10 +193,6 @@ export function ReviewWorkflowSkeleton() {
 	);
 }
 
-/**
- * The workflow with nothing to show: the same two cards as the loaded page and
- * its skeleton, each saying what's missing instead of a recording or a list.
- */
 function ReviewWorkflowEmpty({
 	message,
 	total,
@@ -229,14 +200,11 @@ function ReviewWorkflowEmpty({
 }: {
 	message: string;
 	total: number;
-	/** Offered when this page is worked through but the queue runs on. */
 	nextPage?: () => void;
 }) {
 	return (
 		<div className="@container/review">
 			<div className={REVIEW_GRID_CLASS}>
-				{/* Both as the site's standard empty card -- header band, hairline,
-				    one line -- so the pair sits level at the same height. */}
 				<section
 					aria-label="Detection under review"
 					className="feature-card rounded-md p-4"
@@ -277,8 +245,6 @@ type Action =
 	| { kind: "delete"; row: ReviewCandidate }
 	| { kind: "recategorize"; row: ReviewCandidate; species: SpeciesOption };
 
-/** "Jul 27, 2026" and "6:04 AM", for the queue's stacked date-over-time
-    column; everywhere else the two travel together as formatDateTime. */
 function formatRecorded(date: string, time: string) {
 	return {
 		day: formatDate(date),
@@ -311,10 +277,8 @@ export function ReviewWorkflow({
 	const row = rows[Math.min(index, Math.max(0, rows.length - 1))];
 	const pageCount = Math.max(1, Math.ceil(page.total / page.pageSize));
 	const paged = pageCount > 1;
-	/** A recording's place in the whole queue, counted from one. */
 	const queueNumber = (item: ReviewCandidate) =>
 		(page.page - 1) * page.pageSize + page.candidates.indexOf(item) + 1;
-	/** The page's largest number, so every dot on it is the same width. */
 	const widest = (page.page - 1) * page.pageSize + page.candidates.length;
 	const matches = useMemo(() => {
 		const q = query.trim().toLowerCase();
@@ -335,9 +299,6 @@ export function ReviewWorkflow({
 		setIndex(0);
 	}
 	if (!row) {
-		// Three different gaps, each named for what's missing: nothing recorded
-		// at all, nothing that needs reviewing, or this page worked through
-		// with more waiting on the next.
 		const message = !page.hasAnyDetections
 			? EMPTY.station.detections
 			: page.page < pageCount
@@ -361,11 +322,6 @@ export function ReviewWorkflow({
 	);
 	return (
 		<>
-			{/* The recording under review takes the width; the rest of the queue sits
-			    beside it so the batch is visible and any bird can be picked next,
-			    instead of one card floating on an empty page. */}
-			{/* Same tracks as the Learn page's game and round rail, so the queue
-			    card sits at the round card's width at every page size. */}
 			<div className="@container/review">
 				<div className={REVIEW_GRID_CLASS}>
 					<section
@@ -382,10 +338,6 @@ export function ReviewWorkflow({
 								/>
 							</div>
 							<div className={IDENTITY_TEXT_CLASS}>
-								{/* One line each, cut short with an ellipsis, so a long name
-								    never grows the card; the full name is in the tooltip.
-								    The name opens the bird's page, as the species hero's
-								    does -- moss set on the heading, not the anchor. */}
 								<h2
 									title={row.comName}
 									className={`${NAME_CLASS} w-full truncate text-[var(--moss)]`}
@@ -404,8 +356,6 @@ export function ReviewWorkflow({
 								>
 									{row.sciName}
 								</p>
-								{/* The species' eBird (or, for non-birds, iNaturalist) page,
-								    under its names. */}
 								{row.speciesLink && (
 									<Button
 										asChild
@@ -427,9 +377,6 @@ export function ReviewWorkflow({
 							</div>
 						</div>
 
-						{/* The evidence itself: hear the call and see its shape. What the
-						    verdict rests on -- when it was heard and its score -- sits
-						    across from the play button, as on every spectrogram card. */}
 						{row.audioAvailable ? (
 							<SpectrogramPlayer
 								key={row.rowId}
@@ -449,8 +396,6 @@ export function ReviewWorkflow({
 							</div>
 						)}
 
-						{/* The verdict in a footer band: Delete held apart on the left,
-						    and the two keeps on the right, ending on Correct. */}
 						<div className={ACTIONS_FOOTER_CLASS}>
 							<Button
 								variant="ghost"
@@ -484,16 +429,11 @@ export function ReviewWorkflow({
 						</div>
 					</section>
 
-					{/* Set like Today's Recent activity log: a header band, hairline-
-					    divided rows bled to the card's edges, and a footer band for
-					    the pager. */}
 					<section aria-label="Review queue" className={QUEUE_CARD_CLASS}>
 						<div className={QUEUE_HEADER_CLASS}>
 							<div className="island-kicker">In the queue</div>
 							<span className="count-figure">{page.total}</span>
 						</div>
-						{/* Paged, the list holds a full page's height, so a short last
-						    page never pulls the pager up from under the cursor. */}
 						<ol
 							style={
 								paged ? { minHeight: page.pageSize * ROW_HEIGHT_PX } : undefined
@@ -505,9 +445,6 @@ export function ReviewWorkflow({
 								const when = formatRecorded(item.date, item.time);
 								return (
 									<li key={item.rowId}>
-										{/* Under 26rem the date and time take the binomial's
-										    line rather than a column of their own, so the row
-										    keeps two lines either way. */}
 										<button
 											type="button"
 											aria-current={current ? "true" : undefined}
@@ -547,8 +484,6 @@ export function ReviewWorkflow({
 								);
 							})}
 						</ol>
-						{/* Shown even on a single page, so the card keeps one shape as
-						    the queue grows and shrinks. */}
 						<div className={QUEUE_FOOTER_CLASS}>
 							<PageStepper
 								className="ml-auto"
@@ -586,17 +521,10 @@ export function ReviewWorkflow({
 								autoFocus
 							/>
 						</div>
-						{/* p-1 gives the full-width rows' focus rings room inside the
-						    scrollport instead of letting it shave them; -m-1 takes it back
-						    so the rows still line up with the search box and the list
-						    still sits the dialog's gap from it and the buttons. */}
 						<div className="-m-1 min-h-0 flex-1 space-y-1 overflow-auto p-1">
 							{matches.map((item) => (
 								<button
 									type="button"
-									// scroll-my-1 matches the list's padding: without it, scrolling
-									// a focused row to the top or bottom edge parks it flush
-									// against the border box and shaves its ring again.
 									className="w-full scroll-my-1 rounded-md px-3 py-2 text-left text-sm hover:bg-accent"
 									key={item.sciName}
 									onClick={() => {

@@ -50,12 +50,6 @@ import { useSettled } from "~/lib/use-settled.ts";
 
 const DEFAULT_PERIOD: TimelinePeriod = "day";
 
-/**
- * Which body to draw for the window: the species x hour heat map, or the grid
- * of everything heard. Only one shows at a time; the other is a click away on
- * the view toggle. Lives in the URL alongside period and date so a link carries
- * the whole view, not just the window.
- */
 const TIMELINE_VIEWS = ["hours", "grid"] as const;
 type TimelineView = (typeof TIMELINE_VIEWS)[number];
 const DEFAULT_VIEW: TimelineView = "hours";
@@ -66,29 +60,9 @@ const timelineSearchSchema = z.object({
 		.default(DEFAULT_PERIOD)
 		.catch(DEFAULT_PERIOD),
 	view: z.enum(TIMELINE_VIEWS).default(DEFAULT_VIEW).catch(DEFAULT_VIEW),
-	/**
-	 * Which window of the period to show, in that period's own notation (see
-	 * TimelineAnchor). Absent means the one containing today, so a bare
-	 * /timeline link stays current instead of freezing on whatever day it was
-	 * written.
-	 */
-	// Coerced, not plain string: a bare year in a hand-written link
-	// (?date=2019) parses as a number, and rejecting it would silently snap the
-	// page back to today.
 	date: z.coerce.string().optional().catch(undefined),
 });
 
-/**
- * Falls back to today's window when the URL names none, and to today's window
- * again when it holds an anchor left over from a different period (switching
- * Monthly -> Daily mid-navigation) or plain garbage.
- *
- * The day period is the exception: it is the one scope that can tell you *why*
- * a date is unusable -- not a date at all, still ahead, or before the station
- * was listening -- so a value it cannot read travels on to be judged rather
- * than being silently swapped for today. Quietly showing a different day than
- * the address asked for is the worse failure.
- */
 function resolveAnchor(period: TimelinePeriod, date: string | undefined) {
 	if (!date) return currentAnchor(period);
 	if (isValidAnchor(period, date)) return date;
@@ -107,8 +81,6 @@ export const Route = createFileRoute("/timeline")({
 		period: search.period,
 		anchor: resolveAnchor(search.period, search.date),
 	}),
-	// Deferred: the page renders at once (see Deferred), and its cards fill in
-	// as the window's data arrives.
 	loader: ({ deps }) => ({ page: getTimelinePage({ data: deps }) }),
 	component: Timeline,
 });
@@ -132,9 +104,6 @@ function Timeline() {
 			resetScroll: false,
 		});
 
-	// An address that names no date at all is the one case with nothing to say
-	// -- no figures, no window, no grid -- so it replaces the page rather than
-	// sitting inside it. Days ahead or before the station are just quiet days.
 	if (settled?.current && settled.value.body.kind === "not-a-date") {
 		return <NotADate date={anchor} />;
 	}
@@ -156,11 +125,6 @@ function Timeline() {
 					onChange={show}
 				/>
 
-				{/* A new period or date keeps the old window's cards up for a
-				    moment: most windows answer well inside it and swap straight in,
-				    rather than flashing their shells for a frame. One that takes
-				    longer drops to the shells, so the old window never passes for
-				    the new one for long. */}
 				<Deferred
 					promise={page}
 					shellAfterMs={SHELL_DELAY_MS}
@@ -168,9 +132,6 @@ function Timeline() {
 				>
 					{(data) =>
 						data.body.kind === "not-a-date" ? null : (
-							// A station with nothing recorded yet draws the same cards as a
-							// quiet window, each saying so, so the page holds the shape its
-							// shells promised and every control stays usable.
 							<TimelineCards
 								rows={data.body.rows}
 								highlights={data.body.highlights}
@@ -189,11 +150,6 @@ function Timeline() {
 	);
 }
 
-/**
- * The cards as TimelineCards lays them out, each its own skeleton: the body
- * in the view the URL asks for, with the window's figures blurred in its
- * header, then the Highlights and the hour chart.
- */
 function TimelineCardsShell({
 	period,
 	view,
@@ -250,12 +206,6 @@ type JumpTarget = {
 	label: string;
 };
 
-/**
- * Where an empty window points: the nearest one that heard something, earlier
- * first -- usually that's today, or this week, before the station has woken
- * up. Null when the window has rows, or for All Time, which is never empty
- * while the station has recorded anything.
- */
 function jumpTarget(data: TimelinePageData): JumpTarget | null {
 	const { period } = data;
 	if (period === "all" || data.body.kind !== "rows") return null;
@@ -275,12 +225,6 @@ function jumpTarget(data: TimelinePageData): JumpTarget | null {
 	};
 }
 
-/**
- * The masthead for every period: the standard page header, with the selected
- * window as the title, the granularity named beneath it, and the share control
- * set against the title. The window's figures no longer live here -- they ride
- * the body card's kicker (see WindowSummary), against the species they count.
- */
 function TimelineHeader({
 	data,
 	staleData,
@@ -289,10 +233,7 @@ function TimelineHeader({
 	viewSwitch,
 	onChange,
 }: {
-	/** This window's page, once it has arrived. */
 	data: TimelinePageData | null;
-	/** The latest page to arrive, perhaps for the window before this one --
-	    enough to keep the toolbar drawn while this window loads. */
 	staleData: TimelinePageData | null;
 	period: TimelinePeriod;
 	anchor: string;
@@ -303,10 +244,6 @@ function TimelineHeader({
 	const highlights = data?.body.kind === "rows" ? data.body.highlights : [];
 	const toolbarData = data ?? staleData;
 
-	// Both cards carry the window's Highlights, which the page has already
-	// loaded for its own Highlights card, so the share says what the page says.
-	// Until this window's page is in, there is nothing true to share: the rows
-	// and window label below would still be empty.
 	const shareSubject = data ? `${period}:${anchor}` : null;
 	const loadShare = async () =>
 		period === "day"
@@ -335,23 +272,11 @@ function TimelineHeader({
 				icon={CalendarRange}
 				title={headerTitle(period, anchor)}
 				description={PAGE_HEADERS.timeline.description}
-				// Below `xl` the menu bar carries it instead, where it has room.
 				action={
 					canShare ? (
 						<ShareButton state={share} className="max-xl:hidden" />
 					) : undefined
 				}
-				// Between the title and the body card, so the window it picks reads as
-				// steering the figures and body beneath it. Gated on the station rather
-				// than the window: an empty week still needs the switcher to reach a
-				// window with something in it.
-				//
-				// Drawn at once: the period and the window come from the URL. While
-				// this window's page is on its way it draws from the last one to
-				// arrive (or from nothing, on the first), and what it can't know yet
-				// -- where the arrows lead, the station's first and last days -- waits
-				// for the data. A station that has recorded nothing keeps it too, so
-				// the page reads the same before and after its first bird.
 				afterHeader={
 					<PeriodToolbar
 						period={period}
@@ -368,28 +293,13 @@ function TimelineHeader({
 	);
 }
 
-/**
- * The page's title: the scope, then the window -- "Daily — Aug 26th, 2026".
- * "all" has no window to name, so it stops at the scope ("All Time"); every
- * other period appends the window label the picker moves through. The day title
- * drops the weekday the shared window label carries -- the "Daily" eyebrow
- * already says what kind of window this is.
- */
 function headerTitle(period: TimelinePeriod, anchor: string): string {
 	return headerLines(period, anchor).join(" — ");
 }
 
-/**
- * The header title's two halves -- the period, then the window it names -- so
- * the share card can stack them on their own lines and still match the page.
- */
 function headerLines(period: TimelinePeriod, anchor: string): string[] {
 	const scope = TIMELINE_PERIOD_LABELS[period];
 	if (period === "all") return [scope];
-	// Worked out here from the URL rather than waiting on the server's window,
-	// so the title is right the moment the period or date changes. A Daily
-	// anchor that isn't a date at all is shown as typed; the page beneath
-	// explains it once the server has judged it.
 	if (period === "day") {
 		return [
 			scope,
@@ -401,37 +311,19 @@ function headerLines(period: TimelinePeriod, anchor: string): string[] {
 	return [scope, safeWindow(period, anchor)?.label ?? anchor];
 }
 
-/** The window an anchor names, or null for one that names none. */
 function safeWindow(period: TimelinePeriod, anchor: string) {
 	return isValidAnchor(period, anchor) ? windowFor(period, anchor) : null;
 }
 
-/**
- * The window's headline figures -- how many detections, across how many species
- * -- set beside the body card's kicker. This replaces the old four-figure
- * masthead row: the two numbers worth keeping now ride the card that actually
- * shows those species and their counts, so they read against the data rather
- * than floating above it. Both bodies (heat map and grid) get the same node, so
- * the view toggle never drops it. Derived from the already period-scoped rows,
- * so it moves with the period toggle without a second round trip.
- */
 function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
-	// Null while the window loads: the words are there at once, and only the
-	// two figures wait, blurred.
 	const detections = rows?.reduce((sum, row) => sum + row.totalDetections, 0);
 
 	return (
-		// Under 480px the widest figures don't fit beside the kicker, so they take
-		// their own line beneath it (the cards' header wraps there), dropping the
-		// divider that only made sense beside the kicker.
 		<div className="flex min-w-0 items-center gap-2.5 max-[480px]:order-last max-[480px]:basis-full">
 			<span
 				className="h-4 w-px shrink-0 bg-[var(--line)] max-[480px]:hidden"
 				aria-hidden="true"
 			/>
-			{/* Lifted 1.5px so its ink centres on the kicker's. The boxes already
-			    centre, but Georgia's lowercase and old-style figures sit low in theirs
-			    next to the kicker's all-caps, so box-centred reads as dropped. */}
 			<div className="flex -translate-y-[1.5px] items-center gap-2 truncate text-[13px] text-muted-foreground">
 				<span className="whitespace-nowrap">
 					{detections === undefined ? (
@@ -458,12 +350,6 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 	);
 }
 
-/**
- * The window's body, one view at a time: either when each species was active
- * across the window's hours, or the grid of everything heard in it. The toggle
- * above swaps between them -- the same rows, drawn two ways, so only the one
- * you asked for takes up the page.
- */
 function TimelineCards({
 	rows,
 	highlights,
@@ -478,20 +364,14 @@ function TimelineCards({
 	highlights: TimelineData["highlights"];
 	thresholds: HighlightThresholds;
 	period: TimelinePeriod;
-	/** The nearest window with detections, offered when this one has none. */
 	jumpTo: JumpTarget | null;
 	windowLabel: string | null;
-	/** The station has recorded nothing at all, in any window. */
 	stationEmpty: boolean;
 	view: TimelineView;
 }) {
 	const emptyMessage = stationEmpty
 		? EMPTY.station.detections
 		: EMPTY.window.timelineWindow(windowLabel);
-	// Only the body card carries the way out: a line naming the nearest window
-	// that heard something, then a full-size button on its own line so it reads
-	// as the next step rather than the tail of a sentence. The two cards beside
-	// it just say they're empty.
 	const emptyAction = jumpTo ? (
 		<>
 			<p className="text-muted-foreground text-sm">
@@ -527,12 +407,8 @@ function TimelineCards({
 		hourCounts: row.hourCounts,
 	}));
 
-	// Kept for a quiet window too: the shell drew it, so dropping it once the
-	// data lands would change the card's header under the reader.
 	const summary = <WindowSummary rows={rows} />;
 
-	// The window's day for the side column's hour chart: every species summed,
-	// hour by hour.
 	const hourActivity: HourActivity[] = Array.from(
 		{ length: 24 },
 		(_, hour) => ({
@@ -560,21 +436,9 @@ function TimelineCards({
 			/>
 		);
 
-	// On the widest screens the body sits on the left at one fixed width in both
-	// views, so the toggle never shifts the column beside it: the window's
-	// Highlights, then its detections by hour, stacked. Below that there isn't room
-	// for the column beside the body, so the same two cards follow it
-	// underneath, side by side from md (768px, roughly 360px each) up, each only
-	// as tall as its own content -- Highlights doesn't stretch to the chart's
-	// height and trail empty space, and the chart keeps its fixed height rather
-	// than growing to a long Highlights card. Only on a phone do they stack.
 	return (
 		<div className="min-[1800px]:flex min-[1800px]:items-start min-[1800px]:gap-4">
 			{body}
-			{/* Drawn for a quiet window too, with the Activity card's own empty
-			    line in each card, so the column holds its place instead of the page jumping when the
-			    period steps from a window that heard something to one that
-			    didn't. */}
 			<div className="mt-(--page-gap) grid min-w-0 gap-(--page-gap) md:max-[1799px]:grid-cols-2 min-[1800px]:mt-0 min-[1800px]:flex-1">
 				<HighlightsCard
 					highlights={highlights}
@@ -587,8 +451,6 @@ function TimelineCards({
 					activity={hourActivity}
 					emptyMessage={emptyMessage}
 					info={HOUR_CARD_INFO}
-					// A quiet window has no chart to size, just the empty line, so
-					// the card fits it like Highlights beside it does.
 					className={
 						hourActivity.some((point) => point.count > 0)
 							? HOUR_CARD_SIZE
@@ -600,29 +462,14 @@ function TimelineCards({
 	);
 }
 
-// The heat map's hours (24 fixed 1.75rem columns) and counts plus a generous
-// name column: the heat map's names soak up whatever the hours and counts
-// leave, so this width is really the room given to bird names -- enough that
-// even long ones and an all-time count of eight or nine characters fit. The
-// species grid takes the same width so the view toggle leaves the left card,
-// and the column beside it, in place. That column only sits beside it from
-// 1800px: below that, what's left beside a 72rem card is too narrow to hold
-// anything, so its cards drop beneath the body instead.
 const BODY_CARD_WIDTH = "min-w-0 min-[1800px]:w-[72rem] min-[1800px]:flex-none";
 
-// One height for the hour chart, whatever sits beside it: its 220px plot plus
-// the header and padding. The bird page lets the same card stretch to its row;
-// here a long Highlights card would pull it into a tall, mostly empty chart.
-// No fixed height on top: anything under that sum spills into the padding.
 const HOUR_CARD_SIZE = "self-start";
 
 const VIEW_META: Record<
 	TimelineView,
 	{
 		label: string;
-		/** A bulleted list for the one-bird-per-row view, uneven panels for the
-		    species tiles. Both glyphs fill the same 18 of lucide's 24 units, so
-		    they share one size. */
 		icon: React.ComponentType<{ className?: string }>;
 	}
 > = {
@@ -636,13 +483,6 @@ const VIEW_META: Record<
 	},
 };
 
-/**
- * Picks which body the window draws. It lives in the page's toolbar rather than
- * on the body card: it steers the whole window, as the period and date beside
- * it do, and on the page's bare ground its border isn't a line inside a card's
- * lines. The period toggle's own group, down to icons alone, so the row reads as
- * one family of controls and the toolbar has room for it.
- */
 function ViewToggle({
 	view,
 	onViewChange,
@@ -679,11 +519,6 @@ function ViewToggle({
 	);
 }
 
-/**
- * A Daily address that isn't a date. Not a page with empty cards on it: the
- * window itself is the thing that does not exist, so there is nothing to scope
- * and nothing to draw.
- */
 function NotADate({ date }: { date: string }) {
 	return (
 		<StatusPage
