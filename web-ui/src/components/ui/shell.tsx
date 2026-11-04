@@ -155,10 +155,13 @@ export function ShellCard({
 export function ShellChartCard({
 	title,
 	ariaLabel,
+	action,
 	className = "",
 }: {
 	title: string;
 	ariaLabel: string;
+	/** Held against the header's right edge, as on the loaded card. */
+	action?: ReactNode;
 	className?: string;
 }) {
 	return (
@@ -170,7 +173,7 @@ export function ShellChartCard({
 				className,
 			)}
 		>
-			<CardHeader title={title} />
+			<CardHeader title={title}>{action}</CardHeader>
 			<ShellBar className="mt-(--page-gap) min-h-[220px] w-full flex-1 rounded-md" />
 		</section>
 	);

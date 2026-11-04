@@ -80,15 +80,20 @@ function GameInfo({
 }) {
 	const meanings = learnPoolMeanings(rareMax);
 	return (
-		<InfoTip label="the quiz" size="default">
+		<InfoTip label="Bird quiz" size="default">
 			<p>
-				Listen to the clip, then pick the bird. {POINTS_BY_ATTEMPT[0]} points
-				first try, {POINTS_BY_ATTEMPT[1]} on the second.
+				Each round has {QUESTIONS_PER_ROUND} bird detections. Play each clip,
+				then pick which bird corresponds to that audio recording.
 			</p>
-			{/* No keyboard to speak of on a touch screen. */}
-			<p className="pointer-coarse:hidden">
-				Keys 1–4 pick a bird; Enter moves on.
+			<p>
+				Points are gained depending on the number of guesses. The first guess
+				awards {POINTS_BY_ATTEMPT[0]} points, while the second only gives{" "}
+				{POINTS_BY_ATTEMPT[1]} point, and no points are gained after that.
 			</p>
+			<p>
+				Then repeat for all {QUESTIONS_PER_ROUND} birds for your final score!
+			</p>
+			<p>Selection options:</p>
 			<ul className="space-y-1">
 				{LEARN_POOLS.map((pool) => (
 					<li key={pool}>
@@ -117,7 +122,7 @@ export function LearnGameSkeleton() {
 					className={GAME_CARD_CLASS}
 				>
 					<header className={GAME_HEADER_CLASS}>
-						<h2 className="island-kicker">Mystery call</h2>
+						<h2 className="island-kicker">Bird quiz</h2>
 						<GameInfo />
 					</header>
 
@@ -218,7 +223,7 @@ export function LearnGameEmpty({ message }: { message: string }) {
 			<div className={QUIZ_GRID_CLASS}>
 				<section aria-label="Bird call quiz" className={GAME_CARD_CLASS}>
 					<header className={GAME_HEADER_CLASS}>
-						<h2 className="island-kicker">Mystery call</h2>
+						<h2 className="island-kicker">Bird quiz</h2>
 					</header>
 					<p className="text-muted-foreground text-sm">{message}</p>
 				</section>
@@ -355,7 +360,7 @@ export function LearnGame({
 			<div className={QUIZ_GRID_CLASS}>
 				<section aria-label="Bird call quiz" className={GAME_CARD_CLASS}>
 					<header className={GAME_HEADER_CLASS}>
-						<h2 className="island-kicker">Mystery call</h2>
+						<h2 className="island-kicker">Bird quiz</h2>
 						<GameInfo rareMax={rareMax} />
 					</header>
 

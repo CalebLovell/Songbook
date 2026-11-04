@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { type ReactNode, useId } from "react";
 import {
 	Area,
 	AreaChart,
@@ -13,6 +13,7 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { ChartDataTable } from "~/components/chart-data-table.tsx";
 import { ChartValueTooltip } from "~/components/chart-tooltip.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
+import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { ShellChartCard } from "~/components/ui/shell.tsx";
 import {
 	CHART_ANIMATION_MS,
@@ -25,6 +26,15 @@ import { hourLabel } from "~/lib/time-ago.ts";
 
 const EVEN_HOURS = Array.from({ length: 12 }, (_, index) => index * 2);
 
+/** The header's info icon, for a page that explains the chart. */
+function HourInfo({ info }: { info?: ReactNode }) {
+	return info ? (
+		<InfoTip label="Detections by hour" size="default">
+			{info}
+		</InfoTip>
+	) : null;
+}
+
 /**
  * Detections bucketed by hour of day, midnight to midnight: every detection of
  * the species on its page, the selected window's on the timeline.
@@ -32,11 +42,14 @@ const EVEN_HOURS = Array.from({ length: 12 }, (_, index) => index * 2);
 export function DetectionsByHourCard({
 	activity,
 	emptyMessage = EMPTY.station.detections,
+	info,
 	className = "",
 }: {
 	activity: HourActivity[];
 	/** What the card says when every hour is zero. */
 	emptyMessage?: string;
+	/** The explanation behind the header's info icon. Without it, no icon. */
+	info?: ReactNode;
 	className?: string;
 }) {
 	// Two of these can share a page in principle; a scoped id keeps the
@@ -53,7 +66,9 @@ export function DetectionsByHourCard({
 				aria-label="Detections by hour"
 				className={`feature-card flex flex-col rounded-md p-4 ${className}`}
 			>
-				<CardHeader title="Detections by hour" />
+				<CardHeader title="Detections by hour">
+					<HourInfo info={info} />
+				</CardHeader>
 				<EmptyNote>{emptyMessage}</EmptyNote>
 			</section>
 		);
@@ -64,7 +79,9 @@ export function DetectionsByHourCard({
 			aria-label="Detections by hour"
 			className={`feature-card flex min-h-72 flex-col rounded-md p-4 ${className}`}
 		>
-			<CardHeader title="Detections by hour" />
+			<CardHeader title="Detections by hour">
+				<HourInfo info={info} />
+			</CardHeader>
 
 			<div className="mt-(--page-gap) min-h-0 flex-1">
 				{/* `minHeight` is not decoration: ResponsiveContainer measures its own
@@ -154,14 +171,17 @@ export function DetectionsByHourCard({
 
 /** The chart card before its counts arrive (see ShellChartCard). */
 export function DetectionsByHourCardSkeleton({
+	info,
 	className = "",
 }: {
+	info?: ReactNode;
 	className?: string;
 }) {
 	return (
 		<ShellChartCard
 			title="Detections by hour"
 			ariaLabel="Detections by hour"
+			action={<HourInfo info={info} />}
 			className={className}
 		/>
 	);

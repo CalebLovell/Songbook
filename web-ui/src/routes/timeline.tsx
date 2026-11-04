@@ -228,11 +228,22 @@ function TimelineCardsShell({
 					emptyMessage=""
 					className="self-start"
 				/>
-				<DetectionsByHourCardSkeleton className={HOUR_CARD_SIZE} />
+				<DetectionsByHourCardSkeleton
+					info={HOUR_CARD_INFO}
+					className={HOUR_CARD_SIZE}
+				/>
 			</div>
 		</div>
 	);
 }
+
+const HOUR_CARD_INFO = (
+	<p>
+		This chart shows all the birds recorded each hour for the selected time
+		period. The peaks show what time of day your station is most active, and the
+		valleys show when it is most quiet.
+	</p>
+);
 
 const PERIOD_NOUNS: Record<Exclude<TimelinePeriod, "all">, string> = {
 	day: "day",
@@ -586,6 +597,7 @@ function TimelineCards({
 				<DetectionsByHourCard
 					activity={hourActivity}
 					emptyMessage={emptyMessage}
+					info={HOUR_CARD_INFO}
 					// A quiet window has no chart to size, just the empty line, so
 					// the card fits it like Highlights beside it does.
 					className={
