@@ -65,7 +65,13 @@ const config = defineConfig({
 			// (synchronous) SQLite queries -- so a click during a slow query waited
 			// on it before the page could switch. The app is small enough that
 			// loading it whole is cheaper than that wait.
-			router: { codeSplittingOptions: { defaultBehavior: [] } },
+			router: {
+				codeSplittingOptions: { defaultBehavior: [] },
+				routeTreeFileHeader: [
+					"// @ts-nocheck",
+					"// noinspection JSUnusedGlobalSymbols",
+				],
+			},
 		}),
 		viteReact(),
 	],
