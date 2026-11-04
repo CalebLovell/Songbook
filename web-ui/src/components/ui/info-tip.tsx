@@ -53,9 +53,11 @@ export function InfoTip({
 	    title case and adds "Information". */
 	label: string;
 	/** `default` is a 16px glyph on a 28px target for a card's header, pulled
-	    out so the glyph sits 12px from the card's edge; `sm` is a 14px glyph on
-	    a 24px target for a field's label, pulled out so the outline takes up no
-	    room in the line. */
+	    out so the glyph sits 12px from the card's edge -- under 400px, where
+	    the card's padding halves to 8px, only as far as lines the glyph up with
+	    that padding, or the target would overhang the card; `sm` is a 14px
+	    glyph on a 24px target for a field's label, pulled out so the outline
+	    takes up no room in the line. */
 	size?: "sm" | "default";
 	children: ReactNode;
 }) {
@@ -68,7 +70,9 @@ export function InfoTip({
 					type="button"
 					aria-label={`About ${label}`}
 					className={`inline-flex shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground transition-colors hover:border-border hover:bg-accent hover:text-accent-foreground ${
-						size === "default" ? "-me-2.5 size-7" : "-m-1.25 size-6"
+						size === "default"
+							? "-me-1.5 size-7 min-[400px]:-me-2.5"
+							: "-m-1.25 size-6"
 					}`}
 					onClick={(event) => {
 						event.preventDefault();

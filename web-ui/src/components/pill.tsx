@@ -6,9 +6,10 @@ import { Hint } from "~/components/ui/hint.tsx";
 /**
  * One pill. Every pill -- confidence, New, Returned, Rare, Vocal -- shares this
  * size, radius and weight so a cluster reads as one family; only the tint and
- * the optional icon set them apart. A `tooltip` explains what the pill means
- * on hover. `iconOnly` draws just the glyph as a GlyphChip, the label kept
- * for screen readers -- the tooltip then carries the name.
+ * the optional icon set them apart. The height is fixed at the Highlights
+ * badge's 26px, so the two match at any text size. A `tooltip` explains what
+ * the pill means on hover. `iconOnly` draws just the glyph as a GlyphChip, the
+ * label kept for screen readers -- the tooltip then carries the name.
  */
 export function Pill({
 	icon: Icon,
@@ -43,7 +44,7 @@ export function Pill({
 	return (
 		<Hint content={tooltip}>
 			<span
-				className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1.5 font-semibold text-[13px] leading-none sm:text-xs ${tabular ? "tabular-data" : ""} ${className}`}
+				className={`inline-flex h-[26px] shrink-0 items-center gap-1 rounded-full px-2.5 font-semibold text-[13px] leading-none sm:text-xs ${tabular ? "tabular-data" : ""} ${className}`}
 				style={style}
 			>
 				{Icon ? <Icon className="size-3" aria-hidden="true" /> : null}

@@ -76,6 +76,14 @@ const CURRENT_YEAR = Number(stationToday().slice(0, 4));
 const MIN_YEAR = 2000;
 const DEFAULT_YEAR = CURRENT_YEAR;
 
+const HOUR_CARD_INFO = (
+	<p>
+		This chart shows every detection of this bird by hour of day, across all the
+		time the station has been listening. The peaks show when it is heard most
+		often, and the valleys show when it is most quiet.
+	</p>
+);
+
 const speciesDetailSearchSchema = z.object({
 	year: z.coerce
 		.number()
@@ -332,7 +340,10 @@ function SpeciesDetailShell({ year }: { year: number }) {
 				<BestRecordingCardSkeleton />
 
 				<div className="grid min-w-0 @min-[80rem]/bird:grid-rows-2 gap-(--page-gap)">
-					<DetectionsByHourCardSkeleton className="@min-[80rem]/bird:min-h-0" />
+					<DetectionsByHourCardSkeleton
+						info={HOUR_CARD_INFO}
+						className="@min-[80rem]/bird:min-h-0"
+					/>
 					<DetectionsByMonthCardSkeleton className="@min-[80rem]/bird:min-h-0" />
 				</div>
 
@@ -627,6 +638,7 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 					<div className="grid min-w-0 @min-[80rem]/bird:grid-rows-2 gap-(--page-gap)">
 						<DetectionsByHourCard
 							activity={detail.hourActivity}
+							info={HOUR_CARD_INFO}
 							className="@min-[80rem]/bird:min-h-0"
 						/>
 

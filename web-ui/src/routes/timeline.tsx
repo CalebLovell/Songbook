@@ -231,7 +231,7 @@ function TimelineCardsShell({
 const HOUR_CARD_INFO = (
 	<p>
 		This chart shows all the birds recorded each hour for the selected time
-		period. The peaks show what time of day your station is most active, and the
+		period. The peaks show what time of day the station is most active, and the
 		valleys show when it is most quiet.
 	</p>
 );

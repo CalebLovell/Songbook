@@ -12,6 +12,7 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { ChartDataTable } from "~/components/chart-data-table.tsx";
 import { ChartValueTooltip } from "~/components/chart-tooltip.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
+import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { ShellChartCard } from "~/components/ui/shell.tsx";
 import { CHART_MARGIN, X_AXIS_HEIGHT } from "~/lib/chart-style.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
@@ -24,6 +25,20 @@ import type { TrendPoint } from "~/lib/stats-data.ts";
  * full names, so the initials are never the only way to tell the Js apart.
  */
 const INITIALS_BELOW_PX = 380;
+
+/** The header's info icon. */
+function MonthInfo() {
+	return (
+		<InfoTip label="Detections by month" size="default">
+			<p>
+				This chart shows every detection of this bird by month of the year, with
+				all the years the station has been listening added together. The tallest
+				bars show the time of year it is heard most often, and the shortest show
+				when it is most quiet.
+			</p>
+		</InfoTip>
+	);
+}
 
 /**
  * The bird page's detections-by-month chart: every detection on record,
@@ -52,7 +67,9 @@ export function DetectionsByMonthCard({
 			// in the card it would just be empty space.
 			className={`feature-card flex flex-col rounded-md p-4 ${isEmpty ? "" : "min-h-72"} ${className}`}
 		>
-			<CardHeader title="Detections by month" />
+			<CardHeader title="Detections by month">
+				<MonthInfo />
+			</CardHeader>
 
 			{isEmpty ? (
 				<EmptyNote>{EMPTY.station.detections}</EmptyNote>
@@ -150,6 +167,7 @@ export function DetectionsByMonthCardSkeleton({
 		<ShellChartCard
 			title="Detections by month"
 			ariaLabel="Detections by month"
+			action={<MonthInfo />}
 			className={className}
 		/>
 	);
