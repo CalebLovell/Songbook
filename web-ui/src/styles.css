@@ -38,6 +38,10 @@
 	--icon-well: color-mix(in oklab, var(--sage) 30%, var(--paper-raised));
 	--row-selected: color-mix(in oklab, var(--sage) 30%, var(--paper-raised));
 	--live-fill: color-mix(in oklab, var(--moss) 10%, var(--paper-raised));
+	/* What a paged list's white rows stack on: the slack under a short page.
+	   A warm off-white, picked by eye over cream, grey and the paper ground: a
+	   literal because no mix of the named colours lands on it. */
+	--row-well: #fafaf5;
 	/* The three confidence tiers (see lib/confidence.ts), each paired with a
 	   text colour: moss, bark, ink. */
 	--confidence-high: color-mix(in oklab, var(--moss) 12%, var(--paper-raised));
@@ -316,6 +320,22 @@ code {
   .feature-card {
     border: 1px solid var(--line);
     background: linear-gradient(165deg, var(--surface-strong), var(--surface));
+  }
+
+  /* A paged list holds its height, so a short last page leaves slack. White
+     rows stack on an off-white well instead of ending in a block of empty card. The
+     last row's hairline is a shadow rather than a border, so `clip` (or a
+     scrolling body) drops it on a full page, where the footer's rule already
+     closes the list and a border would draw a second line beside it. */
+  .row-well {
+    overflow: clip;
+    background: var(--row-well);
+  }
+  .row-well > * {
+    background: var(--card);
+  }
+  .row-well > :last-child {
+    box-shadow: 0 1px 0 var(--line);
   }
 }
 

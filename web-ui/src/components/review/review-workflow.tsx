@@ -498,7 +498,7 @@ export function ReviewWorkflow({
 							style={
 								paged ? { minHeight: page.pageSize * ROW_HEIGHT_PX } : undefined
 							}
-							className="-mx-(--page-gap) divide-y"
+							className="row-well -mx-(--page-gap) divide-y"
 						>
 							{rows.map((item, i) => {
 								const current = item === row;

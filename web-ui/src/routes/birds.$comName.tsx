@@ -392,7 +392,10 @@ function VisitLogSkeleton() {
 				<div className={VISIT_LOG_HEADER_CLASS}>
 					<div className="island-kicker">Visit log</div>
 				</div>
-				<ul aria-hidden="true" className="-mx-(--page-gap) divide-y">
+				<ul
+					aria-hidden="true"
+					className="row-well -mx-(--page-gap) grow divide-y"
+				>
 					{Array.from({ length: VISITS_PAGE_SIZE }, (_, index) => (
 						// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 						<li key={index} className={VISIT_ROW_CLASS}>
@@ -995,7 +998,7 @@ function VisitLogCard({
 						// On the smallest phones (under 400px) every row holds its
 						// full content, one track as wide as the widest row, and the
 						// list scrolls sideways instead of cutting the day short.
-						className={`-mx-(--page-gap) divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
+						className={`row-well -mx-(--page-gap) grow divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
 					>
 						{visits.map((visit, i) => {
 							const heardAt = formatDateTime(visit.date, visit.time);
@@ -1055,8 +1058,8 @@ function VisitLogCard({
 
 				{/* The header's twin: the same full-width hairline and the same 45px
 			    band, so the log is bookended evenly. Which visits these are on the
-			    left, the stepper held right, and `mt-auto` pinning it to the card's
-			    bottom on a short last page. */}
+			    left, the stepper held right, and the list's well pushing it to the
+			    card's bottom on a short last page. */}
 				{visits.length > 0 ? (
 					<div className={VISIT_LOG_FOOTER_CLASS}>
 						<div className={PAGE_ROW_CLASS}>

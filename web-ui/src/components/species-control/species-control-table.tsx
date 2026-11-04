@@ -317,7 +317,7 @@ export function SpeciesControlTable({
 					role="rowgroup"
 					aria-busy={rows === null || undefined}
 					data-scroll-reset=""
-					className="col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+					className="col-span-full row-well grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
 				>
 					{rows === null
 						? Array.from({ length: SPECIES_CONTROL_PAGE_SIZE }, (_, index) => (

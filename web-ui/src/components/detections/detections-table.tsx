@@ -871,7 +871,7 @@ export function DetectionsTable({
 					role="rowgroup"
 					aria-busy={skeleton || undefined}
 					data-scroll-reset=""
-					className="col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+					className="col-span-full row-well grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
 				>
 					{table.getRowModel().rows.map((row) => (
 						<TableRow

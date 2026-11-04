@@ -47,6 +47,7 @@ for a meaning; don't write a new mix inline when one exists:
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
 | `--live-fill` | the Live pill |
+| `--row-well` | the slack under a paged list's rows on a short page (`.row-well`) |
 | `--confidence-high/mid/low` | confidence pills; text is moss / bark / ink |
 | `--toast-{success,warning,error}-fill/-line` | toast tones; title is moss / bark / clay, neutral toasts stay white |
 
