@@ -241,7 +241,8 @@ export function RecentLogCard({
 				</ul>
 			)}
 
-			<RecentLogFooter />
+			{/* An empty window means an empty today, so there's nothing to link on to. */}
+			{recent.length > 0 ? <RecentLogFooter /> : null}
 		</section>
 	);
 }

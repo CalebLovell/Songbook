@@ -176,32 +176,27 @@ function LiveBody({
 				<div className="grid grid-cols-1 gap-(--page-gap)">
 					<LiveAudioCard unlocked={unlocked} />
 
-					{/* A station that has never recorded anything has nothing to
-					    highlight, and the hero card above already says so, far more
-					    plainly. */}
-					{snapshot.hasAnyDetections ? (
-						<Deferred
-							promise={highlights}
-							shell={
-								<HighlightsCard
-									highlights={null}
-									period="live"
-									emptyMessage={HIGHLIGHTS_EMPTY}
-								/>
-							}
-						>
-							{(judged) =>
-								judged.hasAnyDetections ? (
-									<HighlightsCard
-										highlights={judged.highlights}
-										thresholds={judged.thresholds}
-										period="live"
-										emptyMessage={HIGHLIGHTS_EMPTY}
-									/>
-								) : null
-							}
-						</Deferred>
-					) : null}
+					{/* Drawn even for a station that has never recorded anything, with
+					    the same empty line as the log beside it. */}
+					<Deferred
+						promise={highlights}
+						shell={
+							<HighlightsCard
+								highlights={null}
+								period="live"
+								emptyMessage={HIGHLIGHTS_EMPTY}
+							/>
+						}
+					>
+						{(judged) => (
+							<HighlightsCard
+								highlights={judged.highlights}
+								thresholds={judged.thresholds}
+								period="live"
+								emptyMessage={HIGHLIGHTS_EMPTY}
+							/>
+						)}
+					</Deferred>
 				</div>
 			</div>
 		</div>

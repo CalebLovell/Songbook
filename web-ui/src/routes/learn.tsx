@@ -19,7 +19,7 @@ import { getLearnRound } from "~/lib/learn.ts";
 import { LEARN_POOLS, type LearnPool } from "~/lib/learn-pools.ts";
 import {
 	type GameProgress,
-	loadSavedGame,
+	loadResumableGame,
 	saveGame,
 } from "~/lib/learn-saved-game.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
@@ -167,7 +167,7 @@ function LearnRoundView({
 	// The game this tab already had going in the pool, if any, read once as
 	// the pool opens. Only ever rendered on the client (the round arrives in an
 	// effect), so sessionStorage is there to read.
-	const [saved] = useState(() => loadSavedGame(pool));
+	const [saved] = useState(() => loadResumableGame(pool, loaded.round));
 	// The loader hands back a freshly randomized round every time it runs, so
 	// "play again" is just an invalidation -- and the new round's id re-keys the
 	// game below, which is what clears the finished round's state. Reruns nobody

@@ -4,6 +4,7 @@ import { beforeEach, test } from "node:test";
 import type { LearnRound } from "~/lib/learn-round.ts";
 import {
 	FRESH_PROGRESS,
+	loadResumableGame,
 	loadSavedGame,
 	type SavedGame,
 	saveGame,
@@ -60,6 +61,21 @@ test("a save that can't drive the game reads as none", () => {
 
 	saveGame("rare", { round, progress: { ...game.progress, index: 2 } });
 	assert.equal(loadSavedGame("rare"), null);
+});
+
+test("a save resumes while the pool can still deal a round", () => {
+	saveGame("rare", game);
+	assert.deepEqual(loadResumableGame("rare", round), game);
+	assert.deepEqual(loadSavedGame("rare"), game);
+});
+
+test("a pool that can no longer deal a round forgets its save", () => {
+	saveGame("rare", game);
+	saveGame("common", game);
+	const emptyRound = { ...round, questions: [] };
+	assert.equal(loadResumableGame("rare", emptyRound), null);
+	assert.equal(loadSavedGame("rare"), null);
+	assert.deepEqual(loadSavedGame("common"), game);
 });
 
 test("storage that throws is treated as empty, and saving doesn't throw", () => {

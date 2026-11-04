@@ -66,6 +66,24 @@ export function loadSavedGame(pool: LearnPool): SavedGame | null {
 	}
 }
 
+/**
+ * The game to resume as a pool opens, given the round the server just dealt
+ * it. A pool that can't deal a round has no clips left to play, so a save from
+ * before that happened is forgotten: it would quiz on recordings that are gone.
+ */
+export function loadResumableGame(
+	pool: LearnPool,
+	dealt: LearnRound,
+): SavedGame | null {
+	if (dealt.questions.length > 0) return loadSavedGame(pool);
+	try {
+		sessionStorage.removeItem(KEY_PREFIX + pool);
+	} catch {
+		// Blocked storage has nothing to forget.
+	}
+	return null;
+}
+
 /** Saving is best effort: if storage is unavailable or full, the game plays
     on and is simply not remembered. */
 export function saveGame(pool: LearnPool, game: SavedGame) {
