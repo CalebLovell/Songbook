@@ -34,8 +34,12 @@ import {
 	updateBusy,
 } from "~/lib/updates-data.ts";
 import { RestartButton } from "./restart-button.tsx";
-import { SettingsCard } from "./settings-card.tsx";
+import { RESET_RESTARTS_DESCRIPTION, SettingsCard } from "./settings-card.tsx";
+import { SETTINGS_TABS, type SettingsTab } from "./settings-index.ts";
 import { StationLocation } from "./station-location.tsx";
+
+const RESET_NO_RESTART_DESCRIPTION =
+	"Every value in this card goes back to what a fresh install writes, and any edits you haven't saved are dropped. Nothing restarts. Other cards are left as they are.";
 
 type Saver<T> = (values: T) => Promise<SettingsSaveResult<T>>;
 type CardRestarter = () => Promise<{ message: string }>;
@@ -65,6 +69,7 @@ function useCardSave<T>(
 	initial: T,
 	save?: Saver<T>,
 	restart?: CardRestarter,
+	defaults?: T,
 ) {
 	const toastId = `settings-${title}`;
 	const [values, setValues] = useState(initial);
@@ -72,12 +77,12 @@ function useCardSave<T>(
 	const [saving, setSaving] = useState(false);
 	const [needsRestart, setNeedsRestart] = useState(false);
 
-	async function submit() {
+	async function write(next: T) {
 		if (!save) return;
 		setSaving(true);
 		toast.loading(`Saving ${title.toLowerCase()} settings…`, { id: toastId });
 		try {
-			const result = await save(values);
+			const result = await save(next);
 			setValues(result.values);
 			setSaved(result.values);
 			const pending =
@@ -122,12 +127,18 @@ function useCardSave<T>(
 	}
 
 	const dirty = !unchanged(values, saved);
+	const atDefaults = (current: T) =>
+		defaults !== undefined && unchanged({ ...defaults, ...current }, defaults);
 	return {
 		values,
 		setValues,
-		submit,
+		submit: () => write(values),
+		resetToDefaults: () => {
+			if (defaults !== undefined) void write(defaults);
+		},
 		dirty,
 		saveDisabled: saving || !dirty,
+		resetDisabled: saving || !save || (atDefaults(values) && atDefaults(saved)),
 		needsRestart: needsRestart && restart !== undefined,
 		applyNow,
 	};
@@ -137,6 +148,17 @@ function restartControl(form: { needsRestart: boolean; applyNow: () => void }) {
 	return form.needsRestart ? (
 		<RestartButton onRestart={async () => form.applyNow()} />
 	) : undefined;
+}
+
+function resetControl(
+	form: { resetToDefaults: () => void; resetDisabled: boolean },
+	description = RESET_RESTARTS_DESCRIPTION,
+) {
+	return {
+		onReset: form.resetToDefaults,
+		disabled: form.resetDisabled,
+		description,
+	};
 }
 
 function Field({
@@ -273,6 +295,7 @@ function numberOr(event: ChangeEvent<HTMLInputElement>, fallback: number) {
 }
 
 export function SettingsCards({
+	tab,
 	data,
 	savers,
 	restarter,
@@ -281,6 +304,7 @@ export function SettingsCards({
 	onCheckUpdates,
 	onInstallUpdate,
 }: {
+	tab: SettingsTab;
 	data: SettingsPageData;
 	savers: SettingsSavers;
 	restarter?: SettingsRestarter;
@@ -291,46 +315,60 @@ export function SettingsCards({
 }) {
 	const restartFor = (card: SettingsCardKind): CardRestarter | undefined =>
 		restarter ? () => restarter(card) : undefined;
-	return (
-		<div className="space-y-page">
+	const cards: Record<SettingsTab, ReactNode> = {
+		station: (
 			<StationCard
 				initial={data.station}
 				timezones={data.supportedTimezones}
 				save={savers.station}
 				restart={restartFor("station")}
 			/>
+		),
+		detection: (
 			<DetectionCard
 				initial={data.detection}
 				models={data.supportedModels}
 				save={savers.detection}
 				restart={restartFor("detection")}
 			/>
+		),
+		privacy: (
 			<PrivacyCard
 				initial={data.privacy}
 				save={savers.privacy}
 				restart={restartFor("privacy")}
 			/>
+		),
+		"audio-input": (
 			<AudioCard
 				initial={data.audio}
 				save={savers.audio}
 				restart={restartFor("audio")}
 			/>
+		),
+		recording: (
 			<RecordingCard
 				initial={data.recording}
 				save={savers.recording}
 				restart={restartFor("recording")}
 			/>
+		),
+		storage: (
 			<StorageCard
 				initial={data.storage}
 				save={savers.storage}
 				restart={restartFor("storage")}
 				diskUsedPercent={diskUsedPercent}
 			/>
-			<ReviewSettingsCard initial={data.review} save={savers.review} />
+		),
+		review: <ReviewSettingsCard initial={data.review} save={savers.review} />,
+		highlights: (
 			<HighlightsSettingsCard
 				initial={data.highlights}
 				save={savers.highlights}
 			/>
+		),
+		updates: (
 			<UpdatesSettingsCard
 				initial={data.updates}
 				save={savers.updates}
@@ -338,7 +376,16 @@ export function SettingsCards({
 				onCheck={onCheckUpdates}
 				onInstall={onInstallUpdate}
 			/>
-		</div>
+		),
+	};
+	return (
+		<>
+			{SETTINGS_TABS.map((id) => (
+				<div key={id} hidden={id !== tab}>
+					{cards[id]}
+				</div>
+			))}
+		</>
 	);
 }
 
@@ -501,13 +548,20 @@ function DetectionCard({
 	save?: Saver<DetectionSettings>;
 	restart?: CardRestarter;
 }) {
-	const form = useCardSave("Detection", initial, save, restart);
+	const form = useCardSave(
+		"Detection",
+		initial,
+		save,
+		restart,
+		SETTINGS_DEFAULTS.detection as DetectionSettings,
+	);
 	const selectedModel = models.find((model) => model.id === form.values.model);
 	return (
 		<SettingsCard
 			title="Detection"
 			description="Tune which model predictions become saved detections."
 			onSave={() => void form.submit()}
+			reset={resetControl(form)}
 			restart={restartControl(form)}
 			saveDisabled={form.saveDisabled}
 		>
@@ -656,12 +710,19 @@ function PrivacyCard({
 	save?: Saver<PrivacySettings>;
 	restart?: CardRestarter;
 }) {
-	const form = useCardSave("Privacy", initial, save, restart);
+	const form = useCardSave(
+		"Privacy",
+		initial,
+		save,
+		restart,
+		SETTINGS_DEFAULTS.privacy as PrivacySettings,
+	);
 	return (
 		<SettingsCard
 			title="Privacy"
 			description="Suppress chunks where the model detects likely human sounds."
 			onSave={() => void form.submit()}
+			reset={resetControl(form)}
 			restart={restartControl(form)}
 			saveDisabled={form.saveDisabled}
 		>
@@ -705,13 +766,23 @@ function AudioCard({
 	save?: Saver<AudioSettings>;
 	restart?: CardRestarter;
 }) {
-	const form = useCardSave("Audio input", initial, save, restart);
+	const form = useCardSave(
+		"Audio input",
+		initial,
+		save,
+		restart,
+		SETTINGS_DEFAULTS.audio as AudioSettings,
+	);
 	const streams = form.values.rtspStreams.filter(Boolean);
 	return (
 		<SettingsCard
 			title="Audio input"
 			description="Choose a local microphone or one or more network audio streams."
 			onSave={() => void form.submit()}
+			reset={resetControl(
+				form,
+				`${RESET_RESTARTS_DESCRIPTION} Any RTSP streams you have configured are cleared and the station returns to microphone input.`,
+			)}
 			restart={restartControl(form)}
 			saveDisabled={form.saveDisabled}
 		>
@@ -830,12 +901,19 @@ function RecordingCard({
 	save?: Saver<RecordingSettings>;
 	restart?: CardRestarter;
 }) {
-	const form = useCardSave("Recording", initial, save, restart);
+	const form = useCardSave(
+		"Recording",
+		initial,
+		save,
+		restart,
+		SETTINGS_DEFAULTS.recording as RecordingSettings,
+	);
 	return (
 		<SettingsCard
 			title="Recording"
 			description="Control capture duration and the files retained for playback."
 			onSave={() => void form.submit()}
+			reset={resetControl(form)}
 			restart={restartControl(form)}
 			saveDisabled={form.saveDisabled}
 		>
@@ -910,12 +988,19 @@ function StorageCard({
 	restart?: CardRestarter;
 	diskUsedPercent: number | null;
 }) {
-	const form = useCardSave("Storage", initial, save, restart);
+	const form = useCardSave(
+		"Storage",
+		initial,
+		save,
+		restart,
+		SETTINGS_DEFAULTS.storage as StorageSettings,
+	);
 	return (
 		<SettingsCard
 			title="Storage"
 			description="Decide what happens as the station fills its disk."
 			onSave={() => void form.submit()}
+			reset={resetControl(form)}
 			restart={restartControl(form)}
 			saveDisabled={form.saveDisabled}
 		>
@@ -1009,13 +1094,20 @@ function ReviewSettingsCard({
 	initial: ReviewSettings;
 	save?: Saver<ReviewSettings>;
 }) {
-	const form = useCardSave("Review", initial, save);
+	const form = useCardSave(
+		"Review",
+		initial,
+		save,
+		undefined,
+		SETTINGS_DEFAULTS.review,
+	);
 	return (
 		<SettingsCard
 			title="Review"
 			description="Decide which uncommon species the Review page asks you to confirm."
 			confirmDescription="This writes the value in this card to the station's configuration. Nothing restarts: the Review queue is judged by it from its next load."
 			onSave={() => void form.submit()}
+			reset={resetControl(form, RESET_NO_RESTART_DESCRIPTION)}
 			saveDisabled={form.saveDisabled}
 		>
 			<Field
@@ -1047,7 +1139,13 @@ function HighlightsSettingsCard({
 	initial: HighlightSettings;
 	save?: Saver<HighlightSettings>;
 }) {
-	const form = useCardSave("Highlights", initial, save);
+	const form = useCardSave(
+		"Highlights",
+		initial,
+		save,
+		undefined,
+		SETTINGS_DEFAULTS.highlights,
+	);
 	const number =
 		(key: keyof HighlightSettings) => (event: ChangeEvent<HTMLInputElement>) =>
 			form.setValues({
@@ -1060,6 +1158,7 @@ function HighlightsSettingsCard({
 			description="Decide which birds the Highlights card calls out on the Live page and timeline."
 			confirmDescription="This writes the values in this card to the station's configuration. Nothing restarts: the Live page and timeline judge by them from their next load."
 			onSave={() => void form.submit()}
+			reset={resetControl(form, RESET_NO_RESTART_DESCRIPTION)}
 			saveDisabled={form.saveDisabled}
 		>
 			<Field
@@ -1366,11 +1465,11 @@ const SKELETON_DATA: SettingsPageData = {
 const SKELETON_VALUES_CLASS =
 	"[&_:is(input,select,textarea)]:animate-pulse! [&_:is(input,select,textarea)]:border-transparent! [&_:is(input,select,textarea)]:bg-muted! [&_:is(input,select,textarea)]:bg-none! [&_:is(input,select,textarea)]:text-transparent! [&_:is(input,textarea)::placeholder]:text-transparent! [&_[data-slot=toggle-group-item]]:animate-pulse! [&_[data-slot=toggle-group-item]]:border-paper-raised! [&_[data-slot=toggle-group-item]]:bg-muted! [&_[data-slot=toggle-group-item]]:text-transparent!";
 
-export function SettingsCardsSkeleton() {
+export function SettingsCardsSkeleton({ tab }: { tab: SettingsTab }) {
 	return (
 		<div inert aria-busy="true" className={SKELETON_VALUES_CLASS}>
 			<SkeletonContext.Provider value={true}>
-				<SettingsCards data={SKELETON_DATA} savers={{}} />
+				<SettingsCards tab={tab} data={SKELETON_DATA} savers={{}} />
 			</SkeletonContext.Provider>
 		</div>
 	);

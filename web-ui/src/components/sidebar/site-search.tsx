@@ -19,7 +19,6 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
 	SETTINGS_INDEX,
 	type SettingsIndexEntry,
-	settingsCardId,
 } from "~/components/settings/settings-index.ts";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
 import { Count } from "~/components/ui/count.tsx";
@@ -149,7 +148,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 		} else if (result.kind === "page") {
 			navigate({ to: result.page.to });
 		} else {
-			navigate({ to: "/settings", hash: settingsCardId(result.setting.title) });
+			navigate({ to: "/settings", search: { tab: result.setting.tab } });
 		}
 		close();
 		onNavigate?.();

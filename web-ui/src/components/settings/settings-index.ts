@@ -13,7 +13,26 @@ import {
 
 import type { SearchSetting } from "~/lib/site-search.ts";
 
-export type SettingsIndexEntry = SearchSetting & { icon: LucideIcon };
+export const SETTINGS_TABS = [
+	"station",
+	"detection",
+	"privacy",
+	"audio-input",
+	"recording",
+	"storage",
+	"review",
+	"highlights",
+	"updates",
+] as const;
+
+export type SettingsTab = (typeof SETTINGS_TABS)[number];
+
+export const DEFAULT_SETTINGS_TAB: SettingsTab = "station";
+
+export type SettingsIndexEntry = SearchSetting & {
+	tab: SettingsTab;
+	icon: LucideIcon;
+};
 
 export function settingsCardId(title: string): string {
 	return title.toLowerCase().replaceAll(" ", "-");
@@ -22,12 +41,14 @@ export function settingsCardId(title: string): string {
 export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 	{
 		title: "Station",
+		tab: "station",
 		icon: MapPin,
 		fields: ["Station name", "Latitude", "Longitude", "Timezone"],
 		keywords: ["location", "coordinates"],
 	},
 	{
 		title: "Detection",
+		tab: "detection",
 		icon: SlidersHorizontal,
 		fields: [
 			"Analysis model",
@@ -40,12 +61,14 @@ export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 	},
 	{
 		title: "Privacy",
+		tab: "privacy",
 		icon: ShieldCheck,
 		fields: ["Privacy threshold"],
 		keywords: ["human", "voice"],
 	},
 	{
 		title: "Audio input",
+		tab: "audio-input",
 		icon: Mic2,
 		fields: [
 			"Input",
@@ -58,12 +81,14 @@ export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 	},
 	{
 		title: "Recording",
+		tab: "recording",
 		icon: Disc3,
 		fields: ["Recording length", "Extraction length", "Audio format"],
 		keywords: ["clip"],
 	},
 	{
 		title: "Storage",
+		tab: "storage",
 		icon: HardDrive,
 		fields: [
 			"When the disk fills",
@@ -74,18 +99,21 @@ export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 	},
 	{
 		title: "Review",
+		tab: "review",
 		icon: SearchCheck,
 		fields: ["Rare species threshold"],
 		keywords: ["queue", "confirm", "rare"],
 	},
 	{
 		title: "Highlights",
+		tab: "highlights",
 		icon: Sparkles,
 		fields: ["Rare", "Returned", "Gone quiet", "Regular", "Vocal"],
 		keywords: ["rarity", "rarities", "returns", "thresholds"],
 	},
 	{
 		title: "Updates",
+		tab: "updates",
 		icon: RefreshCw,
 		fields: ["This station", "Newest release", "Automatic updates"],
 		keywords: ["version", "release", "upgrade"],

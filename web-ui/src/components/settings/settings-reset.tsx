@@ -1,4 +1,4 @@
-import { RotateCcw, X } from "lucide-react";
+import { Factory, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
@@ -28,19 +28,19 @@ export function SettingsReset({ onReset }: { onReset: () => Promise<void> }) {
 		<>
 			<Button
 				variant="outline"
-				size="default"
-				icon={RotateCcw}
+				size="lg"
+				icon={Factory}
 				onClick={() => setOpen(true)}
 			>
-				Reset to defaults
+				Factory defaults
 			</Button>
 			{open ? (
 				<ConfirmDialog
-					title="Reset all settings to defaults?"
+					title="Restore all settings to factory defaults?"
 					description="Detection, Privacy, Audio input, Recording, Storage, Highlights, and the Review queue threshold all go back to the values a fresh install writes. Any RTSP streams you have configured are cleared and the station returns to microphone input. This cannot be undone."
 					cancelIcon={X}
-					confirmIcon={RotateCcw}
-					confirmLabel="Reset to defaults"
+					confirmIcon={Factory}
+					confirmLabel="Restore factory defaults"
 					destructive
 					pending={busy}
 					onCancel={() => setOpen(false)}

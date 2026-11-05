@@ -6,9 +6,11 @@ import { Button } from "~/components/ui/button.tsx";
 export function RestartButton({
 	onRestart,
 	label = "Restart BirdNET",
+	size = "default",
 }: {
 	onRestart: () => Promise<void>;
 	label?: string;
+	size?: "default" | "lg";
 }) {
 	const [busy, setBusy] = useState(false);
 
@@ -16,7 +18,7 @@ export function RestartButton({
 		<Button
 			type="button"
 			variant="outline"
-			size="default"
+			size={size}
 			icon={RefreshCw}
 			loading={busy}
 			title="Briefly interrupts recording while BirdNET reloads its settings"

@@ -4,6 +4,7 @@ import { test } from "node:test";
 import type { z } from "zod";
 
 import { Route as BirdsRoute } from "~/routes/birds.index.tsx";
+import { Route as SettingsRoute } from "~/routes/settings.tsx";
 import { Route as TimelineRoute } from "~/routes/timeline.tsx";
 
 import { parseSearch, stringifySearch } from "./search-params.ts";
@@ -32,4 +33,13 @@ test("a non-numeric date survives the round trip", () => {
 
 test("a numeric species search reaches the birds page as a string", () => {
 	assert.equal(validated(BirdsRoute, { q: "1080" }).q, "1080");
+});
+
+test("a settings tab in the URL selects that tab", () => {
+	assert.equal(validated(SettingsRoute, { tab: "storage" }).tab, "storage");
+});
+
+test("a missing or unknown settings tab falls back to Station", () => {
+	assert.equal(validated(SettingsRoute, {}).tab, "station");
+	assert.equal(validated(SettingsRoute, { tab: "nope" }).tab, "station");
 });

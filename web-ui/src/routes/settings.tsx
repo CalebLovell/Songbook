@@ -1,5 +1,15 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	stripSearchParams,
+	useRouter,
+} from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import {
+	DEFAULT_SETTINGS_TAB,
+	SETTINGS_TABS,
+	type SettingsTab,
+} from "~/components/settings/settings-index.ts";
 import {
 	SettingsPage,
 	SettingsPageSkeleton,
@@ -33,8 +43,19 @@ const HEALTH_INTERVAL_MS = 30_000;
 
 const UPDATES_INTERVAL_MS = 5_000;
 
+const settingsSearchSchema = z.object({
+	tab: z
+		.enum(SETTINGS_TABS)
+		.default(DEFAULT_SETTINGS_TAB)
+		.catch(DEFAULT_SETTINGS_TAB),
+});
+
 export const Route = createFileRoute("/settings")({
 	head: () => ({ meta: [{ title: pageTitle("Settings") }] }),
+	validateSearch: settingsSearchSchema,
+	search: {
+		middlewares: [stripSearchParams({ tab: DEFAULT_SETTINGS_TAB })],
+	},
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
 	loader: () => ({
@@ -72,11 +93,21 @@ function SettingsRoute() {
 	const reset = useServerFn(resetSettingsFn);
 	const restart = useServerFn(restartStationFn);
 	const router = useRouter();
+	const { tab } = Route.useSearch();
+	const navigate = Route.useNavigate();
+	const showTab = (next: SettingsTab) =>
+		navigate({
+			search: { tab: next },
+			replace: true,
+			resetScroll: false,
+		});
 
-	if (!settled) return <SettingsPageSkeleton />;
+	if (!settled) return <SettingsPageSkeleton tab={tab} onTabChange={showTab} />;
 
 	return (
 		<SettingsPage
+			tab={tab}
+			onTabChange={showTab}
 			data={settled.value}
 			health={health ?? undefined}
 			onRestart={(card) => restart({ data: { card } })}

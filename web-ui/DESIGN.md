@@ -248,7 +248,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   point at its answer, and a loader rerun never swaps the round being played.
 - **Settings**: a save writes the config, then restarts the card's services. A
   refused and a declined restart read the same, and the card keeps offering Restart
-  until the values are live. Reset leaves the Station card alone.
+  until the values are live. Reset leaves the Station card alone. One tab per card,
+  held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
+  never drops an unsaved edit. The toolbar's Factory defaults covers every card; a card's own
+  footer reset covers only that card and goes through its normal save, and Station
+  and Updates have no default to offer one. A card's Save and reset show as disabled
+  when there is nothing to do.
 
 ## Data and security
 

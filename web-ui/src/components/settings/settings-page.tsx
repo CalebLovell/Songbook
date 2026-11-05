@@ -15,11 +15,15 @@ import {
 	type SettingsRestarter,
 	type SettingsSavers,
 } from "./settings-cards.tsx";
+import type { SettingsTab } from "./settings-index.ts";
 import { SettingsReset } from "./settings-reset.tsx";
+import { SettingsToolbar } from "./settings-toolbar.tsx";
 
 type ResetOutcome = { message: string; needsRestart: boolean };
 
 export function SettingsPage({
+	tab,
+	onTabChange,
 	data,
 	savers = {},
 	onReset,
@@ -29,6 +33,8 @@ export function SettingsPage({
 	onCheckUpdates,
 	onInstallUpdate,
 }: {
+	tab: SettingsTab;
+	onTabChange: (next: SettingsTab) => void;
 	data: SettingsPageData;
 	savers?: SettingsSavers;
 	health?: StationHealth;
@@ -58,49 +64,59 @@ export function SettingsPage({
 				icon={Settings}
 				title={PAGE_HEADERS.settings.title}
 				description={PAGE_HEADERS.settings.description}
-				action={
-					onReset ? (
-						<div className="flex flex-wrap items-center justify-end gap-2">
-							{needsRestart && onRestart ? (
-								<RestartButton
-									onRestart={async () => {
-										const toastId = "settings-reset";
-										toast.loading("Restarting BirdNET…", { id: toastId });
-										try {
-											const result = await onRestart(undefined);
-											setNeedsRestart(false);
-											toast.success(result.message, { id: toastId });
-										} catch (error) {
-											toast.warning(
-												error instanceof Error
-													? error.message
-													: "BirdNET could not be restarted.",
-												{ id: toastId, duration: 10_000 },
-											);
-										}
-									}}
-								/>
-							) : null}
-							<SettingsReset
-								onReset={async () => {
-									const outcome = await onReset();
-									setNeedsRestart(outcome.needsRestart);
-									if (outcome.needsRestart) {
-										toast.warning(outcome.message, {
-											id: "settings-reset",
-											duration: 10_000,
-										});
-									} else {
-										destructiveToast(outcome.message, { id: "settings-reset" });
-									}
-								}}
-							/>
-						</div>
-					) : undefined
+				afterHeader={
+					<SettingsToolbar
+						tab={tab}
+						onTabChange={onTabChange}
+						actions={
+							onReset ? (
+								<>
+									{needsRestart && onRestart ? (
+										<RestartButton
+											size="lg"
+											onRestart={async () => {
+												const toastId = "settings-reset";
+												toast.loading("Restarting BirdNET…", { id: toastId });
+												try {
+													const result = await onRestart(undefined);
+													setNeedsRestart(false);
+													toast.success(result.message, { id: toastId });
+												} catch (error) {
+													toast.warning(
+														error instanceof Error
+															? error.message
+															: "BirdNET could not be restarted.",
+														{ id: toastId, duration: 10_000 },
+													);
+												}
+											}}
+										/>
+									) : null}
+									<SettingsReset
+										onReset={async () => {
+											const outcome = await onReset();
+											setNeedsRestart(outcome.needsRestart);
+											if (outcome.needsRestart) {
+												toast.warning(outcome.message, {
+													id: "settings-reset",
+													duration: 10_000,
+												});
+											} else {
+												destructiveToast(outcome.message, {
+													id: "settings-reset",
+												});
+											}
+										}}
+									/>
+								</>
+							) : null
+						}
+					/>
 				}
 			/>
 			<SettingsCards
 				key={loadedValues}
+				tab={tab}
 				data={data}
 				savers={savers}
 				restarter={onRestart}
@@ -113,20 +129,32 @@ export function SettingsPage({
 	);
 }
 
-export function SettingsPageSkeleton() {
+export function SettingsPageSkeleton({
+	tab,
+	onTabChange,
+}: {
+	tab: SettingsTab;
+	onTabChange: (next: SettingsTab) => void;
+}) {
 	return (
 		<PageWrap className="space-y-page">
 			<PageHeaderCard
 				icon={Settings}
 				title={PAGE_HEADERS.settings.title}
 				description={PAGE_HEADERS.settings.description}
-				action={
-					<div inert className="flex flex-wrap items-center justify-end gap-2">
-						<SettingsReset onReset={async () => {}} />
-					</div>
+				afterHeader={
+					<SettingsToolbar
+						tab={tab}
+						onTabChange={onTabChange}
+						actions={
+							<div inert>
+								<SettingsReset onReset={async () => {}} />
+							</div>
+						}
+					/>
 				}
 			/>
-			<SettingsCardsSkeleton />
+			<SettingsCardsSkeleton tab={tab} />
 		</PageWrap>
 	);
 }
