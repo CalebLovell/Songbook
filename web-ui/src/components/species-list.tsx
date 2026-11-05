@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { CardHeader } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { LIST_ROW, SpeciesThumbnail } from "~/components/species-row.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Count } from "~/components/ui/count.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { rankingBarPercent } from "~/lib/stats-data.ts";
@@ -30,9 +32,10 @@ export function SpeciesList({
 	const maximum = Math.max(...species.map((item) => item.count), 0);
 
 	return (
-		<section
+		<Card
+			as="section"
 			aria-label={ariaLabel}
-			className={`feature-card flex flex-col rounded-md p-4 ${className}`}
+			className={`flex flex-col ${className}`}
 		>
 			<CardHeader title={title} />
 
@@ -45,7 +48,7 @@ export function SpeciesList({
 					))}
 				</ol>
 			)}
-		</section>
+		</Card>
 	);
 }
 
@@ -71,9 +74,7 @@ function SpeciesListRow({
 					>
 						{comName}
 					</Link>
-					<span className="count-figure shrink-0">
-						{count.toLocaleString()}
-					</span>
+					<Count className="shrink-0">{count.toLocaleString()}</Count>
 				</div>
 				<div className="truncate text-bark text-xs italic">{sciName}</div>
 				<div

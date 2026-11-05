@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { CardHeader } from "~/components/card-header.tsx";
+import { Card } from "~/components/ui/card.tsx";
 
 export type PageStatusTone = "missing" | "unavailable";
 
@@ -18,7 +19,7 @@ export function PageStatus({
 	children: ReactNode;
 }) {
 	return (
-		<section aria-label={title} className="feature-card rounded-md p-4">
+		<Card as="section" aria-label={title}>
 			<CardHeader
 				as={heading}
 				title={
@@ -40,6 +41,6 @@ export function PageStatus({
 					{actions}
 				</div>
 			) : null}
-		</section>
+		</Card>
 	);
 }

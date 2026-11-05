@@ -4,10 +4,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { useCanListen } from "~/lib/use-can-listen.ts";
-
-export const HERO_CARD_SHELL = "feature-card rounded-md p-4";
 
 const HERO_CARD_ROW =
 	"grid items-center gap-page sm:min-h-[7.75rem] sm:grid-cols-[9.5rem_minmax(0,1fr)]";
@@ -22,7 +21,7 @@ export const HERO_ACTIONS_CLASS = "max-sm:hidden";
 export function HeroCardShell({
 	label,
 	portrait,
-	className = HERO_CARD_SHELL,
+	className = "",
 	style,
 	actions,
 	footer,
@@ -37,7 +36,7 @@ export function HeroCardShell({
 	children: ReactNode;
 }) {
 	return (
-		<section aria-label={label} className={className} style={style}>
+		<Card as="section" aria-label={label} className={className} style={style}>
 			{actions ? (
 				<div className="mb-2 flex justify-end sm:hidden">{actions}</div>
 			) : null}
@@ -50,7 +49,7 @@ export function HeroCardShell({
 			</div>
 
 			{footer ? <div className={HERO_CARD_FOOTER}>{footer}</div> : null}
-		</section>
+		</Card>
 	);
 }
 

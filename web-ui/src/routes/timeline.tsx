@@ -22,6 +22,8 @@ import {
 import { StatusPage } from "~/components/status-page.tsx";
 import { PeriodToolbar } from "~/components/timeline/period-toolbar.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
+import { Count } from "~/components/ui/count.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { ShellFigure } from "~/components/ui/shell.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import { TooltipProvider } from "~/components/ui/tooltip.tsx";
@@ -110,7 +112,7 @@ function Timeline() {
 
 	return (
 		<TooltipProvider>
-			<div className="page-wrap space-y-page py-4">
+			<PageWrap className="space-y-page">
 				<TimelineHeader
 					data={settled?.current ? settled.value : null}
 					staleData={settled?.value ?? null}
@@ -145,7 +147,7 @@ function Timeline() {
 						)
 					}
 				</Deferred>
-			</div>
+			</PageWrap>
 		</TooltipProvider>
 	);
 }
@@ -329,7 +331,7 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 					{detections === undefined ? (
 						<ShellFigure />
 					) : (
-						<span className="count-figure">{detections.toLocaleString()}</span>
+						<Count>{detections.toLocaleString()}</Count>
 					)}{" "}
 					detections
 				</span>
@@ -339,7 +341,7 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 				/>
 				<span className="whitespace-nowrap">
 					{rows ? (
-						<span className="count-figure">{rows.length.toLocaleString()}</span>
+						<Count>{rows.length.toLocaleString()}</Count>
 					) : (
 						<ShellFigure />
 					)}{" "}

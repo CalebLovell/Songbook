@@ -11,7 +11,9 @@ import {
 	SpectrogramPlayerSkeleton,
 } from "~/components/spectrogram-player.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
+import { Kicker } from "~/components/ui/kicker.tsx";
 import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
 import { formatDateTime } from "~/lib/date-format.ts";
 import { HIGHLIGHT_THRESHOLDS } from "~/lib/highlight-thresholds.ts";
@@ -35,8 +37,7 @@ import { FRESH_PROGRESS, type GameProgress } from "~/lib/learn-saved-game.ts";
 
 const QUIZ_GRID_CLASS =
 	"grid grid-cols-[minmax(0,1fr)] @3xl/quiz:grid-cols-[minmax(0,1fr)_24rem] @7xl/quiz:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-page";
-const GAME_CARD_CLASS =
-	"@container/game feature-card flex min-w-0 flex-col gap-page rounded-md p-4";
+const GAME_CARD_CLASS = "@container/game flex min-w-0 flex-col gap-page";
 const GAME_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-[45px] flex-wrap items-center justify-between gap-x-2 border-b px-page py-2";
 const CHOICES_CLASS =
@@ -45,7 +46,7 @@ const CHOICE_CLASS =
 	"@container/choice flex items-center gap-4 rounded-md border px-4 py-2 text-left max-[400px]:gap-2 max-[400px]:px-2";
 const CHOICE_TEXT_CLASS =
 	"flex min-h-[calc(2*1.375rem+1rem)] min-w-0 flex-1 flex-col justify-center @max-[20rem]/choice:min-h-[calc(2*1.203125rem+1rem)]";
-const RAIL_CLASS = "feature-card @3xl/quiz:flex hidden flex-col rounded-md p-4";
+const RAIL_CLASS = "@3xl/quiz:flex hidden flex-col";
 const RAIL_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
 const RAIL_ROW_CLASS = "flex min-h-[54px] items-center gap-3 px-page py-1.75";
@@ -89,13 +90,14 @@ export function LearnGameSkeleton() {
 	return (
 		<div className="@container/quiz">
 			<div className={QUIZ_GRID_CLASS}>
-				<section
+				<Card
+					as="section"
 					aria-busy="true"
 					aria-label="Bird call quiz"
 					className={GAME_CARD_CLASS}
 				>
 					<header className={GAME_HEADER_CLASS}>
-						<h2 className="island-kicker">Bird quiz</h2>
+						<Kicker as="h2">Bird quiz</Kicker>
 						<GameInfo />
 					</header>
 
@@ -157,11 +159,16 @@ export function LearnGameSkeleton() {
 							Next bird
 						</Button>
 					</div>
-				</section>
+				</Card>
 
-				<aside aria-busy="true" aria-label="This round" className={RAIL_CLASS}>
+				<Card
+					as="aside"
+					aria-busy="true"
+					aria-label="This round"
+					className={RAIL_CLASS}
+				>
 					<div className={RAIL_HEADER_CLASS}>
-						<div className="island-kicker">This round</div>
+						<Kicker>This round</Kicker>
 					</div>
 					<ol aria-hidden="true" className="-mx-page divide-y">
 						{Array.from({ length: QUESTIONS_PER_ROUND }, (_, position) => (
@@ -179,7 +186,7 @@ export function LearnGameSkeleton() {
 							barClassName="right-0 left-auto w-full"
 						/>
 					</div>
-				</aside>
+				</Card>
 			</div>
 		</div>
 	);
@@ -189,19 +196,23 @@ export function LearnGameEmpty({ message }: { message: string }) {
 	return (
 		<div className="@container/quiz">
 			<div className={QUIZ_GRID_CLASS}>
-				<section aria-label="Bird call quiz" className={GAME_CARD_CLASS}>
+				<Card
+					as="section"
+					aria-label="Bird call quiz"
+					className={GAME_CARD_CLASS}
+				>
 					<header className={GAME_HEADER_CLASS}>
-						<h2 className="island-kicker">Bird quiz</h2>
+						<Kicker as="h2">Bird quiz</Kicker>
 					</header>
 					<p className="text-muted-foreground text-sm">{message}</p>
-				</section>
+				</Card>
 
-				<aside aria-label="This round" className={RAIL_CLASS}>
+				<Card as="aside" aria-label="This round" className={RAIL_CLASS}>
 					<div className={RAIL_HEADER_CLASS}>
-						<div className="island-kicker">This round</div>
+						<Kicker>This round</Kicker>
 					</div>
 					<p className="mt-page text-muted-foreground text-sm">{message}</p>
-				</aside>
+				</Card>
 			</div>
 		</div>
 	);
@@ -306,9 +317,13 @@ export function LearnGame({
 	return (
 		<div className="@container/quiz">
 			<div className={QUIZ_GRID_CLASS}>
-				<section aria-label="Bird call quiz" className={GAME_CARD_CLASS}>
+				<Card
+					as="section"
+					aria-label="Bird call quiz"
+					className={GAME_CARD_CLASS}
+				>
 					<header className={GAME_HEADER_CLASS}>
-						<h2 className="island-kicker">Bird quiz</h2>
+						<Kicker as="h2">Bird quiz</Kicker>
 						<GameInfo rareMax={rareMax} />
 					</header>
 
@@ -383,7 +398,7 @@ export function LearnGame({
 							</Button>
 						)}
 					</div>
-				</section>
+				</Card>
 
 				<RoundRail
 					questions={round.questions}
@@ -411,9 +426,9 @@ function RoundRail({
 	maxScore: number;
 }) {
 	return (
-		<aside aria-label="This round" className={RAIL_CLASS}>
+		<Card as="aside" aria-label="This round" className={RAIL_CLASS}>
 			<div className={RAIL_HEADER_CLASS}>
-				<div className="island-kicker">This round</div>
+				<Kicker>This round</Kicker>
 			</div>
 
 			<ol className="-mx-page divide-y">
@@ -467,7 +482,7 @@ function RoundRail({
 					</span>
 				</span>
 			</div>
-		</aside>
+		</Card>
 	);
 }
 
@@ -685,9 +700,10 @@ function RoundSummary({
 	const score = scoreRound(results);
 
 	return (
-		<section
+		<Card
+			as="section"
 			aria-label="Round results"
-			className="@container feature-card rise-in flex flex-col gap-page rounded-md p-4"
+			className="@container flex animate-rise-in flex-col gap-page"
 		>
 			<CardHeader title="Round complete">
 				<span className="text-sm tabular-nums">
@@ -752,6 +768,6 @@ function RoundSummary({
 					{isLoadingNextRound ? "Dealing a new round…" : "Play again"}
 				</Button>
 			</div>
-		</section>
+		</Card>
 	);
 }

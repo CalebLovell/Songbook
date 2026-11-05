@@ -3,6 +3,7 @@ import { type ReactNode, useState } from "react";
 
 import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { settingsCardId } from "./settings-index.ts";
 
@@ -31,10 +32,11 @@ export function SettingsCard({
 	const headingId = `settings-${cardId}`;
 
 	return (
-		<section
+		<Card
+			as="section"
 			id={cardId}
 			aria-labelledby={headingId}
-			className="feature-card scroll-mt-4 rounded-md p-4"
+			className="scroll-mt-4"
 		>
 			<form
 				className="flex h-full flex-col"
@@ -77,6 +79,6 @@ export function SettingsCard({
 					}}
 				/>
 			) : null}
-		</section>
+		</Card>
 	);
 }

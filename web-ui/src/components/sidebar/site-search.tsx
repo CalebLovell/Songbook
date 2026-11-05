@@ -22,7 +22,9 @@ import {
 	settingsCardId,
 } from "~/components/settings/settings-index.ts";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
+import { Count } from "~/components/ui/count.tsx";
 import { Input } from "~/components/ui/input.tsx";
+import { Kicker } from "~/components/ui/kicker.tsx";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import { getSearchSpecies } from "~/lib/search-species.ts";
 import {
@@ -285,14 +287,14 @@ function GroupLabel({
 	children: string;
 }) {
 	return (
-		<div
+		<Kicker
 			className={cn(
-				"island-kicker px-3 pt-1.5 pb-1",
+				"px-3 pt-1.5 pb-1",
 				divided && "mt-1 border-line border-t pt-2",
 			)}
 		>
 			{children}
-		</div>
+		</Kicker>
 	);
 }
 
@@ -311,7 +313,7 @@ function ResultBody({ result }: { result: Result }) {
 						{sciName}
 					</span>
 				</span>
-				<span className="count-figure">{count.toLocaleString()}</span>
+				<Count>{count.toLocaleString()}</Count>
 			</>
 		);
 	}

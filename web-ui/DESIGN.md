@@ -9,8 +9,8 @@ on claude.ai.
 
 ## Principles
 
-- **Paper for content.** Content sits on `feature-card`s (white, `--line`
-  hairline, 4px radius) on the paper ground. Cards never nest: a figure row
+- **Paper for content.** Content sits on `Card`s (`ui/card.tsx`: white, `--line`
+  hairline, 4px radius, `p-page`) on the paper ground. Cards never nest: a figure row
   inside a card uses `PageHeaderStats inline`, not more cards.
 - **The sidebar is an inset card** on desktop (`site-sidebar.tsx`), with paper
   around it. Page content fills the remaining width; no max-width column.
@@ -50,7 +50,7 @@ for a meaning; don't write a new mix inline when one exists:
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
 | `--live-fill` | the Live pill |
-| `--row-well` | the slack under a paged list's rows on a short page (`.row-well`) |
+| `--row-well` | the slack under a paged list's rows on a short page (`RowWell`) |
 | `--confidence-high/mid/low` | confidence pills; text is moss / bark / ink |
 | `--toast-{success,warning,error}-fill/-line` | toast tones; title is moss / bark / clay, neutral toasts stay white |
 
@@ -72,12 +72,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 
 - Page title: 20px bold
 - Figure: 20px semibold, tabular
-- Count: `.count-figure`, 13px bold ink, tabular. Every count of birds or
+- Count: `Count` (`ui/count.tsx`), 13px bold ink, tabular. Every count of birds or
   detections in running UI (a species row's total, a "117 detections · 30
   species" readout) uses it. Headline stats stay Figures; numbers drawn inside
   a chart (heatmap cells, bar labels) and table cells keep their own sizes.
 - Body 16px, secondary 14px, species binomial 14px italic
-- Kicker: `.island-kicker`, 11px, 700, uppercase, 0.16em tracking, moss
+- Kicker: `Kicker` (`ui/kicker.tsx`), 11px, 700, uppercase, 0.16em tracking, moss
 - Controls: 11–14px, weight 500
 
 ## Shape, spacing, motion
@@ -89,12 +89,17 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   controls in a toolbar or a row of buttons (search, menus, toggles,
   buttons), side by side or stacked; only a segmented control's own
   segments are joined.
-- Motion: 180ms ease for color/border/lift; `.rise-in` 700ms on mount;
-  `.flash-in` 2.4s sand highlight for new arrivals; charts 500ms.
-  Only linked cards lift on hover (`feature-card-link`).
+- Motion: 180ms ease for color/border/lift; `animate-rise-in` 700ms on mount;
+  `animate-flash-in` 2.4s sand highlight for new arrivals; charts 500ms.
+  Only linked cards lift on hover.
 
 ## Components
 
+- **Styling lives in the component.** A repeated look is a component with Tailwind
+  classes in its own file, not a class in `styles.css`. That file holds tokens,
+  `@theme`, base element rules, `@keyframes` and overrides of markup we don't own.
+- **Page wrapper**: every page sits in `PageWrap`. Its gutters and a card's padding
+  use `--page-gap`, so all of them halve together under 400px.
 - **Button** (`ui/button.tsx`): the default size is `xs` (24px). Pass glyphs
   via `icon`, never as children, so padding stays constant.
 - **Control height**: the toolbar row under a page's header, the inputs,

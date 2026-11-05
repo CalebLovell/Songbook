@@ -7,6 +7,8 @@ import {
 	Trash2,
 } from "lucide-react";
 import { type ExternalToast, Toaster as Sonner, toast } from "sonner";
+import { CARD_CLASS } from "~/components/ui/card.tsx";
+import { cn } from "~/lib/utils.ts";
 
 export { toast };
 
@@ -39,8 +41,10 @@ export function Toaster() {
 			toastOptions={{
 				unstyled: true,
 				classNames: {
-					toast:
-						"feature-card flex w-full items-start gap-2.5 rounded-md p-3 text-sm shadow-[0_6px_20px_-8px_color-mix(in_oklab,var(--ink)_28%,transparent)] *:transition-opacity *:duration-200 data-[expanded=false]:data-[front=false]:*:opacity-0 data-[type=success]:border-toast-success-line data-[type=success]:[background:var(--toast-success-fill)] data-[type=warning]:border-toast-warning-line data-[type=warning]:[background:var(--toast-warning-fill)] data-[type=error]:border-toast-error-line data-[type=error]:[background:var(--toast-error-fill)]",
+					toast: cn(
+						CARD_CLASS,
+						"flex w-full items-start gap-2.5 p-3 text-sm shadow-[0_6px_20px_-8px_color-mix(in_oklab,var(--ink)_28%,transparent)] *:transition-opacity *:duration-200 data-[expanded=false]:data-[front=false]:*:opacity-0 data-[type=success]:border-toast-success-line data-[type=success]:[background:var(--toast-success-fill)] data-[type=warning]:border-toast-warning-line data-[type=warning]:[background:var(--toast-warning-fill)] data-[type=error]:border-toast-error-line data-[type=error]:[background:var(--toast-error-fill)]",
+					),
 					icon: "relative mt-px flex size-4 shrink-0 items-center justify-center",
 					content: "min-w-0 grow space-y-0.5",
 					title:

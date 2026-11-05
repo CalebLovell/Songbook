@@ -28,12 +28,15 @@ import {
 } from "~/components/species-actions.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Count } from "~/components/ui/count.tsx";
 import {
 	PAGE_RANGE_CARD_CLASS,
 	PAGE_RANGE_CLASS,
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { SearchInput } from "~/components/ui/search-input.tsx";
 import {
 	ShellBar,
@@ -94,7 +97,7 @@ const PAGE_SIZE = 24;
 const GRID_CLASS =
 	"grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-page";
 const CARD_CLASS =
-	"feature-card relative flex flex-col gap-3 overflow-hidden rounded-md p-4 max-[400px]:gap-2";
+	"relative flex flex-col gap-3 overflow-hidden max-[400px]:gap-2";
 const FOOTER_CLASS =
 	"mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 text-sm";
 
@@ -102,7 +105,7 @@ function Species() {
 	const { cards } = Route.useLoaderData();
 
 	return (
-		<div className="page-wrap flex min-h-full flex-col gap-page py-4">
+		<PageWrap className="flex min-h-full flex-col gap-page">
 			<PageHeaderCard
 				icon={Feather}
 				title={PAGE_HEADERS.birds.title}
@@ -114,7 +117,7 @@ function Species() {
 			<Deferred promise={cards} shell={<SpeciesGridShell />}>
 				{(loaded) => <SpeciesBrowser cards={loaded} />}
 			</Deferred>
-		</div>
+		</PageWrap>
 	);
 }
 
@@ -126,13 +129,9 @@ function LifeListSummary({ cards }: { cards: Promise<LifeListCard[]> }) {
 		detections === undefined ? (
 			<ShellFigure />
 		) : (
-			<span className="count-figure">{detections.toLocaleString()}</span>
+			<Count>{detections.toLocaleString()}</Count>
 		),
-		loaded ? (
-			<span className="count-figure">{loaded.length.toLocaleString()}</span>
-		) : (
-			<ShellFigure />
-		),
+		loaded ? <Count>{loaded.length.toLocaleString()}</Count> : <ShellFigure />,
 		detections === 1,
 	);
 }
@@ -232,7 +231,7 @@ const NAME_WIDTHS = ["w-36", "w-28", "w-40", "w-32"];
 
 function SpeciesCardSkeleton({ index }: { index: number }) {
 	return (
-		<div aria-hidden="true" className={CARD_CLASS}>
+		<Card aria-hidden="true" className={CARD_CLASS}>
 			<div className="flex flex-col gap-1">
 				<div className="flex items-baseline gap-1">
 					<ShellText
@@ -277,7 +276,7 @@ function SpeciesCardSkeleton({ index }: { index: number }) {
 					barClassName="right-0 left-auto w-36"
 				/>
 			</div>
-		</div>
+		</Card>
 	);
 }
 
@@ -319,17 +318,14 @@ function SpeciesBrowser({ cards }: { cards: LifeListCard[] }) {
 	return (
 		<div className="flex flex-1 flex-col gap-page">
 			{pageItems.length === 0 ? (
-				<section
-					aria-label="Species recorded"
-					className="feature-card rounded-md p-4"
-				>
+				<Card as="section" aria-label="Species recorded">
 					<CardHeader title="Species recorded" />
 					<EmptyNote>
 						{cards.length === 0
 							? EMPTY.station.species
 							: EMPTY.filter.birdsSearch(search)}
 					</EmptyNote>
-				</section>
+				</Card>
 			) : (
 				<div className={GRID_CLASS}>
 					{pageItems.map((card) => (
@@ -531,8 +527,8 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 	const lastHeard = card.lastDetected ? formatDateTime(card.lastDetected) : "—";
 
 	return (
-		<div
-			className={`${CARD_CLASS} feature-card-link has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2`}
+		<Card
+			className={`${CARD_CLASS} hover:border-hover-line has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2 hover:[transform:translateY(-2px)]`}
 		>
 			<Link
 				to="/birds/$comName"
@@ -577,6 +573,6 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 					Last heard · {lastHeard}
 				</div>
 			</div>
-		</div>
+		</Card>
 	);
 }

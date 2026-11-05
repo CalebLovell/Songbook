@@ -2,12 +2,14 @@ import { Check, Crosshair, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import {
 	MODAL_ACTIONS_CLASS,
 	MODAL_BACKDROP_CLASS,
 	MODAL_CARD_CLASS,
 	MODAL_TITLE_CLASS,
 } from "~/components/ui/confirm-dialog.tsx";
+import { Kicker } from "~/components/ui/kicker.tsx";
 
 const COORDINATE_PLACES = 4;
 
@@ -93,7 +95,7 @@ export function StationLocation({
 					aria-labelledby="station-location-title"
 					className={MODAL_BACKDROP_CLASS}
 				>
-					<div className={`${MODAL_CARD_CLASS} max-w-md`}>
+					<Card className={`${MODAL_CARD_CLASS} max-w-md`}>
 						<h2 id="station-location-title" className={MODAL_TITLE_CLASS}>
 							{state.kind === "found"
 								? "Use this location?"
@@ -103,13 +105,13 @@ export function StationLocation({
 							<>
 								<dl className="grid grid-cols-2 gap-page rounded-md bg-muted p-page text-sm tabular-nums">
 									<div>
-										<dt className="island-kicker">Latitude</dt>
+										<Kicker as="dt">Latitude</Kicker>
 										<dd className="mt-1 font-semibold">
 											{state.coordinates.latitude}
 										</dd>
 									</div>
 									<div>
-										<dt className="island-kicker">Longitude</dt>
+										<Kicker as="dt">Longitude</Kicker>
 										<dd className="mt-1 font-semibold">
 											{state.coordinates.longitude}
 										</dd>
@@ -157,7 +159,7 @@ export function StationLocation({
 								</Button>
 							) : null}
 						</div>
-					</div>
+					</Card>
 				</div>
 			) : null}
 		</>

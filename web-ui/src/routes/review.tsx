@@ -8,6 +8,7 @@ import {
 	ReviewWorkflow,
 	ReviewWorkflowSkeleton,
 } from "~/components/review/review-workflow.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { pageTitle } from "~/lib/page-title.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
@@ -65,7 +66,7 @@ function Review() {
 		}
 	}
 	return (
-		<div className="page-wrap space-y-page py-4">
+		<PageWrap className="space-y-page">
 			<PageHeaderCard
 				icon={SearchCheck}
 				title={PAGE_HEADERS.review.title}
@@ -99,6 +100,6 @@ function Review() {
 					/>
 				)}
 			</Deferred>
-		</div>
+		</PageWrap>
 	);
 }

@@ -9,6 +9,7 @@ import {
 import type { ComponentType } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
+import { Count } from "~/components/ui/count.tsx";
 import { ShellFigure } from "~/components/ui/shell.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import {
@@ -85,9 +86,9 @@ export function LearnPoolSelector({
 
 function PoolCount({ count }: { count: number | undefined }) {
 	return (
-		<span className="count-figure inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground/8 in-data-[state=on]:bg-primary-foreground/20 px-1.5 in-data-[state=on]:text-primary-foreground! leading-5">
+		<Count className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground/8 in-data-[state=on]:bg-primary-foreground/20 px-1.5 in-data-[state=on]:text-primary-foreground! leading-5">
 			{count === undefined ? <ShellFigure className="w-[1.6ch]!" /> : count}
-		</span>
+		</Count>
 	);
 }
 

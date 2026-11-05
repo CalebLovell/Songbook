@@ -4,6 +4,7 @@ import { LogOut, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { toast } from "~/components/ui/toaster.tsx";
 import { lockFn } from "~/lib/auth.ts";
 import { SESSION_IDLE_DAYS } from "~/lib/auth-limits.ts";
@@ -33,9 +34,10 @@ export function SessionCard() {
 	}
 
 	return (
-		<section
+		<Card
+			as="section"
 			aria-labelledby="account-sign-in"
-			className="feature-card flex flex-col gap-page rounded-md p-page"
+			className="flex flex-col gap-page"
 		>
 			<CardHeader
 				as="h2"
@@ -66,6 +68,6 @@ export function SessionCard() {
 					{pending ? "Signing out…" : "Sign out"}
 				</Button>
 			</div>
-		</section>
+		</Card>
 	);
 }

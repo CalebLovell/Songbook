@@ -6,6 +6,7 @@ import {
 	SpectrogramPlayer,
 	SpectrogramPlayerSkeleton,
 } from "~/components/spectrogram-player.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { formatDateTime } from "~/lib/date-format.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import type { BestRecording } from "~/lib/species-detail.ts";
@@ -22,9 +23,10 @@ export function BestRecordingCard({
 	className?: string;
 }) {
 	return (
-		<section
+		<Card
+			as="section"
 			aria-label="Best recording"
-			className={`feature-card flex flex-col rounded-md p-4 ${className}`}
+			className={`flex flex-col ${className}`}
 		>
 			<CardHeader title="Best recording" />
 
@@ -47,7 +49,7 @@ export function BestRecordingCard({
 					/>
 				</div>
 			)}
-		</section>
+		</Card>
 	);
 }
 
@@ -57,10 +59,11 @@ export function BestRecordingCardSkeleton({
 	className?: string;
 }) {
 	return (
-		<section
+		<Card
+			as="section"
 			aria-busy="true"
 			aria-label="Best recording"
-			className={`feature-card flex flex-col rounded-md p-4 ${className}`}
+			className={`flex flex-col ${className}`}
 		>
 			<CardHeader title="Best recording" />
 			<div className="mt-page flex flex-1 flex-col">
@@ -70,6 +73,6 @@ export function BestRecordingCardSkeleton({
 					aside={<ClipMetaSkeleton />}
 				/>
 			</div>
-		</section>
+		</Card>
 	);
 }

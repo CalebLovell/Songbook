@@ -12,6 +12,7 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { ChartDataTable } from "~/components/chart-data-table.tsx";
 import { ChartValueTooltip } from "~/components/chart-tooltip.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { ShellChartCard } from "~/components/ui/shell.tsx";
 import { CHART_MARGIN, X_AXIS_HEIGHT } from "~/lib/chart-style.ts";
@@ -44,9 +45,10 @@ export function DetectionsByMonthCard({
 	const [initials, setInitials] = useState(false);
 
 	return (
-		<section
+		<Card
+			as="section"
 			aria-label="Detections by month"
-			className={`feature-card flex flex-col rounded-md p-4 ${isEmpty ? "" : "min-h-72"} ${className}`}
+			className={`flex flex-col ${isEmpty ? "" : "min-h-72"} ${className}`}
 		>
 			<CardHeader title="Detections by month">
 				<MonthInfo />
@@ -109,7 +111,7 @@ export function DetectionsByMonthCard({
 					/>
 				</div>
 			)}
-		</section>
+		</Card>
 	);
 }
 

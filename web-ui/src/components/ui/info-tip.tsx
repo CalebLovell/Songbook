@@ -3,11 +3,13 @@ import { Dialog } from "radix-ui";
 import { type ReactNode, type SyntheticEvent, useState } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
+import { CARD_CLASS } from "~/components/ui/card.tsx";
 import {
 	MODAL_BACKDROP_CLASS,
 	MODAL_CARD_CLASS,
 	MODAL_TITLE_CLASS,
 } from "~/components/ui/confirm-dialog.tsx";
+import { cn } from "~/lib/utils.ts";
 
 const TITLE_SMALL_WORDS = new Set(["a", "an", "and", "by", "of", "or", "the"]);
 
@@ -64,7 +66,11 @@ export function InfoTip({
 				>
 					<Dialog.Content
 						aria-describedby={undefined}
-						className={`${MODAL_CARD_CLASS} max-h-[80vh] max-w-md overflow-y-auto`}
+						className={cn(
+							CARD_CLASS,
+							MODAL_CARD_CLASS,
+							"max-h-[80vh] max-w-md overflow-y-auto",
+						)}
 					>
 						<div className="flex items-center justify-between gap-page">
 							<Dialog.Title className={MODAL_TITLE_CLASS}>

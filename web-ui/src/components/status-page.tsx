@@ -2,6 +2,7 @@ import type { ComponentType, ReactNode } from "react";
 
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { PageStatus, type PageStatusTone } from "~/components/page-status.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 
 export function StatusPage({
 	icon,
@@ -21,7 +22,7 @@ export function StatusPage({
 	children: ReactNode;
 }) {
 	return (
-		<div className="page-wrap space-y-page py-4">
+		<PageWrap className="space-y-page">
 			<PageHeaderCard
 				icon={icon}
 				title={section}
@@ -30,6 +31,6 @@ export function StatusPage({
 			<PageStatus tone={tone} title={title} heading="h2" actions={actions}>
 				{children}
 			</PageStatus>
-		</div>
+		</PageWrap>
 	);
 }

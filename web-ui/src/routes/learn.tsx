@@ -14,6 +14,7 @@ import {
 import { LearnPoolSelector } from "~/components/learn/learn-layout.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { getLearnRound } from "~/lib/learn.ts";
 import { LEARN_POOLS, type LearnPool } from "~/lib/learn-pools.ts";
@@ -74,7 +75,7 @@ function Learn() {
 	const [isRoundFinished, setIsRoundFinished] = useState(false);
 
 	return (
-		<div className="page-wrap py-4">
+		<PageWrap>
 			<PageHeaderCard
 				icon={Lightbulb}
 				title={PAGE_HEADERS.learn.title}
@@ -127,7 +128,7 @@ function Learn() {
 					}}
 				/>
 			) : null}
-		</div>
+		</PageWrap>
 	);
 }
 

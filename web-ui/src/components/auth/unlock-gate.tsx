@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { SIGN_IN_CARD_TITLE } from "~/components/auth/session-card.tsx";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { Input } from "~/components/ui/input.tsx";
 import { unlockFn } from "~/lib/auth.ts";
 import { DEV_PASSWORD } from "~/lib/dev-password.ts";
@@ -56,9 +57,10 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 	}
 
 	return (
-		<form
+		<Card
+			as="form"
 			aria-labelledby="unlock-title"
-			className="feature-card flex flex-col gap-4 rounded-md p-page"
+			className="flex flex-col gap-4"
 			onSubmit={onSubmit}
 		>
 			<CardHeader as="h2" titleId="unlock-title" title={SIGN_IN_CARD_TITLE} />
@@ -147,6 +149,6 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 					) : null}
 				</p>
 			</div>
-		</form>
+		</Card>
 	);
 }

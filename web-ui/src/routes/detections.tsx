@@ -16,6 +16,8 @@ import {
 } from "~/components/detections/detections-table.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
 import {
 	type DetectionWorkspaceSearch,
@@ -37,7 +39,7 @@ export const Route = createFileRoute("/detections")({
 });
 
 const TABLE_CARD_CLASS =
-	"feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-page [--card-edge:min(var(--page-gap),0.75rem)]";
+	"flex min-h-80 flex-col overflow-hidden [--card-edge:min(var(--page-gap),0.75rem)]";
 
 function Detections() {
 	const { page: pagePromise } = Route.useLoaderData();
@@ -93,7 +95,7 @@ function Detections() {
 	}
 
 	return (
-		<div className="page-wrap flex h-full min-h-fit flex-col gap-page py-4">
+		<PageWrap className="flex h-full min-h-fit flex-col gap-page">
 			<div className="shrink-0 space-y-page">
 				<PageHeaderCard
 					icon={AudioWaveform}
@@ -127,19 +129,17 @@ function Detections() {
 			>
 				{(loaded) =>
 					loaded.total === 0 ? (
-						<section
-							aria-label="Detections"
-							className="feature-card shrink-0 rounded-md p-4"
-						>
+						<Card as="section" aria-label="Detections" className="shrink-0">
 							<CardHeader title="Detections" />
 							<EmptyNote>
 								{isFiltered
 									? EMPTY.filter.detectionsFilters
 									: EMPTY.station.detections}
 							</EmptyNote>
-						</section>
+						</Card>
 					) : (
-						<section
+						<Card
+							as="section"
 							aria-label="Detections"
 							className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 						>
@@ -155,7 +155,7 @@ function Detections() {
 								canListen={canListen}
 								onDeleteSelected={() => setDeleteOpen(true)}
 							/>
-						</section>
+						</Card>
 					)
 				}
 			</Deferred>
@@ -168,7 +168,7 @@ function Detections() {
 					onConfirm={confirmDeletion}
 				/>
 			) : null}
-		</div>
+		</PageWrap>
 	);
 }
 
@@ -184,7 +184,8 @@ function DetectionsTableShell({
 	onSearchChange: (search: DetectionWorkspaceSearch) => void;
 }) {
 	return (
-		<section
+		<Card
+			as="section"
 			aria-busy="true"
 			aria-label="Detections"
 			className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
@@ -199,6 +200,6 @@ function DetectionsTableShell({
 				canListen={canListen}
 				onDeleteSelected={() => {}}
 			/>
-		</section>
+		</Card>
 	);
 }

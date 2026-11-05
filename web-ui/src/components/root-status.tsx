@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { PageStatus } from "~/components/page-status.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { isUnauthorizedError } from "~/lib/auth.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 
@@ -19,7 +20,7 @@ export function RouteNotFound() {
 	});
 
 	return (
-		<div className="page-wrap py-4">
+		<PageWrap>
 			<PageStatus
 				tone="missing"
 				title="Page not found"
@@ -32,7 +33,7 @@ export function RouteNotFound() {
 				There is nothing at <code>{pathname}</code>. The address may be
 				mistyped, or the page may have moved.
 			</PageStatus>
-		</div>
+		</PageWrap>
 	);
 }
 
@@ -52,7 +53,7 @@ export function RouteError({ error }: ErrorComponentProps) {
 	if (signedOut) return null;
 
 	return (
-		<div className="page-wrap py-4">
+		<PageWrap>
 			<PageStatus
 				tone="unavailable"
 				title="This page couldn't load"
@@ -75,6 +76,6 @@ export function RouteError({ error }: ErrorComponentProps) {
 				Something went wrong on the station. Try again in a minute. If it keeps
 				happening, restarting the station usually fixes it.
 			</PageStatus>
-		</div>
+		</PageWrap>
 	);
 }
