@@ -168,7 +168,7 @@ function DateRangeFilter({
 				title="Clear dates"
 				disabled={!from && !to}
 				onClick={() => onChange({ from: undefined, to: undefined })}
-				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -248,7 +248,7 @@ function SelectionBar({
 				aria-label="Clear selection"
 				title="Clear selection"
 				onClick={onClear}
-				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -256,7 +256,7 @@ function SelectionBar({
 				type="button"
 				aria-label={`Delete ${count} selected ${noun}`}
 				onClick={onDelete}
-				className="flex @min-[36rem]:w-auto pointer-coarse:w-9 w-8.5 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive transition-colors hover:bg-destructive/10"
+				className="flex @min-[36rem]:w-auto pointer-coarse:w-9 w-8.5 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive hover:bg-destructive/10"
 			>
 				<Trash2 className="size-4" aria-hidden="true" />
 				<span className="sr-only @min-[36rem]:not-sr-only">Delete</span>

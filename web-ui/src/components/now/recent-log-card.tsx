@@ -28,7 +28,7 @@ const ROW_BUTTON = {
 const FOOTER_CLASS =
 	"-mx-page mt-auto -mb-page flex min-h-[45px] shrink-0 items-center justify-end border-t px-page";
 const FOOTER_LINK_CLASS =
-	"inline-flex items-center gap-1 text-muted-foreground text-xs no-underline hover:text-foreground hover:underline";
+	"inline-flex items-center gap-1 text-xs no-underline hover:underline";
 
 function RecentLogHeader() {
 	return (

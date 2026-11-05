@@ -216,7 +216,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 								setQuery("");
 								input.current?.focus();
 							}}
-							className="absolute top-0 right-3 bottom-3 flex w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+							className="absolute top-0 right-3 bottom-3 flex w-9 items-center justify-center text-muted-foreground hover:text-foreground"
 						>
 							<X className="size-4" />
 						</button>

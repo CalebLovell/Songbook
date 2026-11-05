@@ -274,7 +274,7 @@ function JoinedStep({
 			title={label}
 			disabled={target === null}
 			onClick={() => target && onPick(target)}
-			className={`flex w-8.5 shrink-0 items-center justify-center border-input transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
+			className={`flex w-8.5 shrink-0 items-center justify-center border-input hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
 		>
 			<Icon className="size-4" aria-hidden="true" />
 		</button>

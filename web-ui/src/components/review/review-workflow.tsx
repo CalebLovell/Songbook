@@ -454,7 +454,7 @@ export function ReviewWorkflow({
 											type="button"
 											aria-current={current ? "true" : undefined}
 											onClick={() => setIndex(i)}
-											className={`${QUEUE_ROW_CLASS} text-left transition-colors duration-[180ms] ${current ? "bg-row-selected" : "hover:bg-meadow"}`}
+											className={`${QUEUE_ROW_CLASS} text-left ${current ? "bg-row-selected" : "hover:bg-meadow"}`}
 										>
 											<IndexDot index={queueNumber(item)} widest={widest} />
 											<SpeciesThumbnail

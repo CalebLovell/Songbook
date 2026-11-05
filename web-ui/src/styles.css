@@ -174,49 +174,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* The document itself never scrolls -- the app shell is one viewport tall and
-   the only scrollport is the content pane inside it (see `__root`). Fixing the
-   height here rather than `min-height` is what stops a tall page from growing
-   the document and taking the sidebar out of frame with it. The scrollbar
-   gutter moved to that pane for the same reason. */
-html,
-body,
-#app {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  color: var(--ink);
-  font-family: var(--font-sans);
-  background-color: var(--paper);
-  overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  color: var(--moss);
-  text-decoration-color: color-mix(in oklab, var(--moss) 45%, transparent);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-
-a:hover {
-  color: var(--ink);
-}
-
-/* A link drawn as a button (`ButtonLink`, or `Button asChild` around an <a>)
-   takes its colours from the button variant, not from the link rules above.
-   Those are unlayered, so they would otherwise beat the variant's layered
-   utilities -- moss text on a moss primary fill. `revert-layer` hands colour
-   back to the layered cascade, where the variant wins. */
-a[data-slot="button"],
-a[data-slot="button"]:hover {
-  color: revert-layer;
-  text-decoration: none;
-}
-
 /* A table's select-row checkbox, drawn rather than native: phones size and
    draw a native box by their own rules, so the header's select-all and the
    rows' boxes came out different sizes. 16px, 18px under a finger. */
@@ -257,73 +214,6 @@ a[data-slot="button"]:hover {
   }
 }
 
-button,
-a {
-  transition:
-    background-color 180ms ease,
-    color 180ms ease,
-    border-color 180ms ease,
-    transform 180ms ease;
-}
-
-/* The vertical counterpart to .nav-link. The underline that marks the active
-   header link reads as an underline, not a selection, once the links are
-   stacked -- so the sidebar marks its active row with a filled pill instead.
-   Each row is sized like the app's controls: with a mouse, a 34px row with
-   a button's 14px label and 16px glyph; on a touch screen, a 36px row with
-   the controls' 16px touch text and an 18px glyph, so the label and icon
-   grow with the target rather than floating in it. */
-.sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  min-height: 2.125rem;
-  padding: 0 0.75rem;
-  border-radius: var(--radius);
-  text-decoration: none;
-  font-size: 0.875rem;
-  color: color-mix(in oklab, var(--ink) 70%, var(--moss) 30%);
-}
-
-@media (pointer: coarse) {
-  .sidebar-link {
-    gap: 0.75rem;
-    min-height: 2.25rem;
-    font-size: 1rem;
-  }
-}
-
-.sidebar-link:hover {
-  background: var(--meadow);
-  color: var(--ink);
-}
-
-/* The active row is marked by weight of background alone, not bolder text:
-   re-weighting the label reflows the row on every navigation. Its fill sits a
-   step deeper than the hover fill so the two never read as the same state. */
-.sidebar-link.is-active {
-  background: color-mix(in oklab, var(--moss) 10%, var(--meadow));
-  color: var(--ink);
-}
-
-.sidebar-icon {
-  width: 1rem;
-  height: 1rem;
-  flex: none;
-  opacity: 0.75;
-}
-
-@media (pointer: coarse) {
-  .sidebar-icon {
-    width: 1.125rem;
-    height: 1.125rem;
-  }
-}
-
-.sidebar-link.is-active .sidebar-icon {
-  opacity: 1;
-}
-
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -355,6 +245,16 @@ a {
 }
 
 @layer base {
+  /* The document itself never scrolls -- the app shell is one viewport tall and
+     the only scrollport is the content pane inside it (see `__root`). Fixing the
+     height here rather than `min-height` is what stops a tall page from growing
+     the document and taking the sidebar out of frame with it. The scrollbar
+     gutter moved to that pane for the same reason. */
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
   * {
     @apply border-border;
     /* Pre-set the resting outline colour so focusing never *changes* it.
@@ -383,8 +283,30 @@ a {
     outline: none;
   }
   body {
-    background-color: var(--background);
+    margin: 0;
     color: var(--foreground);
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a:not([data-slot="button"]) {
+    color: var(--moss);
+    text-decoration-color: color-mix(in oklab, var(--moss) 45%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  a:not([data-slot="button"]):hover {
+    color: var(--ink);
+  }
+  button,
+  a {
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease,
+      transform 180ms ease;
   }
   code {
     font-family: var(--font-mono);

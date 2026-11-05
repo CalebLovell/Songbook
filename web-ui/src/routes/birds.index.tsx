@@ -514,7 +514,7 @@ function DirectionButton({
 			title={reverse ? "Reversed" : "Reverse order"}
 			onClick={onReverse}
 			className={cn(
-				"flex shrink-0 items-center justify-center border-input bg-card transition-colors hover:bg-accent hover:text-accent-foreground aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground",
+				"flex shrink-0 items-center justify-center border-input bg-card hover:bg-accent hover:text-accent-foreground aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground",
 				className,
 			)}
 		>

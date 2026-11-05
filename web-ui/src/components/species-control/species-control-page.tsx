@@ -180,7 +180,7 @@ export function SpeciesSelectionBar({
 				aria-label="Clear selection"
 				title="Clear selection"
 				onClick={onClear}
-				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -190,7 +190,7 @@ export function SpeciesSelectionBar({
 					type="button"
 					aria-label={`Set selected species to ${action.label}`}
 					onClick={() => onStatus(action.status)}
-					className={`flex @max-[36rem]:flex-1 items-center justify-center whitespace-nowrap border-input border-l @min-[36rem]:px-3 px-2 transition-colors ${action.className}`}
+					className={`flex @max-[36rem]:flex-1 items-center justify-center whitespace-nowrap border-input border-l @min-[36rem]:px-3 px-2 ${action.className}`}
 				>
 					<span className="@max-[36rem]:hidden">{action.label}</span>
 					<span className="@min-[36rem]:hidden">{action.short}</span>

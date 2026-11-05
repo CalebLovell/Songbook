@@ -6,6 +6,7 @@ import {
 	CircleUserRound,
 	Feather,
 	Lightbulb,
+	type LucideIcon,
 	SearchCheck,
 	Settings,
 	SlidersHorizontal,
@@ -14,10 +15,21 @@ import { useId } from "react";
 
 import { useUpdateOffered } from "~/lib/use-update-offered.ts";
 
+const NAV_ROW_CLASS =
+	"group flex min-h-8.5 pointer-coarse:min-h-9 items-center gap-2.5 pointer-coarse:gap-3 rounded-(--radius) px-3 text-[0.875rem] text-[color-mix(in_oklab,var(--ink)_70%,var(--moss)_30%)] pointer-coarse:text-[1rem] no-underline hover:bg-meadow hover:text-ink data-[status=active]:bg-[color-mix(in_oklab,var(--moss)_10%,var(--meadow))] data-[status=active]:text-ink";
+
+function NavIcon({ icon: Icon }: { icon: LucideIcon }) {
+	return (
+		<Icon
+			aria-hidden="true"
+			className="pointer-coarse:size-4.5 size-4 flex-none opacity-75 group-data-[status=active]:opacity-100"
+		/>
+	);
+}
+
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 	const linkProps = {
-		className: "sidebar-link",
-		activeProps: { className: "sidebar-link is-active" },
+		className: NAV_ROW_CLASS,
 		onClick: onNavigate,
 	};
 
@@ -33,7 +45,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 			>
 				<SectionLabel id={`${id}-explore`}>Explore</SectionLabel>
 				<Link to="/live" {...linkProps}>
-					<Activity className="sidebar-icon" aria-hidden="true" />
+					<NavIcon icon={Activity} />
 					Live Feed
 				</Link>
 				<Link
@@ -41,15 +53,15 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					activeOptions={{ includeSearch: false }}
 					{...linkProps}
 				>
-					<CalendarRange className="sidebar-icon" aria-hidden="true" />
+					<NavIcon icon={CalendarRange} />
 					Timeline
 				</Link>
 				<Link to="/birds" {...linkProps}>
-					<Feather className="sidebar-icon" aria-hidden="true" />
+					<NavIcon icon={Feather} />
 					All Birds
 				</Link>
 				<Link to="/learn" {...linkProps}>
-					<Lightbulb className="sidebar-icon" aria-hidden="true" />
+					<NavIcon icon={Lightbulb} />
 					Learn
 				</Link>
 			</nav>
@@ -71,7 +83,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 						activeOptions={{ includeSearch: false }}
 						{...linkProps}
 					>
-						<AudioWaveform className="sidebar-icon" aria-hidden="true" />
+						<NavIcon icon={AudioWaveform} />
 						Detections
 					</Link>
 					<Link
@@ -80,7 +92,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 						activeOptions={{ includeSearch: false }}
 						{...linkProps}
 					>
-						<SearchCheck className="sidebar-icon" aria-hidden="true" />
+						<NavIcon icon={SearchCheck} />
 						Review
 					</Link>
 				</nav>
@@ -92,7 +104,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 			>
 				<SectionLabel id={`${id}-station`}>Station</SectionLabel>
 				<Link to="/account" {...linkProps}>
-					<CircleUserRound className="sidebar-icon" aria-hidden="true" />
+					<NavIcon icon={CircleUserRound} />
 					Account
 				</Link>
 				{auth.unlocked ? (
@@ -103,11 +115,11 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 							activeOptions={{ includeSearch: false }}
 							{...linkProps}
 						>
-							<SlidersHorizontal className="sidebar-icon" aria-hidden="true" />
+							<NavIcon icon={SlidersHorizontal} />
 							Species Control
 						</Link>
 						<Link to="/settings" {...linkProps}>
-							<Settings className="sidebar-icon" aria-hidden="true" />
+							<NavIcon icon={Settings} />
 							Settings
 							{offered ? (
 								<UpdateDot
