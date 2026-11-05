@@ -246,7 +246,6 @@ function TimelineHeader({
 	const highlights = data?.body.kind === "rows" ? data.body.highlights : [];
 	const toolbarData = data ?? staleData;
 
-	const shareSubject = data ? `${period}:${anchor}` : null;
 	const loadShare = async () =>
 		period === "day"
 			? formatShareCard({
@@ -260,8 +259,12 @@ function TimelineHeader({
 					rows,
 					highlights,
 				});
-	const share = useShare({ subject: shareSubject, load: loadShare });
-	const canShare = data?.hasAnyDetections ?? false;
+	const share = useShare({
+		subject: `${period}:${anchor}`,
+		hasData: data !== null,
+		load: loadShare,
+	});
+	const canShare = toolbarData?.hasAnyDetections ?? false;
 
 	return (
 		<>

@@ -184,6 +184,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Confirmations** all use `ConfirmDialog`: full-size buttons, an icon on each,
   Escape cancels. Both are `type="button"` because the dialog often sits inside
   the form it guards.
+- **Sharing**: Share opens a modal showing the exact text that will be sent, on a
+  meadow well; opening it sends nothing. Copy is always there, and a touch screen
+  with a share sheet adds Share as the primary button.
 - **Explanations**: `InfoTip` opens a modal from the info icon. `Hint` is the hover
   tooltip, and a tap opens it too.
 - **Outcomes** arrive as toasts, never as a status line or coloured stripe on a

@@ -1,10 +1,11 @@
 import { expect, type Page, test } from "@playwright/test";
 
 /**
- * The Timeline's Share button copies a summary of the window on screen, whatever
- * the period and window were changed to just before. The summary is prepared as
- * soon as the window changes: it once got built before that window's figures had
- * arrived, and said "All time · Nothing heard" for a busy week.
+ * The Timeline's Share button opens a preview of the summary for the window on
+ * screen, whatever the period and window were changed to just before, and copies
+ * it only when asked. The summary is prepared as soon as the window changes: it
+ * once got built before that window's figures had arrived, and said "All time ·
+ * Nothing heard" for a busy week.
  *
  * Needs a seeded station (`npm run db:reset`).
  */
@@ -36,10 +37,25 @@ async function copySummary(page: Page): Promise<string> {
 		window.copiedSummary = undefined;
 	});
 	await page.getByRole("button", { name: "Share" }).click();
-	await expect
-		.poll(() => page.evaluate(() => window.copiedSummary))
-		.toBeTruthy();
-	return page.evaluate(() => window.copiedSummary ?? "");
+	const dialog = page.getByRole("dialog", { name: "Share Summary" });
+	const copy = dialog.getByRole("button", { name: "Copy" });
+	await expect(copy).toBeEnabled();
+	expect(
+		await page.evaluate(() => window.copiedSummary),
+		"opening the dialog copies nothing",
+	).toBeUndefined();
+	const preview = await dialog.getByTestId("share-preview").innerText();
+
+	await copy.click();
+	await expect(dialog.getByRole("button", { name: "Copied" })).toBeVisible();
+	const copied = await page.evaluate(() => window.copiedSummary ?? "");
+	expect(copied.replace(/\s+/g, " "), "copies what it shows").toEqual(
+		preview.replace(/\s+/g, " ").trim(),
+	);
+
+	await page.keyboard.press("Escape");
+	await expect(dialog).toBeHidden();
+	return copied;
 }
 
 async function changeWindow(page: Page, action: () => Promise<void>) {
@@ -66,6 +82,42 @@ async function expectShareMatchesPage(page: Page, period: string) {
 	}
 	return summary;
 }
+
+test("a data refresh leaves the open dialog and its text in place", async ({
+	page,
+}) => {
+	await page.goto("/timeline?period=week");
+	await page.waitForLoadState("networkidle");
+	const share = page.getByRole("button", { name: "Share" });
+	test.skip((await share.count()) === 0, "station has no detections yet");
+
+	await share.click();
+	const dialog = page.getByRole("dialog", { name: "Share Summary" });
+	const preview = dialog.getByTestId("share-preview");
+	await expect(preview).toHaveAttribute("aria-busy", "false");
+	const before = await preview.innerText();
+
+	const sawInterruption = await page.evaluate(async () => {
+		const shown = () =>
+			document.querySelector('[data-testid="share-preview"]')?.getAttribute(
+				"aria-busy",
+			) === "false";
+		let interrupted = false;
+		const watch = setInterval(() => {
+			if (!shown()) interrupted = true;
+		}, 5);
+		const { __TSR_ROUTER__: router } = window as unknown as {
+			__TSR_ROUTER__: { invalidate: () => Promise<void> };
+		};
+		await router.invalidate();
+		await new Promise((resolve) => setTimeout(resolve, 1_000));
+		clearInterval(watch);
+		return interrupted;
+	});
+
+	expect(sawInterruption, "never closes or falls back to a shell").toBe(false);
+	await expect(preview).toHaveText(before);
+});
 
 test("the copied summary follows every period and window change", async ({
 	page,
