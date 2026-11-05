@@ -91,7 +91,7 @@ async function getHourActivity(
 	);
 }
 
-export const VISITS_PAGE_SIZE = 10;
+export const VISITS_PAGE_SIZE = 100;
 
 async function getVisitPage(
 	comName: string,

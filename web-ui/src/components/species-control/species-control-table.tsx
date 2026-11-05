@@ -42,7 +42,7 @@ export type SpeciesControlViewRow = SpeciesControlRow & {
 
 export type SpeciesSortKey = SpeciesControlSort;
 
-export const SPECIES_CONTROL_PAGE_SIZE = 50;
+export const SPECIES_CONTROL_PAGE_SIZE = 100;
 
 const STATUS_RANK: Record<SpeciesStatus, number> = {
 	automatic: 0,
@@ -82,6 +82,7 @@ export function sortSpeciesControlRows(
 
 const FIRST_COLUMN_CLASSES = "pl-page";
 const CELL_GAP = "px-cell";
+const NAME_CELL = "min-w-0 @max-[36rem]:py-1.5";
 const STATUS_EDGE = "pr-page-end";
 const COLUMN_VISIBILITY: Record<string, string> = {
 	scientific: "hidden @min-[54rem]:block",
@@ -195,13 +196,13 @@ export function SpeciesControlTable({
 		<div className="@container flex min-h-0 flex-1 flex-col">
 			<Table
 				role="table"
-				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:grid-cols-(--cols-xs)"
+				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
 				style={COLUMN_GRID}
 				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
 				<TableHeader
 					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong @min-[36rem]:[scrollbar-gutter:stable] max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					<TableRow role="row" className={GRID_ROW}>
 						<TableHead
@@ -273,7 +274,7 @@ export function SpeciesControlTable({
 					role="rowgroup"
 					aria-busy={rows === null || undefined}
 					data-scroll-reset=""
-					className="col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+					className="col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable] max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
 				>
 					{rows === null
 						? Array.from({ length: SPECIES_CONTROL_PAGE_SIZE }, (_, index) => (
@@ -319,15 +320,18 @@ export function SpeciesControlTable({
 								</TableCell>
 								<TableCell
 									role="cell"
-									className={cn(CELL_GAP, "min-w-0 truncate")}
+									className={cn(CELL_GAP, NAME_CELL, "truncate")}
 								>
 									<Link
 										to="/birds/$comName"
 										params={{ comName: comNameToSlug(row.comName) }}
-										className="font-medium no-underline hover:underline"
+										className="@max-[36rem]:block @max-[36rem]:truncate font-medium @max-[36rem]:leading-tight no-underline hover:underline"
 									>
 										{row.comName}
 									</Link>
+									<em className="block @min-[36rem]:hidden truncate text-bark text-xs leading-tight">
+										{row.sciName}
+									</em>
 								</TableCell>
 								<TableCell
 									role="cell"
@@ -449,10 +453,14 @@ function SkeletonRow({
 					<IndexDot index={widestIndex} widest={widestIndex} />
 				</ShellSized>
 			</TableCell>
-			<TableCell role="cell" className={cn(CELL_GAP, "min-w-0")}>
+			<TableCell role="cell" className={cn(CELL_GAP, NAME_CELL)}>
 				<ShellText
-					className="font-medium"
+					className="font-medium @max-[36rem]:leading-tight"
 					barClassName={NAME_WIDTHS[index % NAME_WIDTHS.length]}
+				/>
+				<ShellText
+					className="@min-[36rem]:hidden text-xs leading-tight"
+					barClassName={SCIENTIFIC_WIDTHS[index % SCIENTIFIC_WIDTHS.length]}
 				/>
 			</TableCell>
 			<TableCell

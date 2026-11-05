@@ -124,8 +124,11 @@ export function PageRange({
 						of{" "}
 						<span className="font-semibold text-foreground tabular-nums">
 							{total.count.toLocaleString()}
-						</span>{" "}
-						{total.noun[total.count === 1 ? 0 : 1]}
+						</span>
+						<span className="max-[400px]:hidden">
+							{" "}
+							{total.noun[total.count === 1 ? 0 : 1]}
+						</span>
 					</>
 				) : null}
 				{children}

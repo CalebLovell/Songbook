@@ -98,8 +98,7 @@ const GRID_CLASS =
 	"grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-page";
 const CARD_CLASS =
 	"relative flex flex-col gap-3 overflow-hidden max-[400px]:gap-2";
-const FOOTER_CLASS =
-	"mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 text-sm";
+const FOOTER_CLASS = "mt-auto flex flex-wrap items-center gap-page text-sm";
 
 function Species() {
 	const { cards } = Route.useLoaderData();
@@ -208,7 +207,10 @@ function SpeciesGridShell() {
 			</div>
 			<div aria-hidden="true" className={FOOTER_CLASS}>
 				<div className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_CARD_CLASS}`}>
-					<ShellText className="w-40 text-sm" barClassName="w-full" />
+					<ShellText
+						className="w-40 text-sm max-[400px]:w-20"
+						barClassName="w-full"
+					/>
 				</div>
 				<span className="ml-auto">
 					<ShellSized className="rounded-md">

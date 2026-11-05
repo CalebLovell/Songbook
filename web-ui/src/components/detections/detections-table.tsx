@@ -46,7 +46,6 @@ import {
 } from "~/lib/detection-workspace.ts";
 import type { DetectionPage, DetectionTableRow } from "~/lib/detections.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
-import { shortAnchorLabel } from "~/lib/timeline-window.ts";
 import { cn } from "~/lib/utils.ts";
 
 type DetectionsTableProps = {
@@ -151,7 +150,7 @@ function DateRangeFilter({
 			/>
 			<span
 				aria-hidden="true"
-				className="flex items-center border-input border-x px-2 text-muted-foreground"
+				className="flex items-center border-input border-x px-2 text-muted-foreground max-[400px]:px-1"
 			>
 				<ArrowRight className="size-4" />
 			</span>
@@ -192,7 +191,7 @@ function DateSegment({
 	onChange: (value: string | undefined) => void;
 }) {
 	return (
-		<div className="relative flex min-w-0 @min-[38rem]:flex-none flex-1 items-center @min-[38rem]:justify-start justify-center gap-2 @min-[38rem]:px-3 px-2 pointer-coarse:text-base text-sm transition-colors hover:bg-accent">
+		<div className="relative flex min-w-0 @min-[38rem]:flex-none flex-1 items-center @min-[38rem]:justify-start justify-center gap-2 @min-[38rem]:px-3 px-2 pointer-coarse:text-base text-sm transition-colors hover:bg-accent max-[400px]:px-1">
 			{showIcon ? (
 				<Calendar
 					className="size-4 shrink-0 text-muted-foreground max-[400px]:hidden"
@@ -200,9 +199,9 @@ function DateSegment({
 				/>
 			) : null}
 			<span
-				className={`@min-[38rem]:min-w-[6.5rem] truncate whitespace-nowrap ${value ? "" : "text-muted-foreground"}`}
+				className={`@min-[38rem]:min-w-[6.5rem] truncate whitespace-nowrap max-[400px]:text-sm ${value ? "" : "text-muted-foreground"}`}
 			>
-				{value ? shortAnchorLabel("day", value) : "Any date"}
+				{value ? formatDate(value) : "Any date"}
 			</span>
 			<input
 				aria-label={label}
@@ -338,10 +337,16 @@ function SkeletonCell({
 			);
 		case "species":
 			return (
-				<ShellText
-					className="font-medium"
-					barClassName={SPECIES_WIDTHS[row % SPECIES_WIDTHS.length]}
-				/>
+				<>
+					<ShellText
+						className="font-medium @max-[36rem]:leading-tight"
+						barClassName={SPECIES_WIDTHS[row % SPECIES_WIDTHS.length]}
+					/>
+					<ShellText
+						className="@min-[36rem]:hidden text-xs leading-tight"
+						barClassName={SCIENTIFIC_WIDTHS[row % SCIENTIFIC_WIDTHS.length]}
+					/>
+				</>
 			);
 		case "scientificName":
 			return (
@@ -502,13 +507,18 @@ export function DetectionsTable({
 				/>
 			),
 			cell: ({ row }) => (
-				<Link
-					to="/birds/$comName"
-					params={{ comName: comNameToSlug(row.original.Com_Name) }}
-					className="font-medium no-underline hover:underline"
-				>
-					{row.original.Com_Name}
-				</Link>
+				<>
+					<Link
+						to="/birds/$comName"
+						params={{ comName: comNameToSlug(row.original.Com_Name) }}
+						className="@max-[36rem]:block @max-[36rem]:truncate font-medium @max-[36rem]:leading-tight no-underline hover:underline"
+					>
+						{row.original.Com_Name}
+					</Link>
+					<em className="block @min-[36rem]:hidden truncate text-bark text-xs leading-tight">
+						{row.original.Sci_Name}
+					</em>
+				</>
 			),
 		},
 		{
@@ -617,13 +627,13 @@ export function DetectionsTable({
 		<div className="@container flex min-h-0 flex-1 flex-col">
 			<Table
 				role="table"
-				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:grid-cols-(--cols-xs)"
+				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
 				style={gridColumns(canDelete, canListen)}
 				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
 				<TableHeader
 					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong @min-[36rem]:[scrollbar-gutter:stable] max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} role="row" className={GRID_ROW}>
@@ -683,7 +693,7 @@ export function DetectionsTable({
 					role="rowgroup"
 					aria-busy={skeleton || undefined}
 					data-scroll-reset=""
-					className="col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+					className="col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable] max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
 				>
 					{table.getRowModel().rows.map((row) => (
 						<TableRow

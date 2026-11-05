@@ -352,11 +352,13 @@ function VisitLogSkeleton() {
 				<div className={VISIT_LOG_HEADER_CLASS}>
 					<Kicker>Visit log</Kicker>
 				</div>
-				<RowWell as="ul" aria-hidden="true" className="-mx-page grow divide-y">
+				<RowWell as="ul" aria-hidden="true" className={VISIT_LIST_CLASS}>
 					{Array.from({ length: VISITS_PAGE_SIZE }, (_, index) => (
 						// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 						<li key={index} className={VISIT_ROW_CLASS}>
-							<ShellBar className="h-6 w-7 shrink-0 rounded-full" />
+							<ShellSized className="rounded-full">
+								<IndexDot index={VISITS_PAGE_SIZE} widest={VISITS_PAGE_SIZE} />
+							</ShellSized>
 							<div className="min-w-0 flex-1 text-sm">
 								<ShellText
 									className="font-medium"
@@ -628,9 +630,15 @@ const PROFILE_TEXT_CLASS =
 	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-[calc(7.75rem+2rem)] sm:justify-between sm:pl-0";
 const COLUMNS_CLASS =
 	"mt-page grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-page";
-const VISIT_LOG_CLASS = "flex min-w-0 flex-col min-h-[420px]";
-const VISIT_LOG_SHORT_CLASS = "flex min-w-0 flex-col self-start";
-const VISIT_LOG_CARD_CLASS = "@container flex flex-1 flex-col pb-0!";
+const VISIT_LOG_BESIDE_CHARTS_CLASS =
+	"@min-[80rem]/bird:h-0 @min-[80rem]/bird:min-h-full";
+const VISIT_LOG_CLASS = `flex min-h-[420px] min-w-0 flex-col ${VISIT_LOG_BESIDE_CHARTS_CLASS}`;
+const VISIT_LOG_SHORT_CLASS = `flex min-w-0 flex-col ${VISIT_LOG_BESIDE_CHARTS_CLASS}`;
+const VISIT_LOG_CARD_CLASS = "@container flex min-h-0 flex-1 flex-col pb-0!";
+const VISIT_LOG_SHORT_CARD_CLASS =
+	"@container flex min-h-0 flex-initial flex-col pb-0!";
+const VISIT_LIST_CLASS =
+	"-mx-page max-h-[calc(10*51px)] grow divide-y overflow-y-auto @min-[80rem]/bird:max-h-none @min-[80rem]/bird:min-h-0";
 const VISIT_LOG_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-[45px] flex-wrap items-center justify-between gap-2 border-b px-page";
 const VISIT_ROW_CLASS =
@@ -822,7 +830,7 @@ function VisitLogCard({
 			className={pageCount > 1 ? VISIT_LOG_CLASS : VISIT_LOG_SHORT_CLASS}
 		>
 			<Card
-				className={`${VISIT_LOG_CARD_CLASS} ${visits.length === 0 ? "pb-4!" : ""}`}
+				className={`${pageCount > 1 ? VISIT_LOG_CARD_CLASS : VISIT_LOG_SHORT_CARD_CLASS} ${visits.length === 0 ? "pb-4!" : ""}`}
 			>
 				<div className={VISIT_LOG_HEADER_CLASS}>
 					<Kicker>Visit log</Kicker>
@@ -834,7 +842,8 @@ function VisitLogCard({
 					<RowWell
 						as="ul"
 						aria-busy={loading}
-						className={`-mx-page grow divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
+						data-scroll-reset=""
+						className={`${VISIT_LIST_CLASS} transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
 					>
 						{visits.map((visit, i) => {
 							const heardAt = formatDateTime(visit.date, visit.time);

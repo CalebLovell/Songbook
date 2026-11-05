@@ -34,7 +34,8 @@ const TOTAL_CLASS = "@max-[22rem]/controls:hidden";
 const SCRUBBER_CLASS =
 	"cursor-pointer touch-none select-none rounded-md focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-2";
 const TIME_CLASS = "tabular-nums text-muted-foreground text-xs";
-const META_DATE_CLASS = "tabular-nums text-muted-foreground text-sm";
+const META_DATE_CLASS =
+	"tabular-nums text-muted-foreground text-sm @max-[22rem]/controls:text-xs";
 
 const RESYNC_SECONDS = 0.15;
 
@@ -363,7 +364,10 @@ export function ClipMeta({
 export function ClipMetaSkeleton() {
 	return (
 		<>
-			<ShellText className={`w-40 ${META_DATE_CLASS}`} barClassName="w-full" />
+			<ShellText
+				className={`@max-[22rem]/controls:w-32 w-36 ${META_DATE_CLASS}`}
+				barClassName="w-full"
+			/>
 			<ShellSized className="rounded-full">
 				<ConfidencePill confidence={0.9} />
 			</ShellSized>

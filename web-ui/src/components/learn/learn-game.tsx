@@ -49,7 +49,7 @@ const CHOICE_TEXT_CLASS =
 const RAIL_CLASS = "@3xl/quiz:flex hidden flex-col";
 const RAIL_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
-const RAIL_ROW_CLASS = "flex min-h-[54px] items-center gap-3 px-page py-1.75";
+const RAIL_ROW_CLASS = "flex min-h-[55px] items-center gap-3 px-page py-1.75";
 const RAIL_FOOTER_CLASS =
 	"-mx-page mt-auto -mb-page flex items-baseline justify-between gap-2 border-t px-page py-3";
 const GAME_FOOTER_CLASS = "flex min-h-8 items-center justify-end";
@@ -182,7 +182,7 @@ export function LearnGameSkeleton() {
 					<div className={RAIL_FOOTER_CLASS}>
 						<span className="text-muted-foreground text-sm">Score</span>
 						<ShellText
-							className="w-24 font-semibold text-xl leading-none"
+							className="w-18 font-semibold text-xl leading-none"
 							barClassName="right-0 left-auto w-full"
 						/>
 					</div>

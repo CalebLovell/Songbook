@@ -58,7 +58,10 @@ const EBIRD_LINK_CLASS = "mt-1";
 const PORTRAIT_CLASS =
 	"flex size-20 shrink-0 items-center justify-center overflow-hidden max-[400px]:size-14";
 const ACTIONS_FOOTER_CLASS =
-	"-mx-page -mb-page flex flex-wrap items-center gap-page border-t px-page py-3";
+	"@container/actions -mx-page -mb-page flex flex-wrap items-center gap-page border-t px-page py-3";
+const ACTION_ICON_ONLY_CLASS =
+	"@max-[28rem]/actions:w-8 @max-[28rem]/actions:px-0";
+const ACTION_LABEL_CLASS = "@max-[28rem]/actions:sr-only";
 const DELETE_BUTTON_CLASS =
 	"bg-[color-mix(in_oklab,var(--clay)_14%,var(--paper-raised))] text-destructive hover:bg-[color-mix(in_oklab,var(--clay)_22%,var(--paper-raised))] hover:text-destructive";
 const QUEUE_CARD_CLASS = "@container flex flex-col";
@@ -96,12 +99,14 @@ export function ReviewWorkflowSkeleton() {
 								className="w-full text-sm leading-tight"
 								barClassName="w-36"
 							/>
-							<ShellSized className={`${EBIRD_LINK_CLASS} rounded-md`}>
-								<Button variant="outline" size="sm">
-									<ExternalLink />
-									eBird
-								</Button>
-							</ShellSized>
+							<span className={`${EBIRD_LINK_CLASS} flex`}>
+								<ShellSized className="rounded-md">
+									<Button variant="outline" size="sm">
+										<ExternalLink />
+										eBird
+									</Button>
+								</ShellSized>
+							</span>
 						</div>
 					</div>
 					<SpectrogramPlayerSkeleton
@@ -112,16 +117,21 @@ export function ReviewWorkflowSkeleton() {
 						<Button
 							variant="ghost"
 							size="default"
-							className={DELETE_BUTTON_CLASS}
+							className={cn(DELETE_BUTTON_CLASS, ACTION_ICON_ONLY_CLASS)}
 							disabled
 						>
 							<Trash2 />
-							Delete
+							<span className={ACTION_LABEL_CLASS}>Delete</span>
 						</Button>
 						<div className="ml-auto flex items-center gap-page">
-							<Button variant="outline" size="default" disabled>
+							<Button
+								variant="outline"
+								size="default"
+								className={ACTION_ICON_ONLY_CLASS}
+								disabled
+							>
 								<Shuffle />
-								Recategorize
+								<span className={ACTION_LABEL_CLASS}>Recategorize</span>
 							</Button>
 							<Button size="default" disabled>
 								<ShieldCheck />
@@ -400,22 +410,23 @@ export function ReviewWorkflow({
 							<Button
 								variant="ghost"
 								size="default"
-								className={DELETE_BUTTON_CLASS}
+								className={cn(DELETE_BUTTON_CLASS, ACTION_ICON_ONLY_CLASS)}
 								disabled={busy}
 								onClick={() => setAction({ kind: "delete", row })}
 							>
 								<Trash2 />
-								Delete
+								<span className={ACTION_LABEL_CLASS}>Delete</span>
 							</Button>
 							<div className="ml-auto flex items-center gap-page">
 								<Button
 									variant="outline"
 									size="default"
+									className={ACTION_ICON_ONLY_CLASS}
 									disabled={!row.audioAvailable || busy}
 									onClick={() => setPicker(row)}
 								>
 									<Shuffle />
-									Recategorize
+									<span className={ACTION_LABEL_CLASS}>Recategorize</span>
 								</Button>
 								<Button
 									size="default"

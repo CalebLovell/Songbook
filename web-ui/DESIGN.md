@@ -151,7 +151,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Tables** (Detections, Species Control): one grid with the header, body and
   rows as subgrids, so only the rows scroll and the columns still align. Header,
   rows and footer stand the same height. Width follows the card: under 36rem one
-  sort menu replaces the headings, 36rem and 54rem each bring columns back. Only
+  sort menu replaces the headings and the binomial stacks under the common name,
+  36rem and 54rem each bring columns back. On the narrowest screens (400px) the
+  body scrolls sideways on its own, so the sort menu never leaves the screen. Only
   the selection column (2.5rem) and the last column are pinned; the rest share
   the width. Row numbers count on across pages (`IndexDot`). Selection actions
   appear in the footer once something is ticked, never as dead buttons, and
@@ -198,6 +200,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   words come from `lib/page-headers.ts`.
 - The Live hero and the bird page's profile share one geometry (a 120px portrait
   centred in a 9.5rem column), so a bird keeps its size and place between them.
+- The bird page's visit log shows 100 rows a page and scrolls inside its card: 10
+  rows tall when stacked, and exactly the charts' height beside them, which it never
+  stretches.
 - Empty wording comes from `lib/empty-messages.ts`: name what's missing and stop.
   A card keeps its title whether full or empty.
 

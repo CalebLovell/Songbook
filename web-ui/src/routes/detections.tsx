@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { RowSelectionState } from "@tanstack/react-table";
-import { AudioWaveform } from "lucide-react";
+import { AudioWaveform, X } from "lucide-react";
 import { useState } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Deferred, SHELL_DELAY_MS } from "~/components/deferred.tsx";
@@ -16,6 +16,7 @@ import {
 } from "~/components/detections/detections-table.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
+import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
@@ -136,6 +137,29 @@ function Detections() {
 									? EMPTY.filter.detectionsFilters
 									: EMPTY.station.detections}
 							</EmptyNote>
+							{isFiltered ? (
+								<Button
+									variant="outline"
+									size="sm"
+									icon={X}
+									className="mt-page"
+									onClick={() =>
+										navigate({
+											search: {
+												...search,
+												page: 1,
+												species: undefined,
+												from: undefined,
+												to: undefined,
+												minConfidence: undefined,
+											},
+											replace: true,
+										})
+									}
+								>
+									Clear filters
+								</Button>
+							) : null}
 						</Card>
 					) : (
 						<Card
