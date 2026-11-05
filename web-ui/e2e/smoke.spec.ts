@@ -60,10 +60,9 @@ test("a bird profile loads", async ({ page }) => {
 	await expectPageLoads(page, href ?? "/birds");
 });
 
-test("old addresses redirect instead of 404ing", async ({ page }) => {
-	for (const path of ["/", "/today", "/stats", "/species"]) {
-		await expectPageLoads(page, path);
-	}
+test("the root address redirects to the live page", async ({ page }) => {
+	await expectPageLoads(page, "/");
+	await expect(page).toHaveURL(/\/live/);
 });
 
 test("an unknown address gets the not-found card", async ({ page }) => {
