@@ -7,7 +7,7 @@ export const MODAL_BACKDROP_CLASS =
 	"fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_oklab,var(--ink)_28%,transparent)] p-(--page-gap)";
 export const MODAL_CARD_CLASS =
 	"feature-card flex w-full flex-col gap-(--page-gap) rounded-md p-4 text-left shadow-xl";
-export const MODAL_TITLE_CLASS = "display-title font-semibold text-lg";
+export const MODAL_TITLE_CLASS = "font-semibold text-lg";
 export const MODAL_ACTIONS_CLASS = "flex justify-end gap-(--page-gap)";
 
 export function ConfirmDialog({

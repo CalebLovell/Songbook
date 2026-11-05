@@ -196,7 +196,7 @@ function FieldInput({
 	const input = (
 		<Input
 			id={id}
-			className={`${numeric ? `tabular-data ${NO_SPINNER}` : ""} ${unit ? (unit.length > 2 ? "pr-20" : "pr-10") : ""} ${className}`}
+			className={`${numeric ? `tabular-nums ${NO_SPINNER}` : ""} ${unit ? (unit.length > 2 ? "pr-20" : "pr-10") : ""} ${className}`}
 			{...props}
 		/>
 	);
@@ -1252,7 +1252,7 @@ function UpdatesSettingsCard({
 						{!managed ? (
 							"Development copy"
 						) : (
-							<span className="tabular-data">
+							<span className="tabular-nums">
 								{installed?.version ?? "Unknown"}
 							</span>
 						)}
@@ -1283,7 +1283,7 @@ function UpdatesSettingsCard({
 				) : updates.state === "updating" ? (
 					<p className="text-sm leading-9">
 						Installing{" "}
-						<span className="tabular-data">{updates.target ?? "update"}</span>…
+						<span className="tabular-nums">{updates.target ?? "update"}</span>…
 					</p>
 				) : offered ? (
 					<Button

@@ -251,7 +251,7 @@ function SpeciesCardSkeleton({ index }: { index: number }) {
 			<div className="flex flex-col gap-3 max-[400px]:gap-2">
 				<div>
 					<ShellText
-						className="display-title font-bold text-base"
+						className="font-bold text-base"
 						barClassName={NAME_WIDTHS[index % NAME_WIDTHS.length]}
 					/>
 					<ShellText className="text-xs" barClassName="w-28" />
@@ -396,7 +396,7 @@ function SpeciesFooter({
 					<span className="max-sm:hidden">
 						{" "}
 						&middot; filtered from{" "}
-						<span className="tabular-data">{lifeList.toLocaleString()}</span>
+						<span className="tabular-nums">{lifeList.toLocaleString()}</span>
 					</span>
 				) : null}
 			</PageRange>
@@ -543,7 +543,7 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 			/>
 			<div className="flex flex-col gap-1">
 				<div className="flex items-baseline gap-1">
-					<div className="tabular-data font-semibold text-foreground text-lg leading-none">
+					<div className="font-semibold text-foreground text-lg tabular-nums leading-none">
 						{card.allTimeCount.toLocaleString()}
 					</div>
 					<div className={CARD_NOTE_CLASS}>
@@ -565,7 +565,7 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 
 			<div className="flex flex-col gap-3 max-[400px]:gap-2">
 				<div>
-					<h2 className="display-title font-bold text-base">{card.comName}</h2>
+					<h2 className="font-bold text-base">{card.comName}</h2>
 					<p className="text-[var(--bark)] text-xs italic">{card.sciName}</p>
 				</div>
 				<SpeciesActions

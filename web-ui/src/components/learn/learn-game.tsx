@@ -128,7 +128,7 @@ export function LearnGameSkeleton() {
 								key={choice}
 								className={`${CHOICE_CLASS} border-[var(--line)]`}
 							>
-								<span className="tabular-data w-4 shrink-0 text-center text-muted-foreground text-xs">
+								<span className="w-4 shrink-0 text-center text-muted-foreground text-xs tabular-nums">
 									{choice + 1}
 								</span>
 								<span
@@ -316,7 +316,7 @@ export function LearnGame({
 					</header>
 
 					<div className="flex @3xl/quiz:hidden flex-col gap-2">
-						<div className="tabular-data flex justify-between text-muted-foreground text-xs">
+						<div className="flex justify-between text-muted-foreground text-xs tabular-nums">
 							<span>
 								Bird {index + 1} of {round.questions.length}
 							</span>
@@ -463,7 +463,7 @@ function RoundRail({
 
 			<div className={RAIL_FOOTER_CLASS}>
 				<span className="text-muted-foreground text-sm">Score</span>
-				<span className="tabular-data font-semibold text-xl leading-none">
+				<span className="font-semibold text-xl tabular-nums leading-none">
 					{score}
 					<span className="ml-1 font-normal text-muted-foreground text-sm">
 						of {maxScore} pts
@@ -501,10 +501,10 @@ function AnsweredRailRow({
 			</div>
 
 			<div className="shrink-0 text-right">
-				<div className="tabular-data text-sm">
+				<div className="text-sm tabular-nums">
 					+{pointsForAttempt(attempts)}
 				</div>
-				<div className="tabular-data text-muted-foreground text-xs">
+				<div className="text-muted-foreground text-xs tabular-nums">
 					{attemptLabel(attempts)}
 				</div>
 			</div>
@@ -535,7 +535,7 @@ function RailDot({
 
 	return (
 		<span
-			className={`tabular-data flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] ${color}`}
+			className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] tabular-nums ${color}`}
 		>
 			<span style={{ transform: `translateY(${digitNudge(label)}px)` }}>
 				{label}
@@ -613,7 +613,7 @@ function ChoiceButton({
 			disabled={state !== "open"}
 			className={`${CHOICE_CLASS} ${CHOICE_STYLES[state]}`}
 		>
-			<span className="tabular-data w-4 shrink-0 text-center text-muted-foreground text-xs">
+			<span className="w-4 shrink-0 text-center text-muted-foreground text-xs tabular-nums">
 				{shortcut}
 			</span>
 			<ChoiceThumbnail choice={choice} size="lg" />
@@ -693,7 +693,7 @@ function RoundSummary({
 			className="@container feature-card rise-in flex flex-col gap-(--page-gap) rounded-md p-4"
 		>
 			<CardHeader title="Round complete">
-				<span className="tabular-data text-sm">
+				<span className="text-sm tabular-nums">
 					<strong className="font-semibold">{score.score}</strong> of{" "}
 					<strong className="font-semibold">{score.maxScore}</strong> pts
 				</span>
@@ -726,7 +726,7 @@ function RoundSummary({
 									{formatDateTime(question.detectedAt)}
 								</div>
 							</div>
-							<span className="tabular-data shrink-0 text-sm">
+							<span className="shrink-0 text-sm tabular-nums">
 								+{pointsForAttempt(result.attempts)}
 							</span>
 							<RecordingButton
@@ -741,7 +741,7 @@ function RoundSummary({
 			</ol>
 
 			<div className="-mx-(--page-gap) -mt-(--page-gap) -mb-(--page-gap) flex items-center justify-between gap-4 border-t p-(--page-gap) max-[400px]:gap-2">
-				<span className="tabular-data min-w-0 text-sm">
+				<span className="min-w-0 text-sm tabular-nums">
 					You named <strong className="font-semibold">{score.firstTry}</strong>{" "}
 					of <strong className="font-semibold">{score.answered}</strong> species
 					on the first try.

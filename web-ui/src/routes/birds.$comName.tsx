@@ -231,7 +231,7 @@ function SpeciesDetailShell({ year }: { year: number }) {
 				<div aria-hidden="true" className={PROFILE_TEXT_CLASS}>
 					<div className="min-w-0">
 						<ShellText
-							className="display-title font-bold text-2xl sm:text-3xl"
+							className="font-bold text-2xl sm:text-3xl"
 							barClassName="w-64 max-w-full"
 						/>
 						<ShellText className="text-xs" barClassName="w-32" />
@@ -418,7 +418,7 @@ function UndetectedSpecies({
 
 				<div className="flex min-w-0 flex-col justify-center gap-3 p-4">
 					<div className="min-w-0">
-						<h1 className="display-title font-bold text-2xl text-[var(--moss)] sm:text-3xl">
+						<h1 className="font-bold text-2xl text-[var(--moss)] sm:text-3xl">
 							{comName}
 						</h1>
 						<p className="text-[var(--bark)] text-xs italic">{sciName}</p>
@@ -694,13 +694,13 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 
 			<div className={PROFILE_TEXT_CLASS}>
 				<div className="min-w-0">
-					<h1 className="display-title font-bold text-2xl text-[var(--moss)] sm:text-3xl">
+					<h1 className="font-bold text-2xl text-[var(--moss)] sm:text-3xl">
 						{detail.comName}
 					</h1>
 					<p className="text-[var(--bark)] text-xs italic">{detail.sciName}</p>
 				</div>
 
-				<p className="tabular-data text-muted-foreground text-sm">
+				<p className="text-muted-foreground text-sm tabular-nums">
 					Last heard{" "}
 					<span className="font-semibold text-foreground">{lastHeard}</span>
 					{lastVisit && detail.lastDetected.date ? (
@@ -736,7 +736,7 @@ function StationRecord({ detail }: { detail: SpeciesDetail }) {
 	const days = daysBetween(detail.firstDetected.date, detail.lastDetected.date);
 
 	return (
-		<p className="tabular-data text-muted-foreground text-xs">
+		<p className="text-muted-foreground text-xs tabular-nums">
 			<span className="count-figure">
 				{detail.totalDetections.toLocaleString()}
 			</span>{" "}

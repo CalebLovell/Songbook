@@ -166,7 +166,7 @@ export function SpeciesSelectionBar({
 			className="flex h-8.5 pointer-coarse:h-9 @max-[36rem]:w-full w-fit max-w-full shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
 			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
-				<span className="tabular-data font-semibold text-foreground">
+				<span className="font-semibold text-foreground tabular-nums">
 					{count}
 				</span>
 				<span className="sr-only @min-[36rem]:not-sr-only">selected</span>
@@ -515,9 +515,7 @@ export function SpeciesControlPage({
 					<div className="flex shrink-0 items-start gap-3">
 						<CircleAlert className="mt-0.5 size-5 text-[var(--clay)]" />
 						<div>
-							<h2 className="display-title font-semibold">
-								Unmatched list entries
-							</h2>
+							<h2 className="font-semibold">Unmatched list entries</h2>
 							<p className="mt-1 text-muted-foreground text-sm">
 								These existing lines do not match the installed model. They stay
 								in place unless you remove them here.

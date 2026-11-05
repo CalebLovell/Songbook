@@ -39,9 +39,7 @@ export function PageHeaderCard({
 							<Icon aria-hidden="true" className="size-5" />
 						</div>
 						<div className="min-w-0">
-							<h1 className="display-title font-bold text-xl leading-tight">
-								{title}
-							</h1>
+							<h1 className="font-bold text-xl leading-tight">{title}</h1>
 							<p className="mt-1 text-muted-foreground text-sm [&_.count-figure]:leading-none">
 								{description}
 							</p>
@@ -113,7 +111,7 @@ function Figure({
 			</div>
 			<div className="min-w-0 flex-1">
 				<dt className="island-kicker">{label}</dt>
-				<dd className="tabular-data mt-2 min-h-[1.75rem] truncate font-semibold @max-[16rem]/figure:text-base text-xl leading-tight max-[400px]:mt-1 max-[400px]:min-h-6 max-[400px]:text-lg">
+				<dd className="mt-2 min-h-[1.75rem] truncate font-semibold @max-[16rem]/figure:text-base text-xl tabular-nums leading-tight max-[400px]:mt-1 max-[400px]:min-h-6 max-[400px]:text-lg">
 					{typeof value === "number" ? value.toLocaleString() : value}
 				</dd>
 			</div>

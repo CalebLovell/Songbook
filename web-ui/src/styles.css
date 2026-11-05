@@ -180,20 +180,6 @@ a[data-slot="button"]:hover {
   text-decoration: none;
 }
 
-code {
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-  border: 1px solid var(--line);
-  background: var(--surface-strong);
-  border-radius: 6px;
-  padding: 2px 7px;
-}
-
-.tabular-data {
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
-}
-
 /* A table's select-row checkbox, drawn rather than native: phones size and
    draw a native box by their own rules, so the header's select-all and the
    rows' boxes came out different sizes. 16px, 18px under a finger. */
@@ -245,7 +231,6 @@ code {
    every count reads alike wherever it sits. Not for headline stat figures
    (PageHeaderCard's 20px) or the numbers drawn inside a chart. */
 .count-figure {
-  font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   font-size: 13px;
@@ -305,10 +290,6 @@ code {
   }
 }
 
-.display-title {
-  font-family: 'Georgia', 'Times New Roman', serif;
-}
-
 /* In `components` rather than unlayered, so Tailwind utilities outrank it.
    Unlayered CSS beats every layered utility regardless of specificity, so a
    card that asked for a different border or background quietly got this one
@@ -316,7 +297,6 @@ code {
    currently overrides either property -- this is here so that the next thing
    which tries to simply works. */
 @layer components {
-  .island-shell,
   .feature-card {
     border: 1px solid var(--line);
     background: linear-gradient(165deg, var(--surface-strong), var(--surface));
@@ -347,7 +327,6 @@ code {
 }
 
 button,
-.island-shell,
 .feature-card,
 a {
   transition:
@@ -363,35 +342,6 @@ a {
   font-weight: 700;
   font-size: 0.69rem;
   color: var(--kicker);
-}
-
-.nav-link {
-  position: relative;
-  text-decoration: none;
-  color: color-mix(in oklab, var(--ink) 70%, var(--moss) 30%);
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -8px;
-  width: 100%;
-  height: 2px;
-  transform: scaleX(0);
-  transform-origin: left;
-  background: var(--moss);
-  transition: transform 170ms ease;
-}
-
-.nav-link:hover,
-.nav-link.is-active {
-  color: var(--ink);
-}
-
-.nav-link:hover::after,
-.nav-link.is-active::after {
-  transform: scaleX(1);
 }
 
 /* The vertical counterpart to .nav-link. The underline that marks the active
@@ -556,6 +506,14 @@ a {
   body {
     background-color: var(--background);
     color: var(--foreground);
+  }
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    border: 1px solid var(--line);
+    background: var(--surface-strong);
+    border-radius: 6px;
+    padding: 2px 7px;
   }
   /* The browser's own calendar glyph is drawn at the field's font size and in
      full-strength ink, so it sat noticeably larger and darker than the lucide

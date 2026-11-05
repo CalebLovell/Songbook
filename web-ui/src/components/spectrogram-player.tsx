@@ -33,8 +33,8 @@ const CONTROLS_CLASS =
 const TOTAL_CLASS = "@max-[22rem]/controls:hidden";
 const SCRUBBER_CLASS =
 	"cursor-pointer touch-none select-none rounded-md focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] focus-visible:outline-offset-2";
-const TIME_CLASS = "tabular-data text-muted-foreground text-xs";
-const META_DATE_CLASS = "tabular-data text-muted-foreground text-sm";
+const TIME_CLASS = "tabular-nums text-muted-foreground text-xs";
+const META_DATE_CLASS = "tabular-nums text-muted-foreground text-sm";
 
 const RESYNC_SECONDS = 0.15;
 

@@ -342,7 +342,7 @@ export function SpeciesControlTable({
 									className={cn(
 										CELL_GAP,
 										COLUMN_VISIBILITY.count,
-										"tabular-data text-right",
+										"text-right tabular-nums",
 										!row.history.detections && "text-muted-foreground",
 									)}
 								>

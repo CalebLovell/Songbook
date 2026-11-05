@@ -207,7 +207,7 @@ function HeatRow({ row, heatMax }: { row: SpeciesHourRow; heatMax: number }) {
 						key={`hour-${hour}`}
 						role="img"
 						aria-label={`${row.comName} — ${hourLabel(hour)}: ${count.toLocaleString()} detections`}
-						className="tabular-data mx-0.5 my-1 flex h-6 items-center justify-center overflow-hidden rounded-[3px] text-[10px] leading-none"
+						className="mx-0.5 my-1 flex h-6 items-center justify-center overflow-hidden rounded-[3px] text-[10px] tabular-nums leading-none"
 						style={{
 							backgroundColor:
 								count > 0 ? heatColor(count, heatMax) : EMPTY_CELL_COLOR,

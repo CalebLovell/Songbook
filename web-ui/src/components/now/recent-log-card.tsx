@@ -167,16 +167,16 @@ export function RecentLogCard({
 									<div className="@min-[26rem]:block hidden truncate text-[var(--bark)] text-xs italic">
 										{visit.sciName}
 									</div>
-									<div className="tabular-data @min-[26rem]:hidden truncate text-muted-foreground text-xs">
+									<div className="@min-[26rem]:hidden truncate text-muted-foreground text-xs tabular-nums">
 										{age} · {clock}
 									</div>
 								</div>
 
 								<div className={TIME_COLUMN_CLASS}>
-									<div className="tabular-data text-sm">{age}</div>
+									<div className="text-sm tabular-nums">{age}</div>
 									<time
 										dateTime={visit.lastAt.replace(" ", "T")}
-										className="tabular-data block text-muted-foreground text-xs"
+										className="block text-muted-foreground text-xs tabular-nums"
 									>
 										{clock}
 									</time>
