@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Kicker } from "~/components/ui/kicker.tsx";
 
 export const CARD_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
@@ -18,9 +19,9 @@ export function CardHeader({
 }) {
 	return (
 		<div className={`${CARD_HEADER_CLASS} ${className}`}>
-			<Title id={titleId} className="island-kicker m-0 shrink-0">
+			<Kicker as={Title} id={titleId} className="m-0 shrink-0">
 				{title}
-			</Title>
+			</Kicker>
 			{children}
 		</div>
 	);

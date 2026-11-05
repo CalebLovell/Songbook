@@ -13,6 +13,9 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Kicker } from "~/components/ui/kicker.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { SearchInput } from "~/components/ui/search-input.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
@@ -42,7 +45,7 @@ const TOOLBAR_CLASS =
 	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-page";
 const SEARCH_CLASS = "@min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
 const TABLE_CARD_CLASS =
-	"@container feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-page [--card-edge:min(var(--page-gap),0.75rem)]";
+	"@container flex min-h-80 flex-col overflow-hidden [--card-edge:min(var(--page-gap),0.75rem)]";
 
 export function SpeciesControlPageSkeleton({
 	search,
@@ -50,7 +53,7 @@ export function SpeciesControlPageSkeleton({
 	search: SpeciesControlWorkspaceSearch;
 }) {
 	return (
-		<div className="page-wrap flex h-full min-h-fit flex-col gap-page py-4">
+		<PageWrap className="flex h-full min-h-fit flex-col gap-page">
 			<div className="@container shrink-0 space-y-page">
 				<PageHeaderCard
 					icon={SlidersHorizontal}
@@ -73,7 +76,8 @@ export function SpeciesControlPageSkeleton({
 					/>
 				</div>
 			</div>
-			<section
+			<Card
+				as="section"
 				aria-busy="true"
 				aria-label="Installed species"
 				className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
@@ -89,8 +93,8 @@ export function SpeciesControlPageSkeleton({
 					onSelectedChange={() => {}}
 					onPageChange={() => {}}
 				/>
-			</section>
-		</div>
+			</Card>
+		</PageWrap>
 	);
 }
 
@@ -432,7 +436,7 @@ export function SpeciesControlPage({
 	}
 
 	return (
-		<div className="page-wrap flex h-full min-h-fit flex-col gap-page py-4">
+		<PageWrap className="flex h-full min-h-fit flex-col gap-page">
 			<div className="@container shrink-0 space-y-page">
 				<PageHeaderCard
 					icon={SlidersHorizontal}
@@ -466,15 +470,13 @@ export function SpeciesControlPage({
 			</div>
 
 			{pagedRows.length === 0 ? (
-				<section
-					aria-label="Installed species"
-					className="feature-card shrink-0 rounded-md p-4"
-				>
+				<Card as="section" aria-label="Installed species" className="shrink-0">
 					<CardHeader title="Installed species" />
 					<EmptyNote>{EMPTY.filter.speciesControlSearch}</EmptyNote>
-				</section>
+				</Card>
 			) : (
-				<section
+				<Card
+					as="section"
 					aria-label="Installed species"
 					className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 				>
@@ -504,13 +506,14 @@ export function SpeciesControlPage({
 							) : null
 						}
 					/>
-				</section>
+				</Card>
 			)}
 
 			{unresolvedCount > 0 ? (
-				<section
+				<Card
+					as="section"
 					aria-label="Unmatched list entries"
-					className="feature-card flex max-h-64 shrink-0 flex-col rounded-md p-4"
+					className="flex max-h-64 shrink-0 flex-col"
 				>
 					<div className="flex shrink-0 items-start gap-3">
 						<CircleAlert className="mt-0.5 size-5 text-clay" />
@@ -537,7 +540,7 @@ export function SpeciesControlPage({
 										className="flex items-center justify-between gap-3 rounded-md border bg-card px-3 py-2"
 									>
 										<div>
-											<span className="island-kicker">{list}</span>
+											<Kicker as="span">{list}</Kicker>
 											<code className="ml-2">{raw}</code>
 										</div>
 										<Button
@@ -562,7 +565,7 @@ export function SpeciesControlPage({
 							}),
 						)}
 					</div>
-				</section>
+				</Card>
 			) : null}
 
 			{dialog?.kind === "status" ? (
@@ -649,6 +652,6 @@ export function SpeciesControlPage({
 					}
 				/>
 			) : null}
-		</div>
+		</PageWrap>
 	);
 }

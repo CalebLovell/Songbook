@@ -6,6 +6,8 @@ import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Count } from "~/components/ui/count.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
@@ -15,7 +17,7 @@ import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
 import { VISIT_GAP_MINUTES } from "~/lib/visits.ts";
 
-const CARD_CLASS = "@container feature-card flex flex-col rounded-md p-4";
+const CARD_CLASS = "@container flex flex-col";
 const ROW_CLASS = "flex items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
 const TIME_COLUMN_CLASS = "@min-[26rem]:block hidden shrink-0 text-right";
 const ROW_BUTTON = {
@@ -63,7 +65,8 @@ function RecentLogFooter() {
 export function RecentLogCardSkeleton() {
 	const canListen = useCanListen();
 	return (
-		<section
+		<Card
+			as="section"
 			aria-busy="true"
 			aria-label="Recent detections"
 			className={CARD_CLASS}
@@ -105,7 +108,7 @@ export function RecentLogCardSkeleton() {
 				))}
 			</ul>
 			<RecentLogFooter />
-		</section>
+		</Card>
 	);
 }
 
@@ -124,7 +127,7 @@ export function RecentLogCard({
 	const offsetMs = useAgeOffset(generatedAt);
 
 	return (
-		<section aria-label="Recent detections" className={CARD_CLASS}>
+		<Card as="section" aria-label="Recent detections" className={CARD_CLASS}>
 			<RecentLogHeader />
 
 			{recent.length === 0 ? (
@@ -138,7 +141,7 @@ export function RecentLogCard({
 						return (
 							<li
 								key={visit.key}
-								className={`${ROW_CLASS} ${freshKeys.has(visit.key) ? "flash-in" : ""}`}
+								className={`${ROW_CLASS} ${freshKeys.has(visit.key) ? "animate-flash-in" : ""}`}
 							>
 								<SpeciesThumbnail
 									imageUrl={visit.imageUrl}
@@ -155,12 +158,12 @@ export function RecentLogCard({
 											{visit.comName}
 										</Link>
 										{visit.detections > 1 ? (
-											<span
-												className="count-figure shrink-0"
+											<Count
+												className="shrink-0"
 												title={`${visit.detections.toLocaleString()} detections in this visit`}
 											>
 												×{visit.detections.toLocaleString()}
-											</span>
+											</Count>
 										) : null}
 									</div>
 									<div className="@min-[26rem]:block hidden truncate text-bark text-xs italic">
@@ -199,6 +202,6 @@ export function RecentLogCard({
 			)}
 
 			{recent.length > 0 ? <RecentLogFooter /> : null}
-		</section>
+		</Card>
 	);
 }

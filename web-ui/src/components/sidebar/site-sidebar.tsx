@@ -3,6 +3,7 @@ import { Link, useRouteContext } from "@tanstack/react-router";
 import { SidebarNav } from "~/components/sidebar/sidebar-nav.tsx";
 import { SiteSearch } from "~/components/sidebar/site-search.tsx";
 import { SongbookWordmark } from "~/components/sidebar/songbook-wordmark.tsx";
+import { Card } from "~/components/ui/card.tsx";
 
 export function SidebarBody({
 	onNavigate,
@@ -42,9 +43,9 @@ export function SidebarBody({
 export function SiteSidebar() {
 	return (
 		<aside className="hidden h-full shrink-0 py-4 pl-4 xl:block">
-			<div className="feature-card h-full w-64 overflow-y-auto rounded-md">
+			<Card className="h-full w-64 overflow-y-auto p-0">
 				<SidebarBody />
-			</div>
+			</Card>
 		</aside>
 	);
 }

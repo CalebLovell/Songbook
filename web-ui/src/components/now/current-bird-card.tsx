@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { LivePillSkeleton } from "~/components/now/live-pill.tsx";
 import {
 	HERO_ACTIONS_CLASS,
-	HERO_CARD_SHELL,
 	HERO_PORTRAIT_SLOT,
 	HeroCardShell,
 	HeroTextShell,
@@ -74,7 +73,7 @@ export function CurrentBirdCard({
 			confidence={current.confidence}
 			audioUrl={current.audioUrl}
 			actions={live}
-			className={flash ? `${HERO_CARD_SHELL} flash-in` : HERO_CARD_SHELL}
+			className={flash ? "animate-flash-in" : undefined}
 		/>
 	);
 }

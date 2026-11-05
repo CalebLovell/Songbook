@@ -13,6 +13,7 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { ChartDataTable } from "~/components/chart-data-table.tsx";
 import { ChartValueTooltip } from "~/components/chart-tooltip.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { ShellChartCard } from "~/components/ui/shell.tsx";
 import {
@@ -51,22 +52,24 @@ export function DetectionsByHourCard({
 
 	if (isEmpty) {
 		return (
-			<section
+			<Card
+				as="section"
 				aria-label="Detections by hour"
-				className={`feature-card flex flex-col rounded-md p-4 ${className}`}
+				className={`flex flex-col ${className}`}
 			>
 				<CardHeader title="Detections by hour">
 					<HourInfo info={info} />
 				</CardHeader>
 				<EmptyNote>{emptyMessage}</EmptyNote>
-			</section>
+			</Card>
 		);
 	}
 
 	return (
-		<section
+		<Card
+			as="section"
 			aria-label="Detections by hour"
-			className={`feature-card flex min-h-72 flex-col rounded-md p-4 ${className}`}
+			className={`flex min-h-72 flex-col ${className}`}
 		>
 			<CardHeader title="Detections by hour">
 				<HourInfo info={info} />
@@ -140,7 +143,7 @@ export function DetectionsByHourCard({
 					}))}
 				/>
 			</div>
-		</section>
+		</Card>
 	);
 }
 

@@ -32,6 +32,9 @@ import { SpeciesActions } from "~/components/species-actions.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Count } from "~/components/ui/count.tsx";
+import { Kicker } from "~/components/ui/kicker.tsx";
 import {
 	PAGE_RANGE_CLASS,
 	PAGE_RANGE_NARROW_HIDDEN,
@@ -39,6 +42,8 @@ import {
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
+import { RowWell } from "~/components/ui/row-well.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
 	Tooltip,
@@ -219,8 +224,9 @@ function BirdResult({
 
 function SpeciesDetailShell({ year }: { year: number }) {
 	return (
-		<div className="@container/bird page-wrap pb-4">
-			<section
+		<PageWrap className="@container/bird pt-0">
+			<Card
+				as="section"
 				aria-busy="true"
 				aria-label="Bird profile"
 				className={PROFILE_CARD_CLASS}
@@ -245,13 +251,14 @@ function SpeciesDetailShell({ year }: { year: number }) {
 						</ShellSized>
 					</div>
 				</div>
-			</section>
+			</Card>
 
 			<div className={COLUMNS_CLASS}>
-				<section
+				<Card
+					as="section"
 					aria-busy="true"
 					aria-label="Detection history"
-					className="feature-card overflow-hidden rounded-md p-4"
+					className="overflow-hidden"
 				>
 					<CardHeader title="Detection history" className="flex-wrap">
 						<div className="-my-1">
@@ -293,11 +300,11 @@ function SpeciesDetailShell({ year }: { year: number }) {
 						<ShellText
 							className="w-56 text-xs"
 							barClassName="w-full"
-							strut={<span className="count-figure">&nbsp;</span>}
+							strut={<Count>&nbsp;</Count>}
 						/>
 						<HeatLegend />
 					</div>
-				</section>
+				</Card>
 
 				<BestRecordingCardSkeleton />
 
@@ -311,7 +318,7 @@ function SpeciesDetailShell({ year }: { year: number }) {
 
 				<VisitLogSkeleton />
 			</div>
-		</div>
+		</PageWrap>
 	);
 }
 
@@ -341,11 +348,11 @@ function VisitLogSkeleton() {
 			aria-label="Visit log"
 			className={VISIT_LOG_CLASS}
 		>
-			<div className={VISIT_LOG_CARD_CLASS}>
+			<Card className={VISIT_LOG_CARD_CLASS}>
 				<div className={VISIT_LOG_HEADER_CLASS}>
-					<div className="island-kicker">Visit log</div>
+					<Kicker>Visit log</Kicker>
 				</div>
-				<ul aria-hidden="true" className="row-well -mx-page grow divide-y">
+				<RowWell as="ul" aria-hidden="true" className="-mx-page grow divide-y">
 					{Array.from({ length: VISITS_PAGE_SIZE }, (_, index) => (
 						// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 						<li key={index} className={VISIT_ROW_CLASS}>
@@ -367,7 +374,7 @@ function VisitLogSkeleton() {
 							) : null}
 						</li>
 					))}
-				</ul>
+				</RowWell>
 				<div aria-hidden="true" className={VISIT_LOG_FOOTER_CLASS}>
 					<div className={PAGE_ROW_CLASS}>
 						<div className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}>
@@ -386,7 +393,7 @@ function VisitLogSkeleton() {
 						</span>
 					</div>
 				</div>
-			</div>
+			</Card>
 		</section>
 	);
 }
@@ -399,10 +406,11 @@ function UndetectedSpecies({
 	sciName: string;
 }) {
 	return (
-		<div className="page-wrap pb-4">
-			<section
+		<PageWrap className="pt-0">
+			<Card
+				as="section"
 				aria-label="Bird profile"
-				className="feature-card mt-page grid overflow-hidden rounded-md sm:grid-cols-[12rem_minmax(0,1fr)]"
+				className="mt-page grid overflow-hidden p-0 sm:grid-cols-[12rem_minmax(0,1fr)]"
 			>
 				<div className="flex h-36 items-center justify-center overflow-hidden p-4 pb-0 sm:h-44 sm:pb-4">
 					<SpeciesImage
@@ -430,8 +438,8 @@ function UndetectedSpecies({
 						size="sm"
 					/>
 				</div>
-			</section>
-		</div>
+			</Card>
+		</PageWrap>
 	);
 }
 
@@ -439,7 +447,7 @@ function SpeciesNotFound() {
 	const { comName } = Route.useParams();
 
 	return (
-		<div className="page-wrap py-4">
+		<PageWrap>
 			<PageStatus
 				tone="missing"
 				title="No such bird"
@@ -452,7 +460,7 @@ function SpeciesNotFound() {
 				“{comName}” doesn’t match any bird this station’s classifier knows
 				about. The address may be mistyped.
 			</PageStatus>
-		</div>
+		</PageWrap>
 	);
 }
 
@@ -481,13 +489,14 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 
 	return (
 		<TooltipProvider>
-			<div className="@container/bird page-wrap pb-4">
+			<PageWrap className="@container/bird pt-0">
 				<SummaryCard detail={detail} />
 
 				<div className={COLUMNS_CLASS}>
-					<section
+					<Card
+						as="section"
 						aria-label="Detection history"
-						className="feature-card overflow-hidden rounded-md p-4"
+						className="overflow-hidden"
 					>
 						<CardHeader title="Detection history" className="flex-wrap">
 							<div className="-my-1">
@@ -540,7 +549,7 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 							<StationRecord detail={detail} />
 							<HeatLegend />
 						</div>
-					</section>
+					</Card>
 
 					<BestRecordingCard
 						recording={detail.bestRecording}
@@ -574,7 +583,7 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 						onPageChange={selectVisitsPage}
 					/>
 				</div>
-			</div>
+			</PageWrap>
 		</TooltipProvider>
 	);
 }
@@ -612,7 +621,7 @@ function WeekdayLabels() {
 }
 
 const PROFILE_CARD_CLASS =
-	"feature-card mt-page grid overflow-hidden rounded-md sm:grid-cols-[11.5rem_minmax(0,1fr)]";
+	"mt-page grid overflow-hidden p-0 sm:grid-cols-[11.5rem_minmax(0,1fr)]";
 const PROFILE_PORTRAIT_CLASS =
 	"flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4";
 const PROFILE_TEXT_CLASS =
@@ -621,8 +630,7 @@ const COLUMNS_CLASS =
 	"mt-page grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-page";
 const VISIT_LOG_CLASS = "flex min-w-0 flex-col min-h-[420px]";
 const VISIT_LOG_SHORT_CLASS = "flex min-w-0 flex-col self-start";
-const VISIT_LOG_CARD_CLASS =
-	"@container feature-card flex flex-1 flex-col rounded-md p-4 pb-0!";
+const VISIT_LOG_CARD_CLASS = "@container flex flex-1 flex-col pb-0!";
 const VISIT_LOG_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-[45px] flex-wrap items-center justify-between gap-2 border-b px-page";
 const VISIT_ROW_CLASS =
@@ -679,7 +687,7 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 		? formatTimeAgo(lastVisit.ageMs + offsetMs)
 		: formatHeardDate(detail.lastDetected.date);
 	return (
-		<section aria-label="Bird profile" className={PROFILE_CARD_CLASS}>
+		<Card as="section" aria-label="Bird profile" className={PROFILE_CARD_CLASS}>
 			<div className={PROFILE_PORTRAIT_CLASS}>
 				<SpeciesImage
 					imageUrl={detail.imageUrl}
@@ -725,7 +733,7 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 					size="sm"
 				/>
 			</div>
-		</section>
+		</Card>
 	);
 }
 
@@ -734,14 +742,12 @@ function StationRecord({ detail }: { detail: SpeciesDetail }) {
 
 	return (
 		<p className="text-muted-foreground text-xs tabular-nums">
-			<span className="count-figure">
-				{detail.totalDetections.toLocaleString()}
-			</span>{" "}
+			<Count>{detail.totalDetections.toLocaleString()}</Count>{" "}
 			{detail.totalDetections === 1 ? "detection" : "detections"}
 			{days === null ? null : (
 				<>
 					{" "}
-					over <span className="count-figure">{days.toLocaleString()}</span>{" "}
+					over <Count>{days.toLocaleString()}</Count>{" "}
 					{days === 1 ? "day" : "days"} on record
 				</>
 			)}
@@ -815,19 +821,20 @@ function VisitLogCard({
 			aria-label="Visit log"
 			className={pageCount > 1 ? VISIT_LOG_CLASS : VISIT_LOG_SHORT_CLASS}
 		>
-			<div
+			<Card
 				className={`${VISIT_LOG_CARD_CLASS} ${visits.length === 0 ? "pb-4!" : ""}`}
 			>
 				<div className={VISIT_LOG_HEADER_CLASS}>
-					<div className="island-kicker">Visit log</div>
+					<Kicker>Visit log</Kicker>
 				</div>
 
 				{visits.length === 0 ? (
 					<EmptyNote>{EMPTY.window.birdVisits}</EmptyNote>
 				) : (
-					<ul
+					<RowWell
+						as="ul"
 						aria-busy={loading}
-						className={`row-well -mx-page grow divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
+						className={`-mx-page grow divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
 					>
 						{visits.map((visit, i) => {
 							const heardAt = formatDateTime(visit.date, visit.time);
@@ -868,7 +875,7 @@ function VisitLogCard({
 								</li>
 							);
 						})}
-					</ul>
+					</RowWell>
 				)}
 
 				{visits.length > 0 ? (
@@ -888,7 +895,7 @@ function VisitLogCard({
 						</div>
 					</div>
 				) : null}
-			</div>
+			</Card>
 		</section>
 	);
 }

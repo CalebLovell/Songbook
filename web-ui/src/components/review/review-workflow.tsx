@@ -23,6 +23,7 @@ import {
 	SpectrogramPlayerSkeleton,
 } from "~/components/spectrogram-player.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import {
 	ConfirmDialog,
 	MODAL_ACTIONS_CLASS,
@@ -30,8 +31,11 @@ import {
 	MODAL_CARD_CLASS,
 	MODAL_TITLE_CLASS,
 } from "~/components/ui/confirm-dialog.tsx";
+import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
 import { Input } from "~/components/ui/input.tsx";
+import { Kicker } from "~/components/ui/kicker.tsx";
 import { PageStepper } from "~/components/ui/page-stepper.tsx";
+import { RowWell } from "~/components/ui/row-well.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { formatConfidence } from "~/lib/confidence.ts";
 import { formatDate, formatDateTime } from "~/lib/date-format.ts";
@@ -39,13 +43,14 @@ import { EMPTY } from "~/lib/empty-messages.ts";
 import type { ReviewCandidate, ReviewPage } from "~/lib/review.server.ts";
 import { REVIEW_PAGE_SIZE, type SpeciesOption } from "~/lib/review-data.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { cn } from "~/lib/utils.ts";
 
 const ROW_HEIGHT_PX = 54;
 
 const REVIEW_GRID_CLASS =
 	"grid grid-cols-[minmax(0,1fr)] @3xl/review:grid-cols-[minmax(0,1fr)_24rem] @7xl/review:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-page";
 const REVIEW_PLOT_CLASS = "h-56 max-sm:h-40";
-const UNDER_REVIEW_CLASS = "feature-card flex flex-col gap-page rounded-md p-4";
+const UNDER_REVIEW_CLASS = "flex flex-col gap-page";
 const IDENTITY_ROW_CLASS = "flex items-start gap-page";
 const IDENTITY_TEXT_CLASS = "flex min-w-0 flex-1 flex-col items-start";
 const NAME_CLASS = "font-bold text-2xl leading-[1.15] sm:text-3xl";
@@ -56,7 +61,7 @@ const ACTIONS_FOOTER_CLASS =
 	"-mx-page -mb-page flex flex-wrap items-center gap-page border-t px-page py-3";
 const DELETE_BUTTON_CLASS =
 	"bg-[color-mix(in_oklab,var(--clay)_14%,var(--paper-raised))] text-destructive hover:bg-[color-mix(in_oklab,var(--clay)_22%,var(--paper-raised))] hover:text-destructive";
-const QUEUE_CARD_CLASS = "@container feature-card flex flex-col rounded-md p-4";
+const QUEUE_CARD_CLASS = "@container flex flex-col";
 const QUEUE_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
 const QUEUE_ROW_CLASS =
@@ -71,7 +76,8 @@ export function ReviewWorkflowSkeleton() {
 	return (
 		<div className="@container/review">
 			<div className={REVIEW_GRID_CLASS}>
-				<section
+				<Card
+					as="section"
 					aria-busy="true"
 					aria-label="Detection under review"
 					className={UNDER_REVIEW_CLASS}
@@ -123,17 +129,18 @@ export function ReviewWorkflowSkeleton() {
 							</Button>
 						</div>
 					</div>
-				</section>
+				</Card>
 
-				<section
+				<Card
+					as="section"
 					aria-busy="true"
 					aria-label="Review queue"
 					className={QUEUE_CARD_CLASS}
 				>
 					<div className={QUEUE_HEADER_CLASS}>
-						<div className="island-kicker">In the queue</div>
+						<Kicker>In the queue</Kicker>
 						<ShellText
-							className="count-figure w-[1ch]"
+							className={cn(COUNT_CLASS, "w-[1ch]")}
 							barClassName="right-0 left-auto w-full"
 						/>
 					</div>
@@ -185,7 +192,7 @@ export function ReviewWorkflowSkeleton() {
 							</ShellSized>
 						</span>
 					</div>
-				</section>
+				</Card>
 			</div>
 		</div>
 	);
@@ -203,20 +210,14 @@ function ReviewWorkflowEmpty({
 	return (
 		<div className="@container/review">
 			<div className={REVIEW_GRID_CLASS}>
-				<section
-					aria-label="Detection under review"
-					className="feature-card rounded-md p-4"
-				>
+				<Card as="section" aria-label="Detection under review">
 					<CardHeader title="Under review" />
 					<EmptyNote>{message}</EmptyNote>
-				</section>
+				</Card>
 
-				<section
-					aria-label="Review queue"
-					className="feature-card rounded-md p-4"
-				>
+				<Card as="section" aria-label="Review queue">
 					<CardHeader title="In the queue">
-						<span className="count-figure">{total}</span>
+						<Count>{total}</Count>
 					</CardHeader>
 					<EmptyNote>{message}</EmptyNote>
 					{nextPage ? (
@@ -232,7 +233,7 @@ function ReviewWorkflowEmpty({
 							</Button>
 						</div>
 					) : null}
-				</section>
+				</Card>
 			</div>
 		</div>
 	);
@@ -322,7 +323,8 @@ export function ReviewWorkflow({
 		<>
 			<div className="@container/review">
 				<div className={REVIEW_GRID_CLASS}>
-					<section
+					<Card
+						as="section"
 						aria-label="Detection under review"
 						className={UNDER_REVIEW_CLASS}
 					>
@@ -425,18 +427,23 @@ export function ReviewWorkflow({
 								</Button>
 							</div>
 						</div>
-					</section>
+					</Card>
 
-					<section aria-label="Review queue" className={QUEUE_CARD_CLASS}>
+					<Card
+						as="section"
+						aria-label="Review queue"
+						className={QUEUE_CARD_CLASS}
+					>
 						<div className={QUEUE_HEADER_CLASS}>
-							<div className="island-kicker">In the queue</div>
-							<span className="count-figure">{page.total}</span>
+							<Kicker>In the queue</Kicker>
+							<Count>{page.total}</Count>
 						</div>
-						<ol
+						<RowWell
+							as="ol"
 							style={
 								paged ? { minHeight: page.pageSize * ROW_HEIGHT_PX } : undefined
 							}
-							className="row-well -mx-page divide-y"
+							className="-mx-page divide-y"
 						>
 							{rows.map((item, i) => {
 								const current = item === row;
@@ -481,7 +488,7 @@ export function ReviewWorkflow({
 									</li>
 								);
 							})}
-						</ol>
+						</RowWell>
 						<div className={QUEUE_FOOTER_CLASS}>
 							<PageStepper
 								className="ml-auto"
@@ -492,7 +499,7 @@ export function ReviewWorkflow({
 								onPageChange={onPageChange}
 							/>
 						</div>
-					</section>
+					</Card>
 				</div>
 			</div>
 			{picker ? (
@@ -502,7 +509,7 @@ export function ReviewWorkflow({
 					aria-labelledby="recategorize-review-title"
 					className={MODAL_BACKDROP_CLASS}
 				>
-					<div className={`${MODAL_CARD_CLASS} max-h-[80vh] max-w-xl`}>
+					<Card className={`${MODAL_CARD_CLASS} max-h-[80vh] max-w-xl`}>
 						<h2 id="recategorize-review-title" className={MODAL_TITLE_CLASS}>
 							Choose the correct species
 						</h2>
@@ -556,7 +563,7 @@ export function ReviewWorkflow({
 								Cancel
 							</Button>
 						</div>
-					</div>
+					</Card>
 				</div>
 			) : null}
 			{action ? (

@@ -8,10 +8,14 @@ import {
 	SpeciesHourBarsSkeleton,
 } from "~/components/species-hour-bars.tsx";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
+import { Kicker } from "~/components/ui/kicker.tsx";
 import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
 import { TooltipProvider } from "~/components/ui/tooltip.tsx";
 import type { VocalJump } from "~/lib/highlights-data.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { cn } from "~/lib/utils.ts";
 
 export type SpeciesGridItem = {
 	comName: string;
@@ -49,15 +53,12 @@ export function SpeciesGrid({
 }) {
 	return (
 		<TooltipProvider>
-			<section
-				aria-label="Species"
-				className={`feature-card rounded-md p-4 ${className}`}
-			>
+			<Card as="section" aria-label="Species" className={className}>
 				<div
 					className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
 				>
 					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
-						<div className="island-kicker shrink-0">Activity</div>
+						<Kicker className="shrink-0">Activity</Kicker>
 						{summary}
 					</div>
 				</div>
@@ -74,7 +75,7 @@ export function SpeciesGrid({
 						))}
 					</ul>
 				)}
-			</section>
+			</Card>
 		</TooltipProvider>
 	);
 }
@@ -99,7 +100,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 				</div>
 
 				<div className="flex shrink-0 flex-col items-end gap-1.5">
-					<span className="count-figure">{item.count.toLocaleString()}</span>
+					<Count>{item.count.toLocaleString()}</Count>
 					<div className="flex flex-wrap items-center justify-end gap-1.5">
 						<SpeciesFlagPills
 							isNew={item.isNew}
@@ -138,16 +139,17 @@ export function SpeciesGridSkeleton({
 	className?: string;
 }) {
 	return (
-		<section
+		<Card
+			as="section"
 			aria-busy="true"
 			aria-label="Species"
-			className={`feature-card rounded-md p-4 ${className}`}
+			className={className}
 		>
 			<div
 				className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
 			>
 				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
-					<div className="island-kicker shrink-0">Activity</div>
+					<Kicker className="shrink-0">Activity</Kicker>
 					{summary}
 				</div>
 			</div>
@@ -168,7 +170,7 @@ export function SpeciesGridSkeleton({
 							</div>
 							<div className="flex shrink-0 flex-col items-end gap-1.5">
 								<ShellText
-									className="count-figure w-10"
+									className={cn(COUNT_CLASS, "w-10")}
 									barClassName="right-0 left-auto w-8"
 								/>
 							</div>
@@ -177,6 +179,6 @@ export function SpeciesGridSkeleton({
 					</li>
 				))}
 			</ul>
-		</section>
+		</Card>
 	);
 }

@@ -4,6 +4,9 @@ import { CARD_HEADER_CLASS } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { SpeciesFlagPills } from "~/components/species-flag-pills.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
+import { Kicker } from "~/components/ui/kicker.tsx";
 import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
 import { TooltipProvider } from "~/components/ui/tooltip.tsx";
 import { heatColor, heatInk, heatMaximum } from "~/lib/heatmap.ts";
@@ -11,6 +14,7 @@ import type { VocalJump } from "~/lib/highlights-data.ts";
 import { compactCount } from "~/lib/number-format.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
+import { cn } from "~/lib/utils.ts";
 
 export type SpeciesHourRow = {
 	comName: string;
@@ -69,15 +73,16 @@ export function SpeciesByHourCard({
 
 	return (
 		<TooltipProvider>
-			<section
+			<Card
+				as="section"
 				aria-label="Species by hour"
-				className={`feature-card @container/card rounded-md p-4 ${isEmpty ? "" : "pb-1!"} ${className}`}
+				className={`@container/card ${isEmpty ? "" : "pb-1!"} ${className}`}
 			>
 				<div
 					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${isEmpty ? "mb-page" : ""}`}
 				>
 					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
-						<div className="island-kicker shrink-0">Activity</div>
+						<Kicker className="shrink-0">Activity</Kicker>
 						{summary}
 					</div>
 				</div>
@@ -102,7 +107,7 @@ export function SpeciesByHourCard({
 						</div>
 					</div>
 				)}
-			</section>
+			</Card>
 		</TooltipProvider>
 	);
 }
@@ -182,9 +187,9 @@ function SpeciesHourRowView({
 					</div>
 				</div>
 
-				<span className="count-figure text-right">
+				<Count className="text-right">
 					{row.totalDetections.toLocaleString()}
-				</span>
+				</Count>
 			</div>
 
 			<div className={HOURS_LAYOUT}>
@@ -234,16 +239,17 @@ export function SpeciesByHourCardSkeleton({
 	className?: string;
 }) {
 	return (
-		<section
+		<Card
+			as="section"
 			aria-busy="true"
 			aria-label="Species by hour"
-			className={`feature-card @container/card rounded-md p-4 pb-1! ${className}`}
+			className={`@container/card pb-1! ${className}`}
 		>
 			<div
 				className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
 			>
 				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
-					<div className="island-kicker shrink-0">Activity</div>
+					<Kicker className="shrink-0">Activity</Kicker>
 					{summary}
 				</div>
 			</div>
@@ -267,7 +273,7 @@ export function SpeciesByHourCardSkeleton({
 									/>
 								</div>
 								<ShellText
-									className="count-figure w-10"
+									className={cn(COUNT_CLASS, "w-10")}
 									barClassName="right-0 left-auto w-8"
 								/>
 							</div>
@@ -288,6 +294,6 @@ export function SpeciesByHourCardSkeleton({
 					))}
 				</div>
 			</div>
-		</section>
+		</Card>
 	);
 }

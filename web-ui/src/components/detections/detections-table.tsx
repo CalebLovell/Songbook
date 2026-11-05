@@ -20,6 +20,8 @@ import {
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
+import { RowCheckbox } from "~/components/ui/row-checkbox.tsx";
+import { RowWell } from "~/components/ui/row-well.tsx";
 import { SearchInput } from "~/components/ui/search-input.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
@@ -65,8 +67,7 @@ type DetectionsFiltersProps = Pick<
 
 const FIRST_COLUMN_CLASSES = "pl-page";
 const CELL_GAP = "px-cell";
-const AUDIO_EDGE =
-	"pr-[max(calc(var(--spacing)*1),calc(var(--page-gap)-var(--scrollbar-w,0px)))]";
+const AUDIO_EDGE = "pr-page-end";
 const LAST_EDGE_WITHOUT_AUDIO: Record<string, string> = {
 	recorded: `${AUDIO_EDGE} @min-[36rem]:pr-cell`,
 	confidence: AUDIO_EDGE,
@@ -427,20 +428,16 @@ export function DetectionsTable({
 	const selectColumn: ColumnDef<DetectionTableRow> = {
 		id: "select",
 		header: ({ table }) => (
-			<input
+			<RowCheckbox
 				aria-label="Select all detections on this page"
 				checked={table.getIsAllPageRowsSelected()}
-				className="row-checkbox"
-				type="checkbox"
 				onChange={table.getToggleAllPageRowsSelectedHandler()}
 			/>
 		),
 		cell: ({ row }) => (
-			<input
+			<RowCheckbox
 				aria-label={`Select ${row.original.Com_Name}`}
 				checked={row.getIsSelected()}
-				className="row-checkbox"
-				type="checkbox"
 				onChange={row.getToggleSelectedHandler()}
 			/>
 		),
@@ -681,11 +678,12 @@ export function DetectionsTable({
 						</TableRow>
 					))}
 				</TableHeader>
-				<TableBody
+				<RowWell
+					as={TableBody}
 					role="rowgroup"
 					aria-busy={skeleton || undefined}
 					data-scroll-reset=""
-					className="col-span-full row-well grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+					className="col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
 				>
 					{table.getRowModel().rows.map((row) => (
 						<TableRow
@@ -716,7 +714,7 @@ export function DetectionsTable({
 							))}
 						</TableRow>
 					))}
-				</TableBody>
+				</RowWell>
 			</Table>
 
 			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">

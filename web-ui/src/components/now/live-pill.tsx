@@ -11,7 +11,10 @@ export function LivePill({ status }: { status: StationStatus }) {
 				className={PILL_CLASS}
 				style={{ backgroundColor: "var(--live-fill)", color: "var(--moss)" }}
 			>
-				<span className="live-dot" aria-hidden="true" />
+				<span
+					className="inline-block size-2 animate-live-pulse rounded-full bg-moss"
+					aria-hidden="true"
+				/>
 				Live
 			</span>
 		);

@@ -16,6 +16,8 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { GLYPH_CHIP_SIZE, GlyphChip } from "~/components/glyph-chip.tsx";
 import { BADGE_STYLES } from "~/components/species-flag-pills.tsx";
+import { Card } from "~/components/ui/card.tsx";
+import { Count } from "~/components/ui/count.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
 import {
@@ -46,10 +48,7 @@ export function HighlightsCard({
 }) {
 	const guide = period ? highlightGuide(period, thresholds) : [];
 	return (
-		<section
-			aria-label="Highlights"
-			className={`feature-card rounded-md p-4 ${className}`}
-		>
+		<Card as="section" aria-label="Highlights" className={className}>
 			<CardHeader title="Highlights">
 				{period ? <HighlightsInfo guide={guide} /> : null}
 			</CardHeader>
@@ -69,7 +68,7 @@ export function HighlightsCard({
 					))}
 				</ul>
 			)}
-		</section>
+		</Card>
 	);
 }
 
@@ -310,5 +309,5 @@ function BirdNames({
 }
 
 function Figure({ children }: { children: ReactNode }) {
-	return <span className="count-figure">{children}</span>;
+	return <Count>{children}</Count>;
 }

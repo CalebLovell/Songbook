@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { CardHeader } from "~/components/card-header.tsx";
+import { Card } from "~/components/ui/card.tsx";
 
 export function EmptyNote({ children }: { children: ReactNode }) {
 	return <p className="mt-page text-muted-foreground text-sm">{children}</p>;
@@ -14,9 +15,9 @@ export function EmptyState({
 	children: ReactNode;
 }) {
 	return (
-		<section aria-label={title} className="feature-card rounded-md p-4">
+		<Card as="section" aria-label={title}>
 			<CardHeader title={title} />
 			<EmptyNote>{children}</EmptyNote>
-		</section>
+		</Card>
 	);
 }

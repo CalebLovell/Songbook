@@ -1363,9 +1363,12 @@ const SKELETON_DATA: SettingsPageData = {
 	updates: { automatic: true },
 };
 
+const SKELETON_VALUES_CLASS =
+	"[&_:is(input,select,textarea)]:animate-pulse! [&_:is(input,select,textarea)]:border-transparent! [&_:is(input,select,textarea)]:bg-muted! [&_:is(input,select,textarea)]:bg-none! [&_:is(input,select,textarea)]:text-transparent! [&_:is(input,textarea)::placeholder]:text-transparent! [&_[data-slot=toggle-group-item]]:animate-pulse! [&_[data-slot=toggle-group-item]]:border-paper-raised! [&_[data-slot=toggle-group-item]]:bg-muted! [&_[data-slot=toggle-group-item]]:text-transparent!";
+
 export function SettingsCardsSkeleton() {
 	return (
-		<div inert aria-busy="true" className="settings-skeleton">
+		<div inert aria-busy="true" className={SKELETON_VALUES_CLASS}>
 			<SkeletonContext.Provider value={true}>
 				<SettingsCards data={SKELETON_DATA} savers={{}} />
 			</SkeletonContext.Provider>

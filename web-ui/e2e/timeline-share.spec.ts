@@ -18,7 +18,7 @@ const PERIODS = ["Weekly", "Monthly", "Yearly", "Daily", "Weekly"] as const;
 async function speciesOnScreen(page: Page): Promise<number> {
 	const figure = page
 		.locator("span.whitespace-nowrap", { hasText: /species$/ })
-		.locator(".count-figure");
+		.locator('[data-slot="count"]');
 	const empty = page.getByText("No detections recorded").first();
 	await expect(figure.or(empty)).toBeVisible();
 	if (await empty.isVisible()) return 0;

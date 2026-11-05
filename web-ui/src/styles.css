@@ -156,9 +156,13 @@
   --spacing-card-edge: var(--card-edge);
   --spacing-masthead: var(--masthead-h);
   --spacing-row-checkbox: var(--row-checkbox-size);
+  --spacing-page-end: var(--page-end);
+  --animate-rise-in: rise-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-flash-in: flash-in 2.4s ease-out;
+  --animate-live-pulse: live-pulse 2s ease-in-out infinite;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: 0.625rem; /* 10px -- cards (feature-card, shadcn Card) */
+  --radius-lg: 0.625rem; /* 10px */
   --radius-xl: calc(var(--radius) + 4px);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -225,49 +229,11 @@ a[data-slot="button"]:hover {
   }
 }
 
-.row-checkbox {
-  appearance: none;
-  display: block;
-  flex: none;
-  width: var(--row-checkbox-size);
-  height: var(--row-checkbox-size);
-  margin: 0;
-  border: 1.5px solid color-mix(in oklab, var(--ink) 35%, transparent);
-  border-radius: 3px;
-  background: var(--card) center / 75% no-repeat;
-  cursor: pointer;
-  transition:
-    background-color 180ms ease,
-    border-color 180ms ease;
-}
-
-.row-checkbox:checked {
-  border-color: var(--moss);
-  background-color: var(--moss);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.25 5 8.75l4.5-5.5'/%3E%3C/svg%3E");
-}
-
-.row-checkbox:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-}
-
 /* The space either side of a table cell: half the page gap, so neighbours sit
    a full gap apart, but never under 6px a side -- on the smallest phones the
    halved page gap left columns 8px apart and the row ran together. */
 :root {
   --cell-gap: max(0.375rem, calc(var(--page-gap) / 2));
-}
-
-/* A count of birds or detections set in running UI -- a species row's total,
-   a card's "117 detections · 30 species" readout. Bold 13px ink, tabular, so
-   every count reads alike wherever it sits. Not for headline stat figures
-   (PageHeaderCard's 20px) or the numbers drawn inside a chart. */
-.count-figure {
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--foreground);
 }
 
 /* The page's standard spacing: the gutter around it and the gap between its
@@ -280,6 +246,10 @@ a[data-slot="button"]:hover {
      height, so the hairline under the wordmark runs level with the bottom of
      the page header beside it. */
   --masthead-h: 76px;
+  --page-end: max(
+    calc(var(--spacing) * 1),
+    calc(var(--page-gap) - var(--scrollbar-w, 0px))
+  );
 }
 @media (width < 400px) {
   :root {
@@ -287,94 +257,13 @@ a[data-slot="button"]:hover {
   }
 }
 
-/* Content fills whatever the sidebar leaves rather than centring in a capped
-   column: the sidebar is pinned to the viewport's left edge, so a max-width
-   here would strand content in the middle of the remaining space. The inline
-   padding (the page gap) is what makes the gap from the sidebar to the first
-   card match the gap from the last card to the right edge. */
-.page-wrap {
-  width: 100%;
-  padding-inline: var(--page-gap);
-  /* The scroll pane always reserves its scrollbar's gutter (see `__root`), and
-     that band already reads as space at the right edge -- so the padding only
-     tops it up to the page gap, keeping at least spacing 1 so the content
-     never touches the scrollbar. Where scrollbars float over the content
-     (--scrollbar-w is 0) this is the full page gap, as on the left. */
-  padding-right: max(
-    calc(var(--spacing) * 1),
-    calc(var(--page-gap) - var(--scrollbar-w, 0px))
-  );
-}
-
-/* Top and bottom come from each page's own `py-4` (or `pb-4`) utility, and a
-   card's inner padding from its own standard `p-4`; on the smallest phones all
-   of them follow the page gap down with the sides, so the page, the gaps
-   between cards and the cards' own edges stay one measure. This block is
-   unlayered, so it outranks those utilities without touching every page. */
-@media (width < 400px) {
-  .page-wrap.py-4 {
-    padding-block: var(--page-gap);
-  }
-  .page-wrap.pb-4 {
-    padding-bottom: var(--page-gap);
-  }
-  .feature-card.p-4 {
-    padding: var(--page-gap);
-  }
-}
-
-/* In `components` rather than unlayered, so Tailwind utilities outrank it.
-   Unlayered CSS beats every layered utility regardless of specificity, so a
-   card that asked for a different border or background quietly got this one
-   instead and no amount of staring at the utility class explained why. Nothing
-   currently overrides either property -- this is here so that the next thing
-   which tries to simply works. */
-@layer components {
-  .feature-card {
-    border: 1px solid var(--line);
-    background: linear-gradient(165deg, var(--surface-strong), var(--surface));
-  }
-
-  /* A paged list holds its height, so a short last page leaves slack. White
-     rows stack on an off-white well instead of ending in a block of empty card. The
-     last row's hairline is a shadow rather than a border, so `clip` (or a
-     scrolling body) drops it on a full page, where the footer's rule already
-     closes the list and a border would draw a second line beside it. */
-  .row-well {
-    overflow: clip;
-    background: var(--row-well);
-  }
-  .row-well > * {
-    background: var(--card);
-  }
-  .row-well > :last-child {
-    box-shadow: 0 1px 0 var(--line);
-  }
-}
-
-/* Only cards that are actually links get the hover lift -- plain
-   informational cards (Stats, Now) stay static. */
-.feature-card-link:hover {
-	transform: translateY(-2px);
-	border-color: var(--hover-line);
-}
-
 button,
-.feature-card,
 a {
   transition:
     background-color 180ms ease,
     color 180ms ease,
     border-color 180ms ease,
     transform 180ms ease;
-}
-
-.island-kicker {
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 0.69rem;
-  color: var(--kicker);
 }
 
 /* The vertical counterpart to .nav-link. The underline that marks the active
@@ -435,10 +324,6 @@ a {
   opacity: 1;
 }
 
-.rise-in {
-  animation: rise-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -450,36 +335,6 @@ a {
   }
 }
 
-/* The settings cards' skeleton is the real cards on placeholder values (see
-   SettingsCardsSkeleton): every field becomes a soft shell of its own size,
-   with nothing of the placeholder showing through it. */
-.settings-skeleton :is(input, select, textarea) {
-  color: transparent;
-  background: var(--muted);
-  background-image: none;
-  border-color: transparent;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* A segmented choice is a value too: blank both halves alike, so the
-   default's moss segment doesn't flash before the station's own arrives. */
-.settings-skeleton [data-slot="toggle-group-item"] {
-  color: transparent;
-  background: var(--muted);
-  border-color: var(--paper-raised);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.settings-skeleton :is(input, textarea)::placeholder {
-  color: transparent;
-}
-
-/* Plays once when a freshly-arrived row/card mounts (or remounts via a
-   changed `key`) -- a brief highlight that fades back to nothing. */
-.flash-in {
-  animation: flash-in 2.4s ease-out;
-}
-
 @keyframes flash-in {
   0% {
     background-color: color-mix(in oklab, var(--sand) 55%, transparent);
@@ -487,15 +342,6 @@ a {
   100% {
     background-color: transparent;
   }
-}
-
-.live-dot {
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 999px;
-  background: var(--moss);
-  animation: live-pulse 2s ease-in-out infinite;
 }
 
 @keyframes live-pulse {

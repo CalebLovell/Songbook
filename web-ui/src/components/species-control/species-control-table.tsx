@@ -10,6 +10,8 @@ import {
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
+import { RowCheckbox } from "~/components/ui/row-checkbox.tsx";
+import { RowWell } from "~/components/ui/row-well.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
 	SELECT_COLUMN_WIDTH,
@@ -80,8 +82,7 @@ export function sortSpeciesControlRows(
 
 const FIRST_COLUMN_CLASSES = "pl-page";
 const CELL_GAP = "px-cell";
-const STATUS_EDGE =
-	"pr-[max(calc(var(--spacing)*1),calc(var(--page-gap)-var(--scrollbar-w,0px)))]";
+const STATUS_EDGE = "pr-page-end";
 const COLUMN_VISIBILITY: Record<string, string> = {
 	scientific: "hidden @min-[54rem]:block",
 	count: "hidden @min-[36rem]:block",
@@ -212,11 +213,9 @@ export function SpeciesControlTable({
 								FIRST_COLUMN_CLASSES,
 							)}
 						>
-							<input
+							<RowCheckbox
 								aria-label="Select all species on this page"
 								checked={allSelected}
-								className="row-checkbox"
-								type="checkbox"
 								onChange={(event) => {
 									const next = new Set(selected);
 									for (const row of rows ?? [])
@@ -269,11 +268,12 @@ export function SpeciesControlTable({
 						</TableHead>
 					</TableRow>
 				</TableHeader>
-				<TableBody
+				<RowWell
+					as={TableBody}
 					role="rowgroup"
 					aria-busy={rows === null || undefined}
 					data-scroll-reset=""
-					className="col-span-full row-well grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
+					className="col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable]"
 				>
 					{rows === null
 						? Array.from({ length: SPECIES_CONTROL_PAGE_SIZE }, (_, index) => (
@@ -303,11 +303,9 @@ export function SpeciesControlTable({
 									role="cell"
 									className={cn(CELL_GAP, FIRST_COLUMN_CLASSES)}
 								>
-									<input
+									<RowCheckbox
 										aria-label={`Select ${row.comName}`}
 										checked={isSelected}
-										className="row-checkbox"
-										type="checkbox"
 										onChange={(event) =>
 											toggle(row.sciName, event.target.checked)
 										}
@@ -362,7 +360,7 @@ export function SpeciesControlTable({
 							</TableRow>
 						);
 					})}
-				</TableBody>
+				</RowWell>
 			</Table>
 
 			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">

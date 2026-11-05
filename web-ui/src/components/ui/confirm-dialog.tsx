@@ -2,11 +2,12 @@ import { type LucideIcon, TriangleAlert, X } from "lucide-react";
 import { type ReactNode, useEffect, useId } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 
 export const MODAL_BACKDROP_CLASS =
 	"fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_oklab,var(--ink)_28%,transparent)] p-page";
 export const MODAL_CARD_CLASS =
-	"feature-card flex w-full flex-col gap-page rounded-md p-4 text-left shadow-xl";
+	"flex w-full flex-col gap-page text-left shadow-xl";
 export const MODAL_TITLE_CLASS = "font-semibold text-lg";
 export const MODAL_ACTIONS_CLASS = "flex justify-end gap-page";
 
@@ -47,7 +48,8 @@ export function ConfirmDialog({
 
 	return (
 		<div className={MODAL_BACKDROP_CLASS}>
-			<section
+			<Card
+				as="section"
 				aria-labelledby={titleId}
 				aria-modal="true"
 				role="alertdialog"
@@ -88,7 +90,7 @@ export function ConfirmDialog({
 						{confirmLabel}
 					</Button>
 				</div>
-			</section>
+			</Card>
 		</div>
 	);
 }

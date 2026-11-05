@@ -2,6 +2,7 @@ import { Settings } from "lucide-react";
 import { useState } from "react";
 
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
 import type { StationHealth } from "~/lib/health-data.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
@@ -52,7 +53,7 @@ export function SettingsPage({
 	]);
 
 	return (
-		<div className="page-wrap space-y-page py-4">
+		<PageWrap className="space-y-page">
 			<PageHeaderCard
 				icon={Settings}
 				title={PAGE_HEADERS.settings.title}
@@ -108,13 +109,13 @@ export function SettingsPage({
 				onCheckUpdates={onCheckUpdates}
 				onInstallUpdate={onInstallUpdate}
 			/>
-		</div>
+		</PageWrap>
 	);
 }
 
 export function SettingsPageSkeleton() {
 	return (
-		<div className="page-wrap space-y-page py-4">
+		<PageWrap className="space-y-page">
 			<PageHeaderCard
 				icon={Settings}
 				title={PAGE_HEADERS.settings.title}
@@ -126,6 +127,6 @@ export function SettingsPageSkeleton() {
 				}
 			/>
 			<SettingsCardsSkeleton />
-		</div>
+		</PageWrap>
 	);
 }

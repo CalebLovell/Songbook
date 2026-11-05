@@ -11,6 +11,7 @@ import {
 	RecentLogCardSkeleton,
 } from "~/components/now/recent-log-card.tsx";
 import { SpeciesHeroCardShell } from "~/components/species-hero-card.tsx";
+import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import {
 	getLiveHighlights,
@@ -91,7 +92,7 @@ function Live() {
 
 function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
 	return (
-		<div className="page-wrap py-4">
+		<PageWrap>
 			<SpeciesHeroCardShell label="Last 24 hours" actions={pill} />
 
 			<div className="mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
@@ -108,7 +109,7 @@ function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
 					</ShellReveal>
 				</div>
 			</div>
-		</div>
+		</PageWrap>
 	);
 }
 
@@ -130,7 +131,7 @@ function LiveBody({
 	const heroIsNew = heroKey !== undefined && freshHeroKeys.has(heroKey);
 
 	return (
-		<div className="page-wrap py-4">
+		<PageWrap>
 			<CurrentBirdCard
 				current={snapshot.current}
 				hasAnyDetections={snapshot.hasAnyDetections}
@@ -170,6 +171,6 @@ function LiveBody({
 					</Deferred>
 				</div>
 			</div>
-		</div>
+		</PageWrap>
 	);
 }

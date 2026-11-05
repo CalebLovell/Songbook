@@ -1,6 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 import { SIGN_IN_CARD_TITLE } from "~/components/auth/session-card.tsx";
 import { CardHeader } from "~/components/card-header.tsx";
+import { Card } from "~/components/ui/card.tsx";
 
 const COPY = {
 	"not-set-up": {
@@ -16,9 +17,10 @@ const COPY = {
 export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 	const { title, body } = COPY[state];
 	return (
-		<section
+		<Card
+			as="section"
 			aria-labelledby="station-not-ready"
-			className="feature-card flex flex-col gap-page rounded-md p-page"
+			className="flex flex-col gap-page"
 		>
 			<CardHeader
 				as="h2"
@@ -46,6 +48,6 @@ export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 					) : null}
 				</div>
 			</div>
-		</section>
+		</Card>
 	);
 }

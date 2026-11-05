@@ -5,7 +5,14 @@ import { extendTailwindMerge } from "tailwind-merge";
 const twMerge = extendTailwindMerge({
 	extend: {
 		theme: {
-			spacing: ["page", "cell", "card-edge", "masthead", "row-checkbox"],
+			spacing: [
+				"page",
+				"cell",
+				"card-edge",
+				"masthead",
+				"row-checkbox",
+				"page-end",
+			],
 		},
 	},
 });

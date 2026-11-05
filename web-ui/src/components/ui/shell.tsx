@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
 import { CardHeader } from "~/components/card-header.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { cn } from "~/lib/utils.ts";
 
 export function ShellBar({ className }: { className?: string }) {
@@ -97,14 +98,15 @@ export function ShellCard({
 	style?: CSSProperties;
 }) {
 	return (
-		<section
+		<Card
+			as="section"
 			aria-busy="true"
-			className={cn("feature-card rounded-md p-4", className)}
+			className={cn("", className)}
 			style={style}
 		>
 			{title ? <CardHeader title={title} /> : null}
 			{children ?? <ShellLines className="mt-2" />}
-		</section>
+		</Card>
 	);
 }
 
@@ -120,16 +122,14 @@ export function ShellChartCard({
 	className?: string;
 }) {
 	return (
-		<section
+		<Card
+			as="section"
 			aria-busy="true"
 			aria-label={ariaLabel}
-			className={cn(
-				"feature-card flex min-h-72 flex-col rounded-md p-4",
-				className,
-			)}
+			className={cn("flex min-h-72 flex-col", className)}
 		>
 			<CardHeader title={title}>{action}</CardHeader>
 			<ShellBar className="mt-page min-h-[220px] w-full flex-1 rounded-md" />
-		</section>
+		</Card>
 	);
 }

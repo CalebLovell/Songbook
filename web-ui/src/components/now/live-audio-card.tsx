@@ -9,6 +9,7 @@ import { Popover } from "radix-ui";
 import { useEffect, useRef } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { Toggle } from "~/components/ui/toggle.tsx";
 import { type Rgb, rampColor } from "~/lib/spectrogram.ts";
 import { useLiveAudio } from "~/lib/use-live-audio.ts";
@@ -28,14 +29,14 @@ function CardShell({
 	status?: React.ReactNode;
 }) {
 	return (
-		<section aria-label="Live audio" className="feature-card rounded-md p-4">
+		<Card as="section" aria-label="Live audio">
 			<CardHeader title="Listen" className="gap-3">
 				<output className="min-w-0 truncate text-destructive text-xs leading-4">
 					{status}
 				</output>
 			</CardHeader>
 			<div className="mt-3 max-[400px]:mt-2">{children}</div>
-		</section>
+		</Card>
 	);
 }
 
