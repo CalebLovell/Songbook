@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { DEV_PASSWORD } from "../src/lib/dev-password.ts";
+
 /**
  * Every page loads in a real browser: no error boundary, no uncaught
  * exception, no console error, and a heading on screen. Run it after
@@ -9,8 +11,8 @@ import { expect, type Page, test } from "@playwright/test";
 
 const PUBLIC_PAGES = ["/live", "/timeline", "/detections", "/birds", "/learn"];
 const GATED_PAGES = ["/review", "/settings", "/species-control"];
-// The shipped default; override for a station whose password was changed.
-const PASSWORD = process.env.SMOKE_PASSWORD ?? "birdnet";
+// The dev server's own password; set SMOKE_PASSWORD to test any other station.
+const PASSWORD = process.env.SMOKE_PASSWORD ?? DEV_PASSWORD;
 
 function collectErrors(page: Page) {
 	const errors: string[] = [];
@@ -82,7 +84,7 @@ test.describe("gated pages", () => {
 		// Typing before hydration leaves the form's state empty.
 		await page.waitForLoadState("networkidle");
 		await page.getByLabel("Station password").fill(PASSWORD);
-		await page.getByRole("button", { name: "Unlock" }).click();
+		await page.getByRole("button", { name: "Sign in", exact: true }).click();
 		await expect(page.getByLabel("Station password")).toHaveCount(0);
 
 		for (const path of GATED_PAGES) {

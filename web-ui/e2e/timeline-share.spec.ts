@@ -1,13 +1,19 @@
 import { expect, type Page, test } from "@playwright/test";
 
 /**
- * The Timeline's share panel stays open while the period and window change
- * under it, so whatever it shows must always describe the window on screen.
- * It once built its text the moment the period changed, before that window's
- * figures had arrived, and kept "All time · Nothing heard" for a busy week.
+ * The Timeline's Share button copies a summary of the window on screen, whatever
+ * the period and window were changed to just before. The summary is prepared as
+ * soon as the window changes: it once got built before that window's figures had
+ * arrived, and said "All time · Nothing heard" for a busy week.
  *
  * Needs a seeded station (`npm run db:reset`).
  */
+
+declare global {
+	interface Window {
+		copiedSummary?: string;
+	}
+}
 
 const PERIODS = ["Weekly", "Monthly", "Yearly", "Daily", "Weekly"] as const;
 
@@ -25,46 +31,79 @@ async function speciesOnScreen(page: Page): Promise<number> {
 	return Number((await figure.innerText()).replace(/,/g, ""));
 }
 
-async function expectShareMatchesPage(page: Page, period: string) {
-	const species = await speciesOnScreen(page);
-	const text = page.locator("pre");
-
-	if (species === 0) {
-		await expect(text).toContainText("Nothing heard");
-	} else {
-		await expect(text).toContainText(`${species.toLocaleString()} species`);
-		await expect(text).not.toContainText("Nothing heard");
-	}
-	// Only the All Time view may describe itself as all time.
-	await expect(text, `${period} names its window`).not.toContainText(
-		"All time",
-	);
-	await expect(page.getByRole("button", { name: "Copy", exact: true })).toBeEnabled();
+async function copySummary(page: Page): Promise<string> {
+	await page.evaluate(() => {
+		window.copiedSummary = undefined;
+	});
+	await page.getByRole("button", { name: "Share" }).click();
+	await expect
+		.poll(() => page.evaluate(() => window.copiedSummary))
+		.toBeTruthy();
+	return page.evaluate(() => window.copiedSummary ?? "");
 }
 
-test("the open share panel follows every period and window change", async ({
+async function changeWindow(page: Page, action: () => Promise<void>) {
+	const heading = page.getByRole("heading", { level: 1 });
+	const before = await heading.innerText();
+	await action();
+	await expect(heading).not.toHaveText(before);
+}
+
+async function expectShareMatchesPage(page: Page, period: string) {
+	// The last window's figures stay up until this one's arrive, along with Share.
+	await expect(page.getByRole("button", { name: "Share" })).toBeEnabled();
+	const species = await speciesOnScreen(page);
+	const summary = await copySummary(page);
+
+	expect(summary, "names its period").toContain(`${period} Summary`);
+	// Only the All Time view may describe itself as all time.
+	expect(summary).not.toMatch(/all time/i);
+	if (species === 0) {
+		expect(summary).toContain("Nothing heard");
+	} else {
+		expect(summary).toContain(`Species · ${species.toLocaleString()}`);
+		expect(summary).not.toContain("Nothing heard");
+	}
+	return summary;
+}
+
+test("the copied summary follows every period and window change", async ({
 	page,
 }) => {
+	// Captured rather than written to the real clipboard, which is the machine's own.
+	await page.addInitScript(() => {
+		Object.defineProperty(navigator, "clipboard", {
+			value: {
+				writeText: async (text: string) => {
+					window.copiedSummary = text;
+				},
+			},
+		});
+	});
 	await page.goto("/timeline?period=day");
 	await page.waitForLoadState("networkidle");
 	const share = page.getByRole("button", { name: "Share" });
 	test.skip((await share.count()) === 0, "station has no detections yet");
 
-	await share.click();
 	await expectShareMatchesPage(page, "Daily");
 
 	for (const period of PERIODS) {
-		await page.getByRole("radio", { name: period, exact: true }).click();
+		await changeWindow(page, () =>
+			page.getByRole("radio", { name: period, exact: true }).click(),
+		);
 		await expectShareMatchesPage(page, period);
 	}
 
 	// Paging within a period, not just switching between them.
+	let summary = await copySummary(page);
 	for (const direction of ["Previous", "Next"]) {
 		const arrow = page.getByRole("button", {
 			name: new RegExp(`^${direction}`),
 		});
 		if (!(await arrow.isEnabled())) continue;
-		await arrow.click();
-		await expectShareMatchesPage(page, `Weekly (${direction})`);
+		await changeWindow(page, () => arrow.click());
+		const paged = await expectShareMatchesPage(page, "Weekly");
+		expect(paged, `${direction} moves the window`).not.toEqual(summary);
+		summary = paged;
 	}
 });
