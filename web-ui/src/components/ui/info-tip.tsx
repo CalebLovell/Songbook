@@ -45,7 +45,7 @@ export function InfoTip({
 				<button
 					type="button"
 					aria-label={`About ${label}`}
-					className={`inline-flex shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground transition-colors hover:border-border hover:bg-accent hover:text-accent-foreground ${
+					className={`inline-flex shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-accent-foreground ${
 						size === "default"
 							? "-me-1.5 size-7 min-[400px]:-me-2.5"
 							: "-m-1.25 size-6"

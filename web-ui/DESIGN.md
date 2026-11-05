@@ -98,6 +98,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Styling lives in the component.** A repeated look is a component with Tailwind
   classes in its own file, not a class in `styles.css`. That file holds tokens,
   `@theme`, base element rules, `@keyframes` and overrides of markup we don't own.
+- **Links and buttons**: `@layer base` gives links their moss text and every link
+  and button the 180ms motion, so a utility on one always wins. A link drawn as a
+  button (`data-slot="button"`) takes its colours from the variant instead. Don't add
+  `transition-*` to them; the base rule is the house motion.
 - **Page wrapper**: every page sits in `PageWrap`. Its gutters and a card's padding
   use `--page-gap`, so all of them halve together under 400px.
 - **Button** (`ui/button.tsx`): the default size is `xs` (24px). Pass glyphs
