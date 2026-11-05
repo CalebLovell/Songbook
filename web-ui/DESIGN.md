@@ -155,9 +155,16 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   36rem and 54rem each bring columns back. On the narrowest screens (400px) the
   body scrolls sideways on its own, so the sort menu never leaves the screen. Only
   the selection column (2.5rem) and the last column are pinned; the rest share
-  the width. Row numbers count on across pages (`IndexDot`). Selection actions
-  appear in the footer once something is ticked, never as dead buttons, and
-  signed-out visitors get neither checkboxes nor a Recording column.
+  the width. Row numbers count on across pages (`IndexDot`). The footer is one
+  line that keeps its height whatever is ticked: range on the left, stepper on the
+  far right, and selection actions beside the range once something is ticked,
+  never as dead buttons. Those actions stand as tall as the stepper, and the
+  selected count and clear button stay at every width. A card too
+  narrow for all of them turns the status buttons into a select, and under 28rem
+  the range gives way while something is ticked. Shift-click applies the clicked
+  box's new state back to the last box clicked, and repeating it on the same box
+  flips that whole range back. Signed-out visitors get
+  neither checkboxes nor a Recording column.
 - **Segmented controls** never wrap. Where the segments no longer fit they become
   a native select in the same control dress, so a phone opens its own picker.
 - **Date controls** show the house format with the native input laid invisibly

@@ -46,7 +46,7 @@ export function PageStepper({
 		<nav
 			aria-label={label}
 			className={cn(
-				"flex h-8 pointer-coarse:h-9 w-fit shrink-0 pointer-coarse:text-base text-sm",
+				"flex h-8 pointer-coarse:h-9 w-fit shrink-0 pointer-coarse:text-base text-sm max-[359px]:min-w-0 max-[359px]:shrink",
 				variant === "outline" &&
 					"overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring",
 				className,
@@ -59,10 +59,12 @@ export function PageStepper({
 				onClick={() => onPageChange(page - 1)}
 			/>
 			<label
-				className="flex cursor-text items-center justify-center gap-[0.5ch] px-3 text-muted-foreground"
-				style={{
-					minWidth: `calc(${2 * numberWidth(pageTotal) + 2.4}ch + 1.5rem)`,
-				}}
+				className="flex min-w-(--page-label-width) cursor-text items-center justify-center gap-[0.5ch] px-1 text-muted-foreground max-[359px]:min-w-0 max-[359px]:overflow-hidden"
+				style={
+					{
+						"--page-label-width": `calc(${2 * numberWidth(pageTotal) + 2.4}ch + 0.5rem)`,
+					} as React.CSSProperties
+				}
 			>
 				<input
 					aria-label={`Page, of ${pageTotal}`}
@@ -141,6 +143,8 @@ export const PAGE_ROW_CLASS =
 	"flex min-w-0 flex-auto flex-wrap items-center gap-page";
 
 export const PAGE_RANGE_NARROW_HIDDEN = "max-[359px]:hidden";
+
+export const PAGE_RANGE_YIELDS_TO_ACTIONS = "@max-[28rem]:hidden";
 
 export const PAGE_RANGE_CLASS =
 	"flex h-8 pointer-coarse:h-9 min-w-0 items-center whitespace-nowrap text-muted-foreground text-sm";

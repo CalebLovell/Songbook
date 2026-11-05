@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import type { CSSProperties, ReactNode } from "react";
+import type { ChangeEvent, CSSProperties, ReactNode } from "react";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import {
 	PAGE_RANGE_CLASS,
 	PAGE_RANGE_NARROW_HIDDEN,
-	PAGE_ROW_CLASS,
+	PAGE_RANGE_YIELDS_TO_ACTIONS,
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
@@ -23,6 +23,7 @@ import {
 	TableRow,
 } from "~/components/ui/table.tsx";
 import { SortButton, SortMenu } from "~/components/ui/table-sort.tsx";
+import { useShiftClickRange } from "~/lib/shift-click-range.ts";
 import type {
 	SpeciesControlRow,
 	SpeciesStatus,
@@ -160,9 +161,15 @@ export function SpeciesControlTable({
 	const lastIndex =
 		firstIndex + (rows?.length ?? SPECIES_CONTROL_PAGE_SIZE) - 1;
 
-	function toggle(sciName: string, checked: boolean) {
+	const rowsForClick = useShiftClickRange(selected.size > 0);
+
+	function toggle(sciName: string, event: ChangeEvent<HTMLInputElement>) {
+		const { checked } = event.target;
+		const orderedIds = (rows ?? []).map((row) => row.sciName);
 		const next = new Set(selected);
-		checked ? next.add(sciName) : next.delete(sciName);
+		for (const id of rowsForClick(orderedIds, sciName, event)) {
+			checked ? next.add(id) : next.delete(id);
+		}
 		onSelectedChange(next);
 	}
 
@@ -307,9 +314,7 @@ export function SpeciesControlTable({
 									<RowCheckbox
 										aria-label={`Select ${row.comName}`}
 										checked={isSelected}
-										onChange={(event) =>
-											toggle(row.sciName, event.target.checked)
-										}
+										onChange={(event) => toggle(row.sciName, event)}
 									/>
 								</TableCell>
 								<TableCell role="cell" className={cn(CELL_GAP, "text-center")}>
@@ -367,42 +372,44 @@ export function SpeciesControlTable({
 				</RowWell>
 			</Table>
 
-			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
+			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
+				{rows === null ? (
+					<div
+						aria-hidden="true"
+						className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}
+					>
+						<ShellText className="w-40" barClassName="w-full" />
+					</div>
+				) : (
+					<PageRange
+						first={firstIndex}
+						last={lastIndex}
+						className={actions ? PAGE_RANGE_YIELDS_TO_ACTIONS : undefined}
+					/>
+				)}
 				{actions}
-				<div className={PAGE_ROW_CLASS}>
-					{rows === null ? (
-						<div
-							aria-hidden="true"
-							className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}
-						>
-							<ShellText className="w-40" barClassName="w-full" />
-						</div>
-					) : (
-						<PageRange first={firstIndex} last={lastIndex} />
-					)}
-					{rows === null ? (
-						<span className="ml-auto">
-							<ShellSized className="rounded-md">
-								<PageStepper
-									variant="ghost"
-									label="Species pages"
-									page={page}
-									pageCount={pageCount}
-									onPageChange={() => {}}
-								/>
-							</ShellSized>
-						</span>
-					) : (
-						<PageStepper
-							className="ml-auto"
-							variant="ghost"
-							label="Species pages"
-							page={page}
-							pageCount={pageCount}
-							onPageChange={onPageChange}
-						/>
-					)}
-				</div>
+				{rows === null ? (
+					<span className="ml-auto">
+						<ShellSized className="rounded-md">
+							<PageStepper
+								variant="ghost"
+								label="Species pages"
+								page={page}
+								pageCount={pageCount}
+								onPageChange={() => {}}
+							/>
+						</ShellSized>
+					</span>
+				) : (
+					<PageStepper
+						className="ml-auto"
+						variant="ghost"
+						label="Species pages"
+						page={page}
+						pageCount={pageCount}
+						onPageChange={onPageChange}
+					/>
+				)}
 			</div>
 		</div>
 	);

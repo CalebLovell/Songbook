@@ -1,5 +1,6 @@
 import {
 	Check,
+	ChevronDown,
 	CircleAlert,
 	RotateCcw,
 	SlidersHorizontal,
@@ -123,33 +124,28 @@ type ProposedDialog =
 const BULK_STATUS_ACTIONS: Array<{
 	status: SpeciesStatus;
 	label: string;
-	short: string;
 	className: string;
 }> = [
 	{
 		status: "automatic",
 		label: "Automatic",
-		short: "Auto",
 		className: "text-muted-foreground hover:bg-muted",
 	},
 	{
 		status: "custom",
 		label: "Custom",
-		short: "Custom",
 		className:
 			"text-moss hover:bg-[color-mix(in_oklab,var(--sage)_35%,var(--paper-raised))]",
 	},
 	{
 		status: "always",
 		label: "Always detect",
-		short: "Always",
 		className:
 			"text-bark hover:bg-[color-mix(in_oklab,var(--sand)_30%,var(--paper-raised))]",
 	},
 	{
 		status: "never",
 		label: "Never detect",
-		short: "Never",
 		className:
 			"text-destructive hover:bg-[color-mix(in_oklab,var(--clay)_15%,var(--paper-raised))]",
 	},
@@ -167,7 +163,7 @@ export function SpeciesSelectionBar({
 	return (
 		<fieldset
 			aria-label="Set selected species status"
-			className="flex h-8.5 pointer-coarse:h-9 @max-[36rem]:w-full w-fit max-w-full shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
+			className="flex h-8 pointer-coarse:h-9 w-fit min-w-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
 			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
 				<span className="font-semibold text-foreground tabular-nums">
@@ -180,7 +176,7 @@ export function SpeciesSelectionBar({
 				aria-label="Clear selection"
 				title="Clear selection"
 				onClick={onClear}
-				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -190,12 +186,32 @@ export function SpeciesSelectionBar({
 					type="button"
 					aria-label={`Set selected species to ${action.label}`}
 					onClick={() => onStatus(action.status)}
-					className={`flex @max-[36rem]:flex-1 items-center justify-center whitespace-nowrap border-input border-l @min-[36rem]:px-3 px-2 ${action.className}`}
+					className={`flex @max-[50rem]:hidden items-center justify-center whitespace-nowrap border-input border-l px-3 ${action.className}`}
 				>
-					<span className="@max-[36rem]:hidden">{action.label}</span>
-					<span className="@min-[36rem]:hidden">{action.short}</span>
+					{action.label}
 				</button>
 			))}
+			<span className="relative flex @min-[50rem]:hidden min-w-0 border-input border-l">
+				<select
+					aria-label="Status for selected species"
+					value=""
+					onChange={(event) => onStatus(event.target.value as SpeciesStatus)}
+					className="w-full min-w-0 cursor-pointer appearance-none bg-transparent pr-7 pl-2 pointer-coarse:text-base text-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none"
+				>
+					<option value="" disabled hidden>
+						Status
+					</option>
+					{BULK_STATUS_ACTIONS.map((action) => (
+						<option key={action.status} value={action.status}>
+							{action.label}
+						</option>
+					))}
+				</select>
+				<ChevronDown
+					aria-hidden="true"
+					className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground"
+				/>
+			</span>
 		</fieldset>
 	);
 }

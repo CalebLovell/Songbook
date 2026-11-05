@@ -16,7 +16,7 @@ import { RecordingButton } from "~/components/recording-button.tsx";
 import {
 	PAGE_RANGE_CLASS,
 	PAGE_RANGE_NARROW_HIDDEN,
-	PAGE_ROW_CLASS,
+	PAGE_RANGE_YIELDS_TO_ACTIONS,
 	PageRange,
 	PageStepper,
 } from "~/components/ui/page-stepper.tsx";
@@ -45,6 +45,7 @@ import {
 	nextDetectionSort,
 } from "~/lib/detection-workspace.ts";
 import type { DetectionPage, DetectionTableRow } from "~/lib/detections.ts";
+import { useShiftClickRange } from "~/lib/shift-click-range.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { cn } from "~/lib/utils.ts";
 
@@ -234,7 +235,7 @@ function SelectionBar({
 	return (
 		<fieldset
 			aria-label="Selected detections"
-			className="flex h-8.5 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
+			className="flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
 			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
 				<span className="font-semibold text-foreground tabular-nums">
@@ -247,7 +248,7 @@ function SelectionBar({
 				aria-label="Clear selection"
 				title="Clear selection"
 				onClick={onClear}
-				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 			>
 				<X className="size-4" aria-hidden="true" />
 			</button>
@@ -255,7 +256,7 @@ function SelectionBar({
 				type="button"
 				aria-label={`Delete ${count} selected ${noun}`}
 				onClick={onDelete}
-				className="flex @min-[36rem]:w-auto pointer-coarse:w-9 w-8.5 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive hover:bg-destructive/10"
+				className="flex @min-[36rem]:w-auto pointer-coarse:w-9 w-8 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive hover:bg-destructive/10"
 			>
 				<Trash2 className="size-4" aria-hidden="true" />
 				<span className="sr-only @min-[36rem]:not-sr-only">Delete</span>
@@ -409,6 +410,9 @@ export function DetectionsTable({
 	canListen,
 	onDeleteSelected,
 }: DetectionsTableProps) {
+	const selectedCount = Object.values(rowSelection).filter(Boolean).length;
+	const rowsForClick = useShiftClickRange(selectedCount > 0);
+
 	function updateSearch(change: Partial<DetectionWorkspaceSearch>) {
 		onSearchChange({ ...search, ...change });
 		onRowSelectionChange({});
@@ -439,11 +443,23 @@ export function DetectionsTable({
 				onChange={table.getToggleAllPageRowsSelectedHandler()}
 			/>
 		),
-		cell: ({ row }) => (
+		cell: ({ row, table }) => (
 			<RowCheckbox
 				aria-label={`Select ${row.original.Com_Name}`}
 				checked={row.getIsSelected()}
-				onChange={row.getToggleSelectedHandler()}
+				onChange={(event) => {
+					const { checked } = event.target;
+					const orderedIds = table.getRowModel().rows.map(({ id }) => id);
+					const ids = rowsForClick(orderedIds, row.id, event);
+					onRowSelectionChange((current) => {
+						const next = { ...current };
+						for (const id of ids) {
+							if (checked) next[id] = true;
+							else delete next[id];
+						}
+						return next;
+					});
+				}}
 			/>
 		),
 		enableHiding: false,
@@ -622,7 +638,7 @@ export function DetectionsTable({
 	const pageCount = page
 		? Math.max(1, Math.ceil(page.total / search.pageSize))
 		: 1000;
-	const selectedCount = Object.values(rowSelection).filter(Boolean).length;
+	const selectionShown = canDelete && selectedCount > 0;
 	return (
 		<div className="@container flex min-h-0 flex-1 flex-col">
 			<Table
@@ -727,48 +743,52 @@ export function DetectionsTable({
 				</RowWell>
 			</Table>
 
-			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
-				{canDelete && selectedCount > 0 ? (
+			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
+				{page ? (
+					<PageRange
+						first={firstIndex}
+						last={lastIndex}
+						className={
+							selectionShown ? PAGE_RANGE_YIELDS_TO_ACTIONS : undefined
+						}
+					/>
+				) : (
+					<div
+						aria-hidden="true"
+						className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}
+					>
+						<ShellText className="w-44" barClassName="w-full" />
+					</div>
+				)}
+				{selectionShown ? (
 					<SelectionBar
 						count={selectedCount}
 						onClear={() => onRowSelectionChange({})}
 						onDelete={onDeleteSelected}
 					/>
 				) : null}
-				<div className={PAGE_ROW_CLASS}>
-					{page ? (
-						<PageRange first={firstIndex} last={lastIndex} />
-					) : (
-						<div
-							aria-hidden="true"
-							className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}
-						>
-							<ShellText className="w-44" barClassName="w-full" />
-						</div>
-					)}
-					{skeleton ? (
-						<span className="ml-auto">
-							<ShellSized className="rounded-md">
-								<PageStepper
-									variant="ghost"
-									label="Detections pages"
-									page={search.page}
-									pageCount={pageCount}
-									onPageChange={() => {}}
-								/>
-							</ShellSized>
-						</span>
-					) : (
-						<PageStepper
-							className="ml-auto"
-							variant="ghost"
-							label="Detections pages"
-							page={search.page}
-							pageCount={pageCount}
-							onPageChange={(page) => updateSearch({ page })}
-						/>
-					)}
-				</div>
+				{skeleton ? (
+					<span className="ml-auto">
+						<ShellSized className="rounded-md">
+							<PageStepper
+								variant="ghost"
+								label="Detections pages"
+								page={search.page}
+								pageCount={pageCount}
+								onPageChange={() => {}}
+							/>
+						</ShellSized>
+					</span>
+				) : (
+					<PageStepper
+						className="ml-auto"
+						variant="ghost"
+						label="Detections pages"
+						page={search.page}
+						pageCount={pageCount}
+						onPageChange={(page) => updateSearch({ page })}
+					/>
+				)}
 			</div>
 		</div>
 	);
