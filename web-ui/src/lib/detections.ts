@@ -12,7 +12,6 @@ import {
 	or,
 	sql,
 } from "drizzle-orm";
-import Fuse from "fuse.js";
 import { z } from "zod";
 import { db, openWritableDetectionsDb, sqlite } from "~/db/index.ts";
 import { type Detection, detections } from "~/db/schema.ts";
@@ -29,6 +28,7 @@ import {
 	normalizeDetectionWorkspaceSearch,
 } from "~/lib/detection-workspace.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
+import { speciesFuse } from "~/lib/species-fuse.ts";
 import { type SpeciesLink, speciesLinkFor } from "~/lib/species-link.ts";
 
 const isToday = sql`${detections.Date} = date('now', 'localtime')`;
@@ -81,12 +81,9 @@ async function fuzzySpeciesNames(query: string): Promise<string[]> {
 			sciName: detections.Sci_Name,
 		})
 		.from(detections);
-	const fuse = new Fuse(names, {
-		keys: ["comName", "sciName"],
-		threshold: 0.2,
-		ignoreLocation: true,
-	});
-	return fuse.search(query).map((result) => result.item.comName);
+	return speciesFuse(names)
+		.search(query)
+		.map((result) => result.item.comName);
 }
 
 function confidencePercent(query: string): number | null {

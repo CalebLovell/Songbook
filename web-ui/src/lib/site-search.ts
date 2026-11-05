@@ -1,4 +1,4 @@
-import Fuse from "fuse.js";
+import { speciesFuse } from "~/lib/species-fuse.ts";
 
 export type SearchSpecies = { comName: string; sciName: string; count: number };
 
@@ -44,11 +44,7 @@ export function searchSite<P extends SearchPage, S extends SearchSetting>(
 	if (needle === "") return { species: [], pages: [], settings: [] };
 	const needles = needle.split(/\s+/);
 
-	const fuse = new Fuse(species, {
-		keys: ["comName", "sciName"],
-		threshold: 0.2,
-		ignoreLocation: true,
-	});
+	const fuse = speciesFuse(species);
 
 	const settingMatches: SettingMatch<S>[] = [];
 	for (const setting of settings) {

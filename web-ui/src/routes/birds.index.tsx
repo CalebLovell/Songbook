@@ -3,7 +3,6 @@ import {
 	Link,
 	stripSearchParams,
 } from "@tanstack/react-router";
-import Fuse from "fuse.js";
 import {
 	ArrowDownAZ,
 	ArrowDownWideNarrow,
@@ -50,6 +49,7 @@ import { getLifeListCards, type LifeListCard } from "~/lib/detections.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { pageTitle } from "~/lib/page-title.ts";
+import { speciesFuse } from "~/lib/species-fuse.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { useSettled } from "~/lib/use-settled.ts";
 import { cn } from "~/lib/utils.ts";
@@ -286,15 +286,7 @@ function SpeciesBrowser({ cards }: { cards: LifeListCard[] }) {
 	const { q: search, sort, reverse, page } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
-	const fuse = useMemo(
-		() =>
-			new Fuse(cards, {
-				keys: ["comName", "sciName"],
-				threshold: 0.2,
-				ignoreLocation: true,
-			}),
-		[cards],
-	);
+	const fuse = useMemo(() => speciesFuse(cards), [cards]);
 
 	const filtered = useMemo(() => {
 		const query = search.trim();

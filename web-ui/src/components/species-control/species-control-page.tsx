@@ -1,4 +1,3 @@
-import Fuse from "fuse.js";
 import {
 	Check,
 	CircleAlert,
@@ -32,6 +31,7 @@ import {
 	nextSpeciesControlSort,
 	type SpeciesControlWorkspaceSearch,
 } from "~/lib/species-control-workspace.ts";
+import { speciesFuse } from "~/lib/species-fuse.ts";
 import { SpeciesControlDialog } from "./species-control-dialogs.tsx";
 import {
 	SPECIES_CONTROL_PAGE_SIZE,
@@ -267,7 +267,7 @@ export function SpeciesControlPage({
 	);
 	const searched = useMemo(() => {
 		if (!search.query) return viewRows;
-		return new Fuse(viewRows, { keys: ["comName", "sciName"], threshold: 0.3 })
+		return speciesFuse(viewRows)
 			.search(search.query)
 			.map((result) => result.item);
 	}, [search.query, viewRows]);
