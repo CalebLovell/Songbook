@@ -59,10 +59,10 @@ export function PageStepper({
 				onClick={() => onPageChange(page - 1)}
 			/>
 			<label
-				className="flex min-w-(--page-label-width) cursor-text items-center justify-center gap-[0.5ch] px-1 text-muted-foreground max-[359px]:min-w-0 max-[359px]:overflow-hidden"
+				className="flex min-w-(--page-label-width) cursor-text items-center justify-center gap-[0.5ch] px-2 text-muted-foreground max-[359px]:min-w-0 max-[359px]:overflow-hidden"
 				style={
 					{
-						"--page-label-width": `calc(${2 * numberWidth(pageTotal) + 2.4}ch + 0.5rem)`,
+						"--page-label-width": `calc(${2 * numberWidth(pageTotal) + 2.4}ch + 1rem)`,
 					} as React.CSSProperties
 				}
 			>

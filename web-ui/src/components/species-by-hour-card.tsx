@@ -79,9 +79,9 @@ export function SpeciesByHourCard({
 				className={`@container/card ${isEmpty ? "" : "pb-1!"} ${className}`}
 			>
 				<div
-					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${isEmpty ? "mb-page" : ""}`}
+					className={`${CARD_HEADER_CLASS} gap-3 py-2 ${isEmpty ? "mb-page" : ""}`}
 				>
-					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
+					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3">
 						<Kicker className="shrink-0">Activity</Kicker>
 						{summary}
 					</div>
@@ -245,10 +245,8 @@ export function SpeciesByHourCardSkeleton({
 			aria-label="Species by hour"
 			className={`@container/card pb-1! ${className}`}
 		>
-			<div
-				className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
-			>
-				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
+			<div className={`${CARD_HEADER_CLASS} gap-3 py-2`}>
+				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3">
 					<Kicker className="shrink-0">Activity</Kicker>
 					{summary}
 				</div>

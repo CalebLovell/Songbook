@@ -54,10 +54,8 @@ export function SpeciesGrid({
 	return (
 		<TooltipProvider>
 			<Card as="section" aria-label="Species" className={className}>
-				<div
-					className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
-				>
-					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
+				<div className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2`}>
+					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3">
 						<Kicker className="shrink-0">Activity</Kicker>
 						{summary}
 					</div>
@@ -145,10 +143,8 @@ export function SpeciesGridSkeleton({
 			aria-label="Species"
 			className={className}
 		>
-			<div
-				className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
-			>
-				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
+			<div className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2`}>
+				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3">
 					<Kicker className="shrink-0">Activity</Kicker>
 					{summary}
 				</div>

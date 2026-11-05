@@ -324,11 +324,8 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 	const detections = rows?.reduce((sum, row) => sum + row.totalDetections, 0);
 
 	return (
-		<div className="flex min-w-0 items-center gap-2.5 max-[480px]:order-last max-[480px]:basis-full">
-			<span
-				className="h-4 w-px shrink-0 bg-line max-[480px]:hidden"
-				aria-hidden="true"
-			/>
+		<div className="flex min-w-0 items-center gap-2.5">
+			<span className="h-4 w-px shrink-0 bg-line" aria-hidden="true" />
 			<div className="flex -translate-y-[1.5px] items-center gap-2 truncate text-[13px] text-muted-foreground">
 				<span className="whitespace-nowrap">
 					{detections === undefined ? (
