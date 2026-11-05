@@ -97,7 +97,7 @@ function Learn() {
 				}
 			/>
 
-			<div className="mt-(--page-gap) w-full">
+			<div className="mt-page w-full">
 				{forPool ? (
 					<LearnRoundView
 						key={pool}

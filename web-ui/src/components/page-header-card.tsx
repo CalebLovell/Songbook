@@ -31,11 +31,11 @@ export function PageHeaderCard({
 	children?: ReactNode;
 }) {
 	return (
-		<section aria-label={title} className="space-y-(--page-gap)">
-			<div className="feature-card flex min-h-(--masthead-h) flex-col justify-center rounded-md px-4 py-3">
+		<section aria-label={title} className="space-y-page">
+			<div className="feature-card flex min-h-masthead flex-col justify-center rounded-md px-4 py-3">
 				<div className="flex items-start justify-between gap-3 max-[400px]:flex-col max-[400px]:gap-2">
 					<div className="flex min-w-0 items-center gap-4">
-						<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--icon-well)] text-[var(--moss)] max-md:hidden">
+						<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-icon-well text-moss max-md:hidden">
 							<Icon aria-hidden="true" className="size-5" />
 						</div>
 						<div className="min-w-0">
@@ -72,7 +72,7 @@ export function PageHeaderStats({
 	if (inline) {
 		return (
 			<dl
-				className={`mt-4 grid grid-cols-2 gap-4 border-[var(--line)] border-t pt-4 ${columns} ${className}`}
+				className={`mt-4 grid grid-cols-2 gap-4 border-line border-t pt-4 ${columns} ${className}`}
 			>
 				{stats.map((stat) => (
 					<Figure key={stat.label} {...stat} inline />
@@ -83,7 +83,7 @@ export function PageHeaderStats({
 
 	return (
 		<dl
-			className={`grid grid-cols-1 gap-(--page-gap) sm:grid-cols-2 ${columns} ${className}`}
+			className={`grid grid-cols-1 gap-page sm:grid-cols-2 ${columns} ${className}`}
 		>
 			{stats.map((stat) => (
 				<Figure key={stat.label} {...stat} />
@@ -106,7 +106,7 @@ function Figure({
 					: "@container/figure feature-card flex items-center gap-4 overflow-hidden rounded-md p-4 max-[400px]:gap-3"
 			}
 		>
-			<div className="flex @max-[15rem]/figure:hidden size-8 shrink-0 items-center justify-center rounded-full bg-[var(--icon-well)] text-[var(--moss)]">
+			<div className="flex @max-[15rem]/figure:hidden size-8 shrink-0 items-center justify-center rounded-full bg-icon-well text-moss">
 				<Icon aria-hidden="true" className="size-4" />
 			</div>
 			<div className="min-w-0 flex-1">

@@ -28,7 +28,7 @@ export function GlyphChip({
 	size?: keyof typeof SIZES;
 	className?: string;
 }) {
-	const chipClass = `inline-grid ${SIZES[size].chip} shrink-0 place-items-center rounded-full bg-[var(--icon-well)] text-muted-foreground ${className}`;
+	const chipClass = `inline-grid ${SIZES[size].chip} shrink-0 place-items-center rounded-full bg-icon-well text-muted-foreground ${className}`;
 	const glyph = <Icon className={SIZES[size].glyph} aria-hidden="true" />;
 
 	return (

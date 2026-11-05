@@ -118,7 +118,7 @@ export function ShareButton({
 						onClick={state.share}
 						className={cn(
 							shape === "pill" &&
-								"h-8 self-center rounded-full px-4 text-[var(--moss)] transition-colors duration-[180ms] hover:border-[var(--hover-line)] hover:bg-[var(--icon-well)] hover:text-[var(--moss)] [&_svg]:size-5!",
+								"h-8 self-center rounded-full px-4 text-moss transition-colors duration-[180ms] hover:border-hover-line hover:bg-icon-well hover:text-moss [&_svg]:size-5!",
 							className,
 						)}
 					>

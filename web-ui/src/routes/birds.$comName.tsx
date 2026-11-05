@@ -264,7 +264,7 @@ function SpeciesDetailShell({ year }: { year: number }) {
 							</ShellSized>
 						</div>
 					</CardHeader>
-					<div aria-hidden="true" className="mt-(--page-gap) flex gap-2">
+					<div aria-hidden="true" className="mt-page flex gap-2">
 						<WeekdayLabels />
 						<div className="min-w-0 flex-1 overflow-hidden pb-1">
 							<div className="w-max">
@@ -301,7 +301,7 @@ function SpeciesDetailShell({ year }: { year: number }) {
 
 				<BestRecordingCardSkeleton />
 
-				<div className="grid min-w-0 @min-[80rem]/bird:grid-rows-2 gap-(--page-gap)">
+				<div className="grid min-w-0 @min-[80rem]/bird:grid-rows-2 gap-page">
 					<DetectionsByHourCardSkeleton
 						info={HOUR_CARD_INFO}
 						className="@min-[80rem]/bird:min-h-0"
@@ -345,10 +345,7 @@ function VisitLogSkeleton() {
 				<div className={VISIT_LOG_HEADER_CLASS}>
 					<div className="island-kicker">Visit log</div>
 				</div>
-				<ul
-					aria-hidden="true"
-					className="row-well -mx-(--page-gap) grow divide-y"
-				>
+				<ul aria-hidden="true" className="row-well -mx-page grow divide-y">
 					{Array.from({ length: VISITS_PAGE_SIZE }, (_, index) => (
 						// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 						<li key={index} className={VISIT_ROW_CLASS}>
@@ -405,7 +402,7 @@ function UndetectedSpecies({
 		<div className="page-wrap pb-4">
 			<section
 				aria-label="Bird profile"
-				className="feature-card mt-(--page-gap) grid overflow-hidden rounded-md sm:grid-cols-[12rem_minmax(0,1fr)]"
+				className="feature-card mt-page grid overflow-hidden rounded-md sm:grid-cols-[12rem_minmax(0,1fr)]"
 			>
 				<div className="flex h-36 items-center justify-center overflow-hidden p-4 pb-0 sm:h-44 sm:pb-4">
 					<SpeciesImage
@@ -418,10 +415,10 @@ function UndetectedSpecies({
 
 				<div className="flex min-w-0 flex-col justify-center gap-3 p-4">
 					<div className="min-w-0">
-						<h1 className="font-bold text-2xl text-[var(--moss)] sm:text-3xl">
+						<h1 className="font-bold text-2xl text-moss sm:text-3xl">
 							{comName}
 						</h1>
-						<p className="text-[var(--bark)] text-xs italic">{sciName}</p>
+						<p className="text-bark text-xs italic">{sciName}</p>
 					</div>
 					<p className="text-muted-foreground text-sm">
 						Not detected at this station yet. It will appear here the first time
@@ -502,7 +499,7 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 							</div>
 						</CardHeader>
 
-						<div className="mt-(--page-gap) flex gap-2">
+						<div className="mt-page flex gap-2">
 							<WeekdayLabels />
 							<div
 								ref={heatScrollRef}
@@ -550,7 +547,7 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 						speciesName={detail.comName}
 					/>
 
-					<div className="grid min-w-0 @min-[80rem]/bird:grid-rows-2 gap-(--page-gap)">
+					<div className="grid min-w-0 @min-[80rem]/bird:grid-rows-2 gap-page">
 						<DetectionsByHourCard
 							activity={detail.hourActivity}
 							info={HOUR_CARD_INFO}
@@ -591,7 +588,7 @@ function HeatLegend() {
 			{LEGEND_SHARES.map((share) => (
 				<span
 					key={share}
-					className="size-3 rounded-[3px] border border-[var(--line)]"
+					className="size-3 rounded-[3px] border border-line"
 					style={{ backgroundColor: heatColorAt(share) }}
 				/>
 			))}
@@ -615,31 +612,31 @@ function WeekdayLabels() {
 }
 
 const PROFILE_CARD_CLASS =
-	"feature-card mt-(--page-gap) grid overflow-hidden rounded-md sm:grid-cols-[11.5rem_minmax(0,1fr)]";
+	"feature-card mt-page grid overflow-hidden rounded-md sm:grid-cols-[11.5rem_minmax(0,1fr)]";
 const PROFILE_PORTRAIT_CLASS =
 	"flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4";
 const PROFILE_TEXT_CLASS =
 	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-[calc(7.75rem+2rem)] sm:justify-between sm:pl-0";
 const COLUMNS_CLASS =
-	"mt-(--page-gap) grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-(--page-gap)";
+	"mt-page grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-page";
 const VISIT_LOG_CLASS = "flex min-w-0 flex-col min-h-[420px]";
 const VISIT_LOG_SHORT_CLASS = "flex min-w-0 flex-col self-start";
 const VISIT_LOG_CARD_CLASS =
 	"@container feature-card flex flex-1 flex-col rounded-md p-4 pb-0!";
 const VISIT_LOG_HEADER_CLASS =
-	"-mx-(--page-gap) -mt-(--page-gap) flex min-h-[45px] flex-wrap items-center justify-between gap-2 border-b px-(--page-gap)";
+	"-mx-page -mt-page flex min-h-[45px] flex-wrap items-center justify-between gap-2 border-b px-page";
 const VISIT_ROW_CLASS =
-	"flex items-center @min-[26rem]:gap-3 gap-2 px-(--page-gap) py-1.75";
+	"flex items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
 const VISIT_ROW_BUTTON = {
 	size: "sm" as const,
 	labelClassName: "@min-[26rem]:inline hidden",
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
 const VISIT_LOG_FOOTER_CLASS =
-	"-mx-(--page-gap) mt-auto flex min-h-[45px] shrink-0 flex-wrap items-center gap-(--page-gap) border-t px-(--page-gap) py-1.5";
+	"-mx-page mt-auto flex min-h-[45px] shrink-0 flex-wrap items-center gap-page border-t px-page py-1.5";
 
 const SWATCH =
-	"size-3 rounded-[3px] border border-[var(--line)] transition-[outline] hover:z-10 hover:outline hover:outline-2 hover:outline-[var(--hover-line)] hover:outline-offset-1";
+	"size-3 rounded-[3px] border border-line transition-[outline] hover:z-10 hover:outline hover:outline-2 hover:outline-hover-line hover:outline-offset-1";
 
 function HeatMapDay({
 	date,
@@ -694,10 +691,10 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 
 			<div className={PROFILE_TEXT_CLASS}>
 				<div className="min-w-0">
-					<h1 className="font-bold text-2xl text-[var(--moss)] sm:text-3xl">
+					<h1 className="font-bold text-2xl text-moss sm:text-3xl">
 						{detail.comName}
 					</h1>
-					<p className="text-[var(--bark)] text-xs italic">{detail.sciName}</p>
+					<p className="text-bark text-xs italic">{detail.sciName}</p>
 				</div>
 
 				<p className="text-muted-foreground text-sm tabular-nums">
@@ -830,7 +827,7 @@ function VisitLogCard({
 				) : (
 					<ul
 						aria-busy={loading}
-						className={`row-well -mx-(--page-gap) grow divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
+						className={`row-well -mx-page grow divide-y transition-opacity max-[400px]:grid max-[400px]:grid-cols-[minmax(max-content,1fr)] max-[400px]:overflow-x-auto ${loading ? "opacity-50" : ""}`}
 					>
 						{visits.map((visit, i) => {
 							const heardAt = formatDateTime(visit.date, visit.time);

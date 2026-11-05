@@ -246,9 +246,9 @@ function ActivityNote({
 }
 
 const NOTE_CLASS =
-	"flex items-center gap-2.5 border-[var(--line)] border-t px-(--page-gap) py-2.5 text-[13px] leading-normal first:border-t-0 first:pt-1.5 last:pb-0 max-[400px]:gap-2";
+	"flex items-center gap-2.5 border-line border-t px-page py-2.5 text-[13px] leading-normal first:border-t-0 first:pt-1.5 last:pb-0 max-[400px]:gap-2";
 
-const NOTES_CLASS = "-mx-(--page-gap) mt-2";
+const NOTES_CLASS = "-mx-page mt-2";
 
 function Note({
 	icon: Icon,

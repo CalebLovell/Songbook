@@ -106,8 +106,8 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 						phase !== "pulling" &&
 							"transition-[transform,opacity,background-color] duration-180 ease-out",
 						armed
-							? "border-transparent bg-(--moss) text-white"
-							: "border-(--line) bg-(--paper-raised) text-(--moss)",
+							? "border-transparent bg-moss text-white"
+							: "border-line bg-paper-raised text-moss",
 					)}
 					style={{
 						width: SIZE,

@@ -156,7 +156,7 @@ function Field({
 	const field = { id, labelId: `${id}-label` };
 	const Name = readOnly ? "span" : "label";
 	return (
-		<div className="-mx-(--page-gap) grid gap-x-8 gap-y-2 border-t px-(--page-gap) py-(--page-gap) sm:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] sm:items-center">
+		<div className="-mx-page grid gap-x-8 gap-y-2 border-t px-page py-page sm:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] sm:items-center">
 			<div className="min-w-0">
 				<div className="flex items-center gap-1.5">
 					<Name
@@ -220,7 +220,7 @@ function FieldSelect({ children, ...props }: ComponentProps<"select">) {
 		<div className="relative">
 			<select
 				id={id}
-				className="h-8.5 pointer-coarse:h-9 w-full cursor-pointer appearance-none rounded-md border border-input bg-card pr-8 pl-3 pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-[var(--focus-ring)] focus-visible:outline-none"
+				className="h-8.5 pointer-coarse:h-9 w-full cursor-pointer appearance-none rounded-md border border-input bg-card pr-8 pl-3 pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
 				{...props}
 			>
 				{children}
@@ -292,7 +292,7 @@ export function SettingsCards({
 	const restartFor = (card: SettingsCardKind): CardRestarter | undefined =>
 		restarter ? () => restarter(card) : undefined;
 	return (
-		<div className="space-y-(--page-gap)">
+		<div className="space-y-page">
 			<StationCard
 				initial={data.station}
 				timezones={data.supportedTimezones}
@@ -482,7 +482,7 @@ function BrowserTimezoneHint({
 			<button
 				type="button"
 				onClick={() => onUse(browserTimezone)}
-				className="font-medium text-[var(--moss)] underline underline-offset-2"
+				className="font-medium text-moss underline underline-offset-2"
 			>
 				Use it
 			</button>
@@ -815,7 +815,7 @@ function FieldTextarea(props: ComponentProps<"textarea">) {
 	return (
 		<textarea
 			id={id}
-			className="block min-h-28 w-full rounded-md border border-input bg-card px-3 py-2 font-mono text-xs transition-colors placeholder:text-muted-foreground focus-visible:border-[var(--focus-ring)] focus-visible:outline-none"
+			className="block min-h-28 w-full rounded-md border border-input bg-card px-3 py-2 font-mono text-xs transition-colors placeholder:text-muted-foreground focus-visible:border-focus-ring focus-visible:outline-none"
 			{...props}
 		/>
 	);
@@ -1235,7 +1235,7 @@ function UpdatesSettingsCard({
 							<button
 								type="button"
 								onClick={() => window.location.reload()}
-								className="font-medium text-[var(--moss)] underline underline-offset-2"
+								className="font-medium text-moss underline underline-offset-2"
 							>
 								Reload to use it
 							</button>

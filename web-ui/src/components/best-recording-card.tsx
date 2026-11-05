@@ -31,7 +31,7 @@ export function BestRecordingCard({
 			{!recording || !recording.audioUrl ? (
 				<EmptyNote>{EMPTY.window.birdRecording}</EmptyNote>
 			) : (
-				<div className="mt-(--page-gap) flex flex-1 flex-col">
+				<div className="mt-page flex flex-1 flex-col">
 					<SpectrogramPlayer
 						key={recording.audioUrl}
 						audioUrl={recording.audioUrl}
@@ -63,7 +63,7 @@ export function BestRecordingCardSkeleton({
 			className={`feature-card flex flex-col rounded-md p-4 ${className}`}
 		>
 			<CardHeader title="Best recording" />
-			<div className="mt-(--page-gap) flex flex-1 flex-col">
+			<div className="mt-page flex flex-1 flex-col">
 				<SpectrogramPlayerSkeleton
 					fill
 					className={PLOT_CLASS}

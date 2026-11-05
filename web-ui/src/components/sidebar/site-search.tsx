@@ -231,7 +231,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 					collisionPadding={16}
 					onOpenAutoFocus={(event) => event.preventDefault()}
 					onCloseAutoFocus={(event) => event.preventDefault()}
-					className="z-50 w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-[var(--line)] bg-[var(--paper-raised)] py-1 shadow-[0_6px_18px_color-mix(in_oklab,var(--ink)_8%,transparent)]"
+					className="z-50 w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-line bg-paper-raised py-1 shadow-[0_6px_18px_color-mix(in_oklab,var(--ink)_8%,transparent)]"
 				>
 					<div id={listId} role="listbox" aria-label="Search results">
 						{results.map((result, index) => (
@@ -257,7 +257,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 									onMouseMove={() => setActive(index)}
 									className={cn(
 										"flex cursor-pointer items-center gap-2.5 px-3 py-1 text-sm",
-										index === active && "bg-[var(--row-selected)]",
+										index === active && "bg-row-selected",
 									)}
 								>
 									<ResultBody result={result} />
@@ -288,7 +288,7 @@ function GroupLabel({
 		<div
 			className={cn(
 				"island-kicker px-3 pt-1.5 pb-1",
-				divided && "mt-1 border-[var(--line)] border-t pt-2",
+				divided && "mt-1 border-line border-t pt-2",
 			)}
 		>
 			{children}
@@ -320,10 +320,7 @@ function ResultBody({ result }: { result: Result }) {
 		const Icon = result.page.icon;
 		return (
 			<>
-				<Icon
-					aria-hidden="true"
-					className="size-4 shrink-0 text-[var(--moss)]"
-				/>
+				<Icon aria-hidden="true" className="size-4 shrink-0 text-moss" />
 				<span className="py-1">{result.page.label}</span>
 			</>
 		);
@@ -332,7 +329,7 @@ function ResultBody({ result }: { result: Result }) {
 	const Icon = result.setting.icon;
 	return (
 		<>
-			<Icon aria-hidden="true" className="size-4 shrink-0 text-[var(--moss)]" />
+			<Icon aria-hidden="true" className="size-4 shrink-0 text-moss" />
 			<span className="py-1">{result.setting.title}</span>
 			{result.field ? (
 				<span className="min-w-0 truncate text-muted-foreground text-xs">

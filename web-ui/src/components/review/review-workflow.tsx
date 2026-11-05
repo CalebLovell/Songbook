@@ -43,28 +43,27 @@ import { comNameToSlug } from "~/lib/species-slug.ts";
 const ROW_HEIGHT_PX = 54;
 
 const REVIEW_GRID_CLASS =
-	"grid grid-cols-[minmax(0,1fr)] @3xl/review:grid-cols-[minmax(0,1fr)_24rem] @7xl/review:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-(--page-gap)";
+	"grid grid-cols-[minmax(0,1fr)] @3xl/review:grid-cols-[minmax(0,1fr)_24rem] @7xl/review:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-page";
 const REVIEW_PLOT_CLASS = "h-56 max-sm:h-40";
-const UNDER_REVIEW_CLASS =
-	"feature-card flex flex-col gap-(--page-gap) rounded-md p-4";
-const IDENTITY_ROW_CLASS = "flex items-start gap-(--page-gap)";
+const UNDER_REVIEW_CLASS = "feature-card flex flex-col gap-page rounded-md p-4";
+const IDENTITY_ROW_CLASS = "flex items-start gap-page";
 const IDENTITY_TEXT_CLASS = "flex min-w-0 flex-1 flex-col items-start";
 const NAME_CLASS = "font-bold text-2xl leading-[1.15] sm:text-3xl";
 const EBIRD_LINK_CLASS = "mt-1";
 const PORTRAIT_CLASS =
 	"flex size-20 shrink-0 items-center justify-center overflow-hidden max-[400px]:size-14";
 const ACTIONS_FOOTER_CLASS =
-	"-mx-(--page-gap) -mb-(--page-gap) flex flex-wrap items-center gap-(--page-gap) border-t px-(--page-gap) py-3";
+	"-mx-page -mb-page flex flex-wrap items-center gap-page border-t px-page py-3";
 const DELETE_BUTTON_CLASS =
 	"bg-[color-mix(in_oklab,var(--clay)_14%,var(--paper-raised))] text-destructive hover:bg-[color-mix(in_oklab,var(--clay)_22%,var(--paper-raised))] hover:text-destructive";
 const QUEUE_CARD_CLASS = "@container feature-card flex flex-col rounded-md p-4";
 const QUEUE_HEADER_CLASS =
-	"-mx-(--page-gap) -mt-(--page-gap) flex min-h-[45px] items-center justify-between gap-2 border-b px-(--page-gap)";
+	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
 const QUEUE_ROW_CLASS =
-	"flex min-h-[54px] w-full items-center @min-[26rem]:gap-3 gap-2 px-(--page-gap) py-1.75";
+	"flex min-h-[54px] w-full items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
 const QUEUE_TIME_CLASS = "@min-[26rem]:block hidden shrink-0 text-right";
 const QUEUE_FOOTER_CLASS =
-	"-mx-(--page-gap) mt-auto -mb-(--page-gap) flex shrink-0 items-center border-t px-(--page-gap) py-2";
+	"-mx-page mt-auto -mb-page flex shrink-0 items-center border-t px-page py-2";
 
 const NAME_WIDTHS = ["w-36", "w-28", "w-40", "w-32"];
 
@@ -113,7 +112,7 @@ export function ReviewWorkflowSkeleton() {
 							<Trash2 />
 							Delete
 						</Button>
-						<div className="ml-auto flex items-center gap-(--page-gap)">
+						<div className="ml-auto flex items-center gap-page">
 							<Button variant="outline" size="default" disabled>
 								<Shuffle />
 								Recategorize
@@ -138,7 +137,7 @@ export function ReviewWorkflowSkeleton() {
 							barClassName="right-0 left-auto w-full"
 						/>
 					</div>
-					<ol aria-hidden="true" className="-mx-(--page-gap) divide-y">
+					<ol aria-hidden="true" className="-mx-page divide-y">
 						{Array.from({ length: REVIEW_PAGE_SIZE }, (_, index) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 							<li key={index}>
@@ -339,7 +338,7 @@ export function ReviewWorkflow({
 							<div className={IDENTITY_TEXT_CLASS}>
 								<h2
 									title={row.comName}
-									className={`${NAME_CLASS} w-full truncate text-[var(--moss)]`}
+									className={`${NAME_CLASS} w-full truncate text-moss`}
 								>
 									<Link
 										to="/birds/$comName"
@@ -351,7 +350,7 @@ export function ReviewWorkflow({
 								</h2>
 								<p
 									title={row.sciName}
-									className="w-full truncate text-[var(--bark)] text-sm italic leading-tight"
+									className="w-full truncate text-bark text-sm italic leading-tight"
 								>
 									{row.sciName}
 								</p>
@@ -386,10 +385,10 @@ export function ReviewWorkflow({
 							/>
 						) : (
 							<div>
-								<p className="grid h-40 place-items-center rounded-md border border-[var(--line)] border-dashed px-4 text-center text-destructive text-sm">
+								<p className="grid h-40 place-items-center rounded-md border border-line border-dashed px-4 text-center text-destructive text-sm">
 									Audio unavailable. You can delete or skip this orphaned entry.
 								</p>
-								<div className="mt-(--page-gap) flex flex-wrap items-center justify-end gap-(--page-gap)">
+								<div className="mt-page flex flex-wrap items-center justify-end gap-page">
 									{heard}
 								</div>
 							</div>
@@ -406,7 +405,7 @@ export function ReviewWorkflow({
 								<Trash2 />
 								Delete
 							</Button>
-							<div className="ml-auto flex items-center gap-(--page-gap)">
+							<div className="ml-auto flex items-center gap-page">
 								<Button
 									variant="outline"
 									size="default"
@@ -437,7 +436,7 @@ export function ReviewWorkflow({
 							style={
 								paged ? { minHeight: page.pageSize * ROW_HEIGHT_PX } : undefined
 							}
-							className="row-well -mx-(--page-gap) divide-y"
+							className="row-well -mx-page divide-y"
 						>
 							{rows.map((item, i) => {
 								const current = item === row;
@@ -448,7 +447,7 @@ export function ReviewWorkflow({
 											type="button"
 											aria-current={current ? "true" : undefined}
 											onClick={() => setIndex(i)}
-											className={`${QUEUE_ROW_CLASS} text-left transition-colors duration-[180ms] ${current ? "bg-[var(--row-selected)]" : "hover:bg-[var(--meadow)]"}`}
+											className={`${QUEUE_ROW_CLASS} text-left transition-colors duration-[180ms] ${current ? "bg-row-selected" : "hover:bg-meadow"}`}
 										>
 											<IndexDot index={queueNumber(item)} widest={widest} />
 											<SpeciesThumbnail
@@ -459,7 +458,7 @@ export function ReviewWorkflow({
 												<span className="block truncate font-medium">
 													{item.comName}
 												</span>
-												<span className="@min-[26rem]:block hidden truncate text-[var(--bark)] text-xs italic">
+												<span className="@min-[26rem]:block hidden truncate text-bark text-xs italic">
 													{item.sciName}
 												</span>
 												<span className="block @min-[26rem]:hidden truncate text-muted-foreground text-xs tabular-nums">

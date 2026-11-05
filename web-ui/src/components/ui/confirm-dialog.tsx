@@ -4,11 +4,11 @@ import { type ReactNode, useEffect, useId } from "react";
 import { Button } from "~/components/ui/button.tsx";
 
 export const MODAL_BACKDROP_CLASS =
-	"fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_oklab,var(--ink)_28%,transparent)] p-(--page-gap)";
+	"fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_oklab,var(--ink)_28%,transparent)] p-page";
 export const MODAL_CARD_CLASS =
-	"feature-card flex w-full flex-col gap-(--page-gap) rounded-md p-4 text-left shadow-xl";
+	"feature-card flex w-full flex-col gap-page rounded-md p-4 text-left shadow-xl";
 export const MODAL_TITLE_CLASS = "font-semibold text-lg";
-export const MODAL_ACTIONS_CLASS = "flex justify-end gap-(--page-gap)";
+export const MODAL_ACTIONS_CLASS = "flex justify-end gap-page";
 
 export function ConfirmDialog({
 	title,
@@ -55,7 +55,7 @@ export function ConfirmDialog({
 			>
 				<h2
 					id={titleId}
-					className={`${MODAL_TITLE_CLASS} flex items-center gap-(--page-gap)`}
+					className={`${MODAL_TITLE_CLASS} flex items-center gap-page`}
 				>
 					{destructive ? (
 						<TriangleAlert className="size-5 shrink-0 text-destructive" />

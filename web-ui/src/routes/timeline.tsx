@@ -110,7 +110,7 @@ function Timeline() {
 
 	return (
 		<TooltipProvider>
-			<div className="page-wrap space-y-(--page-gap) py-4">
+			<div className="page-wrap space-y-page py-4">
 				<TimelineHeader
 					data={settled?.current ? settled.value : null}
 					staleData={settled?.value ?? null}
@@ -168,7 +168,7 @@ function TimelineCardsShell({
 			) : (
 				<SpeciesGridSkeleton summary={summary} className={BODY_CARD_WIDTH} />
 			)}
-			<div className="mt-(--page-gap) grid min-w-0 gap-(--page-gap) md:max-[1799px]:grid-cols-2 min-[1800px]:mt-0 min-[1800px]:flex-1">
+			<div className="mt-page grid min-w-0 gap-page md:max-[1799px]:grid-cols-2 min-[1800px]:mt-0 min-[1800px]:flex-1">
 				<HighlightsCard
 					highlights={null}
 					period={period}
@@ -321,7 +321,7 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 	return (
 		<div className="flex min-w-0 items-center gap-2.5 max-[480px]:order-last max-[480px]:basis-full">
 			<span
-				className="h-4 w-px shrink-0 bg-[var(--line)] max-[480px]:hidden"
+				className="h-4 w-px shrink-0 bg-line max-[480px]:hidden"
 				aria-hidden="true"
 			/>
 			<div className="flex -translate-y-[1.5px] items-center gap-2 truncate text-[13px] text-muted-foreground">
@@ -384,7 +384,7 @@ function TimelineCards({
 				size="default"
 				icon={ArrowRight}
 				iconPosition="end"
-				className="mt-(--page-gap)"
+				className="mt-page"
 			>
 				View {jumpTo.direction === "last" ? "last" : "next"} detections
 			</ButtonLink>
@@ -439,7 +439,7 @@ function TimelineCards({
 	return (
 		<div className="min-[1800px]:flex min-[1800px]:items-start min-[1800px]:gap-4">
 			{body}
-			<div className="mt-(--page-gap) grid min-w-0 gap-(--page-gap) md:max-[1799px]:grid-cols-2 min-[1800px]:mt-0 min-[1800px]:flex-1">
+			<div className="mt-page grid min-w-0 gap-page md:max-[1799px]:grid-cols-2 min-[1800px]:mt-0 min-[1800px]:flex-1">
 				<HighlightsCard
 					highlights={highlights}
 					thresholds={thresholds}

@@ -32,7 +32,7 @@ export type SpeciesGridItem = {
 const LIST_CLASS =
 	"grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3";
 const TILE_CLASS =
-	"flex min-h-16 min-w-0 flex-col gap-2 rounded-md bg-[var(--meadow)] px-3 py-2 max-[400px]:px-2";
+	"flex min-h-16 min-w-0 flex-col gap-2 rounded-md bg-meadow px-3 py-2 max-[400px]:px-2";
 
 export function SpeciesGrid({
 	species,
@@ -54,7 +54,7 @@ export function SpeciesGrid({
 				className={`feature-card rounded-md p-4 ${className}`}
 			>
 				<div
-					className={`${CARD_HEADER_CLASS} mb-(--page-gap) gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
+					className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
 				>
 					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 						<div className="island-kicker shrink-0">Activity</div>
@@ -93,7 +93,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 					>
 						{item.comName}
 					</Link>
-					<div className="truncate text-[var(--bark)] text-xs italic">
+					<div className="truncate text-bark text-xs italic">
 						{item.sciName}
 					</div>
 				</div>
@@ -119,7 +119,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 				<SpeciesHourBars
 					comName={item.comName}
 					hourCounts={item.hourCounts}
-					className="border-[var(--line)] border-t pt-2"
+					className="border-line border-t pt-2"
 				/>
 			) : null}
 		</li>
@@ -144,7 +144,7 @@ export function SpeciesGridSkeleton({
 			className={`feature-card rounded-md p-4 ${className}`}
 		>
 			<div
-				className={`${CARD_HEADER_CLASS} mb-(--page-gap) gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
+				className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2`}
 			>
 				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 					<div className="island-kicker shrink-0">Activity</div>
@@ -173,7 +173,7 @@ export function SpeciesGridSkeleton({
 								/>
 							</div>
 						</div>
-						<SpeciesHourBarsSkeleton className="border-[var(--line)] border-t pt-2" />
+						<SpeciesHourBarsSkeleton className="border-line border-t pt-2" />
 					</li>
 				))}
 			</ul>

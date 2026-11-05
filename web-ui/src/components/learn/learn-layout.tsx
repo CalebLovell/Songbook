@@ -41,7 +41,7 @@ export function LearnPoolSelector({
 	onNewRound?: () => void;
 }) {
 	return (
-		<div className="mt-(--page-gap) flex items-center justify-between gap-(--page-gap)">
+		<div className="mt-page flex items-center justify-between gap-page">
 			<PoolSelect
 				pool={pool}
 				poolCounts={poolCounts}
@@ -111,7 +111,7 @@ function PoolSelect({
 				aria-label="Which birds"
 				value={pool}
 				onChange={(event) => onPoolChange(event.target.value as LearnPool)}
-				className="h-8.5 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-[var(--focus-ring)] focus-visible:outline-none"
+				className="h-8.5 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
 			>
 				{LEARN_POOLS.map((option) => (
 					<option key={option} value={option}>

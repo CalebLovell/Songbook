@@ -32,7 +32,7 @@ function TooltipContent({
 				sideOffset={sideOffset}
 				collisionPadding={collisionPadding}
 				className={cn(
-					"z-50 rounded-md border border-[var(--line)] bg-[var(--paper-raised)] px-2 py-1 text-[var(--ink)] text-xs shadow-md",
+					"z-50 rounded-md border border-line bg-paper-raised px-2 py-1 text-ink text-xs shadow-md",
 					className,
 				)}
 				{...props}

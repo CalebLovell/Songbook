@@ -45,13 +45,13 @@ export function SettingsCard({
 			>
 				<CardHeader as="h2" titleId={headingId} title={title} />
 
-				<p className="py-(--page-gap) text-muted-foreground text-sm leading-relaxed">
+				<p className="py-page text-muted-foreground text-sm leading-relaxed">
 					{description}
 				</p>
 
 				<div className="flex-1">{children}</div>
 
-				<div className="-mx-(--page-gap) flex flex-wrap items-center justify-start gap-2 border-t px-(--page-gap) pt-(--page-gap)">
+				<div className="-mx-page flex flex-wrap items-center justify-start gap-2 border-t px-page pt-page">
 					<Button
 						type="submit"
 						size="default"

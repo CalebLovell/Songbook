@@ -28,10 +28,10 @@ export function Toaster() {
 			gap={8}
 			visibleToasts={4}
 			icons={{
-				success: <CheckCircle2 className="size-4 text-[var(--moss)]" />,
-				warning: <AlertTriangle className="size-4 text-[var(--bark)]" />,
+				success: <CheckCircle2 className="size-4 text-moss" />,
+				warning: <AlertTriangle className="size-4 text-bark" />,
 				error: <CircleAlert className="size-4 text-destructive" />,
-				info: <Info className="size-4 text-[var(--moss)]" />,
+				info: <Info className="size-4 text-moss" />,
 				loading: (
 					<LoaderCircle className="size-4 animate-spin text-muted-foreground" />
 				),
@@ -40,14 +40,14 @@ export function Toaster() {
 				unstyled: true,
 				classNames: {
 					toast:
-						"feature-card flex w-full items-start gap-2.5 rounded-md p-3 text-sm shadow-[0_6px_20px_-8px_color-mix(in_oklab,var(--ink)_28%,transparent)] *:transition-opacity *:duration-200 data-[expanded=false]:data-[front=false]:*:opacity-0 data-[type=success]:border-[var(--toast-success-line)] data-[type=success]:[background:var(--toast-success-fill)] data-[type=warning]:border-[var(--toast-warning-line)] data-[type=warning]:[background:var(--toast-warning-fill)] data-[type=error]:border-[var(--toast-error-line)] data-[type=error]:[background:var(--toast-error-fill)]",
+						"feature-card flex w-full items-start gap-2.5 rounded-md p-3 text-sm shadow-[0_6px_20px_-8px_color-mix(in_oklab,var(--ink)_28%,transparent)] *:transition-opacity *:duration-200 data-[expanded=false]:data-[front=false]:*:opacity-0 data-[type=success]:border-toast-success-line data-[type=success]:[background:var(--toast-success-fill)] data-[type=warning]:border-toast-warning-line data-[type=warning]:[background:var(--toast-warning-fill)] data-[type=error]:border-toast-error-line data-[type=error]:[background:var(--toast-error-fill)]",
 					icon: "relative mt-px flex size-4 shrink-0 items-center justify-center",
 					content: "min-w-0 grow space-y-0.5",
 					title:
-						"font-medium leading-snug text-foreground in-data-[type=error]:text-destructive in-data-[type=success]:text-[var(--moss)] in-data-[type=warning]:text-[var(--bark)]",
+						"font-medium leading-snug text-foreground in-data-[type=error]:text-destructive in-data-[type=success]:text-moss in-data-[type=warning]:text-bark",
 					description: "text-muted-foreground text-xs leading-relaxed",
 					actionButton:
-						"ml-2 shrink-0 self-center rounded-md bg-[var(--moss)] px-2 py-1 font-medium text-[var(--paper-raised)] text-xs",
+						"ml-2 shrink-0 self-center rounded-md bg-moss px-2 py-1 font-medium text-paper-raised text-xs",
 				},
 			}}
 		/>

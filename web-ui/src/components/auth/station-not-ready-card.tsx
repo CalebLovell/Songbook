@@ -18,7 +18,7 @@ export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 	return (
 		<section
 			aria-labelledby="station-not-ready"
-			className="feature-card flex flex-col gap-(--page-gap) rounded-md p-(--page-gap)"
+			className="feature-card flex flex-col gap-page rounded-md p-page"
 		>
 			<CardHeader
 				as="h2"
@@ -26,10 +26,7 @@ export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 				title={SIGN_IN_CARD_TITLE}
 			/>
 			{/* biome-ignore lint/a11y/useSemanticElements: <output> means the result of a calculation; this is a persistent configuration warning */}
-			<div
-				role="status"
-				className="flex items-start gap-2 text-[var(--bark)] text-sm"
-			>
+			<div role="status" className="flex items-start gap-2 text-bark text-sm">
 				<AlertTriangle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
 				<div className="space-y-2">
 					<p className="font-semibold">{title}</p>

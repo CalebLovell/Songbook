@@ -21,17 +21,14 @@ export function SidebarBody({
 						onClick={onNavigate}
 						className="flex h-[calc(var(--masthead-h)-14px)] flex-col items-start px-[1.375rem] pt-1 pb-3 no-underline"
 					>
-						<SongbookWordmark className="shrink-0 text-[24px] text-[var(--moss)]" />
+						<SongbookWordmark className="shrink-0 text-[24px] text-moss" />
 						{auth.siteName ? (
 							<span className="mt-0.5 text-muted-foreground text-xs">
 								{auth.siteName}
 							</span>
 						) : null}
 					</Link>
-					<div
-						aria-hidden="true"
-						className="mb-(--page-gap) h-px bg-[var(--line)]"
-					/>
+					<div aria-hidden="true" className="mb-page h-px bg-line" />
 				</>
 			) : null}
 

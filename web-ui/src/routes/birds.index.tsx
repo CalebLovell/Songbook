@@ -92,7 +92,7 @@ export const Route = createFileRoute("/birds/")({
 const PAGE_SIZE = 24;
 
 const GRID_CLASS =
-	"grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-(--page-gap)";
+	"grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-page";
 const CARD_CLASS =
 	"feature-card relative flex flex-col gap-3 overflow-hidden rounded-md p-4 max-[400px]:gap-2";
 const FOOTER_CLASS =
@@ -102,7 +102,7 @@ function Species() {
 	const { cards } = Route.useLoaderData();
 
 	return (
-		<div className="page-wrap flex min-h-full flex-col gap-(--page-gap) py-4">
+		<div className="page-wrap flex min-h-full flex-col gap-page py-4">
 			<PageHeaderCard
 				icon={Feather}
 				title={PAGE_HEADERS.birds.title}
@@ -163,7 +163,7 @@ function SpeciesControls() {
 		});
 
 	return (
-		<div className="flex items-center gap-(--page-gap)">
+		<div className="flex items-center gap-page">
 			<SearchInput
 				aria-label="Filter birds"
 				placeholder="Search birds..."
@@ -200,7 +200,7 @@ function SpeciesControls() {
 
 function SpeciesGridShell() {
 	return (
-		<div aria-busy="true" className="flex flex-1 flex-col gap-(--page-gap)">
+		<div aria-busy="true" className="flex flex-1 flex-col gap-page">
 			<div className={GRID_CLASS}>
 				{Array.from({ length: PAGE_SIZE }, (_, index) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
@@ -317,7 +317,7 @@ function SpeciesBrowser({ cards }: { cards: LifeListCard[] }) {
 	);
 
 	return (
-		<div className="flex flex-1 flex-col gap-(--page-gap)">
+		<div className="flex flex-1 flex-col gap-page">
 			{pageItems.length === 0 ? (
 				<section
 					aria-label="Species recorded"
@@ -424,7 +424,7 @@ function SortSelect({
 }) {
 	const Icon = SORT_META[sort].icon;
 	return (
-		<div className="flex h-8.5 pointer-coarse:h-9 shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)] sm:hidden">
+		<div className="flex h-8.5 pointer-coarse:h-9 shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring sm:hidden">
 			<div className="relative">
 				<Icon
 					className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 max-[400px]:hidden"
@@ -566,7 +566,7 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 			<div className="flex flex-col gap-3 max-[400px]:gap-2">
 				<div>
 					<h2 className="font-bold text-base">{card.comName}</h2>
-					<p className="text-[var(--bark)] text-xs italic">{card.sciName}</p>
+					<p className="text-bark text-xs italic">{card.sciName}</p>
 				</div>
 				<SpeciesActions
 					audioUrl={card.audioUrl}

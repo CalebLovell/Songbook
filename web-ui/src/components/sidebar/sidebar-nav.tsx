@@ -135,7 +135,7 @@ export function UpdateDot({
 			role="img"
 			aria-label={label}
 			title={label}
-			className={`size-2 shrink-0 rounded-full bg-[var(--moss)] ${className}`}
+			className={`size-2 shrink-0 rounded-full bg-moss ${className}`}
 		/>
 	);
 }
@@ -144,11 +144,11 @@ function SectionLabel({ id, children }: { id: string; children: string }) {
 	return (
 		<h2
 			id={id}
-			className="m-0 -mx-3 flex items-center gap-2 pb-2 font-bold text-[0.69rem] text-[var(--kicker)] leading-none"
+			className="m-0 -mx-3 flex items-center gap-2 pb-2 font-bold text-[0.69rem] text-kicker leading-none"
 		>
-			<span aria-hidden="true" className="h-px w-6 bg-[var(--line)]" />
+			<span aria-hidden="true" className="h-px w-6 bg-line" />
 			{children}
-			<span aria-hidden="true" className="h-px flex-1 bg-[var(--line)]" />
+			<span aria-hidden="true" className="h-px flex-1 bg-line" />
 		</h2>
 	);
 }

@@ -58,7 +58,7 @@ function PlayerPanel() {
 		<CardShell status={isOffline ? "Stream unavailable" : null}>
 			<LiveWaterfall analyser={live.analyser} active={isPlaying} />
 
-			<div className="mt-(--page-gap) flex items-center gap-2">
+			<div className="mt-page flex items-center gap-2">
 				<Button
 					type="button"
 					variant="outline"
@@ -91,7 +91,7 @@ function PlayerPanel() {
 						<Popover.Content
 							align="end"
 							sideOffset={6}
-							className="z-50 flex w-64 flex-col gap-3 rounded-md border border-[var(--line)] bg-[var(--paper-raised)] p-3 text-[var(--ink)] shadow-md"
+							className="z-50 flex w-64 flex-col gap-3 rounded-md border border-line bg-paper-raised p-3 text-ink shadow-md"
 						>
 							<label className="flex items-center gap-2 text-sm">
 								<span className="text-muted-foreground">Gain</span>
@@ -102,7 +102,7 @@ function PlayerPanel() {
 									step={5}
 									value={live.gainPercent}
 									onChange={(e) => live.setGainPercent(Number(e.target.value))}
-									className="min-w-0 flex-1 accent-[var(--moss)]"
+									className="min-w-0 flex-1 accent-moss"
 									aria-label="Gain"
 								/>
 								<span className="w-10 text-right tabular-nums">
@@ -194,7 +194,7 @@ function LiveWaterfall({
 			ref={canvasRef}
 			width={360}
 			height={SPECTROGRAM_HEIGHT}
-			className="h-28 w-full rounded-md border border-[var(--line)] bg-[var(--paper)]"
+			className="h-28 w-full rounded-md border border-line bg-paper"
 			aria-hidden="true"
 		/>
 	);

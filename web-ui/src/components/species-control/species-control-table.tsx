@@ -78,8 +78,8 @@ export function sortSpeciesControlRows(
 	});
 }
 
-const FIRST_COLUMN_CLASSES = "pl-(--page-gap)";
-const CELL_GAP = "px-(--cell-gap)";
+const FIRST_COLUMN_CLASSES = "pl-page";
+const CELL_GAP = "px-cell";
 const STATUS_EDGE =
 	"pr-[max(calc(var(--spacing)*1),calc(var(--page-gap)-var(--scrollbar-w,0px)))]";
 const COLUMN_VISIBILITY: Record<string, string> = {
@@ -116,12 +116,12 @@ const STATUS_PRESENTATION: Record<
 	custom: {
 		label: "Custom",
 		className:
-			"bg-[color-mix(in_oklab,var(--sage)_35%,var(--paper-raised))] text-[var(--moss)]",
+			"bg-[color-mix(in_oklab,var(--sage)_35%,var(--paper-raised))] text-moss",
 	},
 	always: {
 		label: "Always detect",
 		className:
-			"bg-[color-mix(in_oklab,var(--sand)_30%,var(--paper-raised))] text-[var(--bark)]",
+			"bg-[color-mix(in_oklab,var(--sand)_30%,var(--paper-raised))] text-bark",
 	},
 	never: {
 		label: "Never detect",
@@ -196,11 +196,11 @@ export function SpeciesControlTable({
 				role="table"
 				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:grid-cols-(--cols-xs)"
 				style={COLUMN_GRID}
-				containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
+				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
 				<TableHeader
 					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					<TableRow role="row" className={GRID_ROW}>
 						<TableHead
@@ -249,7 +249,7 @@ export function SpeciesControlTable({
 						)}
 						<TableHead
 							role="columnheader"
-							className="col-[2/-1] @min-[36rem]:hidden pr-(--page-gap)"
+							className="col-[2/-1] @min-[36rem]:hidden pr-page"
 						>
 							<div className="flex items-center gap-2">
 								<StatusTip />
@@ -296,7 +296,7 @@ export function SpeciesControlTable({
 								className={cn(
 									GRID_ROW,
 									BODY_ROW_HEIGHT,
-									isSelected ? "bg-[var(--row-selected)]" : "bg-card",
+									isSelected ? "bg-row-selected" : "bg-card",
 								)}
 							>
 								<TableCell
@@ -335,7 +335,7 @@ export function SpeciesControlTable({
 									role="cell"
 									className={cn(CELL_GAP, COLUMN_VISIBILITY.scientific)}
 								>
-									<em className="text-[var(--bark)]">{row.sciName}</em>
+									<em className="text-bark">{row.sciName}</em>
 								</TableCell>
 								<TableCell
 									role="cell"
@@ -365,7 +365,7 @@ export function SpeciesControlTable({
 				</TableBody>
 			</Table>
 
-			<div className="-mr-(--card-edge) -ml-(--page-gap) flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-(--page-gap) border-t py-1.5 pr-(--card-edge) pl-(--page-gap) text-sm">
+			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
 				{actions}
 				<div className={PAGE_ROW_CLASS}>
 					{rows === null ? (
@@ -444,7 +444,7 @@ function SkeletonRow({
 			className={cn(GRID_ROW, BODY_ROW_HEIGHT, "bg-card")}
 		>
 			<TableCell role="cell" className={cn(CELL_GAP, FIRST_COLUMN_CLASSES)}>
-				<ShellBar className="size-(--row-checkbox-size) rounded-sm" />
+				<ShellBar className="size-row-checkbox rounded-sm" />
 			</TableCell>
 			<TableCell role="cell" className={cn(CELL_GAP, "text-center")}>
 				<ShellSized className="rounded-full">

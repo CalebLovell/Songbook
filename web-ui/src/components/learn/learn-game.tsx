@@ -34,11 +34,11 @@ import {
 import { FRESH_PROGRESS, type GameProgress } from "~/lib/learn-saved-game.ts";
 
 const QUIZ_GRID_CLASS =
-	"grid grid-cols-[minmax(0,1fr)] @3xl/quiz:grid-cols-[minmax(0,1fr)_24rem] @7xl/quiz:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-(--page-gap)";
+	"grid grid-cols-[minmax(0,1fr)] @3xl/quiz:grid-cols-[minmax(0,1fr)_24rem] @7xl/quiz:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-page";
 const GAME_CARD_CLASS =
-	"@container/game feature-card flex min-w-0 flex-col gap-(--page-gap) rounded-md p-4";
+	"@container/game feature-card flex min-w-0 flex-col gap-page rounded-md p-4";
 const GAME_HEADER_CLASS =
-	"-mx-(--page-gap) -mt-(--page-gap) flex min-h-[45px] flex-wrap items-center justify-between gap-x-2 border-b px-(--page-gap) py-2";
+	"-mx-page -mt-page flex min-h-[45px] flex-wrap items-center justify-between gap-x-2 border-b px-page py-2";
 const CHOICES_CLASS =
 	"grid min-w-0 @xl/game:grid-cols-2 grid-cols-1 auto-rows-fr gap-4 max-[400px]:gap-2";
 const CHOICE_CLASS =
@@ -47,11 +47,10 @@ const CHOICE_TEXT_CLASS =
 	"flex min-h-[calc(2*1.375rem+1rem)] min-w-0 flex-1 flex-col justify-center @max-[20rem]/choice:min-h-[calc(2*1.203125rem+1rem)]";
 const RAIL_CLASS = "feature-card @3xl/quiz:flex hidden flex-col rounded-md p-4";
 const RAIL_HEADER_CLASS =
-	"-mx-(--page-gap) -mt-(--page-gap) flex min-h-[45px] items-center justify-between gap-2 border-b px-(--page-gap)";
-const RAIL_ROW_CLASS =
-	"flex min-h-[54px] items-center gap-3 px-(--page-gap) py-1.75";
+	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
+const RAIL_ROW_CLASS = "flex min-h-[54px] items-center gap-3 px-page py-1.75";
 const RAIL_FOOTER_CLASS =
-	"-mx-(--page-gap) mt-auto -mb-(--page-gap) flex items-baseline justify-between gap-2 border-t px-(--page-gap) py-3";
+	"-mx-page mt-auto -mb-page flex items-baseline justify-between gap-2 border-t px-page py-3";
 const GAME_FOOTER_CLASS = "flex min-h-8 items-center justify-end";
 
 function GameInfo({
@@ -126,7 +125,7 @@ export function LearnGameSkeleton() {
 							<div
 								// biome-ignore lint/suspicious/noArrayIndexKey: one per choice
 								key={choice}
-								className={`${CHOICE_CLASS} border-[var(--line)]`}
+								className={`${CHOICE_CLASS} border-line`}
 							>
 								<span className="w-4 shrink-0 text-center text-muted-foreground text-xs tabular-nums">
 									{choice + 1}
@@ -164,7 +163,7 @@ export function LearnGameSkeleton() {
 					<div className={RAIL_HEADER_CLASS}>
 						<div className="island-kicker">This round</div>
 					</div>
-					<ol aria-hidden="true" className="-mx-(--page-gap) divide-y">
+					<ol aria-hidden="true" className="-mx-page divide-y">
 						{Array.from({ length: QUESTIONS_PER_ROUND }, (_, position) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: one row per bird
 							<li key={position} className={RAIL_ROW_CLASS}>
@@ -201,9 +200,7 @@ export function LearnGameEmpty({ message }: { message: string }) {
 					<div className={RAIL_HEADER_CLASS}>
 						<div className="island-kicker">This round</div>
 					</div>
-					<p className="mt-(--page-gap) text-muted-foreground text-sm">
-						{message}
-					</p>
+					<p className="mt-page text-muted-foreground text-sm">{message}</p>
 				</aside>
 			</div>
 		</div>
@@ -419,7 +416,7 @@ function RoundRail({
 				<div className="island-kicker">This round</div>
 			</div>
 
-			<ol className="-mx-(--page-gap) divide-y">
+			<ol className="-mx-page divide-y">
 				{questions.map((question, position) => {
 					const result = results[position];
 					const answer = question.choices.find(
@@ -431,7 +428,7 @@ function RoundRail({
 						<li
 							key={question.id}
 							aria-current={isCurrent ? "step" : undefined}
-							className={`${RAIL_ROW_CLASS} ${isCurrent ? "bg-[var(--row-selected)]" : ""}`}
+							className={`${RAIL_ROW_CLASS} ${isCurrent ? "bg-row-selected" : ""}`}
 						>
 							<RailDot
 								position={position}
@@ -447,7 +444,7 @@ function RoundRail({
 								<>
 									<span
 										aria-hidden="true"
-										className={`flex shrink-0 items-center justify-center rounded-md border border-[var(--line)] border-dashed text-muted-foreground text-sm ${THUMBNAIL_SIZES.md}`}
+										className={`flex shrink-0 items-center justify-center rounded-md border border-line border-dashed text-muted-foreground text-sm ${THUMBNAIL_SIZES.md}`}
 									>
 										?
 									</span>
@@ -495,7 +492,7 @@ function AnsweredRailRow({
 				>
 					{answer.comName}
 				</Link>
-				<div className="truncate text-[var(--bark)] text-xs italic">
+				<div className="truncate text-bark text-xs italic">
 					{answer.sciName}
 				</div>
 			</div>
@@ -529,8 +526,8 @@ function RailDot({
 		attempts === null
 			? "bg-muted text-muted-foreground"
 			: attempts === 1
-				? "bg-[color-mix(in_oklab,var(--moss)_12%,var(--paper-raised))] font-semibold text-[var(--moss)]"
-				: "bg-[color-mix(in_oklab,var(--clay)_10%,var(--paper-raised))] font-semibold text-[var(--clay)]";
+				? "bg-[color-mix(in_oklab,var(--moss)_12%,var(--paper-raised))] font-semibold text-moss"
+				: "bg-[color-mix(in_oklab,var(--clay)_10%,var(--paper-raised))] font-semibold text-clay";
 	const label = String(position + 1);
 
 	return (
@@ -575,7 +572,7 @@ function ProgressTrack({
 					<div
 						// biome-ignore lint/suspicious/noArrayIndexKey: pips are positional
 						key={position}
-						className="h-1.5 flex-1 rounded-full border border-[var(--line)]"
+						className="h-1.5 flex-1 rounded-full border border-line"
 						style={{ background }}
 					/>
 				);
@@ -587,12 +584,12 @@ function ProgressTrack({
 type ChoiceState = "open" | "correct" | "wrong" | "muted";
 
 const CHOICE_STYLES: Record<ChoiceState, string> = {
-	open: "border-[var(--line)] bg-[var(--paper-raised)] hover:border-[var(--hover-line)] hover:bg-[var(--meadow)]",
+	open: "border-line bg-paper-raised hover:border-hover-line hover:bg-meadow",
 	correct:
-		"border-[var(--moss)] bg-[color-mix(in_oklab,var(--moss)_12%,var(--paper-raised))]",
+		"border-moss bg-[color-mix(in_oklab,var(--moss)_12%,var(--paper-raised))]",
 	wrong:
-		"border-[var(--clay)] bg-[color-mix(in_oklab,var(--clay)_10%,var(--paper-raised))] opacity-80",
-	muted: "border-[var(--line)] bg-[var(--paper-raised)] opacity-50",
+		"border-clay bg-[color-mix(in_oklab,var(--clay)_10%,var(--paper-raised))] opacity-80",
+	muted: "border-line bg-paper-raised opacity-50",
 };
 
 function ChoiceButton({
@@ -621,15 +618,15 @@ function ChoiceButton({
 				<span className="line-clamp-2 font-medium @max-[20rem]/choice:text-sm leading-snug">
 					{choice.comName}
 				</span>
-				<span className="block truncate text-[var(--bark)] text-xs italic">
+				<span className="block truncate text-bark text-xs italic">
 					{choice.sciName}
 				</span>
 			</span>
 			<span className="size-4 shrink-0">
 				{state === "correct" ? (
-					<Check className="size-4 text-[var(--moss)]" />
+					<Check className="size-4 text-moss" />
 				) : state === "wrong" ? (
-					<X className="size-4 text-[var(--clay)]" />
+					<X className="size-4 text-clay" />
 				) : null}
 			</span>
 		</button>
@@ -690,7 +687,7 @@ function RoundSummary({
 	return (
 		<section
 			aria-label="Round results"
-			className="@container feature-card rise-in flex flex-col gap-(--page-gap) rounded-md p-4"
+			className="@container feature-card rise-in flex flex-col gap-page rounded-md p-4"
 		>
 			<CardHeader title="Round complete">
 				<span className="text-sm tabular-nums">
@@ -699,7 +696,7 @@ function RoundSummary({
 				</span>
 			</CardHeader>
 
-			<ol className="-mx-(--page-gap) -mt-(--page-gap)">
+			<ol className="-mx-page -mt-page">
 				{questions.map((question, position) => {
 					const result = results[position];
 					const answer = question.choices.find(
@@ -710,7 +707,7 @@ function RoundSummary({
 					return (
 						<li
 							key={question.id}
-							className="flex items-center gap-4 px-(--page-gap) py-1.75 odd:bg-[var(--meadow)] max-[400px]:gap-2"
+							className="flex items-center gap-4 px-page py-1.75 odd:bg-meadow max-[400px]:gap-2"
 						>
 							<ChoiceThumbnail choice={answer} />
 							<div className="min-w-0 flex-1">
@@ -740,7 +737,7 @@ function RoundSummary({
 				})}
 			</ol>
 
-			<div className="-mx-(--page-gap) -mt-(--page-gap) -mb-(--page-gap) flex items-center justify-between gap-4 border-t p-(--page-gap) max-[400px]:gap-2">
+			<div className="-mx-page -mt-page -mb-page flex items-center justify-between gap-4 border-t p-page max-[400px]:gap-2">
 				<span className="min-w-0 text-sm tabular-nums">
 					You named <strong className="font-semibold">{score.firstTry}</strong>{" "}
 					of <strong className="font-semibold">{score.answered}</strong> species

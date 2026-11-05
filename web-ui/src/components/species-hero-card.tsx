@@ -10,7 +10,7 @@ import { useCanListen } from "~/lib/use-can-listen.ts";
 export const HERO_CARD_SHELL = "feature-card rounded-md p-4";
 
 const HERO_CARD_ROW =
-	"grid items-center gap-(--page-gap) sm:min-h-[7.75rem] sm:grid-cols-[9.5rem_minmax(0,1fr)]";
+	"grid items-center gap-page sm:min-h-[7.75rem] sm:grid-cols-[9.5rem_minmax(0,1fr)]";
 
 const HERO_CARD_FOOTER = "sm:pl-[calc(9.5rem+var(--page-gap))]";
 
@@ -114,7 +114,7 @@ export function SpeciesHeroCard({
 		>
 			<div className="flex flex-wrap items-start justify-between gap-3 max-[400px]:gap-2">
 				<div className="min-w-0">
-					<h1 className="font-bold text-2xl text-[var(--moss)] sm:text-3xl">
+					<h1 className="font-bold text-2xl text-moss sm:text-3xl">
 						{speciesSlug ? (
 							<Link
 								to="/birds/$comName"
@@ -127,15 +127,13 @@ export function SpeciesHeroCard({
 							comName
 						)}
 					</h1>
-					<p className="text-[var(--bark)] text-xs italic">{sciName}</p>
+					<p className="text-bark text-xs italic">{sciName}</p>
 				</div>
 				{actions ? <div className={HERO_ACTIONS_CLASS}>{actions}</div> : null}
 			</div>
 
 			<div>
-				<p className="font-semibold text-[var(--moss)] text-lg">
-					{relativeTime}
-				</p>
+				<p className="font-semibold text-lg text-moss">{relativeTime}</p>
 				<div className="mt-1 flex flex-wrap items-center gap-2 text-sm tabular-nums">
 					<span className="text-muted-foreground">last heard {heardAt}</span>
 					<ConfidencePill confidence={confidence} />

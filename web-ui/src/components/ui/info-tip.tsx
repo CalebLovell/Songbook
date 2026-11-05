@@ -66,7 +66,7 @@ export function InfoTip({
 						aria-describedby={undefined}
 						className={`${MODAL_CARD_CLASS} max-h-[80vh] max-w-md overflow-y-auto`}
 					>
-						<div className="flex items-center justify-between gap-(--page-gap)">
+						<div className="flex items-center justify-between gap-page">
 							<Dialog.Title className={MODAL_TITLE_CLASS}>
 								{titleCase(label)} Information
 							</Dialog.Title>
