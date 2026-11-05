@@ -94,10 +94,10 @@ function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
 		<div className="page-wrap py-4">
 			<SpeciesHeroCardShell label="Last 24 hours" actions={pill} />
 
-			<div className="mt-(--page-gap) grid grid-cols-1 items-start gap-(--page-gap) lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+			<div className="mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
 				<RecentLogCardSkeleton />
 
-				<div className="grid grid-cols-1 gap-(--page-gap)">
+				<div className="grid grid-cols-1 gap-page">
 					<LiveAudioCard unlocked={unlocked} />
 					<ShellReveal>
 						<HighlightsCard
@@ -139,14 +139,14 @@ function LiveBody({
 				pill={pill}
 			/>
 
-			<div className="mt-(--page-gap) grid grid-cols-1 items-start gap-(--page-gap) lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+			<div className="mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
 				<RecentLogCard
 					recent={snapshot.recent}
 					generatedAt={snapshot.generatedAt}
 					freshKeys={freshKeys}
 				/>
 
-				<div className="grid grid-cols-1 gap-(--page-gap)">
+				<div className="grid grid-cols-1 gap-page">
 					<LiveAudioCard unlocked={unlocked} />
 
 					<Deferred

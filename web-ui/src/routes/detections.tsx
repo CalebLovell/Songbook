@@ -37,7 +37,7 @@ export const Route = createFileRoute("/detections")({
 });
 
 const TABLE_CARD_CLASS =
-	"feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
+	"feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-page [--card-edge:min(var(--page-gap),0.75rem)]";
 
 function Detections() {
 	const { page: pagePromise } = Route.useLoaderData();
@@ -93,8 +93,8 @@ function Detections() {
 	}
 
 	return (
-		<div className="page-wrap flex h-full min-h-fit flex-col gap-(--page-gap) py-4">
-			<div className="shrink-0 space-y-(--page-gap)">
+		<div className="page-wrap flex h-full min-h-fit flex-col gap-page py-4">
+			<div className="shrink-0 space-y-page">
 				<PageHeaderCard
 					icon={AudioWaveform}
 					title={PAGE_HEADERS.detections.title}
@@ -141,7 +141,7 @@ function Detections() {
 					) : (
 						<section
 							aria-label="Detections"
-							className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
+							className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 						>
 							<DetectionsTable
 								page={loaded}
@@ -187,7 +187,7 @@ function DetectionsTableShell({
 		<section
 			aria-busy="true"
 			aria-label="Detections"
-			className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
+			className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 		>
 			<DetectionsTable
 				page={null}

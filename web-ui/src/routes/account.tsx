@@ -28,7 +28,7 @@ function Account() {
 	const navigate = useNavigate();
 
 	return (
-		<div className="page-wrap space-y-(--page-gap) py-4">
+		<div className="page-wrap space-y-page py-4">
 			<PageHeaderCard
 				icon={UserRound}
 				title={PAGE_HEADERS.account.title}

@@ -70,7 +70,7 @@ export function Spectrogram({
 
 	return (
 		<div
-			className={`relative overflow-hidden rounded-md border border-[var(--line)] bg-[var(--paper)] ${className ?? ""}`}
+			className={`relative overflow-hidden rounded-md border border-line bg-paper ${className ?? ""}`}
 		>
 			<canvas
 				ref={canvasRef}

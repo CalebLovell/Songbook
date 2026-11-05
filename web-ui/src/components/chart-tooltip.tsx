@@ -20,7 +20,7 @@ export function ChartValueTooltip({
 			aria-hidden
 			className={
 				shown
-					? "block rounded-sm border border-[var(--line)] bg-[var(--paper-raised)] px-2 py-1 text-[13px] text-[var(--ink)]"
+					? "block rounded-sm border border-line bg-paper-raised px-2 py-1 text-[13px] text-ink"
 					: undefined
 			}
 		>

@@ -16,8 +16,7 @@ import { useCanListen } from "~/lib/use-can-listen.ts";
 import { VISIT_GAP_MINUTES } from "~/lib/visits.ts";
 
 const CARD_CLASS = "@container feature-card flex flex-col rounded-md p-4";
-const ROW_CLASS =
-	"flex items-center @min-[26rem]:gap-3 gap-2 px-(--page-gap) py-1.75";
+const ROW_CLASS = "flex items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
 const TIME_COLUMN_CLASS = "@min-[26rem]:block hidden shrink-0 text-right";
 const ROW_BUTTON = {
 	size: "sm" as const,
@@ -25,7 +24,7 @@ const ROW_BUTTON = {
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
 const FOOTER_CLASS =
-	"-mx-(--page-gap) mt-auto -mb-(--page-gap) flex min-h-[45px] shrink-0 items-center justify-end border-t px-(--page-gap)";
+	"-mx-page mt-auto -mb-page flex min-h-[45px] shrink-0 items-center justify-end border-t px-page";
 const FOOTER_LINK_CLASS =
 	"inline-flex items-center gap-1 text-muted-foreground text-xs no-underline hover:text-foreground hover:underline";
 
@@ -70,7 +69,7 @@ export function RecentLogCardSkeleton() {
 			className={CARD_CLASS}
 		>
 			<RecentLogHeader />
-			<ul aria-hidden="true" className="-mx-(--page-gap) divide-y">
+			<ul aria-hidden="true" className="-mx-page divide-y">
 				{Array.from({ length: RECENT_LIMIT }, (_, index) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 					<li key={index} className={ROW_CLASS}>
@@ -131,7 +130,7 @@ export function RecentLogCard({
 			{recent.length === 0 ? (
 				<EmptyNote>{EMPTY.window.last24Hours}</EmptyNote>
 			) : (
-				<ul className="-mx-(--page-gap) divide-y">
+				<ul className="-mx-page divide-y">
 					{recent.map((visit) => {
 						const clock = formatClockRange(visit.firstAt, visit.lastAt);
 						const age = formatTimeAgo(visit.ageMs + offsetMs);
@@ -164,7 +163,7 @@ export function RecentLogCard({
 											</span>
 										) : null}
 									</div>
-									<div className="@min-[26rem]:block hidden truncate text-[var(--bark)] text-xs italic">
+									<div className="@min-[26rem]:block hidden truncate text-bark text-xs italic">
 										{visit.sciName}
 									</div>
 									<div className="@min-[26rem]:hidden truncate text-muted-foreground text-xs tabular-nums">

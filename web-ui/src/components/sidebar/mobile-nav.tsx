@@ -43,7 +43,7 @@ export function MobileNav() {
 					<Menu className="size-5" aria-hidden="true" />
 					{offered ? (
 						<UpdateDot
-							className="absolute top-1.5 right-1.5 ring-2 ring-[var(--paper-raised)]"
+							className="absolute top-1.5 right-1.5 ring-2 ring-paper-raised"
 							label={`Update to ${offered} available`}
 						/>
 					) : null}
@@ -68,7 +68,7 @@ export function MobileNav() {
 					}`}
 				/>
 				<div
-					className={`absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-[var(--line)] border-r bg-[var(--paper-raised)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
+					className={`absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-line border-r bg-paper-raised transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
 						isOpen ? "translate-x-0" : "-translate-x-full"
 					}`}
 				>
@@ -106,12 +106,12 @@ export function InMenuBar({ children }: { children: ReactNode }) {
 }
 
 const BAR_BASE_CLASS =
-	"z-30 flex h-14 shrink-0 items-center gap-2 border-[var(--line)] border-b bg-[var(--paper-raised)] xl:hidden";
+	"z-30 flex h-14 shrink-0 items-center gap-2 border-line border-b bg-paper-raised xl:hidden";
 const BAR_CLASS = `${BAR_BASE_CLASS} px-4 max-[400px]:px-2`;
 const DRAWER_BAR_CLASS = `${BAR_BASE_CLASS} px-3`;
 
 const ROUND_BUTTON_CLASS =
-	"flex size-8 pointer-coarse:size-9 items-center justify-center rounded-full bg-[var(--paper-raised)] text-[var(--moss)] transition-colors duration-[180ms] hover:bg-[color-mix(in_oklab,var(--moss)_8%,var(--paper-raised))]";
+	"flex size-8 pointer-coarse:size-9 items-center justify-center rounded-full bg-paper-raised text-moss transition-colors duration-[180ms] hover:bg-[color-mix(in_oklab,var(--moss)_8%,var(--paper-raised))]";
 
 function SiteName({ onClick }: { onClick?: () => void }) {
 	return (
@@ -120,7 +120,7 @@ function SiteName({ onClick }: { onClick?: () => void }) {
 			onClick={onClick}
 			className="flex h-8 pointer-coarse:h-9 items-center gap-2 rounded-md px-2 font-semibold text-lg no-underline transition-colors duration-[180ms] hover:bg-[color-mix(in_oklab,var(--moss)_8%,var(--paper-raised))]"
 		>
-			<SongbookWordmark className="shrink-0 text-[24px] text-[var(--moss)]" />
+			<SongbookWordmark className="shrink-0 text-[24px] text-moss" />
 		</Link>
 	);
 }

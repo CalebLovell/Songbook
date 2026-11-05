@@ -75,11 +75,9 @@ function SpeciesListRow({
 						{count.toLocaleString()}
 					</span>
 				</div>
-				<div className="truncate text-[var(--bark)] text-xs italic">
-					{sciName}
-				</div>
+				<div className="truncate text-bark text-xs italic">{sciName}</div>
 				<div
-					className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[var(--track)]"
+					className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-track"
 					role="img"
 					aria-label={`${count} detections`}
 				>

@@ -63,12 +63,12 @@ type DetectionsFiltersProps = Pick<
 	"search" | "onSearchChange"
 >;
 
-const FIRST_COLUMN_CLASSES = "pl-(--page-gap)";
-const CELL_GAP = "px-(--cell-gap)";
+const FIRST_COLUMN_CLASSES = "pl-page";
+const CELL_GAP = "px-cell";
 const AUDIO_EDGE =
 	"pr-[max(calc(var(--spacing)*1),calc(var(--page-gap)-var(--scrollbar-w,0px)))]";
 const LAST_EDGE_WITHOUT_AUDIO: Record<string, string> = {
-	recorded: `${AUDIO_EDGE} @min-[36rem]:pr-(--cell-gap)`,
+	recorded: `${AUDIO_EDGE} @min-[36rem]:pr-cell`,
 	confidence: AUDIO_EDGE,
 };
 const COLUMN_VISIBILITY: Record<string, string> = {
@@ -139,7 +139,7 @@ function DateRangeFilter({
 	return (
 		<fieldset
 			aria-label="Date range"
-			className="flex h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)]"
+			className="flex h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring"
 		>
 			<DateSegment
 				label="From date"
@@ -281,7 +281,7 @@ export function DetectionsFilters({
 
 	return (
 		<div className="@container">
-			<div className="flex @min-[38rem]:flex-row flex-col @min-[38rem]:items-center @min-[38rem]:justify-between gap-(--page-gap)">
+			<div className="flex @min-[38rem]:flex-row flex-col @min-[38rem]:items-center @min-[38rem]:justify-between gap-page">
 				<SearchInput
 					aria-label="Search detections"
 					placeholder="Search detections..."
@@ -328,7 +328,7 @@ function SkeletonCell({
 }) {
 	switch (columnId) {
 		case "select":
-			return <ShellBar className="size-(--row-checkbox-size) rounded-sm" />;
+			return <ShellBar className="size-row-checkbox rounded-sm" />;
 		case "index":
 			return (
 				<ShellSized className="rounded-full">
@@ -526,9 +526,7 @@ export function DetectionsTable({
 					onSort={sortBy}
 				/>
 			),
-			cell: ({ row }) => (
-				<em className="text-[var(--bark)]">{row.original.Sci_Name}</em>
-			),
+			cell: ({ row }) => <em className="text-bark">{row.original.Sci_Name}</em>,
 		},
 		{
 			id: "recorded",
@@ -576,7 +574,7 @@ export function DetectionsTable({
 			cell: ({ row }) => (
 				<div className="flex justify-end">
 					{row.original.Confidence === null ? (
-						<span className="text-[var(--bark)] tabular-nums">—</span>
+						<span className="text-bark tabular-nums">—</span>
 					) : (
 						<ConfidencePill confidence={row.original.Confidence} />
 					)}
@@ -624,11 +622,11 @@ export function DetectionsTable({
 				role="table"
 				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:grid-cols-(--cols-xs)"
 				style={gridColumns(canDelete, canListen)}
-				containerClassName="-ml-(--page-gap) -mr-(--card-edge) -mt-(--page-gap) min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
+				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
 				<TableHeader
 					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-[var(--surface-strong)] @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong @min-[36rem]:[scrollbar-gutter:stable] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} role="row" className={GRID_ROW}>
@@ -663,7 +661,7 @@ export function DetectionsTable({
 									canDelete
 										? "col-[2/-1]"
 										: `col-[1/-1] ${FIRST_COLUMN_CLASSES}`,
-									"pr-(--page-gap)",
+									"pr-page",
 								)}
 							>
 								<SortMenu
@@ -697,7 +695,7 @@ export function DetectionsTable({
 							className={cn(
 								GRID_ROW,
 								"h-auto min-h-[calc(2.5rem+1px)]",
-								row.getIsSelected() ? "bg-[var(--row-selected)]" : "bg-card",
+								row.getIsSelected() ? "bg-row-selected" : "bg-card",
 							)}
 						>
 							{row.getVisibleCells().map((cell, index) => (
@@ -721,7 +719,7 @@ export function DetectionsTable({
 				</TableBody>
 			</Table>
 
-			<div className="-mr-(--card-edge) -ml-(--page-gap) flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-(--page-gap) border-t py-1.5 pr-(--card-edge) pl-(--page-gap) text-sm">
+			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 flex-wrap items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
 				{canDelete && selectedCount > 0 ? (
 					<SelectionBar
 						count={selectedCount}

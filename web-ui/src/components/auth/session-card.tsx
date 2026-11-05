@@ -35,7 +35,7 @@ export function SessionCard() {
 	return (
 		<section
 			aria-labelledby="account-sign-in"
-			className="feature-card flex flex-col gap-(--page-gap) rounded-md p-(--page-gap)"
+			className="feature-card flex flex-col gap-page rounded-md p-page"
 		>
 			<CardHeader
 				as="h2"
@@ -44,7 +44,7 @@ export function SessionCard() {
 			/>
 			<div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
 				<div className="flex min-w-0 items-center gap-3">
-					<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--icon-well)] text-[var(--moss)]">
+					<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-icon-well text-moss">
 						<ShieldCheck aria-hidden="true" className="size-5" />
 					</div>
 					<div className="min-w-0">

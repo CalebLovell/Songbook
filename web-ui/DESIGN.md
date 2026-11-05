@@ -1,8 +1,11 @@
 # Design system
 
-The rules the web UI follows. Tokens live in `src/styles.css`; this file says
-what they mean and when to use them. The visual reference is the "Songbook
-Design System" canvas on claude.ai.
+Tokens live in `src/styles.css`; this file says what they mean and when to use
+them. Each token is registered in `@theme`, so a class names it directly (`bg-meadow`,
+`border-line`, `gap-page`) rather than through `bg-[var(--meadow)]`. New spacing
+tokens also go in the `cn` merge config (`lib/utils.ts`), which otherwise keeps both
+`gap-2` and `gap-page`. The visual reference is the "Songbook Design System" canvas
+on claude.ai.
 
 ## Principles
 
@@ -13,7 +16,7 @@ Design System" canvas on claude.ai.
   around it. Page content fills the remaining width; no max-width column.
 - **Show the bird.** Any list of species uses the species-row idiom:
   `SpeciesThumbnail` + `illustrationUrlFor(sciName)`, common name over an
-  italic binomial, `odd:bg-[var(--meadow)]` zebra, no label→value rows. A
+  italic binomial, `odd:bg-meadow` zebra, no label→value rows. A
   species without a painting shows its reference photo
   (`reference-photos.ts`), square-cropped to fill the slot with the 4px
   radius, and no tag or tone. With no photo, or when the photo can't load, it

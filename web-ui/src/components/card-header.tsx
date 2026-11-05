@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export const CARD_HEADER_CLASS =
-	"-mx-(--page-gap) -mt-(--page-gap) flex min-h-[45px] items-center justify-between gap-2 border-b px-(--page-gap)";
+	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
 
 export function CardHeader({
 	title,

@@ -48,7 +48,7 @@ export function PageStepper({
 			className={cn(
 				"flex h-8 pointer-coarse:h-9 w-fit shrink-0 pointer-coarse:text-base text-sm",
 				variant === "outline" &&
-					"overflow-hidden rounded-md border border-input bg-card focus-within:border-[var(--focus-ring)]",
+					"overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring",
 				className,
 			)}
 		>
@@ -135,7 +135,7 @@ export function PageRange({
 }
 
 export const PAGE_ROW_CLASS =
-	"flex min-w-0 flex-auto flex-wrap items-center gap-(--page-gap)";
+	"flex min-w-0 flex-auto flex-wrap items-center gap-page";
 
 export const PAGE_RANGE_NARROW_HIDDEN = "max-[359px]:hidden";
 

@@ -74,7 +74,7 @@ export function SpeciesByHourCard({
 				className={`feature-card @container/card rounded-md p-4 ${isEmpty ? "" : "pb-1!"} ${className}`}
 			>
 				<div
-					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${isEmpty ? "mb-(--page-gap)" : ""}`}
+					className={`${CARD_HEADER_CLASS} gap-3 py-2 max-[480px]:flex-wrap max-[480px]:gap-y-2 ${isEmpty ? "mb-page" : ""}`}
 				>
 					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3 max-[480px]:contents">
 						<div className="island-kicker shrink-0">Activity</div>
@@ -91,7 +91,7 @@ export function SpeciesByHourCard({
 					<div className="-mx-1 px-1">
 						<HeaderRow />
 
-						<div className="-mx-(--page-gap) [&>*]:px-(--page-gap)">
+						<div className="-mx-page [&>*]:px-page">
 							{rows.map((row) => (
 								<SpeciesHourRowView
 									key={row.comName}
@@ -150,7 +150,7 @@ function SpeciesHourRowView({
 	heatMax: number;
 }) {
 	return (
-		<div className={`${ROW_LAYOUT} border-[var(--line)] border-t`}>
+		<div className={`${ROW_LAYOUT} border-line border-t`}>
 			<div className={`h-8 ${LABEL_LAYOUT}`}>
 				<div className="flex min-w-0 items-center gap-2">
 					<div className={BIRD_BOX_CLASS}>
@@ -249,12 +249,12 @@ export function SpeciesByHourCardSkeleton({
 			</div>
 			<div aria-hidden="true" className="-mx-1 px-1">
 				<HeaderRow />
-				<div className="-mx-(--page-gap) [&>*]:px-(--page-gap)">
+				<div className="-mx-page [&>*]:px-page">
 					{Array.from({ length: rows }, (_, index) => (
 						<div
 							// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 							key={index}
-							className={`${ROW_LAYOUT} border-[var(--line)] border-t`}
+							className={`${ROW_LAYOUT} border-line border-t`}
 						>
 							<div className={`h-8 ${LABEL_LAYOUT}`}>
 								<div className="flex min-w-0 items-center gap-2">

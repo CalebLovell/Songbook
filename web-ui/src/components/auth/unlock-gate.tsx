@@ -58,7 +58,7 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 	return (
 		<form
 			aria-labelledby="unlock-title"
-			className="feature-card flex flex-col gap-4 rounded-md p-(--page-gap)"
+			className="feature-card flex flex-col gap-4 rounded-md p-page"
 			onSubmit={onSubmit}
 		>
 			<CardHeader as="h2" titleId="unlock-title" title={SIGN_IN_CARD_TITLE} />
@@ -77,7 +77,7 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 						autoComplete="username"
 						value={SITE_NAME}
 						readOnly
-						className="bg-[var(--meadow)] text-muted-foreground hover:bg-[var(--meadow)] hover:text-muted-foreground"
+						className="bg-meadow text-muted-foreground hover:bg-meadow hover:text-muted-foreground"
 					/>
 				</div>
 				<div className="space-y-1.5 sm:col-start-1">

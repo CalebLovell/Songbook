@@ -55,7 +55,7 @@ export function DetectionsByMonthCard({
 			{isEmpty ? (
 				<EmptyNote>{EMPTY.station.detections}</EmptyNote>
 			) : (
-				<div className="mt-(--page-gap) min-h-0 flex-1">
+				<div className="mt-page min-h-0 flex-1">
 					<ResponsiveContainer
 						width="100%"
 						height="100%"

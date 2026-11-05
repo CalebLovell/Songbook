@@ -29,13 +29,13 @@ export function PageStatus({
 					)
 				}
 			/>
-			<div className="mt-(--page-gap) max-w-2xl text-muted-foreground text-sm leading-relaxed">
+			<div className="mt-page max-w-2xl text-muted-foreground text-sm leading-relaxed">
 				{children}
 			</div>
 			{actions ? (
 				<div
 					data-testid="page-status-actions"
-					className="mt-(--page-gap) flex flex-wrap items-center gap-2"
+					className="mt-page flex flex-wrap items-center gap-2"
 				>
 					{actions}
 				</div>

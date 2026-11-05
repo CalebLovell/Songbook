@@ -21,7 +21,7 @@ export function StatusPage({
 	children: ReactNode;
 }) {
 	return (
-		<div className="page-wrap space-y-(--page-gap) py-4">
+		<div className="page-wrap space-y-page py-4">
 			<PageHeaderCard
 				icon={icon}
 				title={section}

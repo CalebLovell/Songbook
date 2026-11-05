@@ -29,10 +29,10 @@ import {
 
 const DEFAULT_HEIGHT = "h-36 max-[400px]:h-28";
 const CONTROLS_CLASS =
-	"@container/controls mt-(--page-gap) flex flex-wrap items-center gap-2";
+	"@container/controls mt-page flex flex-wrap items-center gap-2";
 const TOTAL_CLASS = "@max-[22rem]/controls:hidden";
 const SCRUBBER_CLASS =
-	"cursor-pointer touch-none select-none rounded-md focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] focus-visible:outline-offset-2";
+	"cursor-pointer touch-none select-none rounded-md focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-2";
 const TIME_CLASS = "tabular-nums text-muted-foreground text-xs";
 const META_DATE_CLASS = "tabular-nums text-muted-foreground text-sm";
 
@@ -268,7 +268,7 @@ export function SpectrogramPlayer({
 						aria-hidden="true"
 						className={`absolute inset-0 will-change-transform ${clipShowsPlayhead(state) ? "" : "opacity-0"}`}
 					>
-						<div className="absolute inset-y-0 left-0 w-px -translate-x-1/2 bg-[var(--ink)]" />
+						<div className="absolute inset-y-0 left-0 w-px -translate-x-1/2 bg-ink" />
 					</div>
 				</Spectrogram>
 			</div>

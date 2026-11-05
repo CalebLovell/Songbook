@@ -46,7 +46,7 @@ export function SettingsReset({ onReset }: { onReset: () => Promise<void> }) {
 					onCancel={() => setOpen(false)}
 					onConfirm={confirm}
 				>
-					<p className="rounded-md bg-muted p-(--page-gap) text-muted-foreground text-xs leading-relaxed">
+					<p className="rounded-md bg-muted p-page text-muted-foreground text-xs leading-relaxed">
 						Your Station card is left as it is. Its name, coordinates, and
 						timezone have no default to return to, and blanking them would put
 						the station at 0,0 and break geographic species filtering.

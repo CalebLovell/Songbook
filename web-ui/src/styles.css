@@ -30,7 +30,6 @@
 	   instead drains the chroma and the 2px ring just reads black. */
 	--focus-ring: color-mix(in oklch, var(--moss) 50%, oklch(0.3 0.17 145));
   --kicker: var(--moss);
-  --link-bg-hover: color-mix(in oklab, var(--sage) 18%, var(--paper-raised));
 
 	/* Named tints. Each is one colour pushed into paper; they live here so a
 	   component asks for a meaning rather than re-deriving a mix inline.
@@ -123,6 +122,40 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-ink: var(--ink);
+  --color-moss: var(--moss);
+  --color-sage: var(--sage);
+  --color-sand: var(--sand);
+  --color-bark: var(--bark);
+  --color-clay: var(--clay);
+  --color-meadow: var(--meadow);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-line: var(--line);
+  --color-track: var(--track);
+  --color-hover-line: var(--hover-line);
+  --color-focus-ring: var(--focus-ring);
+  --color-kicker: var(--kicker);
+  --color-icon-well: var(--icon-well);
+  --color-row-selected: var(--row-selected);
+  --color-live-fill: var(--live-fill);
+  --color-row-well: var(--row-well);
+  --color-confidence-high: var(--confidence-high);
+  --color-confidence-mid: var(--confidence-mid);
+  --color-confidence-low: var(--confidence-low);
+  --color-toast-success-fill: var(--toast-success-fill);
+  --color-toast-success-line: var(--toast-success-line);
+  --color-toast-warning-fill: var(--toast-warning-fill);
+  --color-toast-warning-line: var(--toast-warning-line);
+  --color-toast-error-fill: var(--toast-error-fill);
+  --color-toast-error-line: var(--toast-error-line);
+  --spacing-page: var(--page-gap);
+  --spacing-cell: var(--cell-gap);
+  --spacing-card-edge: var(--card-edge);
+  --spacing-masthead: var(--masthead-h);
+  --spacing-row-checkbox: var(--row-checkbox-size);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: 0.625rem; /* 10px -- cards (feature-card, shadcn Card) */
@@ -240,7 +273,7 @@ a[data-slot="button"]:hover {
 /* The page's standard spacing: the gutter around it and the gap between its
    cards. One value so the two always move together -- halved on the smallest
    phones (under 400px), so the cards get the width back. Page-level layouts
-   use it as `space-y-(--page-gap)` / `gap-(--page-gap)`. */
+   use it as `space-y-page` / `gap-page`. */
 :root {
   --page-gap: 1rem;
   /* The sidebar's wordmark band and every page's header card share this

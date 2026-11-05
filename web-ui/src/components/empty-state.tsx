@@ -3,9 +3,7 @@ import type { ReactNode } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 
 export function EmptyNote({ children }: { children: ReactNode }) {
-	return (
-		<p className="mt-(--page-gap) text-muted-foreground text-sm">{children}</p>
-	);
+	return <p className="mt-page text-muted-foreground text-sm">{children}</p>;
 }
 
 export function EmptyState({

@@ -39,10 +39,10 @@ import {
 import { SpeciesControlTools } from "./species-control-tools.tsx";
 
 const TOOLBAR_CLASS =
-	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-(--page-gap)";
+	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-page";
 const SEARCH_CLASS = "@min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
 const TABLE_CARD_CLASS =
-	"@container feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-(--page-gap) [--card-edge:min(var(--page-gap),0.75rem)]";
+	"@container feature-card flex min-h-80 flex-col overflow-hidden rounded-md p-page [--card-edge:min(var(--page-gap),0.75rem)]";
 
 export function SpeciesControlPageSkeleton({
 	search,
@@ -50,8 +50,8 @@ export function SpeciesControlPageSkeleton({
 	search: SpeciesControlWorkspaceSearch;
 }) {
 	return (
-		<div className="page-wrap flex h-full min-h-fit flex-col gap-(--page-gap) py-4">
-			<div className="@container shrink-0 space-y-(--page-gap)">
+		<div className="page-wrap flex h-full min-h-fit flex-col gap-page py-4">
+			<div className="@container shrink-0 space-y-page">
 				<PageHeaderCard
 					icon={SlidersHorizontal}
 					title={PAGE_HEADERS.speciesControl.title}
@@ -76,7 +76,7 @@ export function SpeciesControlPageSkeleton({
 			<section
 				aria-busy="true"
 				aria-label="Installed species"
-				className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
+				className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 			>
 				<SpeciesControlTable
 					rows={null}
@@ -133,14 +133,14 @@ const BULK_STATUS_ACTIONS: Array<{
 		label: "Custom",
 		short: "Custom",
 		className:
-			"text-[var(--moss)] hover:bg-[color-mix(in_oklab,var(--sage)_35%,var(--paper-raised))]",
+			"text-moss hover:bg-[color-mix(in_oklab,var(--sage)_35%,var(--paper-raised))]",
 	},
 	{
 		status: "always",
 		label: "Always detect",
 		short: "Always",
 		className:
-			"text-[var(--bark)] hover:bg-[color-mix(in_oklab,var(--sand)_30%,var(--paper-raised))]",
+			"text-bark hover:bg-[color-mix(in_oklab,var(--sand)_30%,var(--paper-raised))]",
 	},
 	{
 		status: "never",
@@ -432,8 +432,8 @@ export function SpeciesControlPage({
 	}
 
 	return (
-		<div className="page-wrap flex h-full min-h-fit flex-col gap-(--page-gap) py-4">
-			<div className="@container shrink-0 space-y-(--page-gap)">
+		<div className="page-wrap flex h-full min-h-fit flex-col gap-page py-4">
+			<div className="@container shrink-0 space-y-page">
 				<PageHeaderCard
 					icon={SlidersHorizontal}
 					title={PAGE_HEADERS.speciesControl.title}
@@ -476,7 +476,7 @@ export function SpeciesControlPage({
 			) : (
 				<section
 					aria-label="Installed species"
-					className={`${TABLE_CARD_CLASS} flex-1 pr-(--card-edge) pb-0`}
+					className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 				>
 					<SpeciesControlTable
 						rows={pagedRows}
@@ -513,7 +513,7 @@ export function SpeciesControlPage({
 					className="feature-card flex max-h-64 shrink-0 flex-col rounded-md p-4"
 				>
 					<div className="flex shrink-0 items-start gap-3">
-						<CircleAlert className="mt-0.5 size-5 text-[var(--clay)]" />
+						<CircleAlert className="mt-0.5 size-5 text-clay" />
 						<div>
 							<h2 className="font-semibold">Unmatched list entries</h2>
 							<p className="mt-1 text-muted-foreground text-sm">

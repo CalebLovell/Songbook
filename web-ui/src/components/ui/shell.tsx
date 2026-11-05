@@ -129,7 +129,7 @@ export function ShellChartCard({
 			)}
 		>
 			<CardHeader title={title}>{action}</CardHeader>
-			<ShellBar className="mt-(--page-gap) min-h-[220px] w-full flex-1 rounded-md" />
+			<ShellBar className="mt-page min-h-[220px] w-full flex-1 rounded-md" />
 		</section>
 	);
 }
