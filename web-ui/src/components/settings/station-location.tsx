@@ -101,7 +101,7 @@ export function StationLocation({
 						</h2>
 						{state.kind === "found" ? (
 							<>
-								<dl className="tabular-data grid grid-cols-2 gap-(--page-gap) rounded-md bg-muted p-(--page-gap) text-sm">
+								<dl className="grid grid-cols-2 gap-(--page-gap) rounded-md bg-muted p-(--page-gap) text-sm tabular-nums">
 									<div>
 										<dt className="island-kicker">Latitude</dt>
 										<dd className="mt-1 font-semibold">

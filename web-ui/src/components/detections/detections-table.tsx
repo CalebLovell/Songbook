@@ -237,7 +237,7 @@ function SelectionBar({
 			className="flex h-8.5 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
 			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
-				<span className="tabular-data font-semibold text-foreground">
+				<span className="font-semibold text-foreground tabular-nums">
 					{count}
 				</span>
 				<span className="sr-only @min-[36rem]:not-sr-only">selected</span>
@@ -545,7 +545,7 @@ export function DetectionsTable({
 				<Link
 					to="/timeline"
 					search={{ period: "day", date: row.original.Date }}
-					className="tabular-data text-sm no-underline hover:underline"
+					className="text-sm tabular-nums no-underline hover:underline"
 				>
 					<span className="flex @min-[36rem]:hidden flex-col items-end">
 						<span className="leading-tight">{clockLabel(row.original)}</span>
@@ -576,7 +576,7 @@ export function DetectionsTable({
 			cell: ({ row }) => (
 				<div className="flex justify-end">
 					{row.original.Confidence === null ? (
-						<span className="tabular-data text-[var(--bark)]">—</span>
+						<span className="text-[var(--bark)] tabular-nums">—</span>
 					) : (
 						<ConfidencePill confidence={row.original.Confidence} />
 					)}

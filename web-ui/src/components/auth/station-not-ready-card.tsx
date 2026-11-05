@@ -35,14 +35,14 @@ export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 					<p className="font-semibold">{title}</p>
 					<p>{body}</p>
 					<p>
-						<code className="tabular-data text-[0.8125rem]">
+						<code className="font-sans tabular-nums">
 							sudo scripts/set_web_ui_password.sh
 						</code>
 					</p>
 					{state === "misconfigured" ? (
 						<p>
 							The log:{" "}
-							<code className="tabular-data text-[0.8125rem]">
+							<code className="font-sans tabular-nums">
 								journalctl -u birdnet_web_ui
 							</code>
 						</p>

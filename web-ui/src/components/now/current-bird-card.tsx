@@ -38,7 +38,7 @@ export function CurrentBirdCard({
 				actions={live}
 			>
 				<StandInBody live={live}>
-					<h1 className="display-title font-bold text-2xl sm:text-3xl">
+					<h1 className="font-bold text-2xl sm:text-3xl">
 						{EMPTY.window.liveQuietTitle}
 					</h1>
 					<p className="text-muted-foreground">{EMPTY.window.liveQuietBody}</p>
@@ -51,7 +51,7 @@ export function CurrentBirdCard({
 		return (
 			<HeroCardShell label="Station status" portrait={<NestPortrait />}>
 				<StandInBody>
-					<h1 className="display-title font-bold text-2xl sm:text-3xl">
+					<h1 className="font-bold text-2xl sm:text-3xl">
 						{EMPTY.station.liveHeroTitle}
 					</h1>
 					<p className="text-muted-foreground">{EMPTY.station.liveHeroBody}</p>

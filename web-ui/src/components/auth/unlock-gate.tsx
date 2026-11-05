@@ -102,7 +102,9 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 						className="text-muted-foreground text-xs leading-relaxed"
 					>
 						Set on the Pi with{" "}
-						<code className="tabular-data">scripts/set_web_ui_password.sh</code>
+						<code className="font-sans tabular-nums">
+							scripts/set_web_ui_password.sh
+						</code>
 						.
 					</p>
 				</div>

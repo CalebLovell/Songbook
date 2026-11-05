@@ -29,7 +29,7 @@ export function YearSelector({
 			>
 				<ChevronLeft />
 			</Button>
-			<div className="tabular-data min-w-12 text-center font-semibold text-sm max-[400px]:min-w-10 max-[400px]:text-xs">
+			<div className="min-w-12 text-center font-semibold text-sm tabular-nums max-[400px]:min-w-10 max-[400px]:text-xs">
 				{year}
 			</div>
 			<Button

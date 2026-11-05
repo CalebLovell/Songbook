@@ -49,8 +49,7 @@ const UNDER_REVIEW_CLASS =
 	"feature-card flex flex-col gap-(--page-gap) rounded-md p-4";
 const IDENTITY_ROW_CLASS = "flex items-start gap-(--page-gap)";
 const IDENTITY_TEXT_CLASS = "flex min-w-0 flex-1 flex-col items-start";
-const NAME_CLASS =
-	"display-title font-bold text-2xl leading-[1.15] sm:text-3xl";
+const NAME_CLASS = "font-bold text-2xl leading-[1.15] sm:text-3xl";
 const EBIRD_LINK_CLASS = "mt-1";
 const PORTRAIT_CLASS =
 	"flex size-20 shrink-0 items-center justify-center overflow-hidden max-[400px]:size-14";
@@ -463,15 +462,15 @@ export function ReviewWorkflow({
 												<span className="@min-[26rem]:block hidden truncate text-[var(--bark)] text-xs italic">
 													{item.sciName}
 												</span>
-												<span className="tabular-data block @min-[26rem]:hidden truncate text-muted-foreground text-xs">
+												<span className="block @min-[26rem]:hidden truncate text-muted-foreground text-xs tabular-nums">
 													{formatDateTime(item.date, item.time)}
 												</span>
 											</span>
 											<span className={QUEUE_TIME_CLASS}>
-												<span className="tabular-data block text-sm">
+												<span className="block text-sm tabular-nums">
 													{when.day}
 												</span>
-												<span className="tabular-data block text-muted-foreground text-xs">
+												<span className="block text-muted-foreground text-xs tabular-nums">
 													{when.clock}
 												</span>
 											</span>

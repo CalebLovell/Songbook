@@ -105,7 +105,7 @@ function PlayerPanel() {
 									className="min-w-0 flex-1 accent-[var(--moss)]"
 									aria-label="Gain"
 								/>
-								<span className="tabular-data w-10 text-right">
+								<span className="w-10 text-right tabular-nums">
 									{live.gainPercent}%
 								</span>
 							</label>

@@ -114,7 +114,7 @@ export function SpeciesHeroCard({
 		>
 			<div className="flex flex-wrap items-start justify-between gap-3 max-[400px]:gap-2">
 				<div className="min-w-0">
-					<h1 className="display-title font-bold text-2xl text-[var(--moss)] sm:text-3xl">
+					<h1 className="font-bold text-2xl text-[var(--moss)] sm:text-3xl">
 						{speciesSlug ? (
 							<Link
 								to="/birds/$comName"
@@ -136,7 +136,7 @@ export function SpeciesHeroCard({
 				<p className="font-semibold text-[var(--moss)] text-lg">
 					{relativeTime}
 				</p>
-				<div className="tabular-data mt-1 flex flex-wrap items-center gap-2 text-sm">
+				<div className="mt-1 flex flex-wrap items-center gap-2 text-sm tabular-nums">
 					<span className="text-muted-foreground">last heard {heardAt}</span>
 					<ConfidencePill confidence={confidence} />
 					{canListen ? (
@@ -181,7 +181,7 @@ export function HeroTextShell({ actions }: { actions?: ReactNode }) {
 			<div className="flex flex-wrap items-start justify-between gap-3 max-[400px]:gap-2">
 				<div className="min-w-0 flex-1">
 					<ShellText
-						className="display-title font-bold text-2xl sm:text-3xl"
+						className="font-bold text-2xl sm:text-3xl"
 						barClassName="w-60 max-w-full"
 					/>
 					<ShellText className="text-xs" barClassName="w-32" />
@@ -191,7 +191,7 @@ export function HeroTextShell({ actions }: { actions?: ReactNode }) {
 
 			<div>
 				<ShellText className="font-semibold text-lg" barClassName="w-32" />
-				<div className="tabular-data mt-1 flex flex-wrap items-center gap-2 text-sm">
+				<div className="mt-1 flex flex-wrap items-center gap-2 text-sm tabular-nums">
 					<ShellText className="w-40 sm:w-52" barClassName="w-full" />
 					<ShellSized className="rounded-full">
 						<ConfidencePill confidence={0.9} />

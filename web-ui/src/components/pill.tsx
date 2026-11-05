@@ -36,7 +36,7 @@ export function Pill({
 	return (
 		<Hint content={tooltip}>
 			<span
-				className={`inline-flex h-[26px] shrink-0 items-center gap-1 rounded-full px-2.5 font-semibold text-[13px] leading-none sm:text-xs ${tabular ? "tabular-data" : ""} ${className}`}
+				className={`inline-flex h-[26px] shrink-0 items-center gap-1 rounded-full px-2.5 font-semibold text-[13px] leading-none sm:text-xs ${tabular ? "tabular-nums" : ""} ${className}`}
 				style={style}
 			>
 				{Icon ? <Icon className="size-3" aria-hidden="true" /> : null}

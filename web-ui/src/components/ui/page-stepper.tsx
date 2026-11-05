@@ -75,10 +75,10 @@ export function PageStepper({
 						if (event.key === "Enter") commit();
 						if (event.key === "Escape") setDraft(String(page));
 					}}
-					className="tabular-data bg-transparent text-center font-semibold text-foreground underline-offset-4 outline-none hover:underline focus-visible:underline"
+					className="bg-transparent text-center font-semibold text-foreground tabular-nums underline-offset-4 outline-none hover:underline focus-visible:underline"
 					style={{ width: `${numberWidth(shown || "0")}ch` }}
 				/>
-				<span className="tabular-data whitespace-nowrap">of {pageTotal}</span>
+				<span className="whitespace-nowrap tabular-nums">of {pageTotal}</span>
 			</label>
 			<StepButton
 				direction="next"
@@ -115,14 +115,14 @@ export function PageRange({
 			)}
 		>
 			<span>
-				<span className="tabular-data font-semibold text-foreground">
+				<span className="font-semibold text-foreground tabular-nums">
 					{first.toLocaleString()}&ndash;{last.toLocaleString()}
 				</span>
 				{total ? (
 					<>
 						{" "}
 						of{" "}
-						<span className="tabular-data font-semibold text-foreground">
+						<span className="font-semibold text-foreground tabular-nums">
 							{total.count.toLocaleString()}
 						</span>{" "}
 						{total.noun[total.count === 1 ? 0 : 1]}
