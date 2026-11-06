@@ -26,7 +26,7 @@ const ROW_BUTTON = {
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
 const FOOTER_CLASS =
-	"-mx-page mt-auto -mb-page flex min-h-[45px] shrink-0 items-center justify-end border-t px-page";
+	"-mx-page mt-auto -mb-page flex min-h-11.25 shrink-0 items-center justify-end border-t px-page";
 const FOOTER_LINK_CLASS =
 	"inline-flex items-center gap-1 text-xs no-underline hover:underline";
 

@@ -83,11 +83,11 @@ export function sortSpeciesControlRows(
 
 const FIRST_COLUMN_CLASSES = "pl-page";
 const CELL_GAP = "px-cell";
-const NAME_CELL = "min-w-0 @max-[36rem]:py-1.5";
+const NAME_CELL = "min-w-0 @max-xl:py-1.5";
 const STATUS_EDGE = "pr-page-end";
 const COLUMN_VISIBILITY: Record<string, string> = {
 	scientific: "hidden @min-[54rem]:block",
-	count: "hidden @min-[36rem]:block",
+	count: "hidden @xl:block",
 };
 const GRID_ROW = "col-span-full grid grid-cols-subgrid items-center";
 const BODY_ROW_HEIGHT = "min-h-[calc(1.75rem+1rem+1px)]";
@@ -184,7 +184,7 @@ export function SpeciesControlTable({
 				className={cn(
 					"font-semibold",
 					CELL_GAP,
-					COLUMN_VISIBILITY[key] ?? "@min-[36rem]:block hidden",
+					COLUMN_VISIBILITY[key] ?? "@xl:block hidden",
 					className,
 				)}
 			>
@@ -203,13 +203,13 @@ export function SpeciesControlTable({
 		<div className="@container flex min-h-0 flex-1 flex-col">
 			<Table
 				role="table"
-				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
+				className="grid h-full min-w-min @min-[54rem]:grid-cols-(--cols-lg) @xl:grid-cols-(--cols-md) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
 				style={COLUMN_GRID}
 				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
 				<TableHeader
 					role="rowgroup"
-					className="@min-[36rem]:scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="@xl:scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					<TableRow role="row" className={GRID_ROW}>
 						<TableHead
@@ -237,7 +237,7 @@ export function SpeciesControlTable({
 						<TableHead
 							role="columnheader"
 							className={cn(
-								"@min-[36rem]:block hidden text-center font-semibold",
+								"@xl:block hidden text-center font-semibold",
 								CELL_GAP,
 							)}
 						>
@@ -249,14 +249,11 @@ export function SpeciesControlTable({
 						{sortHeading("count", "text-right")}
 						{sortHeading(
 							"status",
-							cn(
-								STATUS_EDGE,
-								"text-right @min-[36rem]:w-36 @min-[36rem]:min-w-36",
-							),
+							cn(STATUS_EDGE, "text-right @xl:w-36 @xl:min-w-36"),
 						)}
 						<TableHead
 							role="columnheader"
-							className="col-[2/-1] @min-[36rem]:hidden pr-page"
+							className="col-[2/-1] @xl:hidden pr-page"
 						>
 							<div className="flex items-center gap-2">
 								<StatusTip />
@@ -330,11 +327,11 @@ export function SpeciesControlTable({
 									<Link
 										to="/birds/$comName"
 										params={{ comName: comNameToSlug(row.comName) }}
-										className="@max-[36rem]:block @max-[36rem]:truncate font-medium @max-[36rem]:leading-tight no-underline hover:underline"
+										className="@max-xl:block @max-xl:truncate font-medium @max-xl:leading-tight no-underline hover:underline"
 									>
 										{row.comName}
 									</Link>
-									<em className="block @min-[36rem]:hidden truncate text-bark text-xs leading-tight">
+									<em className="block @xl:hidden truncate text-bark text-xs leading-tight">
 										{row.sciName}
 									</em>
 								</TableCell>
@@ -372,7 +369,7 @@ export function SpeciesControlTable({
 				</RowWell>
 			</Table>
 
-			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
+			<div className="-mr-card-edge -ml-page flex min-h-11.25 shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
 				{rows === null ? (
 					<div
 						aria-hidden="true"
@@ -462,11 +459,11 @@ function SkeletonRow({
 			</TableCell>
 			<TableCell role="cell" className={cn(CELL_GAP, NAME_CELL)}>
 				<ShellText
-					className="font-medium @max-[36rem]:leading-tight"
+					className="font-medium @max-xl:leading-tight"
 					barClassName={NAME_WIDTHS[index % NAME_WIDTHS.length]}
 				/>
 				<ShellText
-					className="@min-[36rem]:hidden text-xs leading-tight"
+					className="@xl:hidden text-xs leading-tight"
 					barClassName={SCIENTIFIC_WIDTHS[index % SCIENTIFIC_WIDTHS.length]}
 				/>
 			</TableCell>

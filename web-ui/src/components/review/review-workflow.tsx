@@ -66,9 +66,9 @@ const DELETE_BUTTON_CLASS =
 	"bg-[color-mix(in_oklab,var(--clay)_14%,var(--paper-raised))] text-destructive hover:bg-[color-mix(in_oklab,var(--clay)_22%,var(--paper-raised))] hover:text-destructive";
 const QUEUE_CARD_CLASS = "@container flex flex-col";
 const QUEUE_HEADER_CLASS =
-	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
+	"-mx-page -mt-page flex min-h-11.25 items-center justify-between gap-2 border-b px-page";
 const QUEUE_ROW_CLASS =
-	"flex min-h-[54px] w-full items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
+	"flex min-h-13.5 w-full items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
 const QUEUE_TIME_CLASS = "@min-[26rem]:block hidden shrink-0 text-right";
 const QUEUE_FOOTER_CLASS =
 	"-mx-page mt-auto -mb-page flex shrink-0 items-center border-t px-page py-2";

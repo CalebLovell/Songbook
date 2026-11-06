@@ -336,7 +336,7 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 					detections
 				</span>
 				<span
-					className="size-[3px] shrink-0 rounded-full bg-muted-foreground opacity-60"
+					className="size-0.75 shrink-0 rounded-full bg-muted-foreground opacity-60"
 					aria-hidden="true"
 				/>
 				<span className="whitespace-nowrap">

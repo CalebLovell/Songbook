@@ -39,7 +39,7 @@ const QUIZ_GRID_CLASS =
 	"grid grid-cols-[minmax(0,1fr)] @3xl/quiz:grid-cols-[minmax(0,1fr)_24rem] @7xl/quiz:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-page";
 const GAME_CARD_CLASS = "@container/game flex min-w-0 flex-col gap-page";
 const GAME_HEADER_CLASS =
-	"-mx-page -mt-page flex min-h-[45px] flex-wrap items-center justify-between gap-x-2 border-b px-page py-2";
+	"-mx-page -mt-page flex min-h-11.25 flex-wrap items-center justify-between gap-x-2 border-b px-page py-2";
 const CHOICES_CLASS =
 	"grid min-w-0 @xl/game:grid-cols-2 grid-cols-1 auto-rows-fr gap-4 max-[400px]:gap-2";
 const CHOICE_CLASS =
@@ -48,8 +48,8 @@ const CHOICE_TEXT_CLASS =
 	"flex min-h-[calc(2*1.375rem+1rem)] min-w-0 flex-1 flex-col justify-center @max-[20rem]/choice:min-h-[calc(2*1.203125rem+1rem)]";
 const RAIL_CLASS = "@3xl/quiz:flex hidden flex-col";
 const RAIL_HEADER_CLASS =
-	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
-const RAIL_ROW_CLASS = "flex min-h-[55px] items-center gap-3 px-page py-1.75";
+	"-mx-page -mt-page flex min-h-11.25 items-center justify-between gap-2 border-b px-page";
+const RAIL_ROW_CLASS = "flex min-h-13.75 items-center gap-3 px-page py-1.75";
 const RAIL_FOOTER_CLASS =
 	"-mx-page mt-auto -mb-page flex items-baseline justify-between gap-2 border-t px-page py-3";
 const GAME_FOOTER_CLASS = "flex min-h-8 items-center justify-end";

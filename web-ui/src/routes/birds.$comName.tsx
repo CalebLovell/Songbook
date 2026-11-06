@@ -633,15 +633,15 @@ const COLUMNS_CLASS =
 	"mt-page grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-page";
 const VISIT_LOG_BESIDE_CHARTS_CLASS =
 	"@min-[80rem]/bird:h-0 @min-[80rem]/bird:min-h-full";
-const VISIT_LOG_CLASS = `flex min-h-[420px] min-w-0 flex-col ${VISIT_LOG_BESIDE_CHARTS_CLASS}`;
+const VISIT_LOG_CLASS = `flex min-h-105 min-w-0 flex-col ${VISIT_LOG_BESIDE_CHARTS_CLASS}`;
 const VISIT_LOG_SHORT_CLASS = `flex min-w-0 flex-col ${VISIT_LOG_BESIDE_CHARTS_CLASS}`;
 const VISIT_LOG_CARD_CLASS = "@container flex min-h-0 flex-1 flex-col pb-0!";
 const VISIT_LOG_SHORT_CARD_CLASS =
 	"@container flex min-h-0 flex-initial flex-col pb-0!";
 const VISIT_LIST_CLASS =
-	"-mx-page max-h-[510px] grow divide-y overflow-y-auto @min-[80rem]/bird:max-h-none @min-[80rem]/bird:min-h-0";
+	"-mx-page max-h-127.5 grow divide-y overflow-y-auto @min-[80rem]/bird:max-h-none @min-[80rem]/bird:min-h-0";
 const VISIT_LOG_HEADER_CLASS =
-	"-mx-page -mt-page flex min-h-[45px] flex-wrap items-center justify-between gap-2 border-b px-page";
+	"-mx-page -mt-page flex min-h-11.25 flex-wrap items-center justify-between gap-2 border-b px-page";
 const VISIT_ROW_CLASS =
 	"flex items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
 const VISIT_ROW_BUTTON = {
@@ -650,7 +650,7 @@ const VISIT_ROW_BUTTON = {
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
 const VISIT_LOG_FOOTER_CLASS =
-	"-mx-page mt-auto flex min-h-[45px] shrink-0 flex-wrap items-center gap-page border-t px-page py-1.5";
+	"-mx-page mt-auto flex min-h-11.25 shrink-0 flex-wrap items-center gap-page border-t px-page py-1.5";
 
 const SWATCH =
 	"size-3 rounded-[3px] border border-line transition-[outline] hover:z-10 hover:outline hover:outline-2 hover:outline-hover-line hover:outline-offset-1";

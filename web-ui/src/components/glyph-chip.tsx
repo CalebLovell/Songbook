@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 
 import { Hint } from "~/components/ui/hint.tsx";
 
-export const GLYPH_CHIP_SIZE = "size-[26px]";
+export const GLYPH_CHIP_SIZE = "size-6.5";
 
 const SIZES = {
 	default: { chip: GLYPH_CHIP_SIZE, glyph: "size-3.5" },

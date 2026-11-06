@@ -167,11 +167,11 @@ export function SpeciesSelectionBar({
 			aria-label="Set selected species status"
 			className="flex h-8 pointer-coarse:h-9 w-fit min-w-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
-			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
+			<span className="flex items-center gap-[0.5ch] @xl:px-3 px-2 text-muted-foreground">
 				<span className="font-semibold text-foreground tabular-nums">
 					{count}
 				</span>
-				<span className="sr-only @min-[36rem]:not-sr-only">selected</span>
+				<span className="sr-only @xl:not-sr-only">selected</span>
 			</span>
 			<button
 				type="button"

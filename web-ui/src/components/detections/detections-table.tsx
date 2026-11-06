@@ -70,23 +70,23 @@ const FIRST_COLUMN_CLASSES = "pl-page";
 const CELL_GAP = "px-cell";
 const AUDIO_EDGE = "pr-page-end";
 const LAST_EDGE_WITHOUT_AUDIO: Record<string, string> = {
-	recorded: `${AUDIO_EDGE} @min-[36rem]:pr-cell`,
+	recorded: `${AUDIO_EDGE} @xl:pr-cell`,
 	confidence: AUDIO_EDGE,
 };
 const COLUMN_VISIBILITY: Record<string, string> = {
 	scientificName: "hidden @min-[54rem]:block",
-	confidence: "hidden @min-[36rem]:block",
+	confidence: "hidden @xl:block",
 };
 const HEADER_CLASSES: Record<string, string> = {
 	select: `${SELECT_COLUMN_WIDTH} w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))] min-w-[calc(var(--page-gap)+var(--row-checkbox-size)+var(--cell-gap))]`,
 	index: "text-center",
 	confidence: "text-right",
-	audio: `${AUDIO_EDGE} text-right @min-[36rem]:w-32 @min-[36rem]:min-w-32`,
+	audio: `${AUDIO_EDGE} text-right @xl:w-32 @xl:min-w-32`,
 };
 const CELL_CLASSES: Record<string, string> = {
 	index: "text-center",
 	species: "min-w-0 truncate",
-	recorded: "text-right @min-[36rem]:text-left",
+	recorded: "text-right @xl:text-left",
 	audio: AUDIO_EDGE,
 };
 
@@ -116,8 +116,8 @@ function dayLabel(row: DetectionTableRow): string {
 	return formatDate(row.Date);
 }
 
-const LISTEN_LABEL = "hidden @min-[36rem]:inline";
-const LISTEN_SQUARE = "@max-[36rem]:w-7 @max-[36rem]:px-0";
+const LISTEN_LABEL = "hidden @xl:inline";
+const LISTEN_SQUARE = "@max-xl:w-7 @max-xl:px-0";
 
 const SORT_LABELS: Record<DetectionWorkspaceSort, string> = {
 	recorded: "Recorded",
@@ -238,11 +238,11 @@ function SelectionBar({
 			aria-label="Selected detections"
 			className="flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
 		>
-			<span className="flex items-center gap-[0.5ch] @min-[36rem]:px-3 px-2 text-muted-foreground">
+			<span className="flex items-center gap-[0.5ch] @xl:px-3 px-2 text-muted-foreground">
 				<span className="font-semibold text-foreground tabular-nums">
 					{count}
 				</span>
-				<span className="sr-only @min-[36rem]:not-sr-only">selected</span>
+				<span className="sr-only @xl:not-sr-only">selected</span>
 			</span>
 			<button
 				type="button"
@@ -257,10 +257,10 @@ function SelectionBar({
 				type="button"
 				aria-label={`Delete ${count} selected ${noun}`}
 				onClick={onDelete}
-				className="flex @min-[36rem]:w-auto pointer-coarse:w-9 w-8 items-center justify-center gap-2 border-input border-l @min-[36rem]:px-3 text-destructive hover:bg-destructive/10"
+				className="flex @xl:w-auto pointer-coarse:w-9 w-8 items-center justify-center gap-2 border-input border-l @xl:px-3 text-destructive hover:bg-destructive/10"
 			>
 				<Trash2 className="size-4" aria-hidden="true" />
-				<span className="sr-only @min-[36rem]:not-sr-only">Delete</span>
+				<span className="sr-only @xl:not-sr-only">Delete</span>
 			</button>
 		</fieldset>
 	);
@@ -340,11 +340,11 @@ function SkeletonCell({
 			return (
 				<>
 					<ShellText
-						className="font-medium @max-[36rem]:leading-tight"
+						className="font-medium @max-xl:leading-tight"
 						barClassName={SPECIES_WIDTHS[row % SPECIES_WIDTHS.length]}
 					/>
 					<ShellText
-						className="@min-[36rem]:hidden text-xs leading-tight"
+						className="@xl:hidden text-xs leading-tight"
 						barClassName={SCIENTIFIC_WIDTHS[row % SCIENTIFIC_WIDTHS.length]}
 					/>
 				</>
@@ -358,7 +358,7 @@ function SkeletonCell({
 		case "recorded":
 			return (
 				<>
-					<span className="flex @min-[36rem]:hidden flex-col items-end">
+					<span className="flex @xl:hidden flex-col items-end">
 						<ShellText
 							className="w-14 text-sm leading-tight"
 							barClassName="right-0 left-auto w-full"
@@ -368,10 +368,7 @@ function SkeletonCell({
 							barClassName="right-0 left-auto w-full"
 						/>
 					</span>
-					<ShellText
-						className="@min-[36rem]:block hidden text-sm"
-						barClassName="w-40"
-					/>
+					<ShellText className="@xl:block hidden text-sm" barClassName="w-40" />
 				</>
 			);
 		case "confidence":
@@ -486,9 +483,7 @@ export function DetectionsTable({
 
 	const audioColumn: ColumnDef<DetectionTableRow> = {
 		id: "audio",
-		header: () => (
-			<span className="sr-only @min-[36rem]:not-sr-only">Recording</span>
-		),
+		header: () => <span className="sr-only @xl:not-sr-only">Recording</span>,
 		cell: ({ row }) => (
 			<div className="flex justify-end">
 				<RecordingButton
@@ -527,11 +522,11 @@ export function DetectionsTable({
 					<Link
 						to="/birds/$comName"
 						params={{ comName: comNameToSlug(row.original.Com_Name) }}
-						className="@max-[36rem]:block @max-[36rem]:truncate font-medium @max-[36rem]:leading-tight no-underline hover:underline"
+						className="@max-xl:block @max-xl:truncate font-medium @max-xl:leading-tight no-underline hover:underline"
 					>
 						{row.original.Com_Name}
 					</Link>
-					<em className="block @min-[36rem]:hidden truncate text-bark text-xs leading-tight">
+					<em className="block @xl:hidden truncate text-bark text-xs leading-tight">
 						{row.original.Sci_Name}
 					</em>
 				</>
@@ -568,13 +563,13 @@ export function DetectionsTable({
 					search={{ period: "day", date: row.original.Date }}
 					className="text-sm tabular-nums no-underline hover:underline"
 				>
-					<span className="flex @min-[36rem]:hidden flex-col items-end">
+					<span className="flex @xl:hidden flex-col items-end">
 						<span className="leading-tight">{clockLabel(row.original)}</span>
 						<span className="text-muted-foreground text-xs leading-tight">
 							{dayLabel(row.original)}
 						</span>
 					</span>
-					<span className="@min-[36rem]:inline hidden">
+					<span className="@xl:inline hidden">
 						{recordedLabel(row.original)}
 					</span>
 				</Link>
@@ -643,13 +638,13 @@ export function DetectionsTable({
 		<div className="@container flex min-h-0 flex-1 flex-col">
 			<Table
 				role="table"
-				className="grid h-full min-w-min @min-[36rem]:grid-cols-(--cols-md) @min-[54rem]:grid-cols-(--cols-lg) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
+				className="grid h-full min-w-min @min-[54rem]:grid-cols-(--cols-lg) @xl:grid-cols-(--cols-md) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
 				style={gridColumns(canDelete, canListen)}
 				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
 				<TableHeader
 					role="rowgroup"
-					className="@min-[36rem]:scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="@xl:scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} role="row" className={GRID_ROW}>
@@ -665,7 +660,7 @@ export function DetectionsTable({
 										header.column.id === "select"
 											? undefined
 											: (COLUMN_VISIBILITY[header.column.id] ??
-													"@min-[36rem]:block hidden"),
+													"@xl:block hidden"),
 										header.index === 0 && FIRST_COLUMN_CLASSES,
 									)}
 								>
@@ -680,7 +675,7 @@ export function DetectionsTable({
 							<TableHead
 								role="columnheader"
 								className={cn(
-									"@min-[36rem]:hidden",
+									"@xl:hidden",
 									canDelete
 										? "col-[2/-1]"
 										: `col-span-full ${FIRST_COLUMN_CLASSES}`,
@@ -718,7 +713,7 @@ export function DetectionsTable({
 							data-state={row.getIsSelected() && "selected"}
 							className={cn(
 								GRID_ROW,
-								"h-auto min-h-[calc(2.5rem+1px)]",
+								"h-auto min-h-10.25",
 								row.getIsSelected() ? "bg-row-selected" : "bg-card",
 							)}
 						>
@@ -728,7 +723,7 @@ export function DetectionsTable({
 									role="cell"
 									className={cn(
 										CELL_GAP,
-										"@max-[36rem]:py-2.5",
+										"@max-xl:py-2.5",
 										CELL_CLASSES[cell.column.id],
 										!canListen && LAST_EDGE_WITHOUT_AUDIO[cell.column.id],
 										COLUMN_VISIBILITY[cell.column.id],
@@ -743,7 +738,7 @@ export function DetectionsTable({
 				</RowWell>
 			</Table>
 
-			<div className="-mr-card-edge -ml-page flex min-h-[calc(2.75rem+1px)] shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
+			<div className="-mr-card-edge -ml-page flex min-h-11.25 shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
 				{page ? (
 					<PageRange
 						first={firstIndex}

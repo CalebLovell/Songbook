@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Kicker } from "~/components/ui/kicker.tsx";
 
 export const CARD_HEADER_CLASS =
-	"-mx-page -mt-page flex min-h-[45px] items-center justify-between gap-2 border-b px-page";
+	"-mx-page -mt-page flex min-h-11.25 items-center justify-between gap-2 border-b px-page";
 
 export function CardHeader({
 	title,

@@ -143,7 +143,7 @@ export const PAGE_ROW_CLASS =
 
 export const PAGE_RANGE_NARROW_HIDDEN = "max-[359px]:hidden";
 
-export const PAGE_RANGE_YIELDS_TO_ACTIONS = "@max-[28rem]:hidden";
+export const PAGE_RANGE_YIELDS_TO_ACTIONS = "@max-md:hidden";
 
 export const PAGE_RANGE_CLASS =
 	"flex h-8 pointer-coarse:h-9 min-w-0 items-center whitespace-nowrap text-muted-foreground text-sm";
