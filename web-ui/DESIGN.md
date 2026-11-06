@@ -295,7 +295,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   folder's own mtime, because the analyzer deletes the files. A station name equal to
   the hostname counts as unset, because the installer writes that. A purging disk
   alarms 2 points past `PURGE_THRESHOLD`, since it rests near that line when healthy;
-  a keeping disk warns 5 points before it, since services stop there.
+  a keeping disk warns 5 points before it, since services stop there. The card keeps
+  the normal header, and its rows wear the error tones (`--toast-error-fill`, `--toast-error-line`)
+  with clay titles and bark text, the one place a whole row goes red.
 
 ## Data and security
 

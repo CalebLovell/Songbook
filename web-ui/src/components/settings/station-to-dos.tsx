@@ -27,21 +27,25 @@ export function StationToDos({
 	if (toDos.length === 0) return null;
 
 	return (
-		<Card as="section" aria-labelledby={HEADING_ID} className="@container">
+		<Card
+			as="section"
+			aria-labelledby={HEADING_ID}
+			className="@container overflow-hidden"
+		>
 			<CardHeader as="h2" titleId={HEADING_ID} title="To do" />
-			<ul className="m-0 -mx-page -mb-page list-none p-0">
+			<ul className="m-0 -mx-page -mb-page list-none bg-toast-error-fill p-0">
 				{toDos.map((toDo) => {
 					const { title, detail, action } = describeToDo(toDo);
 					return (
 						<li
 							key={toDo.kind}
-							className="flex @2xl:flex-row flex-col @2xl:items-center @2xl:justify-between gap-page p-page odd:bg-meadow"
+							className="flex @2xl:flex-row flex-col @2xl:items-center @2xl:justify-between gap-page border-toast-error-line border-t p-page first:border-t-0"
 						>
 							<div className="min-w-0">
-								<h3 className="m-0 font-semibold text-base text-ink">
+								<h3 className="m-0 font-semibold text-base text-clay">
 									{title}
 								</h3>
-								<p className="m-0 text-muted-foreground text-sm leading-relaxed">
+								<p className="m-0 text-bark text-sm leading-relaxed">
 									{detail}
 								</p>
 							</div>
