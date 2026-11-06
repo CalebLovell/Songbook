@@ -1,33 +1,35 @@
 name: Python CI
 
 on:
+  push:
+    branches: ["main"]
   pull_request:
-    branches:
-      - main
-    paths:
-      - '**.py'
+    branches: ["main"]
+
+permissions:
+  contents: read
 
 jobs:
-  python-lint:
+  lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.11", "3.13"]
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Setup Python
-        uses: actions/setup-python@v6
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          architecture: 'x64'
+      - run: pip install flake8
+      - run: flake8
 
-      - name: Install flake8
-        run: pip install flake8
-
-      - name: Run Flake8 Lint
-        run: |
-          flake8
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt pytest
+      - run: pytest
