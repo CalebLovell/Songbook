@@ -49,7 +49,7 @@ export function SpeciesImage({
 				className="h-full w-auto max-w-full"
 			>
 				{title ? <title>{title}</title> : null}
-				<image href={imageUrl} width={800} height={800} />
+				<image href={imageUrl} width={480} height={480} />
 			</svg>
 		);
 	}

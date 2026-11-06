@@ -6,7 +6,7 @@
     "page": "https://www.inaturalist.org/photos/606908974",
     "sci_name": "Acanthis flammea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/606908974/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/606908974/medium.jpg"
   },
   "aechmophorus-occidentalis": {
     "com_name": "Western Grebe",
@@ -15,7 +15,7 @@
     "page": "https://www.inaturalist.org/photos/748193038",
     "sci_name": "Aechmophorus occidentalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/748193038/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/748193038/medium.jpg"
   },
   "aegolius-acadicus": {
     "com_name": "Northern Saw-whet Owl",
@@ -24,7 +24,7 @@
     "page": "https://www.inaturalist.org/photos/455387411",
     "sci_name": "Aegolius acadicus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/455387411/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/455387411/medium.jpg"
   },
   "aegolius-funereus": {
     "com_name": "Boreal Owl",
@@ -33,7 +33,7 @@
     "page": "https://www.inaturalist.org/photos/604229882",
     "sci_name": "Aegolius funereus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/604229882/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/604229882/medium.jpg"
   },
   "aeronautes-saxatalis": {
     "com_name": "White-throated Swift",
@@ -42,7 +42,7 @@
     "page": "https://www.inaturalist.org/photos/481377938",
     "sci_name": "Aeronautes saxatalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/481377938/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/481377938/medium.jpg"
   },
   "agelaius-phoeniceus": {
     "com_name": "Red-winged Blackbird",
@@ -51,7 +51,7 @@
     "page": "https://www.inaturalist.org/photos/31553950",
     "sci_name": "Agelaius phoeniceus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/31553950/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/31553950/medium.jpg"
   },
   "aimophila-ruficeps": {
     "com_name": "Rufous-crowned Sparrow",
@@ -60,7 +60,7 @@
     "page": "https://www.inaturalist.org/photos/605178053",
     "sci_name": "Aimophila ruficeps",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605178053/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605178053/medium.jpg"
   },
   "aix-sponsa": {
     "com_name": "Wood Duck",
@@ -69,7 +69,7 @@
     "page": "https://www.inaturalist.org/photos/185575703",
     "sci_name": "Aix sponsa",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/185575703/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/185575703/medium.jpeg"
   },
   "alca-torda": {
     "com_name": "Razorbill",
@@ -78,7 +78,7 @@
     "page": "https://www.inaturalist.org/photos/296064879",
     "sci_name": "Alca torda",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/296064879/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/296064879/medium.jpg"
   },
   "ammodramus-savannarum": {
     "com_name": "Grasshopper Sparrow",
@@ -87,7 +87,7 @@
     "page": "https://www.inaturalist.org/photos/455388724",
     "sci_name": "Ammodramus savannarum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/455388724/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/455388724/medium.jpg"
   },
   "ammospiza-leconteii": {
     "com_name": "LeConte's Sparrow",
@@ -96,7 +96,7 @@
     "page": "https://www.inaturalist.org/photos/339593504",
     "sci_name": "Ammospiza leconteii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339593504/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339593504/medium.jpg"
   },
   "ammospiza-nelsoni": {
     "com_name": "Nelson's Sparrow",
@@ -105,7 +105,7 @@
     "page": "https://www.inaturalist.org/photos/145265620",
     "sci_name": "Ammospiza nelsoni",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145265620/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145265620/medium.jpg"
   },
   "amphispiza-bilineata": {
     "com_name": "Black-throated Sparrow",
@@ -114,7 +114,7 @@
     "page": "https://www.inaturalist.org/photos/466856440",
     "sci_name": "Amphispiza bilineata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/466856440/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/466856440/medium.jpg"
   },
   "anas-acuta": {
     "com_name": "Northern Pintail",
@@ -123,7 +123,7 @@
     "page": "https://www.inaturalist.org/photos/250677147",
     "sci_name": "Anas acuta",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/250677147/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/250677147/medium.jpeg"
   },
   "anas-fulvigula": {
     "com_name": "Mottled Duck",
@@ -132,7 +132,7 @@
     "page": "https://www.inaturalist.org/photos/174399837",
     "sci_name": "Anas fulvigula",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/174399837/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/174399837/medium.jpeg"
   },
   "anas-platyrhynchos": {
     "com_name": "Mallard",
@@ -141,7 +141,7 @@
     "page": "https://www.inaturalist.org/photos/61061200",
     "sci_name": "Anas platyrhynchos",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/61061200/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/61061200/medium.jpeg"
   },
   "anas-rubripes": {
     "com_name": "American Black Duck",
@@ -150,7 +150,7 @@
     "page": "https://www.inaturalist.org/photos/104795742",
     "sci_name": "Anas rubripes",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/104795742/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/104795742/medium.jpg"
   },
   "anhinga-anhinga": {
     "com_name": "Anhinga",
@@ -159,7 +159,7 @@
     "page": "https://www.inaturalist.org/photos/32428000",
     "sci_name": "Anhinga anhinga",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/32428000/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/32428000/medium.jpeg"
   },
   "anser-albifrons": {
     "com_name": "Greater White-fronted Goose",
@@ -168,7 +168,7 @@
     "page": "https://www.inaturalist.org/photos/324140544",
     "sci_name": "Anser albifrons",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/324140544/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/324140544/medium.jpeg"
   },
   "anser-caerulescens": {
     "com_name": "Snow Goose",
@@ -177,7 +177,7 @@
     "page": "https://www.inaturalist.org/photos/100142192",
     "sci_name": "Anser caerulescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/100142192/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/100142192/medium.jpeg"
   },
   "anser-rossii": {
     "com_name": "Ross's Goose",
@@ -186,7 +186,7 @@
     "page": "https://www.inaturalist.org/photos/143237000",
     "sci_name": "Anser rossii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/143237000/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/143237000/medium.jpg"
   },
   "anthus-rubescens": {
     "com_name": "American Pipit",
@@ -195,7 +195,7 @@
     "page": "https://www.inaturalist.org/photos/345136553",
     "sci_name": "Anthus rubescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/345136553/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/345136553/medium.jpg"
   },
   "aphelocoma-californica": {
     "com_name": "California Scrub-Jay",
@@ -204,7 +204,7 @@
     "page": "https://www.inaturalist.org/photos/114762200",
     "sci_name": "Aphelocoma californica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/114762200/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/114762200/medium.jpeg"
   },
   "aphelocoma-wollweberi": {
     "com_name": "Mexican Jay",
@@ -213,7 +213,7 @@
     "page": "https://www.inaturalist.org/photos/603982567",
     "sci_name": "Aphelocoma wollweberi",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/603982567/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/603982567/medium.jpg"
   },
   "aphelocoma-woodhouseii": {
     "com_name": "Woodhouse's Scrub-Jay",
@@ -222,7 +222,7 @@
     "page": "https://www.inaturalist.org/photos/577913207",
     "sci_name": "Aphelocoma woodhouseii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/577913207/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/577913207/medium.jpg"
   },
   "ardea-alba": {
     "com_name": "Great Egret",
@@ -231,7 +231,7 @@
     "page": "https://www.inaturalist.org/photos/576660418",
     "sci_name": "Ardea alba",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/576660418/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/576660418/medium.jpg"
   },
   "ardenna-creatopus": {
     "com_name": "Pink-footed Shearwater",
@@ -240,7 +240,7 @@
     "page": "https://www.inaturalist.org/photos/742064695",
     "sci_name": "Ardenna creatopus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/742064695/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/742064695/medium.jpg"
   },
   "ardenna-grisea": {
     "com_name": "Sooty Shearwater",
@@ -249,7 +249,7 @@
     "page": "https://www.inaturalist.org/photos/277763328",
     "sci_name": "Ardenna grisea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/277763328/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/277763328/medium.jpg"
   },
   "arenaria-interpres": {
     "com_name": "Ruddy Turnstone",
@@ -258,7 +258,7 @@
     "page": "https://www.inaturalist.org/photos/307931609",
     "sci_name": "Arenaria interpres",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/307931609/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/307931609/medium.jpeg"
   },
   "asio-flammeus": {
     "com_name": "Short-eared Owl",
@@ -267,7 +267,7 @@
     "page": "https://www.inaturalist.org/photos/342022223",
     "sci_name": "Asio flammeus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/342022223/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/342022223/medium.jpeg"
   },
   "asio-otus": {
     "com_name": "Long-eared Owl",
@@ -276,7 +276,7 @@
     "page": "https://www.inaturalist.org/photos/74551536",
     "sci_name": "Asio otus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/74551536/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/74551536/medium.jpeg"
   },
   "athene-cunicularia": {
     "com_name": "Burrowing Owl",
@@ -285,7 +285,7 @@
     "page": "https://www.inaturalist.org/photos/206415101",
     "sci_name": "Athene cunicularia",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/206415101/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/206415101/medium.jpeg"
   },
   "auriparus-flaviceps": {
     "com_name": "Verdin",
@@ -294,7 +294,7 @@
     "page": "https://www.inaturalist.org/photos/348556915",
     "sci_name": "Auriparus flaviceps",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/348556915/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/348556915/medium.jpg"
   },
   "aythya-affinis": {
     "com_name": "Lesser Scaup",
@@ -303,7 +303,7 @@
     "page": "https://www.inaturalist.org/photos/594304361",
     "sci_name": "Aythya affinis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/594304361/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/594304361/medium.jpg"
   },
   "aythya-americana": {
     "com_name": "Redhead",
@@ -312,7 +312,7 @@
     "page": "https://www.inaturalist.org/photos/264322088",
     "sci_name": "Aythya americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/264322088/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/264322088/medium.jpg"
   },
   "aythya-collaris": {
     "com_name": "Ring-necked Duck",
@@ -321,7 +321,7 @@
     "page": "https://www.inaturalist.org/photos/111757286",
     "sci_name": "Aythya collaris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/111757286/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/111757286/medium.jpeg"
   },
   "aythya-marila": {
     "com_name": "Greater Scaup",
@@ -330,7 +330,7 @@
     "page": "https://www.inaturalist.org/photos/178807346",
     "sci_name": "Aythya marila",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/178807346/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/178807346/medium.jpeg"
   },
   "aythya-valisineria": {
     "com_name": "Canvasback",
@@ -339,7 +339,7 @@
     "page": "https://www.inaturalist.org/photos/179533306",
     "sci_name": "Aythya valisineria",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/179533306/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/179533306/medium.jpeg"
   },
   "baeolophus-atricristatus": {
     "com_name": "Black-crested Titmouse",
@@ -348,7 +348,7 @@
     "page": "https://www.inaturalist.org/photos/176527882",
     "sci_name": "Baeolophus atricristatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/176527882/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/176527882/medium.jpg"
   },
   "baeolophus-bicolor": {
     "com_name": "Tufted Titmouse",
@@ -357,7 +357,7 @@
     "page": "https://www.inaturalist.org/photos/11998344",
     "sci_name": "Baeolophus bicolor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11998344/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11998344/medium.jpeg"
   },
   "bartramia-longicauda": {
     "com_name": "Upland Sandpiper",
@@ -366,7 +366,7 @@
     "page": "https://www.inaturalist.org/photos/269841249",
     "sci_name": "Bartramia longicauda",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/269841249/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/269841249/medium.jpeg"
   },
   "bombycilla-garrulus": {
     "com_name": "Bohemian Waxwing",
@@ -375,7 +375,7 @@
     "page": "https://www.inaturalist.org/photos/344655918",
     "sci_name": "Bombycilla garrulus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/344655918/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/344655918/medium.jpg"
   },
   "bonasa-umbellus": {
     "com_name": "Ruffed Grouse",
@@ -384,7 +384,7 @@
     "page": "https://www.inaturalist.org/photos/742039496",
     "sci_name": "Bonasa umbellus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/742039496/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/742039496/medium.jpg"
   },
   "botaurus-lentiginosus": {
     "com_name": "American Bittern",
@@ -393,7 +393,7 @@
     "page": "https://www.inaturalist.org/photos/572502646",
     "sci_name": "Botaurus lentiginosus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/572502646/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/572502646/medium.jpg"
   },
   "branta-bernicla": {
     "com_name": "Brant",
@@ -402,7 +402,7 @@
     "page": "https://www.inaturalist.org/photos/100388782",
     "sci_name": "Branta bernicla",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/100388782/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/100388782/medium.jpg"
   },
   "bubo-scandiacus": {
     "com_name": "Snowy Owl",
@@ -411,7 +411,7 @@
     "page": "https://www.inaturalist.org/photos/751438134",
     "sci_name": "Bubo scandiacus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/751438134/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/751438134/medium.jpg"
   },
   "bubo-virginianus": {
     "com_name": "Great Horned Owl",
@@ -420,7 +420,7 @@
     "page": "https://www.inaturalist.org/photos/119330691",
     "sci_name": "Bubo virginianus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/119330691/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/119330691/medium.jpeg"
   },
   "bucephala-albeola": {
     "com_name": "Bufflehead",
@@ -429,7 +429,7 @@
     "page": "https://www.inaturalist.org/photos/59819786",
     "sci_name": "Bucephala albeola",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/59819786/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/59819786/medium.jpg"
   },
   "bucephala-clangula": {
     "com_name": "Common Goldeneye",
@@ -438,7 +438,7 @@
     "page": "https://www.inaturalist.org/photos/64131469",
     "sci_name": "Bucephala clangula",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/64131469/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/64131469/medium.jpg"
   },
   "bucephala-islandica": {
     "com_name": "Barrow's Goldeneye",
@@ -447,7 +447,7 @@
     "page": "https://www.inaturalist.org/photos/246708935",
     "sci_name": "Bucephala islandica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/246708935/large.png"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/246708935/medium.png"
   },
   "buteo-albonotatus": {
     "com_name": "Zone-tailed Hawk",
@@ -456,7 +456,7 @@
     "page": "https://www.inaturalist.org/photos/287843087",
     "sci_name": "Buteo albonotatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/287843087/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/287843087/medium.jpg"
   },
   "buteo-lagopus": {
     "com_name": "Rough-legged Hawk",
@@ -465,7 +465,7 @@
     "page": "https://www.inaturalist.org/photos/329972991",
     "sci_name": "Buteo lagopus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/329972991/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/329972991/medium.jpeg"
   },
   "buteo-plagiatus": {
     "com_name": "Gray Hawk",
@@ -474,7 +474,7 @@
     "page": "https://www.inaturalist.org/photos/252866158",
     "sci_name": "Buteo plagiatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/252866158/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/252866158/medium.jpg"
   },
   "buteo-platypterus": {
     "com_name": "Broad-winged Hawk",
@@ -483,7 +483,7 @@
     "page": "https://www.inaturalist.org/photos/20207767",
     "sci_name": "Buteo platypterus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/20207767/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/20207767/medium.jpg"
   },
   "buteo-regalis": {
     "com_name": "Ferruginous Hawk",
@@ -492,7 +492,7 @@
     "page": "https://www.inaturalist.org/photos/108568550",
     "sci_name": "Buteo regalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/108568550/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/108568550/medium.jpeg"
   },
   "butorides-virescens": {
     "com_name": "Green Heron",
@@ -501,7 +501,7 @@
     "page": "https://www.inaturalist.org/photos/120436157",
     "sci_name": "Butorides virescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/120436157/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/120436157/medium.jpg"
   },
   "calamospiza-melanocorys": {
     "com_name": "Lark Bunting",
@@ -510,7 +510,7 @@
     "page": "https://www.inaturalist.org/photos/370985846",
     "sci_name": "Calamospiza melanocorys",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/370985846/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/370985846/medium.jpeg"
   },
   "calcarius-lapponicus": {
     "com_name": "Lapland Longspur",
@@ -519,7 +519,7 @@
     "page": "https://www.inaturalist.org/photos/588143117",
     "sci_name": "Calcarius lapponicus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/588143117/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/588143117/medium.jpg"
   },
   "calidris-alba": {
     "com_name": "Sanderling",
@@ -528,7 +528,7 @@
     "page": "https://www.inaturalist.org/photos/339539369",
     "sci_name": "Calidris alba",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339539369/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339539369/medium.jpg"
   },
   "calidris-alpina": {
     "com_name": "Dunlin",
@@ -537,7 +537,7 @@
     "page": "https://www.inaturalist.org/photos/494908570",
     "sci_name": "Calidris alpina",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/494908570/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/494908570/medium.jpg"
   },
   "calidris-bairdii": {
     "com_name": "Baird's Sandpiper",
@@ -546,7 +546,7 @@
     "page": "https://www.inaturalist.org/photos/244561263",
     "sci_name": "Calidris bairdii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/244561263/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/244561263/medium.jpeg"
   },
   "calidris-canutus": {
     "com_name": "Red Knot",
@@ -555,7 +555,7 @@
     "page": "https://www.inaturalist.org/photos/28181596",
     "sci_name": "Calidris canutus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/28181596/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/28181596/medium.jpg"
   },
   "calidris-fuscicollis": {
     "com_name": "White-rumped Sandpiper",
@@ -564,7 +564,7 @@
     "page": "https://www.inaturalist.org/photos/673583809",
     "sci_name": "Calidris fuscicollis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/673583809/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/673583809/medium.jpg"
   },
   "calidris-himantopus": {
     "com_name": "Stilt Sandpiper",
@@ -573,7 +573,7 @@
     "page": "https://www.inaturalist.org/photos/249110861",
     "sci_name": "Calidris himantopus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/249110861/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/249110861/medium.jpeg"
   },
   "calidris-maritima": {
     "com_name": "Purple Sandpiper",
@@ -582,7 +582,7 @@
     "page": "https://www.inaturalist.org/photos/557136242",
     "sci_name": "Calidris maritima",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/557136242/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/557136242/medium.jpg"
   },
   "calidris-mauri": {
     "com_name": "Western Sandpiper",
@@ -591,7 +591,7 @@
     "page": "https://www.inaturalist.org/photos/255765715",
     "sci_name": "Calidris mauri",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/255765715/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/255765715/medium.jpeg"
   },
   "calidris-melanotos": {
     "com_name": "Pectoral Sandpiper",
@@ -600,7 +600,7 @@
     "page": "https://www.inaturalist.org/photos/96621186",
     "sci_name": "Calidris melanotos",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/96621186/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/96621186/medium.jpg"
   },
   "calidris-subruficollis": {
     "com_name": "Buff-breasted Sandpiper",
@@ -609,7 +609,7 @@
     "page": "https://www.inaturalist.org/photos/648960650",
     "sci_name": "Calidris subruficollis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/648960650/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/648960650/medium.jpg"
   },
   "calidris-virgata": {
     "com_name": "Surfbird",
@@ -618,7 +618,7 @@
     "page": "https://www.inaturalist.org/photos/427510860",
     "sci_name": "Calidris virgata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/427510860/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/427510860/medium.jpg"
   },
   "callipepla-californica": {
     "com_name": "California Quail",
@@ -627,7 +627,7 @@
     "page": "https://www.inaturalist.org/photos/631615643",
     "sci_name": "Callipepla californica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/631615643/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/631615643/medium.jpg"
   },
   "callipepla-gambelii": {
     "com_name": "Gambel's Quail",
@@ -636,7 +636,7 @@
     "page": "https://www.inaturalist.org/photos/2993356",
     "sci_name": "Callipepla gambelii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/2993356/large.JPG"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/2993356/medium.JPG"
   },
   "callipepla-squamata": {
     "com_name": "Scaled Quail",
@@ -645,7 +645,7 @@
     "page": "https://www.inaturalist.org/photos/224798450",
     "sci_name": "Callipepla squamata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/224798450/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/224798450/medium.jpg"
   },
   "calypte-anna": {
     "com_name": "Anna's Hummingbird",
@@ -654,7 +654,7 @@
     "page": "https://www.inaturalist.org/photos/117315866",
     "sci_name": "Calypte anna",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/117315866/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/117315866/medium.jpeg"
   },
   "calypte-costae": {
     "com_name": "Costa's Hummingbird",
@@ -663,7 +663,7 @@
     "page": "https://www.inaturalist.org/photos/653887724",
     "sci_name": "Calypte costae",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/653887724/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/653887724/medium.jpg"
   },
   "campylorhynchus-brunneicapillus": {
     "com_name": "Cactus Wren",
@@ -672,7 +672,7 @@
     "page": "https://www.inaturalist.org/photos/506527334",
     "sci_name": "Campylorhynchus brunneicapillus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/506527334/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/506527334/medium.jpg"
   },
   "canachites-canadensis": {
     "com_name": "Spruce Grouse",
@@ -681,7 +681,7 @@
     "page": "https://www.inaturalist.org/photos/11386623",
     "sci_name": "Canachites canadensis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11386623/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11386623/medium.jpeg"
   },
   "caracara-plancus": {
     "com_name": "Crested Caracara",
@@ -690,7 +690,7 @@
     "page": "https://www.inaturalist.org/photos/252914936",
     "sci_name": "Caracara plancus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/252914936/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/252914936/medium.jpg"
   },
   "cardellina-canadensis": {
     "com_name": "Canada Warbler",
@@ -699,7 +699,7 @@
     "page": "https://www.inaturalist.org/photos/342001267",
     "sci_name": "Cardellina canadensis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/342001267/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/342001267/medium.jpg"
   },
   "cardellina-pusilla": {
     "com_name": "Wilson's Warbler",
@@ -708,7 +708,7 @@
     "page": "https://www.inaturalist.org/photos/94047457",
     "sci_name": "Cardellina pusilla",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/94047457/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/94047457/medium.jpeg"
   },
   "cardinalis-sinuatus": {
     "com_name": "Pyrrhuloxia",
@@ -717,7 +717,7 @@
     "page": "https://www.inaturalist.org/photos/512690522",
     "sci_name": "Cardinalis sinuatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/512690522/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/512690522/medium.jpg"
   },
   "cathartes-aura": {
     "com_name": "Turkey Vulture",
@@ -726,7 +726,7 @@
     "page": "https://www.inaturalist.org/photos/96897308",
     "sci_name": "Cathartes aura",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/96897308/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/96897308/medium.jpg"
   },
   "catharus-fuscescens": {
     "com_name": "Veery",
@@ -735,7 +735,7 @@
     "page": "https://www.inaturalist.org/photos/339611789",
     "sci_name": "Catharus fuscescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339611789/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339611789/medium.jpg"
   },
   "catharus-minimus": {
     "com_name": "Gray-cheeked Thrush",
@@ -744,7 +744,7 @@
     "page": "https://www.inaturalist.org/photos/194749961",
     "sci_name": "Catharus minimus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/194749961/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/194749961/medium.jpeg"
   },
   "catherpes-mexicanus": {
     "com_name": "Canyon Wren",
@@ -753,7 +753,7 @@
     "page": "https://www.inaturalist.org/photos/339539531",
     "sci_name": "Catherpes mexicanus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339539531/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339539531/medium.jpg"
   },
   "cepphus-columba": {
     "com_name": "Pigeon Guillemot",
@@ -762,7 +762,7 @@
     "page": "https://www.inaturalist.org/photos/682762635",
     "sci_name": "Cepphus columba",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/682762635/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/682762635/medium.jpg"
   },
   "chamaea-fasciata": {
     "com_name": "Wrentit",
@@ -771,7 +771,7 @@
     "page": "https://www.inaturalist.org/photos/448749972",
     "sci_name": "Chamaea fasciata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/448749972/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/448749972/medium.jpg"
   },
   "charadrius-nivosus": {
     "com_name": "Snowy Plover",
@@ -780,7 +780,7 @@
     "page": "https://www.inaturalist.org/photos/179455149",
     "sci_name": "Charadrius nivosus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/179455149/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/179455149/medium.jpeg"
   },
   "charadrius-semipalmatus": {
     "com_name": "Semipalmated Plover",
@@ -789,7 +789,7 @@
     "page": "https://www.inaturalist.org/photos/280831734",
     "sci_name": "Charadrius semipalmatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/280831734/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/280831734/medium.jpeg"
   },
   "charadrius-vociferus": {
     "com_name": "Killdeer",
@@ -798,7 +798,7 @@
     "page": "https://www.inaturalist.org/photos/280146909",
     "sci_name": "Charadrius vociferus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/280146909/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/280146909/medium.jpeg"
   },
   "chlidonias-niger": {
     "com_name": "Black Tern",
@@ -807,7 +807,7 @@
     "page": "https://www.inaturalist.org/photos/83455374",
     "sci_name": "Chlidonias niger",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/83455374/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/83455374/medium.jpeg"
   },
   "chloroceryle-americana": {
     "com_name": "Green Kingfisher",
@@ -816,7 +816,7 @@
     "page": "https://www.inaturalist.org/photos/96508468",
     "sci_name": "Chloroceryle americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/96508468/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/96508468/medium.jpeg"
   },
   "chondestes-grammacus": {
     "com_name": "Lark Sparrow",
@@ -825,7 +825,7 @@
     "page": "https://www.inaturalist.org/photos/487331512",
     "sci_name": "Chondestes grammacus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/487331512/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/487331512/medium.jpg"
   },
   "chordeiles-acutipennis": {
     "com_name": "Lesser Nighthawk",
@@ -834,7 +834,7 @@
     "page": "https://www.inaturalist.org/photos/140488083",
     "sci_name": "Chordeiles acutipennis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/140488083/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/140488083/medium.jpg"
   },
   "chordeiles-minor": {
     "com_name": "Common Nighthawk",
@@ -843,7 +843,7 @@
     "page": "https://www.inaturalist.org/photos/10568857",
     "sci_name": "Chordeiles minor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10568857/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10568857/medium.jpg"
   },
   "chroicocephalus-philadelphia": {
     "com_name": "Bonaparte's Gull",
@@ -852,7 +852,7 @@
     "page": "https://www.inaturalist.org/photos/12171826",
     "sci_name": "Chroicocephalus philadelphia",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12171826/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12171826/medium.jpeg"
   },
   "cinclus-mexicanus": {
     "com_name": "American Dipper",
@@ -861,7 +861,7 @@
     "page": "https://www.inaturalist.org/photos/108664780",
     "sci_name": "Cinclus mexicanus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/108664780/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/108664780/medium.jpeg"
   },
   "circus-hudsonius": {
     "com_name": "Northern Harrier",
@@ -870,7 +870,7 @@
     "page": "https://www.inaturalist.org/photos/748185113",
     "sci_name": "Circus hudsonius",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/748185113/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/748185113/medium.jpg"
   },
   "cistothorus-palustris": {
     "com_name": "Marsh Wren",
@@ -879,7 +879,7 @@
     "page": "https://www.inaturalist.org/photos/45083788",
     "sci_name": "Cistothorus palustris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/45083788/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/45083788/medium.jpeg"
   },
   "cistothorus-stellaris": {
     "com_name": "Sedge Wren",
@@ -888,7 +888,7 @@
     "page": "https://www.inaturalist.org/photos/88481069",
     "sci_name": "Cistothorus stellaris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/88481069/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/88481069/medium.jpg"
   },
   "clangula-hyemalis": {
     "com_name": "Long-tailed Duck",
@@ -897,7 +897,7 @@
     "page": "https://www.inaturalist.org/photos/10634954",
     "sci_name": "Clangula hyemalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10634954/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10634954/medium.jpeg"
   },
   "coccothraustes-vespertinus": {
     "com_name": "Evening Grosbeak",
@@ -906,7 +906,7 @@
     "page": "https://www.inaturalist.org/photos/105940796",
     "sci_name": "Coccothraustes vespertinus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/105940796/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/105940796/medium.jpeg"
   },
   "coccyzus-minor": {
     "com_name": "Mangrove Cuckoo",
@@ -915,7 +915,7 @@
     "page": "https://www.inaturalist.org/photos/246169484",
     "sci_name": "Coccyzus minor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/246169484/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/246169484/medium.jpg"
   },
   "coereba-flaveola": {
     "com_name": "Bananaquit",
@@ -924,7 +924,7 @@
     "page": "https://www.inaturalist.org/photos/425565702",
     "sci_name": "Coereba flaveola",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/425565702/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/425565702/medium.jpeg"
   },
   "colinus-virginianus": {
     "com_name": "Northern Bobwhite",
@@ -933,7 +933,7 @@
     "page": "https://www.inaturalist.org/photos/195517487",
     "sci_name": "Colinus virginianus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/195517487/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/195517487/medium.jpeg"
   },
   "columbina-inca": {
     "com_name": "Inca Dove",
@@ -942,7 +942,7 @@
     "page": "https://www.inaturalist.org/photos/416766007",
     "sci_name": "Columbina inca",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/416766007/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/416766007/medium.jpeg"
   },
   "columbina-passerina": {
     "com_name": "Common Ground Dove",
@@ -951,7 +951,7 @@
     "page": "https://www.inaturalist.org/photos/31560382",
     "sci_name": "Columbina passerina",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/31560382/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/31560382/medium.jpg"
   },
   "contopus-cooperi": {
     "com_name": "Olive-sided Flycatcher",
@@ -960,7 +960,7 @@
     "page": "https://www.inaturalist.org/photos/711116486",
     "sci_name": "Contopus cooperi",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711116486/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711116486/medium.jpg"
   },
   "contopus-sordidulus": {
     "com_name": "Western Wood-Pewee",
@@ -969,7 +969,7 @@
     "page": "https://www.inaturalist.org/photos/494801172",
     "sci_name": "Contopus sordidulus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/494801172/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/494801172/medium.jpeg"
   },
   "corvus-cryptoleucus": {
     "com_name": "Chihuahuan Raven",
@@ -978,7 +978,7 @@
     "page": "https://www.inaturalist.org/photos/339623103",
     "sci_name": "Corvus cryptoleucus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339623103/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339623103/medium.jpeg"
   },
   "corvus-ossifragus": {
     "com_name": "Fish Crow",
@@ -987,7 +987,7 @@
     "page": "https://www.inaturalist.org/photos/39442358",
     "sci_name": "Corvus ossifragus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/39442358/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/39442358/medium.jpg"
   },
   "crotophaga-ani": {
     "com_name": "Smooth-billed Ani",
@@ -996,7 +996,7 @@
     "page": "https://www.inaturalist.org/photos/194955287",
     "sci_name": "Crotophaga ani",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/194955287/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/194955287/medium.jpeg"
   },
   "cyanocitta-stelleri": {
     "com_name": "Steller's Jay",
@@ -1005,7 +1005,7 @@
     "page": "https://www.inaturalist.org/photos/114485662",
     "sci_name": "Cyanocitta stelleri",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/114485662/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/114485662/medium.jpeg"
   },
   "cyanocorax-yncas": {
     "com_name": "Green Jay",
@@ -1014,7 +1014,7 @@
     "page": "https://www.inaturalist.org/photos/643178208",
     "sci_name": "Cyanocorax yncas",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/643178208/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/643178208/medium.jpg"
   },
   "cygnus-buccinator": {
     "com_name": "Trumpeter Swan",
@@ -1023,7 +1023,7 @@
     "page": "https://www.inaturalist.org/photos/180610953",
     "sci_name": "Cygnus buccinator",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/180610953/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/180610953/medium.jpg"
   },
   "cygnus-columbianus": {
     "com_name": "Tundra Swan",
@@ -1032,7 +1032,7 @@
     "page": "https://www.inaturalist.org/photos/183205026",
     "sci_name": "Cygnus columbianus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/183205026/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/183205026/medium.jpeg"
   },
   "dendragapus-obscurus": {
     "com_name": "Dusky Grouse",
@@ -1041,7 +1041,7 @@
     "page": "https://www.inaturalist.org/photos/59592442",
     "sci_name": "Dendragapus obscurus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/59592442/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/59592442/medium.jpg"
   },
   "dendrocygna-autumnalis": {
     "com_name": "Black-bellied Whistling-Duck",
@@ -1050,7 +1050,7 @@
     "page": "https://www.inaturalist.org/photos/711016130",
     "sci_name": "Dendrocygna autumnalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711016130/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711016130/medium.jpg"
   },
   "dolichonyx-oryzivorus": {
     "com_name": "Bobolink",
@@ -1059,7 +1059,7 @@
     "page": "https://www.inaturalist.org/photos/72504446",
     "sci_name": "Dolichonyx oryzivorus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/72504446/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/72504446/medium.jpg"
   },
   "dryobates-nuttallii": {
     "com_name": "Nuttall's Woodpecker",
@@ -1068,7 +1068,7 @@
     "page": "https://www.inaturalist.org/photos/670227241",
     "sci_name": "Dryobates nuttallii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/670227241/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/670227241/medium.jpg"
   },
   "dryobates-scalaris": {
     "com_name": "Ladder-backed Woodpecker",
@@ -1077,7 +1077,7 @@
     "page": "https://www.inaturalist.org/photos/351455077",
     "sci_name": "Dryobates scalaris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/351455077/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/351455077/medium.jpg"
   },
   "egretta-caerulea": {
     "com_name": "Little Blue Heron",
@@ -1086,7 +1086,7 @@
     "page": "https://www.inaturalist.org/photos/524281306",
     "sci_name": "Egretta caerulea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/524281306/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/524281306/medium.jpg"
   },
   "egretta-rufescens": {
     "com_name": "Reddish Egret",
@@ -1095,7 +1095,7 @@
     "page": "https://www.inaturalist.org/photos/466095667",
     "sci_name": "Egretta rufescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/466095667/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/466095667/medium.jpeg"
   },
   "egretta-thula": {
     "com_name": "Snowy Egret",
@@ -1104,7 +1104,7 @@
     "page": "https://www.inaturalist.org/photos/709699313",
     "sci_name": "Egretta thula",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709699313/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709699313/medium.jpg"
   },
   "egretta-tricolor": {
     "com_name": "Tricolored Heron",
@@ -1113,7 +1113,7 @@
     "page": "https://www.inaturalist.org/photos/120438286",
     "sci_name": "Egretta tricolor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/120438286/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/120438286/medium.jpg"
   },
   "elanus-leucurus": {
     "com_name": "White-tailed Kite",
@@ -1122,7 +1122,7 @@
     "page": "https://www.inaturalist.org/photos/106336655",
     "sci_name": "Elanus leucurus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/106336655/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/106336655/medium.jpg"
   },
   "empidonax-alnorum": {
     "com_name": "Alder Flycatcher",
@@ -1131,7 +1131,7 @@
     "page": "https://www.inaturalist.org/photos/287332881",
     "sci_name": "Empidonax alnorum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/287332881/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/287332881/medium.jpeg"
   },
   "empidonax-difficilis": {
     "com_name": "Pacific-slope Flycatcher",
@@ -1140,7 +1140,7 @@
     "page": "https://www.inaturalist.org/photos/265847545",
     "sci_name": "Empidonax difficilis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/265847545/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/265847545/medium.jpg"
   },
   "empidonax-flaviventris": {
     "com_name": "Yellow-bellied Flycatcher",
@@ -1149,7 +1149,7 @@
     "page": "https://www.inaturalist.org/photos/197078654",
     "sci_name": "Empidonax flaviventris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/197078654/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/197078654/medium.jpg"
   },
   "empidonax-hammondii": {
     "com_name": "Hammond's Flycatcher",
@@ -1158,7 +1158,7 @@
     "page": "https://www.inaturalist.org/photos/124363545",
     "sci_name": "Empidonax hammondii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/124363545/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/124363545/medium.jpeg"
   },
   "empidonax-minimus": {
     "com_name": "Least Flycatcher",
@@ -1167,7 +1167,7 @@
     "page": "https://www.inaturalist.org/photos/108960720",
     "sci_name": "Empidonax minimus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/108960720/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/108960720/medium.jpeg"
   },
   "empidonax-oberholseri": {
     "com_name": "Dusky Flycatcher",
@@ -1176,7 +1176,7 @@
     "page": "https://www.inaturalist.org/photos/515024987",
     "sci_name": "Empidonax oberholseri",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/515024987/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/515024987/medium.jpg"
   },
   "empidonax-traillii": {
     "com_name": "Willow Flycatcher",
@@ -1185,7 +1185,7 @@
     "page": "https://www.inaturalist.org/photos/76184191",
     "sci_name": "Empidonax traillii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/76184191/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/76184191/medium.jpeg"
   },
   "empidonax-wrightii": {
     "com_name": "Gray Flycatcher",
@@ -1194,7 +1194,7 @@
     "page": "https://www.inaturalist.org/photos/464557640",
     "sci_name": "Empidonax wrightii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/464557640/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/464557640/medium.jpeg"
   },
   "eremophila-alpestris": {
     "com_name": "Horned Lark",
@@ -1203,7 +1203,7 @@
     "page": "https://www.inaturalist.org/photos/294230085",
     "sci_name": "Eremophila alpestris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/294230085/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/294230085/medium.jpg"
   },
   "eudocimus-albus": {
     "com_name": "White Ibis",
@@ -1212,7 +1212,7 @@
     "page": "https://www.inaturalist.org/photos/551544369",
     "sci_name": "Eudocimus albus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/551544369/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/551544369/medium.jpg"
   },
   "euphagus-carolinus": {
     "com_name": "Rusty Blackbird",
@@ -1221,7 +1221,7 @@
     "page": "https://www.inaturalist.org/photos/633258694",
     "sci_name": "Euphagus carolinus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/633258694/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/633258694/medium.jpg"
   },
   "euphagus-cyanocephalus": {
     "com_name": "Brewer's Blackbird",
@@ -1230,7 +1230,7 @@
     "page": "https://www.inaturalist.org/photos/709680347",
     "sci_name": "Euphagus cyanocephalus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709680347/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709680347/medium.jpg"
   },
   "falco-columbarius": {
     "com_name": "Merlin",
@@ -1239,7 +1239,7 @@
     "page": "https://www.inaturalist.org/photos/343415526",
     "sci_name": "Falco columbarius",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/343415526/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/343415526/medium.jpeg"
   },
   "falco-mexicanus": {
     "com_name": "Prairie Falcon",
@@ -1248,7 +1248,7 @@
     "page": "https://www.inaturalist.org/photos/105947787",
     "sci_name": "Falco mexicanus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/105947787/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/105947787/medium.jpg"
   },
   "falco-peregrinus": {
     "com_name": "Peregrine Falcon",
@@ -1257,7 +1257,7 @@
     "page": "https://www.inaturalist.org/photos/469053407",
     "sci_name": "Falco peregrinus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/469053407/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/469053407/medium.jpeg"
   },
   "falco-rusticolus": {
     "com_name": "Gyrfalcon",
@@ -1266,7 +1266,7 @@
     "page": "https://www.inaturalist.org/photos/109968011",
     "sci_name": "Falco rusticolus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/109968011/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/109968011/medium.jpg"
   },
   "fratercula-arctica": {
     "com_name": "Atlantic Puffin",
@@ -1275,7 +1275,7 @@
     "page": "https://www.inaturalist.org/photos/519402766",
     "sci_name": "Fratercula arctica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/519402766/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/519402766/medium.jpg"
   },
   "fregata-magnificens": {
     "com_name": "Magnificent Frigatebird",
@@ -1284,7 +1284,7 @@
     "page": "https://www.inaturalist.org/photos/471706486",
     "sci_name": "Fregata magnificens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/471706486/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/471706486/medium.jpeg"
   },
   "fulica-americana": {
     "com_name": "American Coot",
@@ -1293,7 +1293,7 @@
     "page": "https://www.inaturalist.org/photos/190784696",
     "sci_name": "Fulica americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/190784696/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/190784696/medium.jpg"
   },
   "fulmarus-glacialis": {
     "com_name": "Northern Fulmar",
@@ -1302,7 +1302,7 @@
     "page": "https://www.inaturalist.org/photos/64947786",
     "sci_name": "Fulmarus glacialis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/64947786/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/64947786/medium.jpeg"
   },
   "gallinago-delicata": {
     "com_name": "Wilson's Snipe",
@@ -1311,7 +1311,7 @@
     "page": "https://www.inaturalist.org/photos/350585226",
     "sci_name": "Gallinago delicata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/350585226/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/350585226/medium.jpg"
   },
   "gallinula-galeata": {
     "com_name": "Common Gallinule",
@@ -1320,7 +1320,7 @@
     "page": "https://www.inaturalist.org/photos/248305775",
     "sci_name": "Gallinula galeata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/248305775/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/248305775/medium.jpeg"
   },
   "gavia-stellata": {
     "com_name": "Red-throated Loon",
@@ -1329,7 +1329,7 @@
     "page": "https://www.inaturalist.org/photos/24698593",
     "sci_name": "Gavia stellata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/24698593/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/24698593/medium.jpg"
   },
   "geococcyx-californianus": {
     "com_name": "Greater Roadrunner",
@@ -1338,7 +1338,7 @@
     "page": "https://www.inaturalist.org/photos/173823589",
     "sci_name": "Geococcyx californianus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/173823589/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/173823589/medium.jpeg"
   },
   "geothlypis-philadelphia": {
     "com_name": "Mourning Warbler",
@@ -1347,7 +1347,7 @@
     "page": "https://www.inaturalist.org/photos/530101196",
     "sci_name": "Geothlypis philadelphia",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/530101196/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/530101196/medium.jpg"
   },
   "geothlypis-tolmiei": {
     "com_name": "MacGillivray's Warbler",
@@ -1356,7 +1356,7 @@
     "page": "https://www.inaturalist.org/photos/572888677",
     "sci_name": "Geothlypis tolmiei",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/572888677/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/572888677/medium.jpg"
   },
   "geothlypis-trichas": {
     "com_name": "Common Yellowthroat",
@@ -1365,7 +1365,7 @@
     "page": "https://www.inaturalist.org/photos/79301180",
     "sci_name": "Geothlypis trichas",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/79301180/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/79301180/medium.jpg"
   },
   "glaucidium-gnoma": {
     "com_name": "Northern Pygmy-Owl",
@@ -1374,7 +1374,7 @@
     "page": "https://www.inaturalist.org/photos/120566543",
     "sci_name": "Glaucidium gnoma",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/120566543/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/120566543/medium.jpeg"
   },
   "haematopus-bachmani": {
     "com_name": "Black Oystercatcher",
@@ -1383,7 +1383,7 @@
     "page": "https://www.inaturalist.org/photos/251509444",
     "sci_name": "Haematopus bachmani",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/251509444/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/251509444/medium.jpg"
   },
   "haematopus-palliatus": {
     "com_name": "American Oystercatcher",
@@ -1392,7 +1392,7 @@
     "page": "https://www.inaturalist.org/photos/268677260",
     "sci_name": "Haematopus palliatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/268677260/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/268677260/medium.jpeg"
   },
   "haemorhous-cassinii": {
     "com_name": "Cassin's Finch",
@@ -1401,7 +1401,7 @@
     "page": "https://www.inaturalist.org/photos/711117123",
     "sci_name": "Haemorhous cassinii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711117123/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711117123/medium.jpg"
   },
   "haemorhous-purpureus": {
     "com_name": "Purple Finch",
@@ -1410,7 +1410,7 @@
     "page": "https://www.inaturalist.org/photos/73218113",
     "sci_name": "Haemorhous purpureus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/73218113/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/73218113/medium.jpg"
   },
   "himantopus-mexicanus": {
     "com_name": "Black-necked Stilt",
@@ -1419,7 +1419,7 @@
     "page": "https://www.inaturalist.org/photos/709618149",
     "sci_name": "Himantopus mexicanus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709618149/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709618149/medium.jpg"
   },
   "hylocichla-mustelina": {
     "com_name": "Wood Thrush",
@@ -1428,7 +1428,7 @@
     "page": "https://www.inaturalist.org/photos/281005534",
     "sci_name": "Hylocichla mustelina",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/281005534/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/281005534/medium.jpeg"
   },
   "icteria-virens": {
     "com_name": "Yellow-breasted Chat",
@@ -1437,7 +1437,7 @@
     "page": "https://www.inaturalist.org/photos/381604184",
     "sci_name": "Icteria virens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/381604184/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/381604184/medium.jpeg"
   },
   "icterus-bullockii": {
     "com_name": "Bullock's Oriole",
@@ -1446,7 +1446,7 @@
     "page": "https://www.inaturalist.org/photos/486942177",
     "sci_name": "Icterus bullockii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/486942177/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/486942177/medium.jpeg"
   },
   "icterus-cucullatus": {
     "com_name": "Hooded Oriole",
@@ -1455,7 +1455,7 @@
     "page": "https://www.inaturalist.org/photos/688217417",
     "sci_name": "Icterus cucullatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/688217417/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/688217417/medium.jpg"
   },
   "icterus-galbula": {
     "com_name": "Baltimore Oriole",
@@ -1464,7 +1464,7 @@
     "page": "https://www.inaturalist.org/photos/145445553",
     "sci_name": "Icterus galbula",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145445553/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145445553/medium.jpg"
   },
   "icterus-parisorum": {
     "com_name": "Scott's Oriole",
@@ -1473,7 +1473,7 @@
     "page": "https://www.inaturalist.org/photos/359387273",
     "sci_name": "Icterus parisorum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/359387273/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/359387273/medium.jpeg"
   },
   "icterus-spurius": {
     "com_name": "Orchard Oriole",
@@ -1482,7 +1482,7 @@
     "page": "https://www.inaturalist.org/photos/382798029",
     "sci_name": "Icterus spurius",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/382798029/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/382798029/medium.jpeg"
   },
   "ictinia-mississippiensis": {
     "com_name": "Mississippi Kite",
@@ -1491,7 +1491,7 @@
     "page": "https://www.inaturalist.org/photos/310243862",
     "sci_name": "Ictinia mississippiensis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/310243862/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/310243862/medium.jpeg"
   },
   "ixoreus-naevius": {
     "com_name": "Varied Thrush",
@@ -1500,7 +1500,7 @@
     "page": "https://www.inaturalist.org/photos/174070565",
     "sci_name": "Ixoreus naevius",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/174070565/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/174070565/medium.jpeg"
   },
   "lagopus-leucura": {
     "com_name": "White-tailed Ptarmigan",
@@ -1509,7 +1509,7 @@
     "page": "https://www.inaturalist.org/photos/58192885",
     "sci_name": "Lagopus leucura",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/58192885/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/58192885/medium.jpg"
   },
   "lagopus-muta": {
     "com_name": "Rock Ptarmigan",
@@ -1518,7 +1518,7 @@
     "page": "https://www.inaturalist.org/photos/306075524",
     "sci_name": "Lagopus muta",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/306075524/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/306075524/medium.jpg"
   },
   "lanius-borealis": {
     "com_name": "Northern Shrike",
@@ -1527,7 +1527,7 @@
     "page": "https://www.inaturalist.org/photos/251067240",
     "sci_name": "Lanius borealis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/251067240/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/251067240/medium.jpeg"
   },
   "lanius-ludovicianus": {
     "com_name": "Loggerhead Shrike",
@@ -1536,7 +1536,7 @@
     "page": "https://www.inaturalist.org/photos/251060743",
     "sci_name": "Lanius ludovicianus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/251060743/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/251060743/medium.jpeg"
   },
   "larus-argentatus": {
     "com_name": "Herring Gull",
@@ -1545,7 +1545,7 @@
     "page": "https://www.inaturalist.org/photos/176166764",
     "sci_name": "Larus argentatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/176166764/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/176166764/medium.jpeg"
   },
   "larus-brachyrhynchus": {
     "com_name": "Short-billed Gull",
@@ -1554,7 +1554,7 @@
     "page": "https://www.inaturalist.org/photos/107032258",
     "sci_name": "Larus brachyrhynchus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/107032258/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/107032258/medium.jpeg"
   },
   "larus-californicus": {
     "com_name": "California Gull",
@@ -1563,7 +1563,7 @@
     "page": "https://www.inaturalist.org/photos/709430619",
     "sci_name": "Larus californicus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709430619/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709430619/medium.jpg"
   },
   "larus-fuscus": {
     "com_name": "Lesser Black-backed Gull",
@@ -1572,7 +1572,7 @@
     "page": "https://www.inaturalist.org/photos/422476978",
     "sci_name": "Larus fuscus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/422476978/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/422476978/medium.jpeg"
   },
   "larus-glaucescens": {
     "com_name": "Glaucous-winged Gull",
@@ -1581,7 +1581,7 @@
     "page": "https://www.inaturalist.org/photos/177362320",
     "sci_name": "Larus glaucescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/177362320/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/177362320/medium.jpeg"
   },
   "larus-glaucoides": {
     "com_name": "Iceland Gull",
@@ -1590,7 +1590,7 @@
     "page": "https://www.inaturalist.org/photos/590584698",
     "sci_name": "Larus glaucoides",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/590584698/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/590584698/medium.jpg"
   },
   "larus-heermanni": {
     "com_name": "Heermann's Gull",
@@ -1599,7 +1599,7 @@
     "page": "https://www.inaturalist.org/photos/268668449",
     "sci_name": "Larus heermanni",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/268668449/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/268668449/medium.jpeg"
   },
   "larus-hyperboreus": {
     "com_name": "Glaucous Gull",
@@ -1608,7 +1608,7 @@
     "page": "https://www.inaturalist.org/photos/556183768",
     "sci_name": "Larus hyperboreus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/556183768/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/556183768/medium.jpg"
   },
   "larus-livens": {
     "com_name": "Yellow-footed Gull",
@@ -1617,7 +1617,7 @@
     "page": "https://www.inaturalist.org/photos/476769314",
     "sci_name": "Larus livens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/476769314/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/476769314/medium.jpeg"
   },
   "larus-marinus": {
     "com_name": "Great Black-backed Gull",
@@ -1626,7 +1626,7 @@
     "page": "https://www.inaturalist.org/photos/700817804",
     "sci_name": "Larus marinus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/700817804/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/700817804/medium.jpg"
   },
   "larus-occidentalis": {
     "com_name": "Western Gull",
@@ -1635,7 +1635,7 @@
     "page": "https://www.inaturalist.org/photos/99701687",
     "sci_name": "Larus occidentalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/99701687/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/99701687/medium.jpg"
   },
   "leiothlypis-celata": {
     "com_name": "Orange-crowned Warbler",
@@ -1644,7 +1644,7 @@
     "page": "https://www.inaturalist.org/photos/329780860",
     "sci_name": "Leiothlypis celata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/329780860/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/329780860/medium.jpeg"
   },
   "leiothlypis-ruficapilla": {
     "com_name": "Nashville Warbler",
@@ -1653,7 +1653,7 @@
     "page": "https://www.inaturalist.org/photos/145198249",
     "sci_name": "Leiothlypis ruficapilla",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145198249/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145198249/medium.jpg"
   },
   "leptotila-verreauxi": {
     "com_name": "White-tipped Dove",
@@ -1662,7 +1662,7 @@
     "page": "https://www.inaturalist.org/photos/568786686",
     "sci_name": "Leptotila verreauxi",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/568786686/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/568786686/medium.jpg"
   },
   "leucophaeus-pipixcan": {
     "com_name": "Franklin's Gull",
@@ -1671,7 +1671,7 @@
     "page": "https://www.inaturalist.org/photos/381683851",
     "sci_name": "Leucophaeus pipixcan",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/381683851/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/381683851/medium.jpg"
   },
   "leucosticte-tephrocotis": {
     "com_name": "Gray-crowned Rosy-Finch",
@@ -1680,7 +1680,7 @@
     "page": "https://www.inaturalist.org/photos/750288529",
     "sci_name": "Leucosticte tephrocotis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/750288529/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/750288529/medium.jpg"
   },
   "limnodromus-griseus": {
     "com_name": "Short-billed Dowitcher",
@@ -1689,7 +1689,7 @@
     "page": "https://www.inaturalist.org/photos/24623830",
     "sci_name": "Limnodromus griseus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/24623830/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/24623830/medium.jpg"
   },
   "limnodromus-scolopaceus": {
     "com_name": "Long-billed Dowitcher",
@@ -1698,7 +1698,7 @@
     "page": "https://www.inaturalist.org/photos/736232887",
     "sci_name": "Limnodromus scolopaceus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/736232887/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/736232887/medium.jpg"
   },
   "limosa-fedoa": {
     "com_name": "Marbled Godwit",
@@ -1707,7 +1707,7 @@
     "page": "https://www.inaturalist.org/photos/709375029",
     "sci_name": "Limosa fedoa",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709375029/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709375029/medium.jpg"
   },
   "limosa-haemastica": {
     "com_name": "Hudsonian Godwit",
@@ -1716,7 +1716,7 @@
     "page": "https://www.inaturalist.org/photos/664668125",
     "sci_name": "Limosa haemastica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/664668125/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/664668125/medium.jpg"
   },
   "lophodytes-cucullatus": {
     "com_name": "Hooded Merganser",
@@ -1725,7 +1725,7 @@
     "page": "https://www.inaturalist.org/photos/176410807",
     "sci_name": "Lophodytes cucullatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/176410807/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/176410807/medium.jpg"
   },
   "loxia-curvirostra": {
     "com_name": "Red Crossbill",
@@ -1734,7 +1734,7 @@
     "page": "https://www.inaturalist.org/photos/132767810",
     "sci_name": "Loxia curvirostra",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/132767810/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/132767810/medium.jpeg"
   },
   "loxia-leucoptera": {
     "com_name": "White-winged Crossbill",
@@ -1743,7 +1743,7 @@
     "page": "https://www.inaturalist.org/photos/11206802",
     "sci_name": "Loxia leucoptera",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11206802/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/11206802/medium.jpeg"
   },
   "mareca-americana": {
     "com_name": "American Wigeon",
@@ -1752,7 +1752,7 @@
     "page": "https://www.inaturalist.org/photos/12858667",
     "sci_name": "Mareca americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12858667/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12858667/medium.jpeg"
   },
   "mareca-penelope": {
     "com_name": "Eurasian Wigeon",
@@ -1761,7 +1761,7 @@
     "page": "https://www.inaturalist.org/photos/611204029",
     "sci_name": "Mareca penelope",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/611204029/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/611204029/medium.jpg"
   },
   "mareca-strepera": {
     "com_name": "Gadwall",
@@ -1770,7 +1770,7 @@
     "page": "https://www.inaturalist.org/photos/465778475",
     "sci_name": "Mareca strepera",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/465778475/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/465778475/medium.jpeg"
   },
   "margarops-fuscatus": {
     "com_name": "Pearly-eyed Thrasher",
@@ -1779,7 +1779,7 @@
     "page": "https://www.inaturalist.org/photos/653323405",
     "sci_name": "Margarops fuscatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/653323405/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/653323405/medium.jpg"
   },
   "melanerpes-aurifrons": {
     "com_name": "Golden-fronted Woodpecker",
@@ -1788,7 +1788,7 @@
     "page": "https://www.inaturalist.org/photos/165492152",
     "sci_name": "Melanerpes aurifrons",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/165492152/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/165492152/medium.jpg"
   },
   "melanerpes-formicivorus": {
     "com_name": "Acorn Woodpecker",
@@ -1797,7 +1797,7 @@
     "page": "https://www.inaturalist.org/photos/12151951",
     "sci_name": "Melanerpes formicivorus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12151951/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/12151951/medium.jpeg"
   },
   "melanerpes-uropygialis": {
     "com_name": "Gila Woodpecker",
@@ -1806,7 +1806,7 @@
     "page": "https://www.inaturalist.org/photos/339608463",
     "sci_name": "Melanerpes uropygialis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339608463/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339608463/medium.jpg"
   },
   "melanitta-americana": {
     "com_name": "Black Scoter",
@@ -1815,7 +1815,7 @@
     "page": "https://www.inaturalist.org/photos/28337248",
     "sci_name": "Melanitta americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/28337248/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/28337248/medium.jpg"
   },
   "melanitta-perspicillata": {
     "com_name": "Surf Scoter",
@@ -1824,7 +1824,7 @@
     "page": "https://www.inaturalist.org/photos/747536761",
     "sci_name": "Melanitta perspicillata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/747536761/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/747536761/medium.jpg"
   },
   "melanospiza-bicolor": {
     "com_name": "Black-faced Grassquit",
@@ -1833,7 +1833,7 @@
     "page": "https://www.inaturalist.org/photos/616531808",
     "sci_name": "Melanospiza bicolor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/616531808/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/616531808/medium.jpg"
   },
   "melopyrrha-violacea": {
     "com_name": "Greater Antillean Bullfinch",
@@ -1842,7 +1842,7 @@
     "page": "https://www.inaturalist.org/photos/186539048",
     "sci_name": "Melopyrrha violacea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/186539048/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/186539048/medium.jpeg"
   },
   "melospiza-georgiana": {
     "com_name": "Swamp Sparrow",
@@ -1851,7 +1851,7 @@
     "page": "https://www.inaturalist.org/photos/10710162",
     "sci_name": "Melospiza georgiana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10710162/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10710162/medium.jpg"
   },
   "melospiza-lincolnii": {
     "com_name": "Lincoln's Sparrow",
@@ -1860,7 +1860,7 @@
     "page": "https://www.inaturalist.org/photos/592949372",
     "sci_name": "Melospiza lincolnii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/592949372/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/592949372/medium.jpg"
   },
   "melospiza-melodia": {
     "com_name": "Song Sparrow",
@@ -1869,7 +1869,7 @@
     "page": "https://www.inaturalist.org/photos/546060381",
     "sci_name": "Melospiza melodia",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/546060381/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/546060381/medium.jpg"
   },
   "melozone-crissalis": {
     "com_name": "California Towhee",
@@ -1878,7 +1878,7 @@
     "page": "https://www.inaturalist.org/photos/515882427",
     "sci_name": "Melozone crissalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/515882427/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/515882427/medium.jpg"
   },
   "melozone-fusca": {
     "com_name": "Canyon Towhee",
@@ -1887,7 +1887,7 @@
     "page": "https://www.inaturalist.org/photos/469409442",
     "sci_name": "Melozone fusca",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/469409442/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/469409442/medium.jpg"
   },
   "mergus-merganser": {
     "com_name": "Common Merganser",
@@ -1896,7 +1896,7 @@
     "page": "https://www.inaturalist.org/photos/175751812",
     "sci_name": "Mergus merganser",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/175751812/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/175751812/medium.jpg"
   },
   "mergus-serrator": {
     "com_name": "Red-breasted Merganser",
@@ -1905,7 +1905,7 @@
     "page": "https://www.inaturalist.org/photos/266434632",
     "sci_name": "Mergus serrator",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/266434632/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/266434632/medium.jpg"
   },
   "mimus-gundlachii": {
     "com_name": "Bahama Mockingbird",
@@ -1914,7 +1914,7 @@
     "page": "https://www.inaturalist.org/photos/260033370",
     "sci_name": "Mimus gundlachii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/260033370/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/260033370/medium.jpeg"
   },
   "mimus-polyglottos": {
     "com_name": "Northern Mockingbird",
@@ -1923,7 +1923,7 @@
     "page": "https://www.inaturalist.org/photos/182670681",
     "sci_name": "Mimus polyglottos",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/182670681/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/182670681/medium.jpg"
   },
   "mniotilta-varia": {
     "com_name": "Black-and-white Warbler",
@@ -1932,7 +1932,7 @@
     "page": "https://www.inaturalist.org/photos/190709984",
     "sci_name": "Mniotilta varia",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/190709984/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/190709984/medium.jpeg"
   },
   "molothrus-aeneus": {
     "com_name": "Bronzed Cowbird",
@@ -1941,7 +1941,7 @@
     "page": "https://www.inaturalist.org/photos/78937897",
     "sci_name": "Molothrus aeneus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/78937897/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/78937897/medium.jpeg"
   },
   "morus-bassanus": {
     "com_name": "Northern Gannet",
@@ -1950,7 +1950,7 @@
     "page": "https://www.inaturalist.org/photos/116959122",
     "sci_name": "Morus bassanus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/116959122/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/116959122/medium.jpg"
   },
   "motacilla-tschutschensis": {
     "com_name": "Eastern Yellow Wagtail",
@@ -1959,7 +1959,7 @@
     "page": "https://www.inaturalist.org/photos/269718484",
     "sci_name": "Motacilla tschutschensis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/269718484/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/269718484/medium.jpeg"
   },
   "myadestes-townsendi": {
     "com_name": "Townsend's Solitaire",
@@ -1968,7 +1968,7 @@
     "page": "https://www.inaturalist.org/photos/263738750",
     "sci_name": "Myadestes townsendi",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/263738750/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/263738750/medium.jpeg"
   },
   "mycteria-americana": {
     "com_name": "Wood Stork",
@@ -1977,7 +1977,7 @@
     "page": "https://www.inaturalist.org/photos/360387506",
     "sci_name": "Mycteria americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/360387506/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/360387506/medium.jpeg"
   },
   "myiarchus-cinerascens": {
     "com_name": "Ash-throated Flycatcher",
@@ -1986,7 +1986,7 @@
     "page": "https://www.inaturalist.org/photos/484356379",
     "sci_name": "Myiarchus cinerascens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/484356379/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/484356379/medium.jpeg"
   },
   "myiarchus-tuberculifer": {
     "com_name": "Dusky-capped Flycatcher",
@@ -1995,7 +1995,7 @@
     "page": "https://www.inaturalist.org/photos/341471711",
     "sci_name": "Myiarchus tuberculifer",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/341471711/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/341471711/medium.jpeg"
   },
   "myiarchus-tyrannulus": {
     "com_name": "Brown-crested Flycatcher",
@@ -2004,7 +2004,7 @@
     "page": "https://www.inaturalist.org/photos/210199021",
     "sci_name": "Myiarchus tyrannulus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/210199021/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/210199021/medium.jpg"
   },
   "myiopsitta-monachus": {
     "com_name": "Monk Parakeet",
@@ -2013,7 +2013,7 @@
     "page": "https://www.inaturalist.org/photos/302246993",
     "sci_name": "Myiopsitta monachus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/302246993/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/302246993/medium.jpg"
   },
   "nannopterum-auritum": {
     "com_name": "Double-crested Cormorant",
@@ -2022,7 +2022,7 @@
     "page": "https://www.inaturalist.org/photos/512439682",
     "sci_name": "Nannopterum auritum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/512439682/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/512439682/medium.jpg"
   },
   "nannopterum-brasilianum": {
     "com_name": "Neotropic Cormorant",
@@ -2031,7 +2031,7 @@
     "page": "https://www.inaturalist.org/photos/135711015",
     "sci_name": "Nannopterum brasilianum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/135711015/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/135711015/medium.jpg"
   },
   "nucifraga-columbiana": {
     "com_name": "Clark's Nutcracker",
@@ -2040,7 +2040,7 @@
     "page": "https://www.inaturalist.org/photos/151706381",
     "sci_name": "Nucifraga columbiana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/151706381/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/151706381/medium.jpg"
   },
   "numenius-americanus": {
     "com_name": "Long-billed Curlew",
@@ -2049,7 +2049,7 @@
     "page": "https://www.inaturalist.org/photos/500211455",
     "sci_name": "Numenius americanus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/500211455/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/500211455/medium.jpeg"
   },
   "nycticorax-nycticorax": {
     "com_name": "Black-crowned Night-Heron",
@@ -2058,7 +2058,7 @@
     "page": "https://www.inaturalist.org/photos/49357930",
     "sci_name": "Nycticorax nycticorax",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/49357930/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/49357930/medium.jpg"
   },
   "oenanthe-oenanthe": {
     "com_name": "Northern Wheatear",
@@ -2067,7 +2067,7 @@
     "page": "https://www.inaturalist.org/photos/373084915",
     "sci_name": "Oenanthe oenanthe",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/373084915/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/373084915/medium.jpeg"
   },
   "oporornis-agilis": {
     "com_name": "Connecticut Warbler",
@@ -2076,7 +2076,7 @@
     "page": "https://www.inaturalist.org/photos/279206116",
     "sci_name": "Oporornis agilis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/279206116/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/279206116/medium.jpeg"
   },
   "parabuteo-unicinctus": {
     "com_name": "Harris's Hawk",
@@ -2085,7 +2085,7 @@
     "page": "https://www.inaturalist.org/photos/287701605",
     "sci_name": "Parabuteo unicinctus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/287701605/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/287701605/medium.jpg"
   },
   "parkesia-noveboracensis": {
     "com_name": "Northern Waterthrush",
@@ -2094,7 +2094,7 @@
     "page": "https://www.inaturalist.org/photos/459373417",
     "sci_name": "Parkesia noveboracensis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/459373417/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/459373417/medium.jpg"
   },
   "passerculus-sandwichensis": {
     "com_name": "Savannah Sparrow",
@@ -2103,7 +2103,7 @@
     "page": "https://www.inaturalist.org/photos/170466408",
     "sci_name": "Passerculus sandwichensis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/170466408/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/170466408/medium.jpg"
   },
   "passerella-iliaca": {
     "com_name": "Fox Sparrow",
@@ -2112,7 +2112,7 @@
     "page": "https://www.inaturalist.org/photos/103681314",
     "sci_name": "Passerella iliaca",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/103681314/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/103681314/medium.jpeg"
   },
   "passerina-amoena": {
     "com_name": "Lazuli Bunting",
@@ -2121,7 +2121,7 @@
     "page": "https://www.inaturalist.org/photos/496429178",
     "sci_name": "Passerina amoena",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/496429178/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/496429178/medium.jpg"
   },
   "passerina-caerulea": {
     "com_name": "Blue Grosbeak",
@@ -2130,7 +2130,7 @@
     "page": "https://www.inaturalist.org/photos/381683583",
     "sci_name": "Passerina caerulea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/381683583/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/381683583/medium.jpg"
   },
   "passerina-ciris": {
     "com_name": "Painted Bunting",
@@ -2139,7 +2139,7 @@
     "page": "https://www.inaturalist.org/photos/3179793",
     "sci_name": "Passerina ciris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/3179793/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/3179793/medium.jpg"
   },
   "passerina-cyanea": {
     "com_name": "Indigo Bunting",
@@ -2148,7 +2148,7 @@
     "page": "https://www.inaturalist.org/photos/339455700",
     "sci_name": "Passerina cyanea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339455700/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339455700/medium.jpg"
   },
   "patagioenas-fasciata": {
     "com_name": "Band-tailed Pigeon",
@@ -2157,7 +2157,7 @@
     "page": "https://www.inaturalist.org/photos/682518198",
     "sci_name": "Patagioenas fasciata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/682518198/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/682518198/medium.jpg"
   },
   "patagioenas-leucocephala": {
     "com_name": "White-crowned Pigeon",
@@ -2166,7 +2166,7 @@
     "page": "https://www.inaturalist.org/photos/264620572",
     "sci_name": "Patagioenas leucocephala",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/264620572/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/264620572/medium.jpeg"
   },
   "pelecanus-erythrorhynchos": {
     "com_name": "American White Pelican",
@@ -2175,7 +2175,7 @@
     "page": "https://www.inaturalist.org/photos/393751118",
     "sci_name": "Pelecanus erythrorhynchos",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/393751118/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/393751118/medium.jpeg"
   },
   "pelecanus-occidentalis": {
     "com_name": "Brown Pelican",
@@ -2184,7 +2184,7 @@
     "page": "https://www.inaturalist.org/photos/105515190",
     "sci_name": "Pelecanus occidentalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/105515190/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/105515190/medium.jpeg"
   },
   "perisoreus-canadensis": {
     "com_name": "Canada Jay",
@@ -2193,7 +2193,7 @@
     "page": "https://www.inaturalist.org/photos/746300281",
     "sci_name": "Perisoreus canadensis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/746300281/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/746300281/medium.jpg"
   },
   "petrochelidon-fulva": {
     "com_name": "Cave Swallow",
@@ -2202,7 +2202,7 @@
     "page": "https://www.inaturalist.org/photos/477879719",
     "sci_name": "Petrochelidon fulva",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/477879719/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/477879719/medium.jpeg"
   },
   "phainopepla-nitens": {
     "com_name": "Phainopepla",
@@ -2211,7 +2211,7 @@
     "page": "https://www.inaturalist.org/photos/129686308",
     "sci_name": "Phainopepla nitens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/129686308/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/129686308/medium.jpeg"
   },
   "phalaenoptilus-nuttallii": {
     "com_name": "Common Poorwill",
@@ -2220,7 +2220,7 @@
     "page": "https://www.inaturalist.org/photos/110995343",
     "sci_name": "Phalaenoptilus nuttallii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/110995343/large.png"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/110995343/medium.png"
   },
   "phalaropus-fulicarius": {
     "com_name": "Red Phalarope",
@@ -2229,7 +2229,7 @@
     "page": "https://www.inaturalist.org/photos/267337165",
     "sci_name": "Phalaropus fulicarius",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/267337165/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/267337165/medium.jpg"
   },
   "phalaropus-lobatus": {
     "com_name": "Red-necked Phalarope",
@@ -2238,7 +2238,7 @@
     "page": "https://www.inaturalist.org/photos/550372040",
     "sci_name": "Phalaropus lobatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/550372040/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/550372040/medium.jpg"
   },
   "phalaropus-tricolor": {
     "com_name": "Wilson's Phalarope",
@@ -2247,7 +2247,7 @@
     "page": "https://www.inaturalist.org/photos/418561768",
     "sci_name": "Phalaropus tricolor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/418561768/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/418561768/medium.jpeg"
   },
   "phasianus-colchicus": {
     "com_name": "Ring-necked Pheasant",
@@ -2256,7 +2256,7 @@
     "page": "https://www.inaturalist.org/photos/50306262",
     "sci_name": "Phasianus colchicus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/50306262/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/50306262/medium.jpg"
   },
   "pheucticus-melanocephalus": {
     "com_name": "Black-headed Grosbeak",
@@ -2265,7 +2265,7 @@
     "page": "https://www.inaturalist.org/photos/134761134",
     "sci_name": "Pheucticus melanocephalus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/134761134/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/134761134/medium.jpeg"
   },
   "phoebastria-immutabilis": {
     "com_name": "Laysan Albatross",
@@ -2274,7 +2274,7 @@
     "page": "https://www.inaturalist.org/photos/422966441",
     "sci_name": "Phoebastria immutabilis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/422966441/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/422966441/medium.jpeg"
   },
   "phoebastria-nigripes": {
     "com_name": "Black-footed Albatross",
@@ -2283,7 +2283,7 @@
     "page": "https://www.inaturalist.org/photos/85274713",
     "sci_name": "Phoebastria nigripes",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/85274713/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/85274713/medium.jpeg"
   },
   "phoenicopterus-ruber": {
     "com_name": "American Flamingo",
@@ -2292,7 +2292,7 @@
     "page": "https://www.inaturalist.org/photos/167796159",
     "sci_name": "Phoenicopterus ruber",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/167796159/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/167796159/medium.jpeg"
   },
   "phylloscopus-borealis": {
     "com_name": "Arctic Warbler",
@@ -2301,7 +2301,7 @@
     "page": "https://www.inaturalist.org/photos/600984390",
     "sci_name": "Phylloscopus borealis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/600984390/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/600984390/medium.jpg"
   },
   "picoides-arcticus": {
     "com_name": "Black-backed Woodpecker",
@@ -2310,7 +2310,7 @@
     "page": "https://www.inaturalist.org/photos/231335061",
     "sci_name": "Picoides arcticus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/231335061/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/231335061/medium.jpg"
   },
   "picoides-dorsalis": {
     "com_name": "American Three-toed Woodpecker",
@@ -2319,7 +2319,7 @@
     "page": "https://www.inaturalist.org/photos/251264592",
     "sci_name": "Picoides dorsalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/251264592/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/251264592/medium.jpeg"
   },
   "pinicola-enucleator": {
     "com_name": "Pine Grosbeak",
@@ -2328,7 +2328,7 @@
     "page": "https://www.inaturalist.org/photos/345821881",
     "sci_name": "Pinicola enucleator",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/345821881/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/345821881/medium.jpg"
   },
   "pipilo-chlorurus": {
     "com_name": "Green-tailed Towhee",
@@ -2337,7 +2337,7 @@
     "page": "https://www.inaturalist.org/photos/339619091",
     "sci_name": "Pipilo chlorurus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339619091/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339619091/medium.jpg"
   },
   "pipilo-erythrophthalmus": {
     "com_name": "Eastern Towhee",
@@ -2346,7 +2346,7 @@
     "page": "https://www.inaturalist.org/photos/171863792",
     "sci_name": "Pipilo erythrophthalmus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/171863792/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/171863792/medium.jpeg"
   },
   "pipilo-maculatus": {
     "com_name": "Spotted Towhee",
@@ -2355,7 +2355,7 @@
     "page": "https://www.inaturalist.org/photos/663667581",
     "sci_name": "Pipilo maculatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/663667581/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/663667581/medium.jpg"
   },
   "piranga-ludoviciana": {
     "com_name": "Western Tanager",
@@ -2364,7 +2364,7 @@
     "page": "https://www.inaturalist.org/photos/506250087",
     "sci_name": "Piranga ludoviciana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/506250087/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/506250087/medium.jpg"
   },
   "pitangus-sulphuratus": {
     "com_name": "Great Kiskadee",
@@ -2373,7 +2373,7 @@
     "page": "https://www.inaturalist.org/photos/561178521",
     "sci_name": "Pitangus sulphuratus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/561178521/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/561178521/medium.jpg"
   },
   "platalea-ajaja": {
     "com_name": "Roseate Spoonbill",
@@ -2382,7 +2382,7 @@
     "page": "https://www.inaturalist.org/photos/77452025",
     "sci_name": "Platalea ajaja",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/77452025/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/77452025/medium.jpg"
   },
   "plectrophenax-nivalis": {
     "com_name": "Snow Bunting",
@@ -2391,7 +2391,7 @@
     "page": "https://www.inaturalist.org/photos/265304916",
     "sci_name": "Plectrophenax nivalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/265304916/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/265304916/medium.jpg"
   },
   "plegadis-chihi": {
     "com_name": "White-faced Ibis",
@@ -2400,7 +2400,7 @@
     "page": "https://www.inaturalist.org/photos/517969599",
     "sci_name": "Plegadis chihi",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/517969599/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/517969599/medium.jpg"
   },
   "pluvialis-dominica": {
     "com_name": "American Golden-Plover",
@@ -2409,7 +2409,7 @@
     "page": "https://www.inaturalist.org/photos/95794430",
     "sci_name": "Pluvialis dominica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/95794430/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/95794430/medium.jpeg"
   },
   "pluvialis-squatarola": {
     "com_name": "Black-bellied Plover",
@@ -2418,7 +2418,7 @@
     "page": "https://www.inaturalist.org/photos/449678785",
     "sci_name": "Pluvialis squatarola",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/449678785/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/449678785/medium.jpeg"
   },
   "podiceps-auritus": {
     "com_name": "Horned Grebe",
@@ -2427,7 +2427,7 @@
     "page": "https://www.inaturalist.org/photos/463875329",
     "sci_name": "Podiceps auritus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/463875329/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/463875329/medium.jpg"
   },
   "podiceps-grisegena": {
     "com_name": "Red-necked Grebe",
@@ -2436,7 +2436,7 @@
     "page": "https://www.inaturalist.org/photos/729398534",
     "sci_name": "Podiceps grisegena",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/729398534/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/729398534/medium.jpg"
   },
   "podiceps-nigricollis": {
     "com_name": "Eared Grebe",
@@ -2445,7 +2445,7 @@
     "page": "https://www.inaturalist.org/photos/241724727",
     "sci_name": "Podiceps nigricollis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/241724727/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/241724727/medium.jpeg"
   },
   "podilymbus-podiceps": {
     "com_name": "Pied-billed Grebe",
@@ -2454,7 +2454,7 @@
     "page": "https://www.inaturalist.org/photos/709460844",
     "sci_name": "Podilymbus podiceps",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709460844/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/709460844/medium.jpg"
   },
   "poecile-gambeli": {
     "com_name": "Mountain Chickadee",
@@ -2463,7 +2463,7 @@
     "page": "https://www.inaturalist.org/photos/725992426",
     "sci_name": "Poecile gambeli",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/725992426/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/725992426/medium.jpg"
   },
   "poecile-hudsonicus": {
     "com_name": "Boreal Chickadee",
@@ -2472,7 +2472,7 @@
     "page": "https://www.inaturalist.org/photos/597801237",
     "sci_name": "Poecile hudsonicus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/597801237/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/597801237/medium.jpg"
   },
   "poecile-rufescens": {
     "com_name": "Chestnut-backed Chickadee",
@@ -2481,7 +2481,7 @@
     "page": "https://www.inaturalist.org/photos/241990721",
     "sci_name": "Poecile rufescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/241990721/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/241990721/medium.jpeg"
   },
   "polioptila-caerulea": {
     "com_name": "Blue-gray Gnatcatcher",
@@ -2490,7 +2490,7 @@
     "page": "https://www.inaturalist.org/photos/27031596",
     "sci_name": "Polioptila caerulea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/27031596/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/27031596/medium.jpeg"
   },
   "polioptila-californica": {
     "com_name": "California Gnatcatcher",
@@ -2499,7 +2499,7 @@
     "page": "https://www.inaturalist.org/photos/511677755",
     "sci_name": "Polioptila californica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/511677755/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/511677755/medium.jpg"
   },
   "polioptila-melanura": {
     "com_name": "Black-tailed Gnatcatcher",
@@ -2508,7 +2508,7 @@
     "page": "https://www.inaturalist.org/photos/144262718",
     "sci_name": "Polioptila melanura",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/144262718/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/144262718/medium.jpg"
   },
   "porzana-carolina": {
     "com_name": "Sora",
@@ -2517,7 +2517,7 @@
     "page": "https://www.inaturalist.org/photos/110155912",
     "sci_name": "Porzana carolina",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/110155912/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/110155912/medium.jpeg"
   },
   "protonotaria-citrea": {
     "com_name": "Prothonotary Warbler",
@@ -2526,7 +2526,7 @@
     "page": "https://www.inaturalist.org/photos/205505382",
     "sci_name": "Protonotaria citrea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/205505382/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/205505382/medium.jpg"
   },
   "psaltriparus-minimus": {
     "com_name": "Bushtit",
@@ -2535,7 +2535,7 @@
     "page": "https://www.inaturalist.org/photos/669090245",
     "sci_name": "Psaltriparus minimus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/669090245/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/669090245/medium.jpg"
   },
   "pyrocephalus-rubinus": {
     "com_name": "Vermilion Flycatcher",
@@ -2544,7 +2544,7 @@
     "page": "https://www.inaturalist.org/photos/112584347",
     "sci_name": "Pyrocephalus rubinus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/112584347/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/112584347/medium.jpeg"
   },
   "quiscalus-major": {
     "com_name": "Boat-tailed Grackle",
@@ -2553,7 +2553,7 @@
     "page": "https://www.inaturalist.org/photos/249722334",
     "sci_name": "Quiscalus major",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/249722334/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/249722334/medium.jpeg"
   },
   "quiscalus-mexicanus": {
     "com_name": "Great-tailed Grackle",
@@ -2562,7 +2562,7 @@
     "page": "https://www.inaturalist.org/photos/102703179",
     "sci_name": "Quiscalus mexicanus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/102703179/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/102703179/medium.jpeg"
   },
   "rallus-crepitans": {
     "com_name": "Clapper Rail",
@@ -2571,7 +2571,7 @@
     "page": "https://www.inaturalist.org/photos/191693394",
     "sci_name": "Rallus crepitans",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/191693394/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/191693394/medium.jpg"
   },
   "rallus-limicola": {
     "com_name": "Virginia Rail",
@@ -2580,7 +2580,7 @@
     "page": "https://www.inaturalist.org/photos/339592480",
     "sci_name": "Rallus limicola",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339592480/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339592480/medium.jpg"
   },
   "rallus-obsoletus": {
     "com_name": "Ridgway's Rail",
@@ -2589,7 +2589,7 @@
     "page": "https://www.inaturalist.org/photos/10566083",
     "sci_name": "Rallus obsoletus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10566083/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/10566083/medium.jpg"
   },
   "recurvirostra-americana": {
     "com_name": "American Avocet",
@@ -2598,7 +2598,7 @@
     "page": "https://www.inaturalist.org/photos/409017744",
     "sci_name": "Recurvirostra americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/409017744/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/409017744/medium.jpeg"
   },
   "riparia-riparia": {
     "com_name": "Bank Swallow",
@@ -2607,7 +2607,7 @@
     "page": "https://www.inaturalist.org/photos/129556642",
     "sci_name": "Riparia riparia",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/129556642/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/129556642/medium.jpg"
   },
   "rissa-tridactyla": {
     "com_name": "Black-legged Kittiwake",
@@ -2616,7 +2616,7 @@
     "page": "https://www.inaturalist.org/photos/519281841",
     "sci_name": "Rissa tridactyla",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/519281841/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/519281841/medium.jpg"
   },
   "rynchops-niger": {
     "com_name": "Black Skimmer",
@@ -2625,7 +2625,7 @@
     "page": "https://www.inaturalist.org/photos/681919134",
     "sci_name": "Rynchops niger",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/681919134/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/681919134/medium.jpg"
   },
   "salpinctes-obsoletus": {
     "com_name": "Rock Wren",
@@ -2634,7 +2634,7 @@
     "page": "https://www.inaturalist.org/photos/711116624",
     "sci_name": "Salpinctes obsoletus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711116624/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711116624/medium.jpg"
   },
   "sayornis-nigricans": {
     "com_name": "Black Phoebe",
@@ -2643,7 +2643,7 @@
     "page": "https://www.inaturalist.org/photos/520507638",
     "sci_name": "Sayornis nigricans",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/520507638/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/520507638/medium.jpg"
   },
   "sayornis-saya": {
     "com_name": "Say's Phoebe",
@@ -2652,7 +2652,7 @@
     "page": "https://www.inaturalist.org/photos/106027651",
     "sci_name": "Sayornis saya",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/106027651/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/106027651/medium.jpg"
   },
   "scolopax-minor": {
     "com_name": "American Woodcock",
@@ -2661,7 +2661,7 @@
     "page": "https://www.inaturalist.org/photos/17713199",
     "sci_name": "Scolopax minor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/17713199/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/17713199/medium.jpeg"
   },
   "seiurus-aurocapilla": {
     "com_name": "Ovenbird",
@@ -2670,7 +2670,7 @@
     "page": "https://www.inaturalist.org/photos/339592813",
     "sci_name": "Seiurus aurocapilla",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339592813/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339592813/medium.jpg"
   },
   "selasphorus-platycercus": {
     "com_name": "Broad-tailed Hummingbird",
@@ -2679,7 +2679,7 @@
     "page": "https://www.inaturalist.org/photos/199210198",
     "sci_name": "Selasphorus platycercus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/199210198/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/199210198/medium.jpeg"
   },
   "selasphorus-rufus": {
     "com_name": "Rufous Hummingbird",
@@ -2688,7 +2688,7 @@
     "page": "https://www.inaturalist.org/photos/360027365",
     "sci_name": "Selasphorus rufus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/360027365/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/360027365/medium.jpg"
   },
   "setophaga-americana": {
     "com_name": "Northern Parula",
@@ -2697,7 +2697,7 @@
     "page": "https://www.inaturalist.org/photos/195790621",
     "sci_name": "Setophaga americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/195790621/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/195790621/medium.jpeg"
   },
   "setophaga-caerulescens": {
     "com_name": "Black-throated Blue Warbler",
@@ -2706,7 +2706,7 @@
     "page": "https://www.inaturalist.org/photos/339608514",
     "sci_name": "Setophaga caerulescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339608514/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339608514/medium.jpg"
   },
   "setophaga-castanea": {
     "com_name": "Bay-breasted Warbler",
@@ -2715,7 +2715,7 @@
     "page": "https://www.inaturalist.org/photos/200066005",
     "sci_name": "Setophaga castanea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/200066005/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/200066005/medium.jpg"
   },
   "setophaga-discolor": {
     "com_name": "Prairie Warbler",
@@ -2724,7 +2724,7 @@
     "page": "https://www.inaturalist.org/photos/567009754",
     "sci_name": "Setophaga discolor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/567009754/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/567009754/medium.jpg"
   },
   "setophaga-dominica": {
     "com_name": "Yellow-throated Warbler",
@@ -2733,7 +2733,7 @@
     "page": "https://www.inaturalist.org/photos/461502513",
     "sci_name": "Setophaga dominica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/461502513/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/461502513/medium.jpeg"
   },
   "setophaga-fusca": {
     "com_name": "Blackburnian Warbler",
@@ -2742,7 +2742,7 @@
     "page": "https://www.inaturalist.org/photos/95381928",
     "sci_name": "Setophaga fusca",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/95381928/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/95381928/medium.jpeg"
   },
   "setophaga-nigrescens": {
     "com_name": "Black-throated Gray Warbler",
@@ -2751,7 +2751,7 @@
     "page": "https://www.inaturalist.org/photos/157802828",
     "sci_name": "Setophaga nigrescens",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/157802828/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/157802828/medium.jpeg"
   },
   "setophaga-pensylvanica": {
     "com_name": "Chestnut-sided Warbler",
@@ -2760,7 +2760,7 @@
     "page": "https://www.inaturalist.org/photos/145204398",
     "sci_name": "Setophaga pensylvanica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145204398/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145204398/medium.jpg"
   },
   "setophaga-petechia": {
     "com_name": "Yellow Warbler",
@@ -2769,7 +2769,7 @@
     "page": "https://www.inaturalist.org/photos/458961271",
     "sci_name": "Setophaga petechia",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/458961271/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/458961271/medium.jpg"
   },
   "setophaga-pinus": {
     "com_name": "Pine Warbler",
@@ -2778,7 +2778,7 @@
     "page": "https://www.inaturalist.org/photos/178156815",
     "sci_name": "Setophaga pinus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/178156815/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/178156815/medium.jpeg"
   },
   "setophaga-ruticilla": {
     "com_name": "American Redstart",
@@ -2787,7 +2787,7 @@
     "page": "https://www.inaturalist.org/photos/618581507",
     "sci_name": "Setophaga ruticilla",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/618581507/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/618581507/medium.jpg"
   },
   "setophaga-striata": {
     "com_name": "Blackpoll Warbler",
@@ -2796,7 +2796,7 @@
     "page": "https://www.inaturalist.org/photos/196401534",
     "sci_name": "Setophaga striata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/196401534/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/196401534/medium.jpeg"
   },
   "setophaga-tigrina": {
     "com_name": "Cape May Warbler",
@@ -2805,7 +2805,7 @@
     "page": "https://www.inaturalist.org/photos/18089935",
     "sci_name": "Setophaga tigrina",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/18089935/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/18089935/medium.jpg"
   },
   "setophaga-townsendi": {
     "com_name": "Townsend's Warbler",
@@ -2814,7 +2814,7 @@
     "page": "https://www.inaturalist.org/photos/107032155",
     "sci_name": "Setophaga townsendi",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/107032155/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/107032155/medium.jpeg"
   },
   "sialia-currucoides": {
     "com_name": "Mountain Bluebird",
@@ -2823,7 +2823,7 @@
     "page": "https://www.inaturalist.org/photos/452945443",
     "sci_name": "Sialia currucoides",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/452945443/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/452945443/medium.jpg"
   },
   "sialia-mexicana": {
     "com_name": "Western Bluebird",
@@ -2832,7 +2832,7 @@
     "page": "https://www.inaturalist.org/photos/144266148",
     "sci_name": "Sialia mexicana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/144266148/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/144266148/medium.jpg"
   },
   "sitta-pygmaea": {
     "com_name": "Pygmy Nuthatch",
@@ -2841,7 +2841,7 @@
     "page": "https://www.inaturalist.org/photos/154984606",
     "sci_name": "Sitta pygmaea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/154984606/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/154984606/medium.jpeg"
   },
   "somateria-mollissima": {
     "com_name": "Common Eider",
@@ -2850,7 +2850,7 @@
     "page": "https://www.inaturalist.org/photos/607169471",
     "sci_name": "Somateria mollissima",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/607169471/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/607169471/medium.jpg"
   },
   "spatula-clypeata": {
     "com_name": "Northern Shoveler",
@@ -2859,7 +2859,7 @@
     "page": "https://www.inaturalist.org/photos/342842647",
     "sci_name": "Spatula clypeata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/342842647/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/342842647/medium.jpg"
   },
   "spatula-cyanoptera": {
     "com_name": "Cinnamon Teal",
@@ -2868,7 +2868,7 @@
     "page": "https://www.inaturalist.org/photos/295508866",
     "sci_name": "Spatula cyanoptera",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/295508866/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/295508866/medium.jpg"
   },
   "spatula-discors": {
     "com_name": "Blue-winged Teal",
@@ -2877,7 +2877,7 @@
     "page": "https://www.inaturalist.org/photos/255182582",
     "sci_name": "Spatula discors",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/255182582/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/255182582/medium.jpg"
   },
   "sphyrapicus-nuchalis": {
     "com_name": "Red-naped Sapsucker",
@@ -2886,7 +2886,7 @@
     "page": "https://www.inaturalist.org/photos/169179259",
     "sci_name": "Sphyrapicus nuchalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/169179259/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/169179259/medium.jpeg"
   },
   "spinus-psaltria": {
     "com_name": "Lesser Goldfinch",
@@ -2895,7 +2895,7 @@
     "page": "https://www.inaturalist.org/photos/669952328",
     "sci_name": "Spinus psaltria",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/669952328/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/669952328/medium.jpg"
   },
   "spiza-americana": {
     "com_name": "Dickcissel",
@@ -2904,7 +2904,7 @@
     "page": "https://www.inaturalist.org/photos/738051104",
     "sci_name": "Spiza americana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/738051104/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/738051104/medium.jpg"
   },
   "spizella-breweri": {
     "com_name": "Brewer's Sparrow",
@@ -2913,7 +2913,7 @@
     "page": "https://www.inaturalist.org/photos/452974868",
     "sci_name": "Spizella breweri",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/452974868/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/452974868/medium.jpg"
   },
   "spizella-pallida": {
     "com_name": "Clay-colored Sparrow",
@@ -2922,7 +2922,7 @@
     "page": "https://www.inaturalist.org/photos/686303777",
     "sci_name": "Spizella pallida",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/686303777/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/686303777/medium.jpg"
   },
   "spizella-passerina": {
     "com_name": "Chipping Sparrow",
@@ -2931,7 +2931,7 @@
     "page": "https://www.inaturalist.org/photos/198992636",
     "sci_name": "Spizella passerina",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/198992636/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/198992636/medium.jpg"
   },
   "spizelloides-arborea": {
     "com_name": "American Tree Sparrow",
@@ -2940,7 +2940,7 @@
     "page": "https://www.inaturalist.org/photos/339619562",
     "sci_name": "Spizelloides arborea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339619562/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339619562/medium.jpg"
   },
   "stelgidopteryx-serripennis": {
     "com_name": "Northern Rough-winged Swallow",
@@ -2949,7 +2949,7 @@
     "page": "https://www.inaturalist.org/photos/473735359",
     "sci_name": "Stelgidopteryx serripennis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/473735359/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/473735359/medium.jpeg"
   },
   "stercorarius-longicaudus": {
     "com_name": "Long-tailed Jaeger",
@@ -2958,7 +2958,7 @@
     "page": "https://www.inaturalist.org/photos/402790689",
     "sci_name": "Stercorarius longicaudus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/402790689/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/402790689/medium.jpg"
   },
   "stercorarius-parasiticus": {
     "com_name": "Parasitic Jaeger",
@@ -2967,7 +2967,7 @@
     "page": "https://www.inaturalist.org/photos/76843799",
     "sci_name": "Stercorarius parasiticus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/76843799/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/76843799/medium.jpg"
   },
   "stercorarius-pomarinus": {
     "com_name": "Pomarine Jaeger",
@@ -2976,7 +2976,7 @@
     "page": "https://www.inaturalist.org/photos/214805497",
     "sci_name": "Stercorarius pomarinus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/214805497/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/214805497/medium.jpeg"
   },
   "sterna-forsteri": {
     "com_name": "Forster's Tern",
@@ -2985,7 +2985,7 @@
     "page": "https://www.inaturalist.org/photos/21003537",
     "sci_name": "Sterna forsteri",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/21003537/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/21003537/medium.jpg"
   },
   "sterna-hirundo": {
     "com_name": "Common Tern",
@@ -2994,7 +2994,7 @@
     "page": "https://www.inaturalist.org/photos/130866514",
     "sci_name": "Sterna hirundo",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/130866514/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/130866514/medium.jpg"
   },
   "sterna-paradisaea": {
     "com_name": "Arctic Tern",
@@ -3003,7 +3003,7 @@
     "page": "https://www.inaturalist.org/photos/143535701",
     "sci_name": "Sterna paradisaea",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/143535701/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/143535701/medium.jpeg"
   },
   "sternula-antillarum": {
     "com_name": "Least Tern",
@@ -3012,7 +3012,7 @@
     "page": "https://www.inaturalist.org/photos/77435964",
     "sci_name": "Sternula antillarum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/77435964/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/77435964/medium.jpg"
   },
   "strix-nebulosa": {
     "com_name": "Great Gray Owl",
@@ -3021,7 +3021,7 @@
     "page": "https://www.inaturalist.org/photos/205267375",
     "sci_name": "Strix nebulosa",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/205267375/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/205267375/medium.jpg"
   },
   "sturnella-neglecta": {
     "com_name": "Western Meadowlark",
@@ -3030,7 +3030,7 @@
     "page": "https://www.inaturalist.org/photos/113809956",
     "sci_name": "Sturnella neglecta",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/113809956/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/113809956/medium.jpg"
   },
   "sturnus-vulgaris": {
     "com_name": "European Starling",
@@ -3039,7 +3039,7 @@
     "page": "https://www.inaturalist.org/photos/120280586",
     "sci_name": "Sturnus vulgaris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/120280586/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/120280586/medium.jpeg"
   },
   "sula-leucogaster": {
     "com_name": "Brown Booby",
@@ -3048,7 +3048,7 @@
     "page": "https://www.inaturalist.org/photos/339592616",
     "sci_name": "Sula leucogaster",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339592616/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339592616/medium.jpg"
   },
   "sula-nebouxii": {
     "com_name": "Blue-footed Booby",
@@ -3057,7 +3057,7 @@
     "page": "https://www.inaturalist.org/photos/280249083",
     "sci_name": "Sula nebouxii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/280249083/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/280249083/medium.jpeg"
   },
   "surnia-ulula": {
     "com_name": "Northern Hawk Owl",
@@ -3066,7 +3066,7 @@
     "page": "https://www.inaturalist.org/photos/6367504",
     "sci_name": "Surnia ulula",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/6367504/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/6367504/medium.jpg"
   },
   "tachybaptus-dominicus": {
     "com_name": "Least Grebe",
@@ -3075,7 +3075,7 @@
     "page": "https://www.inaturalist.org/photos/169007490",
     "sci_name": "Tachybaptus dominicus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/169007490/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/169007490/medium.jpeg"
   },
   "tachycineta-bicolor": {
     "com_name": "Tree Swallow",
@@ -3084,7 +3084,7 @@
     "page": "https://www.inaturalist.org/photos/196885341",
     "sci_name": "Tachycineta bicolor",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/196885341/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/196885341/medium.jpeg"
   },
   "tachycineta-thalassina": {
     "com_name": "Violet-green Swallow",
@@ -3093,7 +3093,7 @@
     "page": "https://www.inaturalist.org/photos/345782622",
     "sci_name": "Tachycineta thalassina",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/345782622/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/345782622/medium.jpg"
   },
   "thalasseus-elegans": {
     "com_name": "Elegant Tern",
@@ -3102,7 +3102,7 @@
     "page": "https://www.inaturalist.org/photos/117732234",
     "sci_name": "Thalasseus elegans",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/117732234/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/117732234/medium.jpeg"
   },
   "thalasseus-sandvicensis": {
     "com_name": "Sandwich Tern",
@@ -3111,7 +3111,7 @@
     "page": "https://www.inaturalist.org/photos/360318347",
     "sci_name": "Thalasseus sandvicensis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/360318347/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/360318347/medium.jpg"
   },
   "thryomanes-bewickii": {
     "com_name": "Bewick's Wren",
@@ -3120,7 +3120,7 @@
     "page": "https://www.inaturalist.org/photos/656767179",
     "sci_name": "Thryomanes bewickii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/656767179/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/656767179/medium.jpg"
   },
   "toxostoma-cinereum": {
     "com_name": "Gray Thrasher",
@@ -3129,7 +3129,7 @@
     "page": "https://www.inaturalist.org/photos/465448818",
     "sci_name": "Toxostoma cinereum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/465448818/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/465448818/medium.jpeg"
   },
   "toxostoma-crissale": {
     "com_name": "Crissal Thrasher",
@@ -3138,7 +3138,7 @@
     "page": "https://www.inaturalist.org/photos/339582183",
     "sci_name": "Toxostoma crissale",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339582183/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339582183/medium.jpg"
   },
   "toxostoma-curvirostre": {
     "com_name": "Curve-billed Thrasher",
@@ -3147,7 +3147,7 @@
     "page": "https://www.inaturalist.org/photos/4781412",
     "sci_name": "Toxostoma curvirostre",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/4781412/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/4781412/medium.jpeg"
   },
   "toxostoma-redivivum": {
     "com_name": "California Thrasher",
@@ -3156,7 +3156,7 @@
     "page": "https://www.inaturalist.org/photos/426646993",
     "sci_name": "Toxostoma redivivum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/426646993/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/426646993/medium.jpeg"
   },
   "toxostoma-rufum": {
     "com_name": "Brown Thrasher",
@@ -3165,7 +3165,7 @@
     "page": "https://www.inaturalist.org/photos/186561540",
     "sci_name": "Toxostoma rufum",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/186561540/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/186561540/medium.jpeg"
   },
   "tringa-incana": {
     "com_name": "Wandering Tattler",
@@ -3174,7 +3174,7 @@
     "page": "https://www.inaturalist.org/photos/279746853",
     "sci_name": "Tringa incana",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/279746853/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/279746853/medium.jpeg"
   },
   "tringa-semipalmata": {
     "com_name": "Willet",
@@ -3183,7 +3183,7 @@
     "page": "https://www.inaturalist.org/photos/339539307",
     "sci_name": "Tringa semipalmata",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339539307/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339539307/medium.jpg"
   },
   "tringa-solitaria": {
     "com_name": "Solitary Sandpiper",
@@ -3192,7 +3192,7 @@
     "page": "https://www.inaturalist.org/photos/494793608",
     "sci_name": "Tringa solitaria",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/494793608/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/494793608/medium.jpg"
   },
   "troglodytes-hiemalis": {
     "com_name": "Winter Wren",
@@ -3201,7 +3201,7 @@
     "page": "https://www.inaturalist.org/photos/169226102",
     "sci_name": "Troglodytes hiemalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/169226102/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/169226102/medium.jpeg"
   },
   "troglodytes-pacificus": {
     "com_name": "Pacific Wren",
@@ -3210,7 +3210,7 @@
     "page": "https://www.inaturalist.org/photos/62828911",
     "sci_name": "Troglodytes pacificus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/62828911/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/62828911/medium.jpg"
   },
   "tympanuchus-phasianellus": {
     "com_name": "Sharp-tailed Grouse",
@@ -3219,7 +3219,7 @@
     "page": "https://www.inaturalist.org/photos/364926519",
     "sci_name": "Tympanuchus phasianellus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/364926519/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/364926519/medium.jpg"
   },
   "tyrannus-couchii": {
     "com_name": "Couch's Kingbird",
@@ -3228,7 +3228,7 @@
     "page": "https://www.inaturalist.org/photos/349889040",
     "sci_name": "Tyrannus couchii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/349889040/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/349889040/medium.jpg"
   },
   "tyrannus-forficatus": {
     "com_name": "Scissor-tailed Flycatcher",
@@ -3237,7 +3237,7 @@
     "page": "https://www.inaturalist.org/photos/15444329",
     "sci_name": "Tyrannus forficatus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/15444329/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/15444329/medium.jpg"
   },
   "tyrannus-melancholicus": {
     "com_name": "Tropical Kingbird",
@@ -3246,7 +3246,7 @@
     "page": "https://www.inaturalist.org/photos/233887054",
     "sci_name": "Tyrannus melancholicus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/233887054/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/233887054/medium.jpeg"
   },
   "tyrannus-verticalis": {
     "com_name": "Western Kingbird",
@@ -3255,7 +3255,7 @@
     "page": "https://www.inaturalist.org/photos/136752598",
     "sci_name": "Tyrannus verticalis",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/136752598/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/136752598/medium.jpeg"
   },
   "tyrannus-vociferans": {
     "com_name": "Cassin's Kingbird",
@@ -3264,7 +3264,7 @@
     "page": "https://www.inaturalist.org/photos/688217374",
     "sci_name": "Tyrannus vociferans",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/688217374/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/688217374/medium.jpg"
   },
   "uria-aalge": {
     "com_name": "Common Murre",
@@ -3273,7 +3273,7 @@
     "page": "https://www.inaturalist.org/photos/300343948",
     "sci_name": "Uria aalge",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/300343948/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/300343948/medium.jpg"
   },
   "uria-lomvia": {
     "com_name": "Thick-billed Murre",
@@ -3282,7 +3282,7 @@
     "page": "https://www.inaturalist.org/photos/391224906",
     "sci_name": "Uria lomvia",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/391224906/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/391224906/medium.jpeg"
   },
   "vireo-bellii": {
     "com_name": "Bell's Vireo",
@@ -3291,7 +3291,7 @@
     "page": "https://www.inaturalist.org/photos/384653585",
     "sci_name": "Vireo bellii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/384653585/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/384653585/medium.jpeg"
   },
   "vireo-cassinii": {
     "com_name": "Cassin's Vireo",
@@ -3300,7 +3300,7 @@
     "page": "https://www.inaturalist.org/photos/234447",
     "sci_name": "Vireo cassinii",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/234447/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/234447/medium.jpg"
   },
   "vireo-crassirostris": {
     "com_name": "Thick-billed Vireo",
@@ -3309,7 +3309,7 @@
     "page": "https://www.inaturalist.org/photos/603953194",
     "sci_name": "Vireo crassirostris",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/603953194/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/603953194/medium.jpg"
   },
   "vireo-gilvus": {
     "com_name": "Warbling Vireo",
@@ -3318,7 +3318,7 @@
     "page": "https://www.inaturalist.org/photos/311721260",
     "sci_name": "Vireo gilvus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/311721260/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/311721260/medium.jpg"
   },
   "vireo-griseus": {
     "com_name": "White-eyed Vireo",
@@ -3327,7 +3327,7 @@
     "page": "https://www.inaturalist.org/photos/110885272",
     "sci_name": "Vireo griseus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/110885272/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/110885272/medium.jpg"
   },
   "vireo-huttoni": {
     "com_name": "Hutton's Vireo",
@@ -3336,7 +3336,7 @@
     "page": "https://www.inaturalist.org/photos/752472381",
     "sci_name": "Vireo huttoni",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/752472381/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/752472381/medium.jpg"
   },
   "vireo-olivaceus": {
     "com_name": "Red-eyed Vireo",
@@ -3345,7 +3345,7 @@
     "page": "https://www.inaturalist.org/photos/158043683",
     "sci_name": "Vireo olivaceus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/158043683/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/158043683/medium.jpeg"
   },
   "vireo-philadelphicus": {
     "com_name": "Philadelphia Vireo",
@@ -3354,7 +3354,7 @@
     "page": "https://www.inaturalist.org/photos/96138421",
     "sci_name": "Vireo philadelphicus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/96138421/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/96138421/medium.jpeg"
   },
   "vireo-solitarius": {
     "com_name": "Blue-headed Vireo",
@@ -3363,7 +3363,7 @@
     "page": "https://www.inaturalist.org/photos/124665603",
     "sci_name": "Vireo solitarius",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/124665603/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/124665603/medium.jpg"
   },
   "xanthocephalus-xanthocephalus": {
     "com_name": "Yellow-headed Blackbird",
@@ -3372,7 +3372,7 @@
     "page": "https://www.inaturalist.org/photos/195455944",
     "sci_name": "Xanthocephalus xanthocephalus",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/195455944/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/195455944/medium.jpg"
   },
   "xema-sabini": {
     "com_name": "Sabine's Gull",
@@ -3381,7 +3381,7 @@
     "page": "https://www.inaturalist.org/photos/274621497",
     "sci_name": "Xema sabini",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/274621497/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/274621497/medium.jpg"
   },
   "zenaida-asiatica": {
     "com_name": "White-winged Dove",
@@ -3390,7 +3390,7 @@
     "page": "https://www.inaturalist.org/photos/194212003",
     "sci_name": "Zenaida asiatica",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/194212003/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/194212003/medium.jpg"
   },
   "zenaida-aurita": {
     "com_name": "Zenaida Dove",
@@ -3399,7 +3399,7 @@
     "page": "https://www.inaturalist.org/photos/339603424",
     "sci_name": "Zenaida aurita",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339603424/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/339603424/medium.jpg"
   },
   "zonotrichia-atricapilla": {
     "com_name": "Golden-crowned Sparrow",
@@ -3408,7 +3408,7 @@
     "page": "https://www.inaturalist.org/photos/121386464",
     "sci_name": "Zonotrichia atricapilla",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/121386464/large.jpeg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/121386464/medium.jpeg"
   },
   "zonotrichia-querula": {
     "com_name": "Harris's Sparrow",
@@ -3417,6 +3417,6 @@
     "page": "https://www.inaturalist.org/photos/63832174",
     "sci_name": "Zonotrichia querula",
     "source": "inaturalist",
-    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/63832174/large.jpg"
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/63832174/medium.jpg"
   }
 }

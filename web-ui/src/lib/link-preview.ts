@@ -4,7 +4,7 @@ import { pageTitle } from "~/lib/page-title.ts";
 export const STATION_DESCRIPTION =
 	"A record of every bird singing in the yard, heard and identified by a Raspberry Pi station.";
 
-const PAINTING_SIZE = 800;
+const PREVIEW_SIZE = 400;
 
 type PreviewImage = {
 	url: string;
@@ -33,11 +33,11 @@ export function speciesPreviewImage(
 	if (!url) return null;
 	if (isPhotoUrl(url)) return { url, alt: comName, card: "summary" };
 	return {
-		url: `${origin}${url}`,
+		url: `${origin}${url.replace(/^(\/illustrations-new\/)(.+)\.webp$/, "$1previews/$2.jpg")}`,
 		alt: comName,
 		card: "summary",
-		width: PAINTING_SIZE,
-		height: PAINTING_SIZE,
+		width: PREVIEW_SIZE,
+		height: PREVIEW_SIZE,
 	};
 }
 

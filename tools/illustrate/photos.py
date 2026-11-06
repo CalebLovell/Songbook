@@ -239,7 +239,7 @@ def _inat_candidates(taxon_id: int, get_json: Callable[[str], dict], want: int) 
     found = []
     for obs in get_json(f'{INAT_API}/observations?{query}').get('results', []):
         for photo in obs.get('photos', [])[:1]:
-            url = str(photo.get('url', '')).replace('/square.', '/large.')
+            url = str(photo.get('url', '')).replace('/square.', '/medium.')
             if str(photo.get('license_code', '')).lower() != 'cc0' or not _allowed_host(url):
                 continue
             found.append({

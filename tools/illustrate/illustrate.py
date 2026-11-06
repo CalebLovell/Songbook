@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generates the web UI's species illustrations.
 
-One picture per species per pose -- perched (<slug>.png, used everywhere)
-and flight (<slug>-2.png, the large hero slots) -- for every species in a
+One picture per species per pose -- perched (<slug>.webp, used everywhere)
+and flight (<slug>-2.webp, the large hero slots) -- for every species in a
 birds.db. The loop:
 
     generate   paint each pose with Gemini, on plain paper
@@ -35,7 +35,6 @@ import html
 import json
 import os
 import re
-import shutil
 import sqlite3
 import sys
 import time
@@ -61,6 +60,7 @@ PICKS_PATH = WORK_DIR / 'picks.json'
 # The site shows these for the species in NEW_SLUGS (see illustrationUrlFor
 # in web-ui/src/lib/illustrations.ts).
 PUBLIC_DIR = REPO_ROOT / 'web-ui' / 'public' / 'illustrations-new'
+PREVIEW_DIR = 'previews'
 SLUGS_TS = REPO_ROOT / 'web-ui' / 'src' / 'lib' / 'illustrations-new.ts'
 SLUGS_NAME = 'NEW_SLUGS'
 FLIGHT_SLUGS_NAME = 'NEW_FLIGHT_SLUGS'
@@ -778,7 +778,7 @@ def installed_bounds(folder: Path) -> dict[str, tuple[int, int, int, int]]:
     from PIL import Image
 
     bounds = {}
-    for path in sorted(folder.glob('*.png')):
+    for path in sorted(folder.glob('*.webp')):
         with Image.open(path) as image:
             box = painted_bounds(image.convert('RGBA'))
         if box is not None:
@@ -789,25 +789,46 @@ def installed_bounds(folder: Path) -> dict[str, tuple[int, int, int, int]]:
 def installed_slugs(folder: Path) -> tuple[list[str], list[str]]:
     """Species with a perched pose in `folder`, and those that also have a
     flight pose; the web UI shows the perched one in place of a missing flight."""
-    names = {p.stem for p in folder.glob('*.png')}
+    names = {p.stem for p in folder.glob('*.webp')}
     perched = sorted(n for n in names if not n.endswith('-2'))
     return perched, [n for n in perched if f'{n}-2' in names]
 
 
+INSTALL_SIZE = 480
+PREVIEW_SIZE = 400
+
+
+def install_painting(source: Path, folder: Path) -> None:
+    """Write `<stem>.webp` (INSTALL_SIZE square, what the site shows) and
+    `previews/<stem>.jpg` (PREVIEW_SIZE, flattened on white, because link
+    previews can't rely on WebP) into `folder`, from the image at `source`."""
+    from PIL import Image
+
+    with Image.open(source) as image:
+        painting = image.convert('RGBA')
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / PREVIEW_DIR).mkdir(exist_ok=True)
+    small = painting.resize((INSTALL_SIZE, INSTALL_SIZE), Image.LANCZOS)
+    small.save(folder / f'{source.stem}.webp', 'WEBP', quality=85, method=6, alpha_quality=100)
+    preview = painting.resize((PREVIEW_SIZE, PREVIEW_SIZE), Image.LANCZOS)
+    flat = Image.new('RGB', preview.size, 'white')
+    flat.paste(preview, mask=preview.getchannel('A'))
+    flat.save(folder / PREVIEW_DIR / f'{source.stem}.jpg', 'JPEG', quality=80, optimize=True, progressive=True)
+
+
 def cmd_install(args):
     wanted = {sp['slug'] for sp in select(load_species(args.db), args.slugs)}
-    copied = 0
+    written = 0
     for path in sorted(CUT_DIR.glob('*.png')) if CUT_DIR.is_dir() else []:
         if path.stem.removesuffix('-2') in wanted:
-            PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(path, PUBLIC_DIR / path.name)
-            copied += 1
+            install_painting(path, PUBLIC_DIR)
+            written += 1
     perched, flight = installed_slugs(PUBLIC_DIR)
     source = SLUGS_TS.read_text(encoding='utf-8')
     source = rewrite_slugs(rewrite_slugs(source, perched), flight, FLIGHT_SLUGS_NAME)
     source = rewrite_bounds(source, installed_bounds(PUBLIC_DIR))
     SLUGS_TS.write_text(source, encoding='utf-8', newline='\n')
-    print(f'Copied {copied} files. {len(perched)} species in {SLUGS_TS.name}, {len(flight)} with a flight pose.')
+    print(f'Installed {written} paintings. {len(perched)} species in {SLUGS_TS.name}, {len(flight)} with a flight pose.')
 
 
 def main(argv=None):
@@ -858,7 +879,7 @@ def main(argv=None):
     cutout.add_argument('--force', action='store_true')
     cutout.set_defaults(run=cmd_cutout)
 
-    install = commands.add_parser('install', help='copy cutouts into the web UI')
+    install = commands.add_parser('install', help='write the cutouts, as WebP and link-preview JPEG, into the web UI')
     install.add_argument('slugs', nargs='*')
     install.set_defaults(run=cmd_install)
 

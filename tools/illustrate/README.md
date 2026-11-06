@@ -1,7 +1,7 @@
 # Species illustrations
 
 `illustrate.py` paints the web UI's species illustrations: a perched pose
-(`<slug>.png`) and a flight pose (`<slug>-2.png`) for every species in
+(`<slug>.webp`) and a flight pose (`<slug>-2.webp`) for every species in
 `scripts/birds.db`, mammals included (at rest / in motion). They're in the
 style of Ohara Koson's kacho-e woodblock prints, painted by Gemini from our
 own prompt and public-domain style plates.
@@ -59,8 +59,10 @@ From `tools/illustrate`, with `<slug>` from `python illustrate.py species`
 5. Check the cutouts. Stray bits can be erased by hand in the `work/cut`
    files. Later `cutout` runs leave an edited file alone unless given
    `--force`.
-6. `python illustrate.py install <slug>` copies the cutouts into the web UI
-   and lists the species in `illustrations-new.ts`, so the site shows it.
+6. `python illustrate.py install <slug>` writes the cutouts into the web UI
+   as 480px WebP (what the site shows) plus a 400px JPEG in `previews/` (for
+   link previews, where WebP is unreliable), and lists
+   the species in `illustrations-new.ts`, so the site shows it.
 
 `verify` (a blind check by a second Gemini model) and `review` (an HTML
 contact sheet of every attempt) help when running many species at once.

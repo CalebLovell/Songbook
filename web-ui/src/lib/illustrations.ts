@@ -20,7 +20,7 @@ export function illustrationUrlFor(
 	const slug = slugify(sciName);
 	if (!NEW_SLUGS.has(slug)) return photos[slug] ?? null;
 	const flight = pose === "flight" && NEW_FLIGHT_SLUGS.has(slug);
-	return `/illustrations-new/${slug}${flight ? "-2" : ""}.png`;
+	return `/illustrations-new/${slug}${flight ? "-2" : ""}.webp`;
 }
 
 export function isPhotoUrl(url: string): boolean {
@@ -28,6 +28,6 @@ export function isPhotoUrl(url: string): boolean {
 }
 
 export function paintedBoundsFor(imageUrl: string): PaintedBounds | null {
-	const stem = imageUrl.match(/^\/illustrations-new\/([a-z0-9-]+)\.png$/)?.[1];
+	const stem = imageUrl.match(/^\/illustrations-new\/([a-z0-9-]+)\.webp$/)?.[1];
 	return (stem && PAINTED_BOUNDS[stem]) || null;
 }
