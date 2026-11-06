@@ -660,7 +660,7 @@ def render(com_name: str, variant: int) -> np.ndarray:
         if i >= n:
             break
         piece = sound[: n - i]
-        out[i : i + len(piece)] += gain * piece
+        out[i:i + len(piece)] += gain * piece
     peak = np.max(np.abs(out)) or 1.0
     out = out / peak * 0.7
 

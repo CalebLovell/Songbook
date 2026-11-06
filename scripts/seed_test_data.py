@@ -629,7 +629,7 @@ def ensure_numpy():
         )
     site.main()  # pick up a user site that didn't exist when Python started
     importlib.invalidate_caches()
-    import numpy  # noqa: F401
+    import numpy  # noqa: F401,F811
 
 
 def seed_audio(rows: list[tuple], extracted_dir: str, fresh: bool):
