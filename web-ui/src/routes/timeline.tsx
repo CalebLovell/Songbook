@@ -1,4 +1,8 @@
-import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	stripSearchParams,
+	useRouteContext,
+} from "@tanstack/react-router";
 import { ArrowRight, CalendarRange, LayoutDashboard, List } from "lucide-react";
 import { z } from "zod";
 import { Deferred, SHELL_DELAY_MS } from "~/components/deferred.tsx";
@@ -245,6 +249,7 @@ function TimelineHeader({
 	const rows = data?.body.kind === "rows" ? data.body.rows : [];
 	const highlights = data?.body.kind === "rows" ? data.body.highlights : [];
 	const toolbarData = data ?? staleData;
+	const { auth } = useRouteContext({ from: "__root__" });
 
 	const loadShare = async () =>
 		period === "day"
@@ -252,12 +257,14 @@ function TimelineHeader({
 					...(await getDayShareCard({ data: anchor })),
 					highlights,
 					heading: headerLines(period, anchor),
+					stationName: auth.siteName,
 				})
 			: formatTimelineShareCard({
 					period,
 					heading: headerLines(period, anchor),
 					rows,
 					highlights,
+					stationName: auth.siteName,
 				});
 	const share = useShare({
 		subject: `${period}:${anchor}`,

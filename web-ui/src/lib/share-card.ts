@@ -16,6 +16,7 @@ export type ShareCard = {
 	busiestHour: { hour: number; count: number } | null;
 	highlights?: Highlight[];
 	heading?: string[];
+	stationName?: string;
 };
 
 function dateLabel(date: string): string {
@@ -26,9 +27,13 @@ function dateLabel(date: string): string {
 	});
 }
 
-export function shareHeader([period, date]: string[]): string {
+export function shareHeader(
+	[period, date]: string[],
+	stationName?: string,
+): string {
 	return [
 		"📖  Songbook",
+		...(stationName ? [`📍  ${stationName}`] : []),
 		`📊  ${period} Summary`,
 		...(date ? [`📅  ${date}`] : []),
 	].join("\n");
@@ -59,6 +64,7 @@ export function formatShareCard(card: ShareCard): string {
 	const window = card.window ?? "rolling";
 	const header = shareHeader(
 		card.heading ?? ["Last 24 hours", dateLabel(card.date)],
+		card.stationName,
 	);
 
 	if (card.detections === 0) {

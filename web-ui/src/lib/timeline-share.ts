@@ -24,6 +24,7 @@ export type TimelineShareCard = {
 	heading: string[];
 	rows: TimelineShareRow[];
 	highlights: Highlight[];
+	stationName?: string;
 };
 
 const MEDALS = ["🥇", "🥈", "🥉"] as const;
@@ -40,7 +41,7 @@ function hourTotals(rows: TimelineShareRow[]): number[] {
 
 export function formatTimelineShareCard(card: TimelineShareCard): string {
 	const { period, rows } = card;
-	const header = shareHeader(card.heading);
+	const header = shareHeader(card.heading, card.stationName);
 
 	if (rows.length === 0) {
 		return `${header}\n🤫  Nothing heard ${PERIOD_NOUN[period]}.`;
