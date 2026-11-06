@@ -57,6 +57,7 @@ const config = defineConfig({
 	plugins: [
 		devStationPassword(),
 		nitro({
+			plugins: ["./src/server-plugins/voice-check.ts"],
 			rollupConfig: { external: [/^@sentry\//] },
 			compressPublicAssets: { gzip: true, brotli: true },
 			routeRules: {

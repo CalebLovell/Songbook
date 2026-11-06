@@ -17,10 +17,9 @@ import { resolveDetectionClipPath } from "~/lib/detection-file-path.server.ts";
 
 const LOWEST_PRIORITY = 19;
 const CLIP_TIMEOUT_MS = 60_000;
-const RETRY_AFTER_FAILURE_MS = 15 * 60_000;
+const CHECK_INTERVAL_MS = 10 * 60_000;
 
 let running = false;
-let lastFailureAt = 0;
 
 function voiceCheckScript(): string {
 	const beside = path.resolve(
@@ -108,26 +107,20 @@ async function runVoiceChecks(): Promise<void> {
 	}
 }
 
-function startVoiceChecks(): void {
-	if (running || Date.now() - lastFailureAt < RETRY_AFTER_FAILURE_MS) return;
+async function checkNewBestClips(): Promise<void> {
+	if (running) return;
 	running = true;
-	runVoiceChecks()
-		.catch(() => {
-			lastFailureAt = Date.now();
-		})
-		.finally(() => {
-			running = false;
-		});
+	try {
+		const { unchecked } = publicRecordings(sqlite, extractedDir());
+		if (unchecked.length > 0) await runVoiceChecks();
+	} catch (error) {
+		console.error("[voice-check] a check failed:", error);
+	} finally {
+		running = false;
+	}
 }
 
-export function visitorRecordings(
-	comName?: string,
-): Map<string, BestRecording> {
-	const { recordings, unchecked } = publicRecordings(
-		sqlite,
-		extractedDir(),
-		comName,
-	);
-	if (unchecked.length > 0) startVoiceChecks();
-	return recordings;
+export function keepCheckingNewBestClips(): void {
+	void checkNewBestClips();
+	setInterval(() => void checkNewBestClips(), CHECK_INTERVAL_MS).unref();
 }

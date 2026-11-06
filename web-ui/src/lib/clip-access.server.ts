@@ -6,8 +6,8 @@ import { readUnlockStatus } from "~/lib/auth.server.ts";
 import {
 	type BestRecording,
 	bestRecordings,
+	publicRecordings,
 } from "~/lib/best-recording.server.ts";
-import { visitorRecordings } from "~/lib/voice-check.server.ts";
 
 export async function canHearEveryClip(): Promise<boolean> {
 	try {
@@ -22,5 +22,5 @@ export async function hearableRecordings(
 ): Promise<Map<string, BestRecording>> {
 	return (await canHearEveryClip())
 		? bestRecordings(sqlite, extractedDir(), comName)
-		: visitorRecordings(comName);
+		: publicRecordings(sqlite, extractedDir(), comName).recordings;
 }
