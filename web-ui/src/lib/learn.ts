@@ -2,8 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { sqlite } from "~/db/index.ts";
-import { extractedDir } from "~/lib/audio.server.ts";
-import { bestRecordings } from "~/lib/best-recording.server.ts";
+import { hearableRecordings } from "~/lib/clip-access.server.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import {
 	familiarityPool,
@@ -41,8 +40,8 @@ function inPool(
 	);
 }
 
-function playableSpecies(): PoolSpecies[] {
-	return [...bestRecordings(sqlite, extractedDir()).values()]
+async function playableSpecies(): Promise<PoolSpecies[]> {
+	return [...(await hearableRecordings()).values()]
 		.filter((clip) => (clip.confidence ?? 0) >= MINIMUM_CLIP_CONFIDENCE)
 		.map((clip) => ({
 			comName: clip.comName,
@@ -107,7 +106,7 @@ export type LearnRoundData = {
 export const getLearnRound = createServerFn({ method: "GET" })
 	.validator(z.enum(LEARN_POOLS))
 	.handler(async ({ data: pool }): Promise<LearnRoundData> => {
-		const playable = playableSpecies();
+		const playable = await playableSpecies();
 		const detections = allTimeDetections();
 		const { rareMax } = await readHighlightThresholds();
 		const poolCounts = Object.fromEntries(

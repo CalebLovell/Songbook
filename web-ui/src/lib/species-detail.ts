@@ -2,12 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { avg, desc, sql } from "drizzle-orm";
 import { z } from "zod";
 
-import { db, sqlite } from "~/db/index.ts";
+import { db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
-import { extractedDir } from "~/lib/audio.server.ts";
 import { audioUrlFor } from "~/lib/audio.ts";
-import { bestRecordings } from "~/lib/best-recording.server.ts";
-import { canHearEveryClip } from "~/lib/clip-access.server.ts";
+import {
+	canHearEveryClip,
+	hearableRecordings,
+} from "~/lib/clip-access.server.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import {
 	type CatalogSpecies,
@@ -234,7 +235,7 @@ export const getSpeciesDetail = createServerFn({ method: "GET" })
 				return missToResult(comNameSlug);
 			}
 			const comName = totals.comName;
-			const best = bestRecordings(sqlite, extractedDir(), comName).get(comName);
+			const best = (await hearableRecordings(comName)).get(comName);
 			const logPage = Math.min(
 				toPageNumber(visitsPage),
 				visitPageCount(totals.totalDetections),

@@ -6,3 +6,4 @@ inotify
 requests
 pillow
 soundfile
+soxr

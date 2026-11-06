@@ -2,12 +2,12 @@ import { rm } from "node:fs/promises";
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, count, desc, gte, inArray, lte, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import { db, openWritableDetectionsDb, sqlite } from "~/db/index.ts";
+import { db, openWritableDetectionsDb } from "~/db/index.ts";
 import { type Detection, detections } from "~/db/schema.ts";
 import { extractedDir } from "~/lib/audio.server.ts";
 import { audioUrlFor } from "~/lib/audio.ts";
 import { requireUnlocked } from "~/lib/auth.ts";
-import { bestRecordings } from "~/lib/best-recording.server.ts";
+import { hearableRecordings } from "~/lib/clip-access.server.ts";
 import {
 	type DetectionClipIdentity,
 	resolveDetectionClipPath,
@@ -279,7 +279,7 @@ export const getLifeListCards = createServerFn({ method: "GET" }).handler(
 				sql`substr(${detections.Time}, 1, 2)`,
 			);
 
-		const best = bestRecordings(sqlite, extractedDir());
+		const best = await hearableRecordings();
 
 		const cards = new Map<string, LifeListCard>();
 		for (const group of groups) {

@@ -153,12 +153,17 @@ web UI doesn't answer afterwards, the station goes back to the version it had. P
 
 > [!CAUTION]
 > **A public station is a public microphone. Read this first.**
-> - **Anyone can play each species' best clip** without signing in, and those clips are real audio
->   from wherever your mic is.
-> - **The voice filter can miss speech.** It drops audio when BirdNET ranks a human sound among its
->   top predictions. `PRIVACY_THRESHOLD` (**Settings → Privacy**, 0–3) widens how far down the list
->   it looks, and 0 still checks the top 10. It is an estimate, so don't rely on it. Keep the mic
->   away from patios, windows and sidewalks, and raise the threshold if people talk nearby.
+> - **Visitors can play one clip per species.** Those clips are real audio from wherever your mic
+>   is. Every other recording and the live stream require sign-in.
+> - **Each public clip is checked for a human voice first.** A voice check runs on the species' best
+>   clip. If it hears a voice, the clip stays private and the next-best clip is checked instead. A
+>   clip stays private until it passes. In testing, the check caught every voice 10 dB quieter than
+>   the bird, about 60% at 20 dB quieter, and few at 30 dB quieter, so a faint voice can still get
+>   through. It also listens only for voices, not for other household sounds.
+> - **The recording filter can miss speech too.** It drops audio when BirdNET ranks a human sound
+>   among its top predictions. `PRIVACY_THRESHOLD` (**Settings → Privacy**, 0–3) widens how far down
+>   the list it looks, and 0 still checks the top 10. Keep the mic away from patios, windows and
+>   sidewalks.
 > - **Recording laws vary by place**, especially for conversations and neighbors. Check yours
 >   before putting the mic outside or the station online. This is not legal advice.
 > - **Coordinates stay private.** Public pages don't include your latitude or longitude. The station
@@ -242,4 +247,6 @@ on. **You may not use it to develop a commercial product.**
 - Songbook began as a fork of [BirdNET-Pi](https://github.com/mcguirepr89/BirdNET-Pi) by
   [@mcguirepr89](https://github.com/mcguirepr89), continued by
   [@Nachtzuster](https://github.com/Nachtzuster/BirdNET-Pi).
+- [YAMNet](https://github.com/tensorflow/models/tree/master/research/audioset/yamnet), the model
+  behind the voice check, is by Google and licensed under Apache 2.0.
 - Translated bird names are thanks to [@patlevin](https://github.com/patlevin) and Wikipedia.

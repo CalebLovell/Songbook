@@ -8,7 +8,7 @@ import {
 	resolveExtractedFile,
 } from "~/lib/audio.server.ts";
 import { splitSpeciesAndFile } from "~/lib/audio.ts";
-import { isBestRecording } from "~/lib/best-recording.server.ts";
+import { isPublicRecording } from "~/lib/best-recording.server.ts";
 import { canHearEveryClip } from "~/lib/clip-access.server.ts";
 
 export const Route = createFileRoute("/api/audio/$date/$speciesAndFile")({
@@ -23,14 +23,14 @@ export const Route = createFileRoute("/api/audio/$date/$speciesAndFile")({
 				}
 
 				const signedIn = await canHearEveryClip();
-				const best =
+				const allowed =
 					signedIn ||
-					isBestRecording(sqlite, extractedDir(), {
+					isPublicRecording(sqlite, extractedDir(), {
 						date: params.date,
 						speciesDir: species,
 						fileName: file,
 					});
-				if (!best) return new Response("Locked", { status: 401 });
+				if (!allowed) return new Response("Locked", { status: 401 });
 
 				try {
 					const info = await stat(resolved);

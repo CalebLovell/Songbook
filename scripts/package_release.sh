@@ -20,6 +20,7 @@ echo "$version" > "$root/web-ui/.output/VERSION"
 # with the bundle and replaces itself on each update.
 mkdir -p "$root/web-ui/.output/updater"
 cp "$root/scripts/update_birdnet.sh" "$root/scripts/release_helpers.sh" "$root/web-ui/.output/updater/"
+cp -r "$root/web-ui/voice-check" "$root/web-ui/.output/voice-check"
 
 bundle="birdnet-web-ui-${version}.tar.gz"
 tar -C "$root/web-ui/.output" -czf "$dist/$bundle" .
