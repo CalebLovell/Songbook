@@ -82,7 +82,9 @@ export function SpeciesByHourCard({
 					className={`${CARD_HEADER_CLASS} gap-3 py-2 ${isEmpty ? "mb-page" : ""}`}
 				>
 					<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
-						<Kicker className="shrink-0">Activity</Kicker>
+						<Kicker as="h2" className="shrink-0">
+							Activity
+						</Kicker>
 						{summary}
 					</div>
 				</div>
@@ -94,6 +96,7 @@ export function SpeciesByHourCard({
 					</>
 				) : (
 					<div className="-mx-1 px-1">
+						<SpeciesHourDataTable rows={rows} />
 						<HeaderRow />
 
 						<div className="-mx-page *:px-page">
@@ -112,6 +115,34 @@ export function SpeciesByHourCard({
 	);
 }
 
+function SpeciesHourDataTable({ rows }: { rows: SpeciesHourRow[] }) {
+	return (
+		<table className="sr-only">
+			<caption>Species by hour</caption>
+			<thead>
+				<tr>
+					<th scope="col">Species</th>
+					{HOURS.map((hour) => (
+						<th key={hour} scope="col">
+							{hourLabel(hour)}
+						</th>
+					))}
+				</tr>
+			</thead>
+			<tbody>
+				{rows.map((row) => (
+					<tr key={row.comName}>
+						<th scope="row">{row.comName}</th>
+						{HOURS.map((hour) => (
+							<td key={hour}>{(row.hourCounts[hour] ?? 0).toLocaleString()}</td>
+						))}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	);
+}
+
 function HeaderRow() {
 	return (
 		<div className={`${ROW_LAYOUT} py-2`}>
@@ -121,7 +152,7 @@ function HeaderRow() {
 					Total
 				</span>
 			</div>
-			<div className={HOURS_LAYOUT}>
+			<div aria-hidden="true" className={HOURS_LAYOUT}>
 				<div
 					className="grid h-4 items-center"
 					style={{ gridTemplateColumns: HOUR_GRID_COLUMNS }}
@@ -192,7 +223,7 @@ function SpeciesHourRowView({
 				</Count>
 			</div>
 
-			<div className={HOURS_LAYOUT}>
+			<div aria-hidden="true" className={HOURS_LAYOUT}>
 				<HeatRow row={row} heatMax={heatMax} />
 			</div>
 		</div>
@@ -210,8 +241,6 @@ function HeatRow({ row, heatMax }: { row: SpeciesHourRow; heatMax: number }) {
 				return (
 					<div
 						key={`hour-${hour}`}
-						role="img"
-						aria-label={`${row.comName} — ${hourLabel(hour)}: ${count.toLocaleString()} detections`}
 						className="mx-0.5 my-1 flex h-6 items-center justify-center overflow-hidden rounded-[3px] text-[10px] tabular-nums leading-none"
 						style={{
 							backgroundColor:
@@ -247,7 +276,9 @@ export function SpeciesByHourCardSkeleton({
 		>
 			<div className={`${CARD_HEADER_CLASS} gap-3 py-2`}>
 				<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
-					<Kicker className="shrink-0">Activity</Kicker>
+					<Kicker as="h2" className="shrink-0">
+						Activity
+					</Kicker>
 					{summary}
 				</div>
 			</div>

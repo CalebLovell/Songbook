@@ -56,7 +56,9 @@ export function SpeciesGrid({
 			<Card as="section" aria-label="Species" className={className}>
 				<div className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2`}>
 					<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
-						<Kicker className="shrink-0">Activity</Kicker>
+						<Kicker as="h2" className="shrink-0">
+							Activity
+						</Kicker>
 						{summary}
 					</div>
 				</div>
@@ -145,7 +147,9 @@ export function SpeciesGridSkeleton({
 		>
 			<div className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2`}>
 				<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
-					<Kicker className="shrink-0">Activity</Kicker>
+					<Kicker as="h2" className="shrink-0">
+						Activity
+					</Kicker>
 					{summary}
 				</div>
 			</div>

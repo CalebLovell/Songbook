@@ -3,6 +3,7 @@ import {
 	type KeyboardEvent,
 	type PointerEvent,
 	type ReactNode,
+	type Ref,
 	useEffect,
 	useReducer,
 	useRef,
@@ -43,12 +44,14 @@ export function SpectrogramPlayer({
 	audioUrl,
 	speciesName,
 	aside,
+	playButtonRef,
 	fill = false,
 	className = DEFAULT_HEIGHT,
 }: {
 	audioUrl: string;
 	speciesName?: string;
 	aside?: ReactNode;
+	playButtonRef?: Ref<HTMLButtonElement>;
 	fill?: boolean;
 	className?: string;
 }) {
@@ -72,13 +75,13 @@ export function SpectrogramPlayer({
 		const clock = formatClock(seconds);
 		if (timeRef.current && timeRef.current.textContent !== clock) {
 			timeRef.current.textContent = clock;
-			sliderRef.current?.setAttribute(
-				"aria-valuenow",
-				String(Math.round(seconds)),
-			);
+		}
+		const wholeSecond = String(Math.floor(seconds));
+		if (sliderRef.current?.getAttribute("aria-valuenow") !== wholeSecond) {
+			sliderRef.current?.setAttribute("aria-valuenow", wholeSecond);
 			sliderRef.current?.setAttribute(
 				"aria-valuetext",
-				`${clock} of ${formatClock(durationRef.current ?? 0)}`,
+				`${spokenClock(seconds)} of ${spokenClock(durationRef.current ?? 0)}`,
 			);
 		}
 	}
@@ -248,7 +251,7 @@ export function SpectrogramPlayer({
 				aria-valuemin={0}
 				aria-valuemax={Math.round(duration ?? 0)}
 				aria-valuenow={0}
-				aria-valuetext={`0:00.0 of ${total}`}
+				aria-valuetext={`${spokenClock(0)} of ${spokenClock(duration ?? 0)}`}
 				onPointerDown={onPointerDown}
 				onPointerMove={onPointerMove}
 				onPointerUp={onPointerEnd}
@@ -276,6 +279,7 @@ export function SpectrogramPlayer({
 
 			<div className={CONTROLS_CLASS}>
 				<Button
+					ref={playButtonRef}
 					type="button"
 					size="icon-sm"
 					icon={isPlaying ? Pause : Play}
@@ -294,6 +298,7 @@ export function SpectrogramPlayer({
 				) : null}
 			</div>
 
+			{/* biome-ignore lint/a11y/useMediaCaption: a bird call has no words to caption */}
 			<audio
 				ref={audioRef}
 				preload="none"
@@ -306,9 +311,7 @@ export function SpectrogramPlayer({
 				onSeeking={() => {
 					if (state.status !== "playing") paintFromAudio();
 				}}
-			>
-				<track kind="captions" />
-			</audio>
+			/>
 		</div>
 	);
 }
@@ -373,6 +376,11 @@ export function ClipMetaSkeleton() {
 			</ShellSized>
 		</>
 	);
+}
+
+function spokenClock(seconds: number): string {
+	const whole = Math.floor(seconds);
+	return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
 }
 
 function formatClock(seconds: number): string {

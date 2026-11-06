@@ -1,8 +1,11 @@
 import { type LucideIcon, TriangleAlert, X } from "lucide-react";
-import { type ReactNode, useEffect, useId } from "react";
+import { AlertDialog } from "radix-ui";
+import type { ReactNode } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
-import { Card } from "~/components/ui/card.tsx";
+import { CARD_CLASS } from "~/components/ui/card.tsx";
+import { useReturnFocus } from "~/lib/use-return-focus.ts";
+import { cn } from "~/lib/utils.ts";
 
 export const MODAL_BACKDROP_CLASS =
 	"fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_oklab,var(--ink)_28%,transparent)] p-page";
@@ -36,61 +39,62 @@ export function ConfirmDialog({
 	onCancel: () => void;
 	onConfirm: () => void;
 }) {
-	const titleId = useId();
-
-	useEffect(() => {
-		function onKeyDown(event: KeyboardEvent) {
-			if (event.key === "Escape" && !pending) onCancel();
-		}
-		document.addEventListener("keydown", onKeyDown);
-		return () => document.removeEventListener("keydown", onKeyDown);
-	}, [onCancel, pending]);
+	useReturnFocus();
 
 	return (
-		<div className={MODAL_BACKDROP_CLASS}>
-			<Card
-				as="section"
-				aria-labelledby={titleId}
-				aria-modal="true"
-				role="alertdialog"
-				className={`${MODAL_CARD_CLASS} max-w-lg`}
-			>
-				<h2
-					id={titleId}
-					className={`${MODAL_TITLE_CLASS} flex items-center gap-page`}
+		<AlertDialog.Root
+			open
+			onOpenChange={(open) => {
+				if (!open) onCancel();
+			}}
+		>
+			<AlertDialog.Overlay className={MODAL_BACKDROP_CLASS}>
+				<AlertDialog.Content
+					onEscapeKeyDown={(event) => {
+						if (pending) event.preventDefault();
+					}}
+					className={cn(CARD_CLASS, MODAL_CARD_CLASS, "max-w-lg")}
 				>
-					{destructive ? (
-						<TriangleAlert className="size-5 shrink-0 text-destructive" />
-					) : null}
-					{title}
-				</h2>
-				<p className="text-muted-foreground text-sm leading-relaxed">
-					{description}
-				</p>
-				{children}
-				<div className={MODAL_ACTIONS_CLASS}>
-					<Button
-						type="button"
-						size="default"
-						icon={cancelIcon}
-						disabled={pending}
-						variant="outline"
-						onClick={onCancel}
+					<AlertDialog.Title
+						className={`${MODAL_TITLE_CLASS} flex items-center gap-page`}
 					>
-						{cancelLabel}
-					</Button>
-					<Button
-						type="button"
-						size="default"
-						icon={confirmIcon}
-						loading={pending}
-						variant={destructive ? "destructive" : "default"}
-						onClick={onConfirm}
-					>
-						{confirmLabel}
-					</Button>
-				</div>
-			</Card>
-		</div>
+						{destructive ? (
+							<TriangleAlert
+								aria-hidden="true"
+								className="size-5 shrink-0 text-destructive"
+							/>
+						) : null}
+						{title}
+					</AlertDialog.Title>
+					<AlertDialog.Description className="text-muted-foreground text-sm leading-relaxed">
+						{description}
+					</AlertDialog.Description>
+					{children}
+					<div className={MODAL_ACTIONS_CLASS}>
+						<AlertDialog.Cancel asChild>
+							<Button
+								type="button"
+								size="default"
+								icon={cancelIcon}
+								disabled={pending}
+								variant="outline"
+							>
+								{cancelLabel}
+							</Button>
+						</AlertDialog.Cancel>
+						<Button
+							type="button"
+							size="default"
+							icon={confirmIcon}
+							loading={pending}
+							variant={destructive ? "destructive" : "default"}
+							onClick={onConfirm}
+						>
+							{confirmLabel}
+						</Button>
+					</div>
+				</AlertDialog.Content>
+			</AlertDialog.Overlay>
+		</AlertDialog.Root>
 	);
 }

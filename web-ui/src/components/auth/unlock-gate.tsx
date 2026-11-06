@@ -91,6 +91,7 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 						ref={field}
 						id="station-password"
 						aria-describedby="station-password-hint"
+						aria-invalid={error ? true : undefined}
 						name="password"
 						type="password"
 						autoComplete="current-password"

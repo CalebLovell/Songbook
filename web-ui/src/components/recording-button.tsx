@@ -44,7 +44,12 @@ export function RecordingButton({
 				loading={isLoading}
 				disabled={!audioUrl}
 				onClick={togglePlay}
-				aria-label={recordingActionLabel(isPlaying, speciesName)}
+				aria-label={
+					iconOnly
+						? recordingActionLabel(isPlaying, speciesName)
+						: `${PLAY_LABEL} to ${speciesName ? `${speciesName} call` : "the call"}`
+				}
+				aria-pressed={iconOnly ? undefined : isPlaying}
 			>
 				{iconOnly ? null : labelClassName ? (
 					<span className={labelClassName}>{PLAY_LABEL}</span>
@@ -53,15 +58,14 @@ export function RecordingButton({
 				)}
 			</Button>
 			{audioUrl && (
+				// biome-ignore lint/a11y/useMediaCaption: a bird call has no words to caption
 				<audio
 					ref={audioRef}
 					preload="none"
 					onPlay={onPlay}
 					onPause={onPause}
 					onEnded={onEnded}
-				>
-					<track kind="captions" />
-				</audio>
+				/>
 			)}
 		</>
 	);

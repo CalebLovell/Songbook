@@ -1,14 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import {
 	type ColumnDef,
-	flexRender,
 	getCoreRowModel,
 	type OnChangeFn,
 	type RowSelectionState,
 	useReactTable,
 } from "@tanstack/react-table";
 import { ArrowRight, Calendar, Trash2, X } from "lucide-react";
-import type { CSSProperties } from "react";
+import { type CSSProperties, type ReactNode, useId } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
@@ -24,6 +23,7 @@ import { RowCheckbox } from "~/components/ui/row-checkbox.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
 import { SearchInput } from "~/components/ui/search-input.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
+import { SkipLink } from "~/components/ui/skip-link.tsx";
 import {
 	SELECT_COLUMN_WIDTH,
 	Table,
@@ -47,6 +47,7 @@ import {
 import type { DetectionPage, DetectionTableRow } from "~/lib/detections.ts";
 import { useShiftClickRange } from "~/lib/shift-click-range.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { useDraft } from "~/lib/use-draft.ts";
 import { cn } from "~/lib/utils.ts";
 
@@ -141,7 +142,7 @@ function DateRangeFilter({
 	return (
 		<fieldset
 			aria-label="Date range"
-			className="flex h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring"
+			className="flex h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-control-line bg-card focus-within:border-focus-ring"
 		>
 			<DateSegment
 				label="From date"
@@ -223,6 +224,30 @@ function DateSegment({
 	);
 }
 
+function renderInPlace<Context>(
+	template: ReactNode | ((context: Context) => ReactNode),
+	context: Context,
+) {
+	return typeof template === "function" ? template(context) : template;
+}
+
+const SORT_BY_COLUMN: Partial<Record<string, DetectionWorkspaceSort>> = {
+	species: "species",
+	scientificName: "scientific",
+	recorded: "recorded",
+	confidence: "confidence",
+};
+
+function ariaSortFor(
+	columnId: string,
+	search: { sort: DetectionWorkspaceSort; direction: "asc" | "desc" },
+) {
+	const sort = SORT_BY_COLUMN[columnId];
+	if (!sort) return undefined;
+	if (sort !== search.sort) return "none";
+	return search.direction === "asc" ? "ascending" : "descending";
+}
+
 function SelectionBar({
 	count,
 	onClear,
@@ -236,7 +261,7 @@ function SelectionBar({
 	return (
 		<fieldset
 			aria-label="Selected detections"
-			className="flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm"
+			className="flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm *:focus-visible:-outline-offset-2"
 		>
 			<span className="flex items-center gap-[0.5ch] @xl:px-3 px-2 text-muted-foreground">
 				<span className="font-semibold text-foreground tabular-nums">
@@ -408,6 +433,7 @@ export function DetectionsTable({
 	onDeleteSelected,
 }: DetectionsTableProps) {
 	const selectedCount = Object.values(rowSelection).filter(Boolean).length;
+	const actionsId = useId();
 	const rowsForClick = useShiftClickRange(selectedCount > 0);
 
 	function updateSearch(change: Partial<DetectionWorkspaceSearch>) {
@@ -436,6 +462,7 @@ export function DetectionsTable({
 		header: ({ table }) => (
 			<RowCheckbox
 				aria-label="Select all detections on this page"
+				actionsId={actionsId}
 				checked={table.getIsAllPageRowsSelected()}
 				onChange={table.getToggleAllPageRowsSelectedHandler()}
 			/>
@@ -443,6 +470,7 @@ export function DetectionsTable({
 		cell: ({ row, table }) => (
 			<RowCheckbox
 				aria-label={`Select ${row.original.Com_Name}`}
+				actionsId={actionsId}
 				checked={row.getIsSelected()}
 				onChange={(event) => {
 					const { checked } = event.target;
@@ -634,10 +662,24 @@ export function DetectionsTable({
 		? Math.max(1, Math.ceil(page.total / search.pageSize))
 		: 1000;
 	const selectionShown = canDelete && selectedCount > 0;
+	useAnnounceChange(
+		selectedCount > 0
+			? `${selectedCount} selected. Press Enter to reach the actions.`
+			: "Nothing selected",
+	);
+	useAnnounceChange(
+		page
+			? `${page.total.toLocaleString()} ${page.total === 1 ? "detection" : "detections"}`
+			: null,
+	);
 	return (
-		<div className="@container flex min-h-0 flex-1 flex-col">
+		<div className="@container relative flex min-h-0 flex-1 flex-col">
+			<SkipLink targetId={actionsId} className="absolute top-1 left-0">
+				Skip to table actions
+			</SkipLink>
 			<Table
 				role="table"
+				aria-label="Detections"
 				className="grid h-full min-w-min @min-[54rem]:grid-cols-(--cols-lg) @xl:grid-cols-(--cols-md) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
 				style={gridColumns(canDelete, canListen)}
 				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
@@ -652,6 +694,7 @@ export function DetectionsTable({
 								<TableHead
 									key={header.id}
 									role="columnheader"
+									aria-sort={ariaSortFor(header.column.id, search)}
 									className={cn(
 										"font-semibold",
 										CELL_GAP,
@@ -666,7 +709,7 @@ export function DetectionsTable({
 								>
 									{header.isPlaceholder
 										? null
-										: flexRender(
+										: renderInPlace(
 												header.column.columnDef.header,
 												header.getContext(),
 											)}
@@ -730,7 +773,7 @@ export function DetectionsTable({
 										index === 0 && FIRST_COLUMN_CLASSES,
 									)}
 								>
-									{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									{renderInPlace(cell.column.columnDef.cell, cell.getContext())}
 								</TableCell>
 							))}
 						</TableRow>
@@ -738,7 +781,11 @@ export function DetectionsTable({
 				</RowWell>
 			</Table>
 
-			<div className="-mr-card-edge -ml-page flex min-h-11.25 shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
+			<div
+				className="-mr-card-edge -ml-page flex min-h-11.25 shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm outline-none focus-visible:outline-none"
+				id={actionsId}
+				tabIndex={-1}
+			>
 				{page ? (
 					<PageRange
 						first={firstIndex}

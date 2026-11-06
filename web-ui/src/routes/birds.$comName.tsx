@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ExternalLink, Feather } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 
 import {
@@ -138,7 +138,7 @@ export const Route = createFileRoute("/birds/$comName")({
 });
 
 function speciesHead(bird?: { comName: string; sciName: string | null }) {
-	if (!bird) return { meta: [{ title: pageTitle("Bird") }] };
+	if (!bird) return { meta: [{ title: pageTitle("No such bird") }] };
 	const { comName, sciName } = bird;
 	const description = sciName
 		? `A Songbook station's record of the ${comName} (${sciName}).`
@@ -374,7 +374,7 @@ function VisitLogSkeleton() {
 		>
 			<Card className={VISIT_LOG_CARD_CLASS}>
 				<div className={VISIT_LOG_HEADER_CLASS}>
-					<Kicker>Visit log</Kicker>
+					<Kicker as="h2">Visit log</Kicker>
 				</div>
 				<RowWell as="ul" aria-hidden="true" className={VISIT_LIST_CLASS}>
 					{Array.from({ length: VISITS_PAGE_SIZE }, (_, index) => (
@@ -494,6 +494,10 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 	const { year, visits: visitsPage } = Route.useSearch();
 	const navigate = Route.useNavigate();
 	const { weeks, maximum } = buildHeatMap(detail.history);
+	const lastHeardDay = weeks
+		.flatMap((week) => week.days)
+		.filter(({ point }) => (point?.count ?? 0) > 0)
+		.at(-1)?.date;
 	const heatScrollRef = useRef<HTMLDivElement>(null);
 	// biome-ignore lint/correctness/useExhaustiveDependencies: re-aim trigger
 	useEffect(() => {
@@ -551,7 +555,12 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 											</div>
 										))}
 									</div>
-									<div className="flex w-max gap-1">
+									<fieldset
+										aria-label={`Days with detections in ${year}. Arrow keys move between them.`}
+										data-year-grid=""
+										onKeyDown={walkYearGrid}
+										className="flex w-max gap-1"
+									>
 										{weeks.map((week) => (
 											<div
 												key={`week-${week.days[0].date.toISOString()}`}
@@ -563,11 +572,12 @@ function SpeciesDetailView({ detail }: { detail: SpeciesDetail }) {
 														date={date}
 														point={point}
 														maximum={maximum}
+														isTabStop={date === lastHeardDay}
 													/>
 												))}
 											</div>
 										))}
-									</div>
+									</fieldset>
 								</div>
 							</div>
 						</div>
@@ -678,14 +688,37 @@ const VISIT_LOG_FOOTER_CLASS =
 const SWATCH =
 	"size-3 rounded-[3px] border border-line transition-[outline] hover:z-10 hover:outline hover:outline-2 hover:outline-hover-line hover:outline-offset-1";
 
+function walkYearGrid(event: KeyboardEvent<HTMLFieldSetElement>) {
+	const days = [...event.currentTarget.querySelectorAll("a")];
+	const from = days.indexOf(document.activeElement as HTMLAnchorElement);
+	if (from < 0) return;
+	const moves: Record<string, number> = {
+		ArrowRight: from + 1,
+		ArrowDown: from + 1,
+		ArrowLeft: from - 1,
+		ArrowUp: from - 1,
+		Home: 0,
+		End: days.length - 1,
+	};
+	const target = days[moves[event.key]];
+	if (!(event.key in moves)) return;
+	event.preventDefault();
+	if (!target) return;
+	days[from].tabIndex = -1;
+	target.tabIndex = 0;
+	target.focus();
+}
+
 function HeatMapDay({
 	date,
 	point,
 	maximum,
+	isTabStop,
 }: {
 	date: Date;
 	point: TrendPoint | null;
 	maximum: number;
+	isTabStop: boolean;
 }) {
 	const count = point?.count ?? 0;
 	const dateLabel = formatDate(bucketForDate(date));
@@ -696,14 +729,19 @@ function HeatMapDay({
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<Link
-					to="/timeline"
-					search={{ period: "day", date: bucketForDate(date) }}
-					aria-label={label}
-					className="block"
-				>
+				{count > 0 ? (
+					<Link
+						to="/timeline"
+						search={{ period: "day", date: bucketForDate(date) }}
+						aria-label={label}
+						tabIndex={isTabStop ? 0 : -1}
+						className="block"
+					>
+						<div aria-hidden="true" className={SWATCH} style={fill} />
+					</Link>
+				) : (
 					<div aria-hidden="true" className={SWATCH} style={fill} />
-				</Link>
+				)}
 			</TooltipTrigger>
 			<TooltipContent>
 				{dateLabel} — {count.toLocaleString()} {noun}
@@ -845,7 +883,7 @@ function VisitLogCard({
 				className={`${pageCount > 1 ? VISIT_LOG_CARD_CLASS : VISIT_LOG_SHORT_CARD_CLASS} ${visits.length === 0 ? "pb-4!" : ""}`}
 			>
 				<div className={VISIT_LOG_HEADER_CLASS}>
-					<Kicker>Visit log</Kicker>
+					<Kicker as="h2">Visit log</Kicker>
 				</div>
 
 				{visits.length === 0 ? (

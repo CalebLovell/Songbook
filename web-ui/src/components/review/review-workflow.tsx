@@ -27,13 +27,11 @@ import { Card } from "~/components/ui/card.tsx";
 import {
 	ConfirmDialog,
 	MODAL_ACTIONS_CLASS,
-	MODAL_BACKDROP_CLASS,
-	MODAL_CARD_CLASS,
-	MODAL_TITLE_CLASS,
 } from "~/components/ui/confirm-dialog.tsx";
 import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
 import { Input } from "~/components/ui/input.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
+import { ModalDialog } from "~/components/ui/modal-dialog.tsx";
 import { PageStepper } from "~/components/ui/page-stepper.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
@@ -148,7 +146,7 @@ export function ReviewWorkflowSkeleton() {
 					className={QUEUE_CARD_CLASS}
 				>
 					<div className={QUEUE_HEADER_CLASS}>
-						<Kicker>In the queue</Kicker>
+						<Kicker as="h2">In the queue</Kicker>
 						<ShellText
 							className={cn(COUNT_CLASS, "w-[1ch]")}
 							barClassName="right-0 left-auto w-full"
@@ -348,9 +346,9 @@ export function ReviewWorkflow({
 								/>
 							</div>
 							<div className={IDENTITY_TEXT_CLASS}>
-								<h2
+								<h3
 									title={row.comName}
-									className={`${NAME_CLASS} w-full truncate text-moss`}
+									className={`${NAME_CLASS} w-full text-moss`}
 								>
 									<Link
 										to="/birds/$comName"
@@ -359,7 +357,7 @@ export function ReviewWorkflow({
 									>
 										{row.comName}
 									</Link>
-								</h2>
+								</h3>
 								<p
 									title={row.sciName}
 									className="w-full truncate text-bark text-sm italic leading-tight"
@@ -446,7 +444,7 @@ export function ReviewWorkflow({
 						className={QUEUE_CARD_CLASS}
 					>
 						<div className={QUEUE_HEADER_CLASS}>
-							<Kicker>In the queue</Kicker>
+							<Kicker as="h2">In the queue</Kicker>
 							<Count>{page.total}</Count>
 						</div>
 						<RowWell
@@ -514,68 +512,62 @@ export function ReviewWorkflow({
 				</div>
 			</div>
 			{picker ? (
-				<div
-					role="dialog"
-					aria-modal="true"
-					aria-labelledby="recategorize-review-title"
-					className={MODAL_BACKDROP_CLASS}
+				<ModalDialog
+					title="Choose the correct species"
+					className="max-h-[80vh] max-w-xl"
+					onClose={() => setPicker(null)}
 				>
-					<Card className={`${MODAL_CARD_CLASS} max-h-[80vh] max-w-xl`}>
-						<h2 id="recategorize-review-title" className={MODAL_TITLE_CLASS}>
-							Choose the correct species
-						</h2>
-						<div className="relative">
-							<Search
-								aria-hidden="true"
-								className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-							/>
-							<Input
-								className="pl-9"
-								value={query}
-								onChange={(e) => setQuery(e.target.value)}
-								placeholder="Search any BirdNET species"
-								autoFocus
-							/>
-						</div>
-						<div className="-m-1 min-h-0 flex-1 space-y-1 overflow-auto p-1">
-							{matches.map((item) => (
-								<button
-									type="button"
-									className="w-full scroll-my-1 rounded-md px-3 py-2 text-left text-sm hover:bg-accent"
-									key={item.sciName}
-									onClick={() => {
-										setAction({
-											kind: "recategorize",
-											row: picker,
-											species: item,
-										});
-										setPicker(null);
-									}}
-								>
-									<span className="font-medium">{item.comName}</span>
-									<span className="ml-2 text-muted-foreground text-xs italic">
-										{item.sciName}
-									</span>
-								</button>
-							))}
-							{matches.length === 0 ? (
-								<p className="px-3 py-2 text-foreground text-sm">
-									{EMPTY.filter.recategorizeSearch(query.trim())}
-								</p>
-							) : null}
-						</div>
-						<div className={MODAL_ACTIONS_CLASS}>
-							<Button
-								icon={X}
-								variant="outline"
-								size="default"
-								onClick={() => setPicker(null)}
+					<div className="relative">
+						<Search
+							aria-hidden="true"
+							className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+						/>
+						<Input
+							className="pl-9"
+							value={query}
+							onChange={(e) => setQuery(e.target.value)}
+							placeholder="Search any BirdNET species"
+							autoFocus
+						/>
+					</div>
+					<div className="-m-1 min-h-0 flex-1 space-y-1 overflow-auto p-1">
+						{matches.map((item) => (
+							<button
+								type="button"
+								className="w-full scroll-my-1 rounded-md px-3 py-2 text-left text-sm hover:bg-accent"
+								key={item.sciName}
+								onClick={() => {
+									setAction({
+										kind: "recategorize",
+										row: picker,
+										species: item,
+									});
+									setPicker(null);
+								}}
 							>
-								Cancel
-							</Button>
-						</div>
-					</Card>
-				</div>
+								<span className="font-medium">{item.comName}</span>
+								<span className="ml-2 text-muted-foreground text-xs italic">
+									{item.sciName}
+								</span>
+							</button>
+						))}
+						{matches.length === 0 ? (
+							<p className="px-3 py-2 text-foreground text-sm">
+								{EMPTY.filter.recategorizeSearch(query.trim())}
+							</p>
+						) : null}
+					</div>
+					<div className={MODAL_ACTIONS_CLASS}>
+						<Button
+							icon={X}
+							variant="outline"
+							size="default"
+							onClick={() => setPicker(null)}
+						>
+							Cancel
+						</Button>
+					</div>
+				</ModalDialog>
 			) : null}
 			{action ? (
 				<ConfirmDialog

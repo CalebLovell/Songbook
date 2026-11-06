@@ -51,6 +51,7 @@ import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { useDraft } from "~/lib/use-draft.ts";
 import { useSettled } from "~/lib/use-settled.ts";
 import { cn } from "~/lib/utils.ts";
@@ -306,6 +307,7 @@ function SpeciesBrowser({ cards }: { cards: LifeListCard[] }) {
 		});
 	}, [cards, fuse, search, sort, reverse]);
 
+	useAnnounceChange(`${filtered.length.toLocaleString()} species`);
 	const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 	const currentPage = Math.min(page, pageCount);
 	const pageItems = filtered.slice(
@@ -466,6 +468,7 @@ function SortTabs({
 			<ToggleGroup
 				type="single"
 				variant="outline"
+				aria-label="Sort birds by"
 				value={sort}
 				onValueChange={(value) => {
 					if (value) onSort(value as SortKey);

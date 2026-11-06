@@ -45,7 +45,8 @@ for a meaning; don't write a new mix inline when one exists:
 | `--line` | every border and hairline (moss 15%) |
 | `--track` | unfilled remainder of a bar (moss 28%) |
 | `--hover-line` | border of a linked card on hover |
-| `--focus-ring` | keyboard focus, 2px outline, 2px offset |
+| `--focus-ring` | keyboard focus, 2px outline, 2px offset; drawn inset (`-outline-offset-2`) on a segment of a joined control, whose group clips outside it |
+| `--control-line` | the border of a field or checkbox, where the border is what shows there is a control (moss 50%, 3:1) |
 | `--muted-foreground` | secondary text (neutral grey, black 49%) |
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
@@ -58,7 +59,8 @@ Confidence tiers are fixed at ≥90%, ≥75% and below (`lib/confidence.ts`),
 never a gradient. Destructive is clay. Single-series charts are moss. Heat
 shading is a continuous ramp from a pale moss wash to full moss, log-scaled,
 with one scale per chart topped by its busiest cell across every row -- never
-a row's own peak (`lib/heatmap.ts`).
+a row's own peak (`lib/heatmap.ts`). The ramp steps over the mixes where neither
+digit colour reaches 4.5:1.
 
 ## Type
 
@@ -91,7 +93,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   segments are joined.
 - Motion: 180ms ease for color/border/lift; `animate-rise-in` 700ms on mount;
   `animate-flash-in` 2.4s sand highlight for new arrivals; charts 500ms.
-  Only linked cards lift on hover.
+  Only linked cards lift on hover. `prefers-reduced-motion` stops all of it
+  (`styles.css`, `useReducedMotion` for charts).
 
 ## Components
 
@@ -133,6 +136,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   must measure the same; only row counts that depend on the data may differ.
   No animation between the two: shells show from the first frame and content
   replaces them in place.
+- **Keyboard**: every page opens with a skip link, and a page change moves focus to
+  `main` (tabindex -1, never ringed) and speaks the title. A scroll key with nothing
+  focused goes to `main`, the only scroller. Page-wide single-key shortcuts ignore
+  anything typed into a field, and Enter never fires one over the focused control.
 - **Chart tooltip**: one line, "6 AM — 1,284 detections", only the bucket bold.
   Pointer-only.
 - **Charts**: hidden from assistive tech and not tab stops; `ChartDataTable`
@@ -144,9 +151,14 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   columns that never shrink, stack or scroll. Names truncate to make room, and a
   card under 56rem drops the hours. A zero is an empty cell with no digit. The
   bird page's year grid scrolls inside its card on a phone, opens on today for
-  the current year, and never draws a day still to come. Hour bars on a species
+  the current year, and never draws a day still to come. Only days with detections
+  are links; together they are one tab stop, walked in date order with the arrows.
+  Their 12px squares miss the 24px target size, a known gap kept for the look. Hour bars on a species
   tile are the one exception to the shared heat scale: they compare a bird only
   with itself, as a linear share of its own peak.
+- **Heat map text**: the timeline's hours are hidden from assistive tech, and a hidden
+  table gives every species by hour at any width. A narrow card drops the hours for
+  sighted users; that is a known gap against reflow, kept on purpose.
 - **Tables** (Detections, Species Control): one grid with the header, body and
   rows as subgrids, so only the rows scroll and the columns still align. Header,
   rows and footer stand the same height. Width follows the card: under 36rem one
@@ -163,7 +175,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the range gives way while something is ticked. Shift-click applies the clicked
   box's new state back to the last box clicked, and repeating it on the same box
   flips that whole range back. Signed-out visitors get
-  neither checkboxes nor a Recording column.
+  neither checkboxes nor a Recording column. A skip link passes the rows to the
+  footer, and Enter on a row's checkbox does the same. Cells render in place, never
+  as components, so ticking a row keeps focus on it.
 - **Segmented controls** never wrap. Where the segments no longer fit they become
   a native select in the same control dress, so a phone opens its own picker.
 - **Date controls** show the house format with the native input laid invisibly
@@ -174,15 +188,21 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Flags** (New, Rare, Vocal, Returned, Regular) stack, render as glyph pills
   with their name in the tooltip, and share a tint with the Highlights line of
   the same name. Their tints never reuse the confidence scale.
-- **Recordings**: `RecordingButton` where only a button fits, `SpectrogramPlayer`
+- **Recordings**: a bird call has no words, so clips carry no caption track.
+  `RecordingButton` where only a button fits, `SpectrogramPlayer`
   where there's room. One clip sounds at a time across the app. Accessible names
-  name the bird, except in the quiz, where that would give the answer away. Give
+  name the bird, except in the quiz, where that would give the answer away, and
+  contain any visible label. Give
   the player a `key` per clip; it moves the playhead by `transform` written to the
   DOM, never through React state. Spectrograms draw in the browser, capped at
   15kHz, on the same paper-to-moss ramp as the live feed.
 - **Confirmations** all use `ConfirmDialog`: full-size buttons, an icon on each,
-  Escape cancels. Both are `type="button"` because the dialog often sits inside
-  the form it guards.
+  Escape cancels, focus starts on Cancel. Both are `type="button"` because the
+  dialog often sits inside the form it guards.
+- **Modals** are Radix: `ConfirmDialog`, `ModalDialog`, or `InfoTip`. They hold
+  focus and hide the page behind them, then give focus back to what opened them,
+  or to `main` if that has gone. The menu drawer does the same by hand so it can
+  keep its slide.
 - **Sharing**: Share opens a modal showing the exact text that will be sent, on a
   meadow well; opening it sends nothing. Copy is always there, and a touch screen
   with a share sheet adds Share as the primary button.
@@ -190,6 +210,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   tooltip, and a tap opens it too.
 - **Outcomes** arrive as toasts, never as a status line or coloured stripe on a
   card. A destructive action that succeeded wears clay, not moss.
+- **Announcements**: anything that changes in place without moving focus and that
+  a screen reader needs (result counts, a selection, a quiz guess) goes through
+  `announce` or `useAnnounceChange`, which speak from one polite region. Live says
+  a new main bird at most once a minute and never reads the log.
+- **Headings**: a card title is an `h2` (`CardHeader`, or `Kicker as="h2"`), and
+  whatever sits under it steps down from there.
 
 ## Layout
 
@@ -248,6 +274,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Rare** has one meaning, the owner's `rareMax`, for the Rare flag and the quiz
   pools alike. Pools split by familiarity, never by time. Nothing on a question may
   point at its answer, and a loader rerun never swaps the round being played.
+  A guess is spoken and leaves its choice focusable (`aria-disabled`); focus then
+  follows the round: Next after a right answer, the clip after Next, the results at
+  the end.
 - **Settings**: a save writes the config, then restarts the card's services. A
   refused and a declined restart read the same, and the card keeps offering Restart
   until the values are live. Reset leaves the Station card alone. One tab per card,

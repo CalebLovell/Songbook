@@ -84,6 +84,7 @@ export function PeriodToolbar({
 				<ToggleGroup
 					type="single"
 					variant="outline"
+					aria-label="Period"
 					value={period}
 					onValueChange={(value) => {
 						if (value) pickPeriod(value as TimelinePeriod);

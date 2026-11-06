@@ -37,7 +37,7 @@ export function SortMenu<Sort extends string>({
 					onChange={(event) =>
 						sort !== event.target.value && onSort(event.target.value as Sort)
 					}
-					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 leading-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none"
+					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 leading-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:-outline-offset-2"
 				>
 					{sorts.map((option) => (
 						<option key={option} value={option}>
@@ -56,7 +56,7 @@ export function SortMenu<Sort extends string>({
 				aria-pressed={reversed}
 				title={direction === "asc" ? "Ascending" : "Descending"}
 				onClick={onFlip}
-				className="flex w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
+				className="flex w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:-outline-offset-2 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
 			>
 				<DirectionIcon className="size-3.5" aria-hidden="true" />
 			</button>

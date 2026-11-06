@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, RotateCcw, Trophy, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
@@ -15,6 +15,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
 import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
+import { announce } from "~/lib/announce.ts";
 import { formatDateTime } from "~/lib/date-format.ts";
 import { HIGHLIGHT_THRESHOLDS } from "~/lib/highlight-thresholds.ts";
 import {
@@ -53,6 +54,9 @@ const RAIL_ROW_CLASS = "flex min-h-13.75 items-center gap-3 px-page py-1.75";
 const RAIL_FOOTER_CLASS =
 	"-mx-page mt-auto -mb-page flex items-baseline justify-between gap-2 border-t px-page py-3";
 const GAME_FOOTER_CLASS = "flex min-h-8 items-center justify-end";
+const TEXT_ENTRY_SELECTOR = "input, textarea, select, [contenteditable='true']";
+const CONTROL_SELECTOR = `a[href], button, [role='slider'], ${TEXT_ENTRY_SELECTOR}`;
+const DIALOG_SELECTOR = "[role='dialog'], [role='alertdialog']";
 
 function GameInfo({
 	rareMax = HIGHLIGHT_THRESHOLDS.rareMax,
@@ -73,6 +77,10 @@ function GameInfo({
 			</p>
 			<p>
 				Then repeat for all {QUESTIONS_PER_ROUND} birds for your final score!
+			</p>
+			<p>
+				On a keyboard, keys 1 to {CHOICES_PER_QUESTION} pick a bird and Enter
+				moves on.
 			</p>
 			<p>Selection options:</p>
 			<ul className="space-y-1">
@@ -168,7 +176,7 @@ export function LearnGameSkeleton() {
 					className={RAIL_CLASS}
 				>
 					<div className={RAIL_HEADER_CLASS}>
-						<Kicker>This round</Kicker>
+						<Kicker as="h2">This round</Kicker>
 					</div>
 					<ol aria-hidden="true" className="-mx-page divide-y">
 						{Array.from({ length: QUESTIONS_PER_ROUND }, (_, position) => (
@@ -209,7 +217,7 @@ export function LearnGameEmpty({ message }: { message: string }) {
 
 				<Card as="aside" aria-label="This round" className={RAIL_CLASS}>
 					<div className={RAIL_HEADER_CLASS}>
-						<Kicker>This round</Kicker>
+						<Kicker as="h2">This round</Kicker>
 					</div>
 					<p className="mt-page text-muted-foreground text-sm">{message}</p>
 				</Card>
@@ -226,6 +234,7 @@ export function LearnGame({
 	onPlayAgain,
 	isLoadingNextRound,
 	isPaused = false,
+	focusClipOnStart = false,
 }: {
 	round: LearnRound;
 	rareMax: number;
@@ -234,13 +243,27 @@ export function LearnGame({
 	onPlayAgain: () => void;
 	isLoadingNextRound: boolean;
 	isPaused?: boolean;
+	focusClipOnStart?: boolean;
 }) {
 	const [progress, setProgress] = useState(initialProgress);
+	const nextButton = useRef<HTMLButtonElement>(null);
+	const playButton = useRef<HTMLButtonElement>(null);
+	const focusAfterRender = useRef<"next" | "clip" | null>(
+		focusClipOnStart ? "clip" : null,
+	);
+	const justFinished = useRef(false);
 	const { index, wrongGuesses, isSolved, results, isFinished } = progress;
 
 	useEffect(() => {
 		onProgressChange?.(progress);
 	}, [progress, onProgressChange]);
+
+	useEffect(() => {
+		const target = focusAfterRender.current;
+		focusAfterRender.current = null;
+		if (target === "next") nextButton.current?.focus();
+		if (target === "clip") playButton.current?.focus();
+	});
 
 	const question = round.questions[index];
 	const runningScore = scoreRound(results);
@@ -251,6 +274,11 @@ export function LearnGame({
 				return;
 
 			if (choice.sciName === question.answerSciName) {
+				const points = pointsForAttempt(wrongGuesses.length + 1);
+				announce(
+					`Correct: ${choice.comName}. ${points} ${points === 1 ? "point" : "points"}.`,
+				);
+				focusAfterRender.current = "next";
 				setProgress((previous) => ({
 					...previous,
 					results: [
@@ -262,6 +290,7 @@ export function LearnGame({
 				return;
 			}
 
+			announce(`Not the ${choice.comName}. Try again.`);
 			setProgress((previous) => ({
 				...previous,
 				wrongGuesses: [...previous.wrongGuesses, choice.sciName],
@@ -273,9 +302,12 @@ export function LearnGame({
 	const advance = useCallback(() => {
 		if (!isSolved) return;
 		if (index + 1 >= round.questions.length) {
+			justFinished.current = true;
 			setProgress((previous) => ({ ...previous, isFinished: true }));
 			return;
 		}
+		announce(`Bird ${index + 2} of ${round.questions.length}.`);
+		focusAfterRender.current = "clip";
 		setProgress((previous) => ({
 			...previous,
 			index: previous.index + 1,
@@ -289,10 +321,13 @@ export function LearnGame({
 
 		function onKeyDown(event: KeyboardEvent) {
 			if (event.metaKey || event.ctrlKey || event.altKey) return;
+			const target = event.target instanceof Element ? event.target : null;
+			if (target?.closest(DIALOG_SELECTOR)) return;
 			if (event.key === "Enter") {
-				advance();
+				if (!target?.closest(CONTROL_SELECTOR)) advance();
 				return;
 			}
+			if (target?.closest(TEXT_ENTRY_SELECTOR)) return;
 			const choice = question?.choices[Number(event.key) - 1];
 			if (choice) guess(choice);
 		}
@@ -310,6 +345,7 @@ export function LearnGame({
 				results={results}
 				onPlayAgain={onPlayAgain}
 				isLoadingNextRound={isLoadingNextRound}
+				takeFocus={justFinished.current}
 			/>
 		);
 	}
@@ -346,6 +382,7 @@ export function LearnGame({
 						<SpectrogramPlayer
 							key={question.id}
 							audioUrl={question.audioUrl}
+							playButtonRef={playButton}
 							aside={
 								<ClipMeta
 									heardAt={formatDateTime(question.detectedAt)}
@@ -379,6 +416,7 @@ export function LearnGame({
 					<div className={GAME_FOOTER_CLASS}>
 						{index + 1 >= round.questions.length ? (
 							<Button
+								ref={nextButton}
 								size="default"
 								icon={Trophy}
 								onClick={advance}
@@ -388,6 +426,7 @@ export function LearnGame({
 							</Button>
 						) : (
 							<Button
+								ref={nextButton}
 								size="default"
 								icon={ArrowRight}
 								iconPosition="end"
@@ -428,7 +467,7 @@ function RoundRail({
 	return (
 		<Card as="aside" aria-label="This round" className={RAIL_CLASS}>
 			<div className={RAIL_HEADER_CLASS}>
-				<Kicker>This round</Kicker>
+				<Kicker as="h2">This round</Kicker>
 			</div>
 
 			<ol className="-mx-page divide-y">
@@ -601,10 +640,10 @@ type ChoiceState = "open" | "correct" | "wrong" | "muted";
 const CHOICE_STYLES: Record<ChoiceState, string> = {
 	open: "border-line bg-paper-raised hover:border-hover-line hover:bg-meadow",
 	correct:
-		"border-moss bg-[color-mix(in_oklab,var(--moss)_12%,var(--paper-raised))]",
+		"cursor-default border-moss bg-[color-mix(in_oklab,var(--moss)_12%,var(--paper-raised))]",
 	wrong:
-		"border-clay bg-[color-mix(in_oklab,var(--clay)_10%,var(--paper-raised))] opacity-80",
-	muted: "border-line bg-paper-raised opacity-50",
+		"cursor-default border-clay bg-[color-mix(in_oklab,var(--clay)_10%,var(--paper-raised))] opacity-80",
+	muted: "cursor-default border-line bg-paper-raised opacity-50",
 };
 
 function ChoiceButton({
@@ -622,7 +661,7 @@ function ChoiceButton({
 		<button
 			type="button"
 			onClick={onSelect}
-			disabled={state !== "open"}
+			aria-disabled={state === "open" ? undefined : true}
 			className={`${CHOICE_CLASS} ${CHOICE_STYLES[state]}`}
 		>
 			<span className="w-4 shrink-0 text-center text-muted-foreground text-xs tabular-nums">
@@ -639,9 +678,15 @@ function ChoiceButton({
 			</span>
 			<span className="size-4 shrink-0">
 				{state === "correct" ? (
-					<Check className="size-4 text-moss" />
+					<>
+						<Check aria-hidden="true" className="size-4 text-moss" />
+						<span className="sr-only">Correct</span>
+					</>
 				) : state === "wrong" ? (
-					<X className="size-4 text-clay" />
+					<>
+						<X aria-hidden="true" className="size-4 text-clay" />
+						<span className="sr-only">Not this one</span>
+					</>
 				) : null}
 			</span>
 		</button>
@@ -691,19 +736,28 @@ function RoundSummary({
 	results,
 	onPlayAgain,
 	isLoadingNextRound,
+	takeFocus,
 }: {
 	questions: LearnQuestion[];
 	results: QuestionResult[];
 	onPlayAgain: () => void;
 	isLoadingNextRound: boolean;
+	takeFocus: boolean;
 }) {
 	const score = scoreRound(results);
+	const card = useRef<HTMLElement>(null);
+	const [shouldTakeFocus] = useState(takeFocus);
+	useEffect(() => {
+		if (shouldTakeFocus) card.current?.focus();
+	}, [shouldTakeFocus]);
 
 	return (
 		<Card
 			as="section"
+			ref={card}
+			tabIndex={-1}
 			aria-label="Round results"
-			className="@container flex animate-rise-in flex-col gap-page"
+			className="@container flex animate-rise-in flex-col gap-page outline-none focus-visible:outline-none"
 		>
 			<CardHeader title="Round complete">
 				<span className="text-sm tabular-nums">

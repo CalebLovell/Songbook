@@ -11,10 +11,24 @@ import { PageStatus } from "~/components/page-status.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
+import { announce } from "~/lib/announce.ts";
 import { isUnauthorizedError } from "~/lib/auth.ts";
+import { pageTitle } from "~/lib/page-title.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 
+function useStatusTitle(title: string) {
+	useEffect(() => {
+		const previous = document.title;
+		document.title = pageTitle(title);
+		announce(title);
+		return () => {
+			document.title = previous;
+		};
+	}, [title]);
+}
+
 export function RouteNotFound() {
+	useStatusTitle("Page not found");
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
@@ -41,6 +55,7 @@ export function RouteError({ error }: ErrorComponentProps) {
 	const router = useRouter();
 	const navigate = useNavigate();
 	const signedOut = isUnauthorizedError(error);
+	useStatusTitle(signedOut ? "Sign in" : "This page couldn't load");
 
 	useEffect(() => {
 		if (!signedOut) return;

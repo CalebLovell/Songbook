@@ -24,6 +24,7 @@ import {
 import { EMPTY } from "~/lib/empty-messages.ts";
 import type { HourActivity } from "~/lib/stats-data.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
+import { useReducedMotion } from "~/lib/use-reduced-motion.ts";
 
 const EVEN_HOURS = Array.from({ length: 12 }, (_, index) => index * 2);
 
@@ -48,6 +49,7 @@ export function DetectionsByHourCard({
 }) {
 	const fillId = useId();
 
+	const reducedMotion = useReducedMotion();
 	const isEmpty = activity.every((point) => point.count === 0);
 
 	if (isEmpty) {
@@ -119,6 +121,7 @@ export function DetectionsByHourCard({
 						<Area
 							dataKey="count"
 							tooltipType="none"
+							isAnimationActive={!reducedMotion}
 							animationDuration={CHART_ANIMATION_MS}
 							stroke="none"
 							fill={`url(#${fillId})`}
@@ -126,6 +129,7 @@ export function DetectionsByHourCard({
 						<Line
 							type="monotone"
 							dataKey="count"
+							isAnimationActive={!reducedMotion}
 							animationDuration={CHART_ANIMATION_MS}
 							stroke="var(--moss)"
 							strokeWidth={2}

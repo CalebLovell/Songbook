@@ -34,6 +34,7 @@ import {
 	type SpeciesControlWorkspaceSearch,
 } from "~/lib/species-control-workspace.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
+import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { useDraft } from "~/lib/use-draft.ts";
 import { SpeciesControlDialog } from "./species-control-dialogs.tsx";
 import {
@@ -165,7 +166,7 @@ export function SpeciesSelectionBar({
 	return (
 		<fieldset
 			aria-label="Set selected species status"
-			className="flex h-8 pointer-coarse:h-9 w-fit min-w-0 overflow-hidden rounded-md border border-input bg-card text-sm"
+			className="flex h-8 pointer-coarse:h-9 w-fit min-w-0 overflow-hidden rounded-md border border-input bg-card text-sm *:focus-visible:-outline-offset-2"
 		>
 			<span className="flex items-center gap-[0.5ch] @xl:px-3 px-2 text-muted-foreground">
 				<span className="font-semibold text-foreground tabular-nums">
@@ -332,6 +333,7 @@ export function SpeciesControlPage({
 		Math.ceil(sorted.length / SPECIES_CONTROL_PAGE_SIZE),
 	);
 	const safePage = Math.min(search.page, pageCount);
+	useAnnounceChange(`${sorted.length.toLocaleString()} species`);
 	const pagedRows = sorted.slice(
 		(safePage - 1) * SPECIES_CONTROL_PAGE_SIZE,
 		safePage * SPECIES_CONTROL_PAGE_SIZE,

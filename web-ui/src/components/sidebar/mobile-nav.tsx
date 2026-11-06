@@ -1,11 +1,12 @@
 import { Link, useRouteContext, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { UpdateDot } from "~/components/sidebar/sidebar-nav.tsx";
 import { SidebarBody } from "~/components/sidebar/site-sidebar.tsx";
 import { SongbookWordmark } from "~/components/sidebar/songbook-wordmark.tsx";
+import { returnFocusTo } from "~/lib/use-return-focus.ts";
 import { useUpdateOffered } from "~/lib/use-update-offered.ts";
 
 export function MobileNav() {
@@ -28,6 +29,20 @@ export function MobileNav() {
 		}
 		document.addEventListener("keydown", onKeyDown);
 		return () => document.removeEventListener("keydown", onKeyDown);
+	}, [isOpen]);
+
+	const drawer = useRef<HTMLDivElement>(null);
+	const closeButton = useRef<HTMLButtonElement>(null);
+	useEffect(() => {
+		const panel = drawer.current;
+		if (!isOpen || !panel) return;
+		const opener = document.activeElement;
+		const released = makeRestOfPageInert(panel);
+		closeButton.current?.focus();
+		return () => {
+			released();
+			returnFocusTo(opener);
+		};
 	}, [isOpen]);
 
 	return (
@@ -53,14 +68,20 @@ export function MobileNav() {
 			</div>
 
 			<div
+				ref={drawer}
 				inert={!isOpen}
-				className={`fixed inset-0 z-40 transition-[visibility] duration-300 motion-reduce:duration-0 xl:hidden ${
-					isOpen ? "visible" : "invisible"
+				role="dialog"
+				aria-modal="true"
+				aria-label="Navigation"
+				className={`fixed inset-0 z-40 xl:hidden ${
+					isOpen
+						? "visible"
+						: "invisible transition-[visibility] duration-300 motion-reduce:duration-0"
 				}`}
 			>
 				<button
 					type="button"
-					aria-label="Close navigation"
+					aria-hidden="true"
 					tabIndex={-1}
 					onClick={() => setIsOpen(false)}
 					className={`absolute inset-0 h-full w-full bg-[color-mix(in_oklab,var(--ink)_35%,transparent)] ${
@@ -75,6 +96,7 @@ export function MobileNav() {
 					<div className={DRAWER_BAR_CLASS}>
 						<SiteName onClick={() => setIsOpen(false)} />
 						<button
+							ref={closeButton}
 							type="button"
 							onClick={() => setIsOpen(false)}
 							aria-label="Close navigation"
@@ -95,6 +117,26 @@ export function MobileNav() {
 	);
 }
 
+function makeRestOfPageInert(panel: HTMLElement) {
+	const madeInert: Element[] = [];
+	for (
+		let node: HTMLElement | null = panel;
+		node && node !== document.body;
+		node = node.parentElement
+	) {
+		for (const sibling of node.parentElement?.children ?? []) {
+			if (sibling === node || sibling.hasAttribute("inert")) continue;
+			if (sibling.id === LIVE_ANNOUNCER_ID) continue;
+			sibling.setAttribute("inert", "");
+			madeInert.push(sibling);
+		}
+	}
+	return () => {
+		for (const element of madeInert) element.removeAttribute("inert");
+	};
+}
+
+const LIVE_ANNOUNCER_ID = "live-announcer";
 const MENU_BAR_SLOT_ID = "menu-bar-actions";
 
 export function InMenuBar({ children }: { children: ReactNode }) {

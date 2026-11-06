@@ -133,7 +133,11 @@ function Detections() {
 			>
 				{(loaded) =>
 					loaded.total === 0 ? (
-						<Card as="section" aria-label="Detections" className="shrink-0">
+						<Card
+							as="section"
+							aria-label="Detection results"
+							className="shrink-0"
+						>
 							<CardHeader title="Detections" />
 							<EmptyNote>
 								{isFiltered
@@ -167,7 +171,7 @@ function Detections() {
 					) : (
 						<Card
 							as="section"
-							aria-label="Detections"
+							aria-label="Detection results"
 							className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 						>
 							<DetectionsTable
@@ -214,7 +218,7 @@ function DetectionsTableShell({
 		<Card
 			as="section"
 			aria-busy="true"
-			aria-label="Detections"
+			aria-label="Detection results"
 			className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 		>
 			<DetectionsTable

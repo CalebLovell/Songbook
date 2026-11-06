@@ -7,7 +7,7 @@ export const CARD_HEADER_CLASS =
 export function CardHeader({
 	title,
 	titleId,
-	as: Title = "div",
+	as: Title = "h2",
 	children,
 	className = "",
 }: {

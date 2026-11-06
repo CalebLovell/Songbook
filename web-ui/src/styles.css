@@ -25,6 +25,7 @@
 	   border reads fine at 15%, but a 6px track on near-white paper vanishes. */
 	--track: color-mix(in oklab, var(--moss) 28%, transparent);
 	--hover-line: color-mix(in oklab, var(--moss) 45%, var(--line));
+	--control-line: color-mix(in oklab, var(--moss) 50%, transparent);
 	/* Keyboard focus outline: a touch darker than --moss but noticeably more
 	   saturated (chroma 0.12 vs moss's 0.07). Darkening moss toward --ink
 	   instead drains the chroma and the 2px ring just reads black. */
@@ -113,6 +114,7 @@
   --color-line: var(--line);
   --color-track: var(--track);
   --color-hover-line: var(--hover-line);
+  --color-control-line: var(--control-line);
   --color-focus-ring: var(--focus-ring);
   --color-kicker: var(--kicker);
   --color-icon-well: var(--icon-well);
@@ -329,4 +331,15 @@
 	[data-sonner-toast][data-x-position="right"][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="true"] {
 	--y: translateY(calc(var(--lift) * var(--offset)))
 		translateX(calc(100% + var(--offset-right, 16px)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
 }

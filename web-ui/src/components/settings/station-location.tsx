@@ -2,14 +2,9 @@ import { Check, Crosshair, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
-import { Card } from "~/components/ui/card.tsx";
-import {
-	MODAL_ACTIONS_CLASS,
-	MODAL_BACKDROP_CLASS,
-	MODAL_CARD_CLASS,
-	MODAL_TITLE_CLASS,
-} from "~/components/ui/confirm-dialog.tsx";
+import { MODAL_ACTIONS_CLASS } from "~/components/ui/confirm-dialog.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
+import { ModalDialog } from "~/components/ui/modal-dialog.tsx";
 
 const COORDINATE_PLACES = 4;
 
@@ -89,78 +84,74 @@ export function StationLocation({
 				{state.kind === "locating" ? "Locating…" : "Use my location"}
 			</Button>
 			{open ? (
-				<div
-					role="dialog"
-					aria-modal="true"
-					aria-labelledby="station-location-title"
-					className={MODAL_BACKDROP_CLASS}
+				<ModalDialog
+					title={
+						state.kind === "found"
+							? "Use this location?"
+							: "Location unavailable"
+					}
+					className="max-w-md"
+					onClose={() => setState({ kind: "idle" })}
 				>
-					<Card className={`${MODAL_CARD_CLASS} max-w-md`}>
-						<h2 id="station-location-title" className={MODAL_TITLE_CLASS}>
-							{state.kind === "found"
-								? "Use this location?"
-								: "Location unavailable"}
-						</h2>
-						{state.kind === "found" ? (
-							<>
-								<dl className="grid grid-cols-2 gap-page rounded-md bg-muted p-page text-sm tabular-nums">
-									<div>
-										<Kicker as="dt">Latitude</Kicker>
-										<dd className="mt-1 font-semibold">
-											{state.coordinates.latitude}
-										</dd>
-									</div>
-									<div>
-										<Kicker as="dt">Longitude</Kicker>
-										<dd className="mt-1 font-semibold">
-											{state.coordinates.longitude}
-										</dd>
-									</div>
-								</dl>
-								<p className="text-muted-foreground text-sm leading-relaxed">
-									This replaces {current.latitude}, {current.longitude} in the
-									form. Nothing is written to the station until you save the
-									Station card.
-								</p>
-								{state.accuracy !== null ? (
-									<p className="text-muted-foreground text-xs leading-relaxed">
-										Your browser puts this within about {state.accuracy} m. It
-										reports the location of the device you are reading this on,
-										which may not be where the microphone is.
-									</p>
-								) : null}
-							</>
-						) : (
+					{state.kind === "found" ? (
+						<>
+							<dl className="grid grid-cols-2 gap-page rounded-md bg-muted p-page text-sm tabular-nums">
+								<div>
+									<Kicker as="dt">Latitude</Kicker>
+									<dd className="mt-1 font-semibold">
+										{state.coordinates.latitude}
+									</dd>
+								</div>
+								<div>
+									<Kicker as="dt">Longitude</Kicker>
+									<dd className="mt-1 font-semibold">
+										{state.coordinates.longitude}
+									</dd>
+								</div>
+							</dl>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								{state.message}
+								This replaces {current.latitude}, {current.longitude} in the
+								form. Nothing is written to the station until you save the
+								Station card.
 							</p>
-						)}
-						<div className={MODAL_ACTIONS_CLASS}>
+							{state.accuracy !== null ? (
+								<p className="text-muted-foreground text-xs leading-relaxed">
+									Your browser puts this within about {state.accuracy} m. It
+									reports the location of the device you are reading this on,
+									which may not be where the microphone is.
+								</p>
+							) : null}
+						</>
+					) : (
+						<p className="text-muted-foreground text-sm leading-relaxed">
+							{state.message}
+						</p>
+					)}
+					<div className={MODAL_ACTIONS_CLASS}>
+						<Button
+							type="button"
+							size="default"
+							variant="outline"
+							icon={X}
+							onClick={() => setState({ kind: "idle" })}
+						>
+							{state.kind === "found" ? "Cancel" : "Close"}
+						</Button>
+						{state.kind === "found" ? (
 							<Button
 								type="button"
 								size="default"
-								variant="outline"
-								icon={X}
-								onClick={() => setState({ kind: "idle" })}
+								icon={Check}
+								onClick={() => {
+									onApply(state.coordinates);
+									setState({ kind: "idle" });
+								}}
 							>
-								{state.kind === "found" ? "Cancel" : "Close"}
+								Use these coordinates
 							</Button>
-							{state.kind === "found" ? (
-								<Button
-									type="button"
-									size="default"
-									icon={Check}
-									onClick={() => {
-										onApply(state.coordinates);
-										setState({ kind: "idle" });
-									}}
-								>
-									Use these coordinates
-								</Button>
-							) : null}
-						</div>
-					</Card>
-				</div>
+						) : null}
+					</div>
+				</ModalDialog>
 			) : null}
 		</>
 	);

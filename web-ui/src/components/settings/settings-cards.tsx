@@ -183,7 +183,8 @@ function Field({
 	children: ReactNode;
 }) {
 	const id = useId();
-	const field = { id, labelId: `${id}-label` };
+	const hintId = hint ? `${id}-hint` : undefined;
+	const field = { id, labelId: `${id}-label`, hintId };
 	const Name = readOnly ? "span" : "label";
 	return (
 		<div className="-mx-page grid gap-x-8 gap-y-2 border-t px-page py-page sm:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] sm:items-center">
@@ -199,7 +200,10 @@ function Field({
 					{info ? <InfoTip label={label}>{info}</InfoTip> : null}
 				</div>
 				{hint ? (
-					<div className="space-y-1 text-muted-foreground text-xs leading-relaxed">
+					<div
+						id={hintId}
+						className="space-y-1 text-muted-foreground text-xs leading-relaxed"
+					>
 						{hint}
 					</div>
 				) : null}
@@ -211,7 +215,11 @@ function Field({
 	);
 }
 
-const FieldContext = createContext({ id: "", labelId: "" });
+const FieldContext = createContext<{
+	id: string;
+	labelId: string;
+	hintId?: string;
+}>({ id: "", labelId: "" });
 
 const NO_SPINNER =
 	"[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
@@ -221,11 +229,12 @@ function FieldInput({
 	className = "",
 	...props
 }: ComponentProps<typeof Input> & { unit?: string }) {
-	const { id } = useContext(FieldContext);
+	const { id, hintId } = useContext(FieldContext);
 	const numeric = props.type === "number";
 	const input = (
 		<Input
 			id={id}
+			aria-describedby={hintId}
 			className={`${numeric ? `tabular-nums ${NO_SPINNER}` : ""} ${unit ? (unit.length > 2 ? "pr-20" : "pr-10") : ""} ${className}`}
 			{...props}
 		/>
@@ -245,12 +254,13 @@ function FieldInput({
 }
 
 function FieldSelect({ children, ...props }: ComponentProps<"select">) {
-	const { id } = useContext(FieldContext);
+	const { id, hintId } = useContext(FieldContext);
 	return (
 		<div className="relative">
 			<select
 				id={id}
-				className="h-8.5 pointer-coarse:h-9 w-full cursor-pointer appearance-none rounded-md border border-input bg-card pr-8 pl-3 pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
+				aria-describedby={hintId}
+				className="h-8.5 pointer-coarse:h-9 w-full cursor-pointer appearance-none rounded-md border border-control-line bg-card pr-8 pl-3 pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
 				{...props}
 			>
 				{children}
@@ -888,11 +898,12 @@ function AudioCard({
 }
 
 function FieldTextarea(props: ComponentProps<"textarea">) {
-	const { id } = useContext(FieldContext);
+	const { id, hintId } = useContext(FieldContext);
 	return (
 		<textarea
 			id={id}
-			className="block min-h-28 w-full rounded-md border border-input bg-card px-3 py-2 font-mono text-xs transition-colors placeholder:text-muted-foreground focus-visible:border-focus-ring focus-visible:outline-none"
+			aria-describedby={hintId}
+			className="block min-h-28 w-full rounded-md border border-control-line bg-card px-3 py-2 font-mono text-xs transition-colors placeholder:text-muted-foreground focus-visible:border-focus-ring focus-visible:outline-none"
 			{...props}
 		/>
 	);

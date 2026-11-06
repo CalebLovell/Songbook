@@ -13,6 +13,7 @@ import {
 } from "~/components/now/recent-log-card.tsx";
 import { SpeciesHeroCardShell } from "~/components/species-hero-card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
+import { announce } from "~/lib/announce.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import {
@@ -26,7 +27,19 @@ import { getStationStatus } from "~/lib/station-status.ts";
 const POLL_INTERVAL_MS = 10_000;
 const STATUS_INTERVAL_MS = 30_000;
 const FLASH_DURATION_MS = 2_400;
+const NEW_BIRD_ANNOUNCE_GAP_MS = 60_000;
 const HIGHLIGHTS_EMPTY = EMPTY.window.last24Hours;
+
+function useAnnounceNewBird(comName: string | null) {
+	const spoken = useRef({ comName, at: 0 });
+	useEffect(() => {
+		const now = Date.now();
+		if (!comName || comName === spoken.current.comName) return;
+		if (now - spoken.current.at < NEW_BIRD_ANNOUNCE_GAP_MS) return;
+		spoken.current = { comName, at: now };
+		announce(`Now hearing ${comName}`);
+	}, [comName]);
+}
 
 const snapshotQuery = queryOptions({
 	queryKey: ["now-snapshot"],
@@ -131,6 +144,8 @@ function LiveBody({
 	pill: ReactNode;
 }) {
 	const freshKeys = useFreshKeys(snapshot.recent.map((row) => row.key));
+
+	useAnnounceNewBird(snapshot.current?.comName ?? null);
 
 	const heroKey = snapshot.current?.key;
 	const freshHeroKeys = useFreshKeys(heroKey ? [heroKey] : []);

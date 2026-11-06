@@ -1,5 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import type { ChangeEvent, CSSProperties, ReactNode } from "react";
+import {
+	type ChangeEvent,
+	type CSSProperties,
+	type ReactNode,
+	useId,
+} from "react";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
@@ -13,6 +18,7 @@ import {
 import { RowCheckbox } from "~/components/ui/row-checkbox.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
+import { SkipLink } from "~/components/ui/skip-link.tsx";
 import {
 	SELECT_COLUMN_WIDTH,
 	Table,
@@ -35,6 +41,7 @@ import {
 	type SpeciesControlSortDirection,
 } from "~/lib/species-control-workspace.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { cn } from "~/lib/utils.ts";
 
 export type SpeciesControlViewRow = SpeciesControlRow & {
@@ -162,6 +169,12 @@ export function SpeciesControlTable({
 		firstIndex + (rows?.length ?? SPECIES_CONTROL_PAGE_SIZE) - 1;
 
 	const rowsForClick = useShiftClickRange(selected.size > 0);
+	const actionsId = useId();
+	useAnnounceChange(
+		selected.size > 0
+			? `${selected.size} selected. Press Enter to reach the actions.`
+			: "Nothing selected",
+	);
 
 	function toggle(sciName: string, event: ChangeEvent<HTMLInputElement>) {
 		const { checked } = event.target;
@@ -200,9 +213,13 @@ export function SpeciesControlTable({
 	}
 
 	return (
-		<div className="@container flex min-h-0 flex-1 flex-col">
+		<div className="@container relative flex min-h-0 flex-1 flex-col">
+			<SkipLink targetId={actionsId} className="absolute top-1 left-0">
+				Skip to table actions
+			</SkipLink>
 			<Table
 				role="table"
+				aria-label="Installed species"
 				className="grid h-full min-w-min @min-[54rem]:grid-cols-(--cols-lg) @xl:grid-cols-(--cols-md) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
 				style={COLUMN_GRID}
 				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
@@ -223,6 +240,7 @@ export function SpeciesControlTable({
 						>
 							<RowCheckbox
 								aria-label="Select all species on this page"
+								actionsId={actionsId}
 								checked={allSelected}
 								onChange={(event) => {
 									const next = new Set(selected);
@@ -369,7 +387,11 @@ export function SpeciesControlTable({
 				</RowWell>
 			</Table>
 
-			<div className="-mr-card-edge -ml-page flex min-h-11.25 shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm">
+			<div
+				className="-mr-card-edge -ml-page flex min-h-11.25 shrink-0 items-center gap-page border-t py-1.5 pr-card-edge pl-page text-sm outline-none focus-visible:outline-none"
+				id={actionsId}
+				tabIndex={-1}
+			>
 				{rows === null ? (
 					<div
 						aria-hidden="true"

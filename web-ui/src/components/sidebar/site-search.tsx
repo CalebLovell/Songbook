@@ -33,6 +33,7 @@ import {
 	searchSite,
 } from "~/lib/site-search.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { cn } from "~/lib/utils.ts";
 
 const SEARCH_INDEX_FRESH_MS = 5 * 60_000;
@@ -127,6 +128,11 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 	}, [query, species, auth.unlocked]);
 
 	const open = focused && results.length > 0;
+	useAnnounceChange(
+		query.trim()
+			? `${results.length} ${results.length === 1 ? "result" : "results"}`
+			: null,
+	);
 
 	function changeQuery(next: string) {
 		setQuery(next);

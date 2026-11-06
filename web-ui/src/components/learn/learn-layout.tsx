@@ -52,6 +52,7 @@ export function LearnPoolSelector({
 				<ToggleGroup
 					type="single"
 					variant="outline"
+					aria-label="Which birds"
 					value={pool}
 					onValueChange={(value) => {
 						if (value) onPoolChange(value as LearnPool);

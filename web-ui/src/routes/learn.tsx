@@ -4,7 +4,7 @@ import {
 	useRouter,
 } from "@tanstack/react-router";
 import { Lightbulb, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import {
 	LearnGame,
@@ -149,7 +149,9 @@ function LearnRoundView({
 		},
 		[pool, round, onFinishedChange],
 	);
+	const dealtByPlayer = useRef(false);
 	const playAgain = () => {
+		dealtByPlayer.current = true;
 		requestNextRound();
 		router.invalidate();
 	};
@@ -169,6 +171,7 @@ function LearnRoundView({
 				onPlayAgain={playAgain}
 				isLoadingNextRound={isLoadingNextRound}
 				isPaused={isConfirmingNewRound}
+				focusClipOnStart={dealtByPlayer.current}
 			/>
 			{isConfirmingNewRound ? (
 				<ConfirmDialog
