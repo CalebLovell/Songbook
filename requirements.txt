@@ -2,7 +2,6 @@ ai-edge-litert
 librosa
 tzlocal
 numpy
-pytest==7.1.2
 inotify
 requests
 pillow
