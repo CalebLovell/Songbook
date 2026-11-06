@@ -32,8 +32,8 @@ jobs:
 
       - name: Start the services a reboot would start
         run: |
-          # -1 turns off the location filter, which would drop the test recording's magpie.
-          sudo sed -i --follow-symlinks -E 's/^LATITUDE=.*/LATITUDE=-1/; s/^LONGITUDE=.*/LONGITUDE=-1/' /etc/birdnet/birdnet.conf
+          # Somewhere the test recording's magpie lives, or the location filter drops it.
+          sudo sed -i --follow-symlinks -E 's/^LATITUDE=.*/LATITUDE=52.1/; s/^LONGITUDE=.*/LONGITUDE=5.1/' /etc/birdnet/birdnet.conf
           sudo systemctl daemon-reload
           sudo systemctl start "$(systemd-escape -p --suffix=mount "$HOME/BirdSongs/StreamData")"
           sudo systemctl start birdnet_analysis.service birdnet_web_ui.service
