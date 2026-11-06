@@ -60,7 +60,7 @@ const config = defineConfig({
 			rollupConfig: { external: [/^@sentry\//] },
 			compressPublicAssets: { gzip: true, brotli: true },
 			routeRules: {
-				"/illustrations-new/**": {
+				"/illustrations/**": {
 					headers: {
 						"cache-control":
 							"public, max-age=604800, stale-while-revalidate=2592000",

@@ -1,7 +1,7 @@
-// The species in public/illustrations-new/, kept up to date by
+// The species in public/illustrations/, kept up to date by
 // `tools/illustrate/illustrate.py install`. Every one has a perched pose; only
 // some have a flight pose, and the rest show the perched one there too.
-export const NEW_SLUGS = new Set([
+export const PAINTED_SLUGS = new Set([
 	"accipiter-cooperii",
 	"actitis-macularius",
 	"anas-crecca",
@@ -82,7 +82,7 @@ export const NEW_SLUGS = new Set([
 	"zonotrichia-leucophrys",
 ]);
 
-export const NEW_FLIGHT_SLUGS = new Set([
+export const PAINTED_FLIGHT_SLUGS = new Set([
 	"cardinalis-cardinalis",
 	"cyanocitta-cristata",
 	"haemorhous-mexicanus",

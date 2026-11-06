@@ -17,7 +17,7 @@ const BARK = "#472f1d";
 
 const publicUrl = (file: string) =>
 	pathToFileURL(path.join(PUBLIC_DIR, file)).href;
-const painting = (slug: string) => publicUrl(`illustrations-new/${slug}.webp`);
+const painting = (slug: string) => publicUrl(`illustrations/${slug}.webp`);
 
 function previewCard(): string {
 	return `<!doctype html><html><head><meta charset="utf-8"><style>

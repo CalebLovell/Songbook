@@ -33,7 +33,7 @@ export function speciesPreviewImage(
 	if (!url) return null;
 	if (isPhotoUrl(url)) return { url, alt: comName, card: "summary" };
 	return {
-		url: `${origin}${url.replace(/^(\/illustrations-new\/)(.+)\.webp$/, "$1previews/$2.jpg")}`,
+		url: `${origin}${url.replace(/^(\/illustrations\/)(.+)\.webp$/, "$1previews/$2.jpg")}`,
 		alt: comName,
 		card: "summary",
 		width: PREVIEW_SIZE,

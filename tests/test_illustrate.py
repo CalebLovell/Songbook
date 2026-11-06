@@ -254,23 +254,23 @@ class CanvasTest(unittest.TestCase):
 
 class InstallTest(unittest.TestCase):
     def test_rewrites_both_of_the_web_uis_slug_lists(self):
-        """Catches the regex missing the real illustrations-new.ts, or one list
+        """Catches the regex missing the real painted-species.ts, or one list
         overwriting the other."""
         source = illustrate.SLUGS_TS.read_text(encoding="utf-8")
         rewritten = illustrate.rewrite_slugs(source, ["zenaida-macroura", "canis-latrans"])
-        rewritten = illustrate.rewrite_slugs(rewritten, ["canis-latrans"], "NEW_FLIGHT_SLUGS")
+        rewritten = illustrate.rewrite_slugs(rewritten, ["canis-latrans"], "PAINTED_FLIGHT_SLUGS")
         self.assertIn(
-            'export const NEW_SLUGS = new Set(["canis-latrans", "zenaida-macroura"]);',
+            'export const PAINTED_SLUGS = new Set(["canis-latrans", "zenaida-macroura"]);',
             rewritten,
         )
-        self.assertIn('export const NEW_FLIGHT_SLUGS = new Set(["canis-latrans"]);', rewritten)
+        self.assertIn('export const PAINTED_FLIGHT_SLUGS = new Set(["canis-latrans"]);', rewritten)
 
     def test_a_long_slug_list_goes_one_per_line(self):
         """Catches an install leaving a line Biome's formatter would reject."""
-        source = 'const NEW_SLUGS = new Set(["a-b"]);\n'
+        source = 'const PAINTED_SLUGS = new Set(["a-b"]);\n'
         slugs = [f"genus-species{n}" for n in range(6)]
         rewritten = illustrate.rewrite_slugs(source, slugs)
-        self.assertTrue(rewritten.startswith('const NEW_SLUGS = new Set([\n\t"genus-species0",\n'))
+        self.assertTrue(rewritten.startswith('const PAINTED_SLUGS = new Set([\n\t"genus-species0",\n'))
         self.assertTrue(rewritten.endswith('\t"genus-species5",\n]);\n'))
 
     def test_bounds_are_where_the_animal_is_painted(self):
@@ -284,7 +284,7 @@ class InstallTest(unittest.TestCase):
 
     def test_bounds_are_added_once_then_replaced(self):
         """Catches a second install appending a duplicate bounds table."""
-        source = 'export const NEW_SLUGS = new Set(["a-b"]);\n'
+        source = 'export const PAINTED_SLUGS = new Set(["a-b"]);\n'
         once = illustrate.rewrite_bounds(source, {"a-b": (1, 2, 3, 4)})
         twice = illustrate.rewrite_bounds(once, {"a-b": (5, 6, 7, 8), "a-b-2": (0, 0, 9, 9)})
         self.assertEqual(twice.count("PAINTED_BOUNDS"), 1)
@@ -297,6 +297,13 @@ class InstallTest(unittest.TestCase):
             for name in ("a-b.webp", "a-b-2.webp", "c-d.webp", "e-f-2.webp"):
                 (Path(tmp) / name).write_bytes(b"")
             self.assertEqual(illustrate.installed_slugs(Path(tmp)), (["a-b", "c-d"], ["a-b"]))
+
+    def test_other_artwork_in_the_folder_is_not_a_species(self):
+        """Catches an install listing nest.webp, which shares the folder, as a bird."""
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ("a-b.webp", "nest.webp"):
+                (Path(tmp) / name).write_bytes(b"")
+            self.assertEqual(illustrate.installed_slugs(Path(tmp)), (["a-b"], []))
 
     def test_generate_paints_perched_only_by_default(self):
         """Catches flight poses, which double the cost, being painted unasked."""

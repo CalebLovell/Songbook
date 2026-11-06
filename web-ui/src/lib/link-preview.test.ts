@@ -33,7 +33,7 @@ test("a painted species uses its square painting and the square card", () => {
 	const meta = previewImageMeta(image);
 	assert.equal(
 		content(meta, "og:image"),
-		`${ORIGIN}/illustrations-new/previews/cardinalis-cardinalis.jpg`,
+		`${ORIGIN}/illustrations/previews/cardinalis-cardinalis.jpg`,
 	);
 	assert.equal(content(meta, "og:image:width"), "400");
 	assert.equal(content(meta, "twitter:card"), "summary");

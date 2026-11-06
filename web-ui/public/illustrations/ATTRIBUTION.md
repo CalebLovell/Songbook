@@ -1,6 +1,6 @@
 # Illustration credits
 
-The species illustrations live in `../illustrations-new/`, painted with
+The species illustrations live in this folder, painted with
 `tools/illustrate` from public-domain and CC0 reference photos.
 
 `nest.webp`, the Today page's resting state when nothing has been heard for

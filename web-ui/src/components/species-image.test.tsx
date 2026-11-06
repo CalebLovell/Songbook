@@ -16,7 +16,7 @@ const render = (imageUrl: string | null, cropToPainting = false) =>
 	);
 
 test("a painting renders as an img that is not cropped to fill", () => {
-	const html = render("/illustrations-new/x.webp");
+	const html = render("/illustrations/x.webp");
 	assert.match(html, /<img /);
 	assert.doesNotMatch(html, /object-cover/);
 });

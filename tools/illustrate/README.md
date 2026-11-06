@@ -6,9 +6,9 @@
 style of Ohara Koson's kacho-e woodblock prints, painted by Gemini from our
 own prompt and public-domain style plates.
 
-Illustrations ship in `web-ui/public/illustrations-new/`, for the species
-listed in `web-ui/src/lib/illustrations-new.ts`: `NEW_SLUGS` (a perched pose)
-and `NEW_FLIGHT_SLUGS` (a flight pose too). `install` keeps both up to date.
+Illustrations ship in `web-ui/public/illustrations/`, for the species
+listed in `web-ui/src/lib/painted-species.ts`: `PAINTED_SLUGS` (a perched pose)
+and `PAINTED_FLIGHT_SLUGS` (a flight pose too). `install` keeps both up to date.
 A species without one shows the plain bird glyph.
 
 **Flight poses are on hold to halve the cost:** `generate` paints the perched
@@ -62,7 +62,7 @@ From `tools/illustrate`, with `<slug>` from `python illustrate.py species`
 6. `python illustrate.py install <slug>` writes the cutouts into the web UI
    as 480px WebP (what the site shows) plus a 400px JPEG in `previews/` (for
    link previews, where WebP is unreliable), and lists
-   the species in `illustrations-new.ts`, so the site shows it.
+   the species in `painted-species.ts`, so the site shows it.
 
 `verify` (a blind check by a second Gemini model) and `review` (an HTML
 contact sheet of every attempt) help when running many species at once.

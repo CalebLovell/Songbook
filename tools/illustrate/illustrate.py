@@ -11,7 +11,7 @@ birds.db. The loop:
     review     write a contact sheet of every attempt, to pick by eye
     pick       (optional) override the automatic pick
     cutout     remove the paper and crop to the animal
-    install    copy into web-ui/public/illustrations-new, list the species
+    install    copy into web-ui/public/illustrations, list the species
                and record where each painting sits on its canvas
 
 The style lives in prompt.md and the style/ folder; per-species field marks
@@ -57,13 +57,13 @@ PHOTO_HOSTS = {'inaturalist-open-data.s3.amazonaws.com', 'upload.wikimedia.org'}
 WORK_DIR = HERE / 'work'
 CUT_DIR = WORK_DIR / 'cut'
 PICKS_PATH = WORK_DIR / 'picks.json'
-# The site shows these for the species in NEW_SLUGS (see illustrationUrlFor
+# The site shows these for the species in PAINTED_SLUGS (see illustrationUrlFor
 # in web-ui/src/lib/illustrations.ts).
-PUBLIC_DIR = REPO_ROOT / 'web-ui' / 'public' / 'illustrations-new'
+PUBLIC_DIR = REPO_ROOT / 'web-ui' / 'public' / 'illustrations'
 PREVIEW_DIR = 'previews'
-SLUGS_TS = REPO_ROOT / 'web-ui' / 'src' / 'lib' / 'illustrations-new.ts'
-SLUGS_NAME = 'NEW_SLUGS'
-FLIGHT_SLUGS_NAME = 'NEW_FLIGHT_SLUGS'
+SLUGS_TS = REPO_ROOT / 'web-ui' / 'src' / 'lib' / 'painted-species.ts'
+SLUGS_NAME = 'PAINTED_SLUGS'
+FLIGHT_SLUGS_NAME = 'PAINTED_FLIGHT_SLUGS'
 
 PAINT_MODEL = os.environ.get('ILLUSTRATE_PAINT_MODEL', 'gemini-3.1-flash-image')
 VERIFY_MODEL = os.environ.get('ILLUSTRATE_VERIFY_MODEL', 'gemini-3.8-flash')
@@ -773,12 +773,18 @@ def rewrite_bounds(source: str, bounds: dict[str, tuple[int, int, int, int]], na
     return source.rstrip('\n') + '\n' + intro + block + '\n'
 
 
+def species_paintings(folder: Path) -> list[Path]:
+    """The species paintings in `folder`, sorted. A species slug always has a
+    hyphen, which tells them apart from artwork like nest.webp in the same folder."""
+    return sorted(p for p in folder.glob('*.webp') if '-' in p.stem)
+
+
 def installed_bounds(folder: Path) -> dict[str, tuple[int, int, int, int]]:
     """Each installed illustration's painted bounds, by file stem."""
     from PIL import Image
 
     bounds = {}
-    for path in sorted(folder.glob('*.webp')):
+    for path in species_paintings(folder):
         with Image.open(path) as image:
             box = painted_bounds(image.convert('RGBA'))
         if box is not None:
@@ -789,7 +795,7 @@ def installed_bounds(folder: Path) -> dict[str, tuple[int, int, int, int]]:
 def installed_slugs(folder: Path) -> tuple[list[str], list[str]]:
     """Species with a perched pose in `folder`, and those that also have a
     flight pose; the web UI shows the perched one in place of a missing flight."""
-    names = {p.stem for p in folder.glob('*.webp')}
+    names = {p.stem for p in species_paintings(folder)}
     perched = sorted(n for n in names if not n.endswith('-2'))
     return perched, [n for n in perched if f'{n}-2' in names]
 

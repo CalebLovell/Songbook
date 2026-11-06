@@ -9,7 +9,7 @@ test("painting wins over photo", () => {
 	const photos = { "cardinalis-cardinalis": PHOTO };
 	assert.equal(
 		illustrationUrlFor("Cardinalis cardinalis", "perched", photos),
-		"/illustrations-new/cardinalis-cardinalis.webp",
+		"/illustrations/cardinalis-cardinalis.webp",
 	);
 });
 
@@ -31,5 +31,5 @@ test("unknown species is null", () => {
 
 test("isPhotoUrl tells photos from paintings", () => {
 	assert.equal(isPhotoUrl(PHOTO), true);
-	assert.equal(isPhotoUrl("/illustrations-new/x.webp"), false);
+	assert.equal(isPhotoUrl("/illustrations/x.webp"), false);
 });
