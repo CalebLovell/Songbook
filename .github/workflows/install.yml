@@ -1,0 +1,63 @@
+name: Install from scratch
+
+# Runs the real installer on a clean ARM machine, then sends a recording through
+# the running services. Slow, so only for changes that can affect an install.
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "newinstaller.sh"
+      - "requirements.txt"
+      - "scripts/**"
+      - "templates/**"
+      - ".github/workflows/install.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: source
+
+      - name: Install
+        run: |
+          cp -a source "$HOME/BirdNET-Pi"
+          "$HOME/BirdNET-Pi/scripts/install_birdnet.sh"
+
+      - name: Start the services a reboot would start
+        run: |
+          # -1 turns off the location filter, which would drop the test recording's magpie.
+          sudo sed -i --follow-symlinks -E 's/^LATITUDE=.*/LATITUDE=-1/; s/^LONGITUDE=.*/LONGITUDE=-1/' /etc/birdnet/birdnet.conf
+          sudo systemctl daemon-reload
+          sudo systemctl start "$(systemd-escape -p --suffix=mount "$HOME/BirdSongs/StreamData")"
+          sudo systemctl start birdnet_analysis.service birdnet_web_ui.service
+
+      - name: A recording becomes detections
+        run: |
+          source /etc/birdnet/birdnet.conf
+          until systemctl is-active --quiet birdnet_analysis.service; do sleep 2; done
+          sleep 20
+          cp "source/tests/testdata/Pica pica_30s.wav" "$RECS_DIR/StreamData/2024-02-24-birdnet-16:19:37.wav"
+          for _ in $(seq 1 60); do
+            count=$(sqlite3 "$HOME/BirdNET-Pi/scripts/birds.db" "select count(*) from detections where Sci_Name = 'Pica pica'")
+            [ "$count" -gt 0 ] && { echo "$count detections"; exit 0; }
+            sleep 3
+          done
+          echo "No detections were recorded." >&2
+          exit 1
+
+      - name: The web UI serves its pages
+        run: |
+          for page in live timeline detections birds learn; do
+            curl -fsS -L -o /dev/null --retry 20 --retry-delay 3 --retry-all-errors "http://localhost/$page"
+          done
+
+      - name: Service logs
+        if: failure()
+        run: journalctl -u birdnet_analysis.service -u birdnet_web_ui.service --no-pager -n 200

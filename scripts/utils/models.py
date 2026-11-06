@@ -11,10 +11,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
 np.set_printoptions(legacy="1.21")
 
-try:
-    import tflite_runtime.interpreter as tflite
-except ImportError:
-    from tensorflow import lite as tflite
+from ai_edge_litert import interpreter as tflite  # noqa: E402 -- reads the environment set above
 
 log = logging.getLogger(__name__)
 

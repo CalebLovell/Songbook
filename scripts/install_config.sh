@@ -13,7 +13,7 @@ if [ -n "$json" ] && [ "$(echo "$json" | jq -r .status)" = "success" ]; then
   LATITUDE=$(echo "$json" | jq .lat)
   LONGITUDE=$(echo "$json" | jq .lon)
 else
-  echo -e "\033[33mCouldn't set latitude and longitude automatically, you will need to do this manually from the web interface by navigating to Tools -> Settings -> Location.\033[0m"
+  echo -e "\033[33mCouldn't set latitude and longitude automatically, you will need to set them in the web UI's Settings.\033[0m"
   LATITUDE=0.0000
   LONGITUDE=0.0000
 fi

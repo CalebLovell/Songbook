@@ -1,152 +1,55 @@
-<h1 align="center"><a href="https://github.com/mcguirepr89/BirdNET-Pi/blob/main/LICENSE">Review the license!!</a></h1>
-<h1 align="center">You may not use BirdNET-Pi to develop a commercial product!!!!</h1>
-<h1 align="center">
-  Songbook
-</h1>
 <p align="center">
-A record of every bird singing in your yard, built on BirdNET-Pi, for the Raspberry Pi 5, 4B, 400, 3B+, and 0W2
+  <img src="web-ui/public/songbook.svg" alt="Songbook" width="240" />
 </p>
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/60325264/140656397-bf76bad4-f110-467c-897d-992ff0f96476.png" />
-</p>
-<p align="center">
-Icon made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+A record of every bird singing in your yard, on a Raspberry Pi.
 </p>
 
-## About this fork:
-I've been building on [mcguirepr89's](https://github.com/mcguirepr89/BirdNET-Pi) most excellent work to further update and improve BirdNET-Pi. Maybe someone will find it useful.
+Songbook listens through a microphone around the clock, identifies birds with the
+[BirdNET](https://github.com/kahst/BirdNET-Analyzer) model, and keeps a searchable record of
+them in a web interface you host yourself.
 
-Changes include:
-
- - Backup & Restore
- - Web ui is much more responsive
- - Daily charts now include all species, not just top/bottom 10
- - Swipe events on Daily Charts (by @croisez)
- - Support for 'Species range model V2.4 - V2'
- - Bookworm and Trixie support
- - Experimental support for writing transient files to tmpfs
- - Rework analysis to consolidate analysis/server/extraction. Should make analysis more robust and slightly more efficient, especially on installations with a large number of recordings
- - Bump tflite_runtime to 2.17.1, it is faster
- - Rework daily_plot.py (chart_viewer) to run as a daemon to avoid the very expensive startup
- - Lots of fixes & cleanups
-
-!! note: see 'Migrating' on how to migrate from mcguirepr89
-
-## Introduction
-BirdNET-Pi is built on the [BirdNET framework](https://github.com/kahst/BirdNET-Analyzer) by [**@kahst**](https://github.com/kahst) <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg"></a> using [pre-built TFLite binaries](https://github.com/PINTO0309/TensorflowLite-bin) by [**@PINTO0309**](https://github.com/PINTO0309) . It is able to recognize bird sounds from a USB microphone or sound card in realtime and share its data with the rest of the world.
-
-Check out birds from around the world
-- [BirdWeather](https://app.birdweather.com)<br>
-
-## Features
-* **24/7 recording and automatic identification** of bird songs, chirps, and peeps using BirdNET machine learning
-* **Automatic extraction and cataloguing** of bird clips from full-length recordings
-* **Tools to visualize your recorded bird data** and analyze trends
-* **Live audio stream and spectrogram**
-* **Automatic disk space management** that periodically purges old audio files
-* [BirdWeather](https://app.birdweather.com) integration -- you can request a BirdWeather ID from BirdNET-Pi's "Tools" > "Settings" page
-* FTP server included
-* SQLite3 Database
-* Localization supported
-
-## Web UI
-This fork's web interface lives entirely in [`web-ui/`](web-ui/), a TanStack Start application. The legacy PHP dashboard, Streamlit stats page, GoTTY web terminal, Adminer, and phpSysInfo from upstream BirdNET-Pi have been removed.
-
-### Web UI password
-
-Settings, Species Control, and Review require a password. Everything else -- detections,
-species, stats, timeline, learn -- stays public, so you can share your station without
-handing over its controls.
-
-There is no default password. The installer asks you to choose one; until one is set, nobody
-can sign in, and the Account page says so. Set or change it any time with:
-
-```
-sudo ./scripts/set_web_ui_password.sh
-```
-
-It prompts twice without echoing, so the password never reaches your shell history. Minimum
-12 characters. Changing the password signs out every device. The password can only be managed
-on the Pi; the Account page just signs a browser in and out. A browser that hasn't visited in
-30 days is signed out on its own.
-
-The password is stored only as a salted scrypt hash, in `/etc/birdnet/web-ui/auth.conf`
-(mode 0600, in a directory owned by the web UI's account). It is never stored in plaintext, is kept out of `birdnet.conf` and
-`firstrun.ini`, and is excluded from backup archives. If you forget it, re-run the script
-over SSH -- there is no reset through the browser, by design.
-
-### Before exposing this station to the internet
-
-The gate is built for it, but two things are required first:
-
-1. **TLS in front of it** -- a Cloudflare Tunnel, Tailscale, or Caddy with a certificate.
-   Over plain HTTP the password and the session cookie are readable by anyone on the network
-   path, and hashing at rest does not help with that. This one cannot be skipped.
-2. **`WEB_UI_TRUSTED_PROXY=1`** set for the web UI (`sudo systemctl edit birdnet_web_ui`,
-   then `Environment=WEB_UI_TRUSTED_PROXY=1`), so that failed-unlock throttling sees real
-   client addresses rather than your proxy's. Without it every request appears to come from
-   one address; with it set but no proxy actually in front, addresses can be spoofed. With it
-   set, the address comes from Cloudflare's `CF-Connecting-IP` header if present, otherwise
-   from the last `X-Forwarded-For` entry, the one your proxy added.
-
-A Cloudflare Tunnel is the simplest route: `cloudflared` on the Pi connects out to
-Cloudflare, which serves the station at your own domain over HTTPS. Your router doesn't
-need an open port and your home IP stays hidden. Point the tunnel at `http://localhost:80`.
-
-If the microphone can hear people talking, set Settings → Privacy threshold above 0 before
-going public: detection recordings are public, and the threshold drops clips with a human
-voice in them.
+**Non-commercial use only.** See [License and credits](#license-and-credits).
 
 ## Requirements
-* A Raspberry Pi 5, Raspberry 4B, Raspberry Pi 400, Raspberry Pi 3B+, or Raspberry Pi 0W2 (The 3B+ and 0W2 must run on RaspiOS-ARM64-**Lite**)
-* An SD Card with the **_64-bit version of RaspiOS_** installed (please use Trixie) -- Lite is recommended, but the installation works on RaspiOS-ARM64-Full as well. Downloads available within the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
-* A USB Microphone or Sound Card
+
+- A Raspberry Pi 5, 4B, 400, 3B+ or Zero 2 W
+- An SD card with the **64-bit** version of Raspberry Pi OS (Trixie; Lite is recommended)
+- A USB microphone or sound card
+- A user with passwordless sudo, which is the Raspberry Pi OS default
 
 ## Installation
-[A comprehensive installation guide is available here](https://github.com/mcguirepr89/BirdNET-Pi/wiki/Installation-Guide). This guide is slightly out-dated: make sure to pick Bookworm, also the curl command is still pointing to mcguirepr89's repo.
 
-Please note that installing BirdNET-Pi on top of other servers is not supported. If this is something that you require, please open a discussion for your idea and inquire about how to contribute to development.
+Run this on the Pi, as your normal user:
 
-[Raspberry Pi 3B[+] and 0W2 installation guide available here](https://github.com/mcguirepr89/BirdNET-Pi/wiki/RPi0W2-Installation-Guide)
-
-The system can be installed with:
-```
+```bash
 curl -s https://raw.githubusercontent.com/CalebLovell/Songbook/main/newinstaller.sh | bash
 ```
-The installer takes care of any and all necessary updates, so you can run that as the very first command upon the first boot, if you'd like.
 
-It installs the newest release (or `main`, while there are none), Node 22 in
-`/opt/birdnet-node`, and the web UI as `birdnet_web_ui.service` on port 80.
+The installer takes care of updates and dependencies, so it can be the first command you run
+on a new Pi. It installs the newest release, asks you to choose a password for the web UI, and
+reboots. It keeps a log at `~/installation-<date>.txt`.
 
-The installation creates a log in `$HOME/installation-$(date "+%F").txt`.
-## Access
-The BirdNET-Pi can be accessed from any web browser on the same network:
-- http://birdnetpi.local OR your Pi's IP address
+Open `http://birdnetpi.local`, or the Pi's IP address, from a browser on the same network.
+Viewing is open to anyone who can reach the station; Settings, Review and Species control need
+the password. To set it again:
 
-Please take a look at the [wiki](https://github.com/mcguirepr89/BirdNET-Pi/wiki) and [discussions](https://github.com/mcguirepr89/BirdNET-Pi/discussions) for information on
-- [BirdNET-Pi's Deep Convolutional Neural Network(s)](https://github.com/mcguirepr89/BirdNET-Pi/wiki/BirdNET-Pi:-some-theory-on-classification-&-some-practical-hints)
-- [making your installation public](https://github.com/mcguirepr89/BirdNET-Pi/wiki/Sharing-Your-BirdNET-Pi)
-- [backing up and restoring your database](https://github.com/mcguirepr89/BirdNET-Pi/wiki/Backup-and-Restore-the-Database)
-- [adjusting your sound card settings](https://github.com/mcguirepr89/BirdNET-Pi/wiki/Adjusting-your-sound-card)
-- [suggested USB microphones](https://github.com/mcguirepr89/BirdNET-Pi/discussions/39)
-- [building your own microphone](https://github.com/DD4WH/SASS/wiki/Stereo--(Mono)-recording-low-noise-low-cost-system)
-- [privacy concerns and options](https://github.com/mcguirepr89/BirdNET-Pi/discussions/166)
-- [beta testing](https://github.com/mcguirepr89/BirdNET-Pi/discussions/11)
-- [and more!](https://github.com/mcguirepr89/BirdNET-Pi/discussions)
-
+```bash
+sudo ~/BirdNET-Pi/scripts/set_web_ui_password.sh
+```
 
 ## Updating
 
 Stations update from this repository's GitHub releases. Settings → Updates shows the
 installed version and the newest release, with **Check** (asks GitHub now and says what it
 found) and **Update to …**, and an **Automatic updates** switch (`AUTOMATIC_UPDATE` in
-`birdnet.conf`, on for new installs). Every night between 3 and 5 AM `birdnet_update.timer`
-looks for a new release: with the switch on it installs it, with it off it only marks
-Settings in the sidebar so you can press Update when you like.
+`birdnet.conf`). Every night between 3 and 5 AM `birdnet_update.timer` looks for a new release:
+with the switch on it installs it, with it off it only marks Settings in the sidebar so you can
+press Update when you like.
 
 From a shell:
 
-```
+```bash
 update_birdnet.sh        # install the newest release now
 update_birdnet.sh -c     # only check
 ```
@@ -157,7 +60,40 @@ and restarts. If the web UI doesn't answer afterwards, the station goes back to 
 it had. Progress is in `~/BirdNET-Pi-web/update-status.json` and
 `journalctl -u birdnet_update_now`.
 
-### Releasing (for maintainers)
+## Making a station public
+
+The web UI serves port 80 on your network. To reach it from the internet, put a tunnel or
+reverse proxy that you control in front of it, then tell the web UI to trust the address that
+proxy forwards, so sign-in throttling sees real visitors:
+
+```bash
+sudo systemctl edit birdnet_web_ui.service
+```
+
+```ini
+[Service]
+Environment=WEB_UI_TRUSTED_PROXY=1
+```
+
+Only set this behind a proxy. Without one, visitors could fake their address.
+
+## Backup and restore
+
+```bash
+./scripts/backup_data.sh -a backup -f /mnt/birds/backup.tar
+./scripts/backup_data.sh -a restore -f /mnt/birds/backup.tar
+```
+
+## Uninstalling
+
+```bash
+/usr/local/bin/uninstall.sh && cd ~ && rm -drf BirdNET-Pi
+```
+
+## Development
+
+The web UI is in [`web-ui/`](web-ui/README.md), and its design rules are in
+[`web-ui/DESIGN.md`](web-ui/DESIGN.md). The recording and analysis services are in `scripts/`.
 
 Releases are automatic. Every push to `main` runs `.github/workflows/release.yml`, which
 checks the web UI and then lets [semantic-release](https://semantic-release.gitbook.io/)
@@ -173,94 +109,21 @@ release to pick the version:
 
 The highest one among the new commits wins. When there is a release, it builds the web UI
 bundle (`scripts/package_release.sh`), tags the commit `vX.Y.Z`, and publishes
-the GitHub release with notes grouped from the commit messages. A message that doesn't
-follow the format simply doesn't count toward a release.
+the GitHub release with notes grouped from the commit messages.
 
-The checks (Biome, TypeScript, tests) run first, and a failing check means no release:
-fix it and push again. `.githooks/pre-push` runs the same checks before a push to `main`;
-turn it on once per clone with `git config core.hooksPath .githooks`.
+The checks (Biome, TypeScript, tests) run first, and a failing check means no release.
+`.githooks/pre-push` runs the same checks before a push to `main`; turn it on once per clone
+with `git config core.hooksPath .githooks`.
 
-## Backup and Restore
-Use the web interface and go to "Tools" > "System Controls" > "Backup" or "Restore". Backup/Restore is primary meant for migrating your data for one system to another. Since the time required to create or restore a backup depends on the size of the data set and the speed of the storage, this could take quite a while.
+## License and credits
 
-Alternatively, the backup script can be used directly. These examples assume the backup medium is mounted on `/mnt`
+Songbook is licensed under [CC BY-NC-SA 4.0](LICENSE), inherited from the projects it builds
+on. **You may not use it to develop a commercial product.**
 
-To backup:
-```commandline
-./scripts/backup_data.sh -a backup -f /mnt/birds/backup-2024-07-09.tar
-```
-To restore:
-```commandline
-./scripts/backup_data.sh -a restore -f /mnt/birds/backup-2024-07-09.tar
-```
-
-## x86_64 support
-x86_64 support is mainly there for developers or otherwise more Linux savvy people.
-That being said, some pointers:
-- Use Debian 12 or 13
-- The user needs passwordless sudo
-
-For Proxmox, a user has reported adding this in their `cpu-models.conf`, in order for the custom TFLite build to work.
-```
-cpu-model: BirdNet
-    flags +sse4.1
-    reported-model host
-```
-
-## Uninstallation
-```
-/usr/local/bin/uninstall.sh && cd ~ && rm -drf BirdNET-Pi
-```
-## Migrating
-Before switching, make sure your installation is fully up-to-date. Also make sure to have a backup, that is also the only way to get back to the original BirdNET-Pi.
-Please note that upgrading your underlying OS to Bookworm is not going to work. Please stick to Bullseye. If you do want Bookworm, you need to start from a fresh install and copy back your data. (remember the backup!)
-
-Run these commands to migrate to this repo:
-```
-git remote remove origin
-git remote add origin https://github.com/Nachtzuster/BirdNET-Pi.git
-./scripts/update_birdnet.sh
-```
-## Troubleshooting and Ideas
-*Hint: A lot of weird problems can be solved by simply restarting the core services. Do this from the web interface "Tools" > "Services" > "Restart Core Services"
-Having trouble or have an idea? *Submit an issue for trouble* and a *discussion for ideas*. Please do *not* submit an issue as a discussion -- the issue tracker solicits information that is needed for anyone to help -- discussions are *not for issues*.
-
-PLEASE search the repo for your issue before creating a new one. This repo has nothing to do with the validity of the detection results, so please do not start any issues around "False positives."
-
-## Sharing
-Please join a Discussion!! and please join [BirdWeather!!](https://app.birdweather.com)
-I hope that if you find BirdNET-Pi has been worth your time, you will share your setup, results, customizations, etc. [HERE](https://github.com/mcguirepr89/BirdNET-Pi/discussions/69) and will consider [making your installation public](https://github.com/mcguirepr89/BirdNET-Pi/wiki/Sharing-Your-BirdNET-Pi).
-
-## Homeassistant addon
-
-BirdNET-Pi can also be run as a [Homeassistant](https://www.home-assistant.io/) addon through docker.
-For more information : https://github.com/alexbelgium/hassio-addons/blob/master/birdnet-pi/README.md
-
-## Docker
-
-BirdNET-Pi can also be run as as a docker container.
-For more information : https://github.com/alexbelgium/hassio-addons/blob/master/birdnet-pi/README_standalone.md
-
-## Cool Links
-
-- [Marie Lelouche's <i>Out of Spaces</i>](https://www.lestanneries.fr/exposition/marie-lelouche-out-of-spaces/) using BirdNET-Pi in post-sculpture VR! [Press Kit](https://github.com/mcguirepr89/BirdNET-Pi-assets/blob/main/dp_out_of_spaces_marie_lelouche_digital_05_01_22.pdf)
-- [Research on noded BirdNET-Pi networks for farming](https://github.com/mcguirepr89/BirdNET-Pi-assets/blob/main/G23_Report_ModelBasedSysEngineering_FarmMarkBirdDetector_V1__Copy_.pdf)
-- [PixCams Build Guide](https://pixcams.com/building-a-birdnet-pi-real-time-acoustic-bird-id-station/)
-- [Core-Electronics](https://core-electronics.com.au/projects/bird-calls-raspberry-pi) Build Article
-- [RaspberryPi.com Blog Post](https://www.raspberrypi.com/news/classify-birds-acoustically-with-birdnet-pi/)
-- [MagPi Issue 119 Showcase Article](https://magpi.raspberrypi.com/issues/119/pdf)
-
-
-### Internationalization:
-The bird names are in English by default, but other localized versions are available thanks to the wonderful efforts of [@patlevin](https://github.com/patlevin) and Wikipedia. Use the web interface's "Tools" > "Settings" and select your "Database Language" to have the detections in your language.
-
-[Internationalization](docs/translations.md)
-
-
-## Screenshots
-![Overview](docs/overview.png)
-![Spectrogram](docs/spectrogram.png)
-
-
-## :thinking:
-Are you a lucky ducky with a spare Raspberry Pi? [Try Folding@home!](https://foldingathome.org/)
+- [BirdNET](https://github.com/kahst/BirdNET-Analyzer), the model that identifies the birds, is
+  by [@kahst](https://github.com/kahst) and the K. Lisa Yang Center for Conservation Bioacoustics
+  at the Cornell Lab of Ornithology.
+- Songbook began as a fork of [BirdNET-Pi](https://github.com/mcguirepr89/BirdNET-Pi) by
+  [@mcguirepr89](https://github.com/mcguirepr89), continued by
+  [@Nachtzuster](https://github.com/Nachtzuster/BirdNET-Pi).
+- Translated bird names are thanks to [@patlevin](https://github.com/patlevin) and Wikipedia.

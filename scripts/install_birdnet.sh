@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install BirdNET script
+# Installs the Songbook station
 set -x # Debugging
 exec > >(tee -i installation-$(date +%F).txt) 2>&1 # Make log
 set -e # exit installation if anything fails
@@ -13,7 +13,7 @@ git log -n 1 --pretty=oneline --no-color --decorate
 source install_helpers.sh
 
 if [ "$(uname -m)" != "aarch64" ] && [ "$(uname -m)" != "x86_64" ];then
-  echo "BirdNET-Pi requires a 64-bit OS.
+  echo "Songbook requires a 64-bit OS.
 It looks like your operating system is using $(uname -m),
 but would need to be aarch64."
   exit 1
@@ -35,9 +35,8 @@ install_birdnet() {
   python3 -m venv birdnet
   source ./birdnet/bin/activate
   pip3 install wheel
-  get_tf_whl
   LOOP_COUNT=2
-  while ! pip3 install -U -r ./requirements_custom.txt
+  while ! pip3 install -U -r ./requirements.txt
   do
     LOOP_COUNT=$(( LOOP_COUNT - 1 ))
     pip3 cache purge

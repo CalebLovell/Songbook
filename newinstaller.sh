@@ -6,7 +6,7 @@ if [ "$EUID" == 0 ]
 fi
 
 if [ "$(uname -m)" != "aarch64" ] && [ "$(uname -m)" != "x86_64" ];then
-  echo "BirdNET-Pi requires a 64-bit OS.
+  echo "Songbook requires a 64-bit OS.
 It looks like your operating system is using $(uname -m),
 but would need to be aarch64."
   exit 1
@@ -14,8 +14,8 @@ fi
 
 PY_VERSION=$(python3 -c "import sys; print(f'{sys.version_info[0]}{sys.version_info[1]}')")
 if [ "${PY_VERSION}" == "39" ] ;then
-  echo "### BirdNET-Pi requires a newer OS. Bullseye is deprecated, please use Bookworm. ###"
-  [ -z "${FORCE_BULLSEYE}" ] && exit
+  echo "Songbook requires a newer OS. Please use Raspberry Pi OS Trixie."
+  exit 1
 fi
 
 # we require passwordless sudo
