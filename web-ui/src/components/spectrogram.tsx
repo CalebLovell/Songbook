@@ -117,11 +117,9 @@ export function QuietSpectrogram({
 		<div
 			className={`relative overflow-hidden rounded-md border border-line bg-paper ${className ?? ""}`}
 		>
-			<canvas
-				ref={canvasRef}
-				aria-hidden="true"
-				className="absolute inset-0 block h-full w-full"
-			/>
+			<div aria-hidden="true" className="absolute inset-0">
+				<canvas ref={canvasRef} className="block h-full w-full" />
+			</div>
 			<div className="absolute inset-0 flex flex-col items-center justify-center gap-page px-page text-center">
 				{children}
 			</div>
