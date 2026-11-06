@@ -13,7 +13,6 @@ import {
 import { homedir } from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { DETECTION_MODEL } from "./settings-config.server.ts";
 import type {
 	SpeciesControlPageData,
 	SpeciesControlRow,
@@ -32,6 +31,8 @@ type SpeciesControlDependencies = {
 	databasePath?: string;
 	extractedRoot?: string;
 };
+
+const DETECTION_MODEL = "BirdNET_GLOBAL_6K_V2.4_Model_FP16";
 
 const LIST_FILES: Record<SpeciesListName, string> = {
 	custom: "include_species_list.txt",

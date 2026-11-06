@@ -20,8 +20,6 @@ class Settings(dict):
             "DATABASE_LANG": "en",
             "PRIVACY_THRESHOLD": 0,
             "EXTRACTION_LENGTH": 6,
-            "MODEL": "BirdNET_GLOBAL_6K_V2.4_Model_FP16",
-            "DATA_MODEL_VERSION": 2,
             "SENSITIVITY": 1.25,
             "SF_THRESH": 0.003,
         }

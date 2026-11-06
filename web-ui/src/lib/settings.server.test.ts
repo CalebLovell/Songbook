@@ -188,7 +188,7 @@ test("reset returns every card but Station to its defaults", async () => {
 	);
 });
 
-test("a station configured with a removed model loads and moves to v2.4 and location model 2 on save", async () => {
+test("a config still naming removed models loads and saves", async () => {
 	const { file } = await fixtureConfig(
 		"DATA_MODEL_VERSION=1\nMODEL=BirdNET_6K_GLOBAL_MODEL\nCONFIDENCE=0.8\n",
 	);
@@ -198,15 +198,12 @@ test("a station configured with a removed model loads and moves to v2.4 and loca
 	});
 	assert.equal(page.detection.confidence, 0.8);
 
-	await saveDetectionSettings(page.detection, {
-		settingsPath: file,
-		skipSystemActions: true,
-	});
-	assert.match(
-		await readFile(file, "utf8"),
-		/^MODEL=BirdNET_GLOBAL_6K_V2.4_Model_FP16$/m,
+	const result = await saveDetectionSettings(
+		{ ...page.detection, confidence: 0.9 },
+		{ settingsPath: file, skipSystemActions: true },
 	);
-	assert.match(await readFile(file, "utf8"), /^DATA_MODEL_VERSION=2$/m);
+	assert.equal(result.values.confidence, 0.9);
+	assert.match(await readFile(file, "utf8"), /^CONFIDENCE=0.9$/m);
 });
 
 test("reset restarts each affected service once", async () => {

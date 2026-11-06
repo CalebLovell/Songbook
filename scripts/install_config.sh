@@ -39,13 +39,11 @@ LATITUDE=$LATITUDE
 LONGITUDE=$LONGITUDE
 
 #--------------------------------- Model --------------------------------------#
-#_____________The variable below configures which BirdNET model is_____________#
-#______________________used for detecting bird audio.__________________________#
-#_It's recommended that you only change these values through the web interface.#
+#_______The variable below sets how common a species must be near you_________#
+#____________________before BirdNET will consider it at all.___________________#
+#_It's recommended that you only change this value through the web interface.__#
 
-MODEL=BirdNET_GLOBAL_6K_V2.4_Model_FP16
 SF_THRESH=0.03
-DATA_MODEL_VERSION=2
 
 #---------------------  BirdWeather Station Information -----------------------#
 #_____________The variable below can be set to have your BirdNET-Pi____________#
