@@ -522,7 +522,7 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 
 	return (
 		<Card
-			className={`${CARD_CLASS} hover:border-hover-line has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2 hover:[transform:translateY(-2px)]`}
+			className={`${CARD_CLASS} hover:transform-[translateY(-2px)] hover:border-hover-line has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2`}
 		>
 			<Link
 				to="/birds/$comName"

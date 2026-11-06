@@ -209,7 +209,7 @@ export function SpeciesControlTable({
 			>
 				<TableHeader
 					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong @min-[36rem]:[scrollbar-gutter:stable] max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="@min-[36rem]:scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					<TableRow role="row" className={GRID_ROW}>
 						<TableHead
@@ -281,7 +281,7 @@ export function SpeciesControlTable({
 					role="rowgroup"
 					aria-busy={rows === null || undefined}
 					data-scroll-reset=""
-					className="col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable] max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
+					className="scrollbar-gutter-stable col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
 				>
 					{rows === null
 						? Array.from({ length: SPECIES_CONTROL_PAGE_SIZE }, (_, index) => (

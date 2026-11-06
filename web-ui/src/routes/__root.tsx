@@ -76,7 +76,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						<PullToRefresh>
 							<main
 								id="app-scroll"
-								className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain [scrollbar-gutter:stable]"
+								className="scrollbar-gutter-stable min-h-0 flex-1 overflow-y-auto overscroll-y-contain"
 							>
 								{children}
 							</main>

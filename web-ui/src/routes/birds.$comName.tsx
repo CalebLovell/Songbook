@@ -628,7 +628,7 @@ const PROFILE_CARD_CLASS =
 const PROFILE_PORTRAIT_CLASS =
 	"flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4";
 const PROFILE_TEXT_CLASS =
-	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-[calc(7.75rem+2rem)] sm:justify-between sm:pl-0";
+	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-39 sm:justify-between sm:pl-0";
 const COLUMNS_CLASS =
 	"mt-page grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-page";
 const VISIT_LOG_BESIDE_CHARTS_CLASS =
@@ -639,7 +639,7 @@ const VISIT_LOG_CARD_CLASS = "@container flex min-h-0 flex-1 flex-col pb-0!";
 const VISIT_LOG_SHORT_CARD_CLASS =
 	"@container flex min-h-0 flex-initial flex-col pb-0!";
 const VISIT_LIST_CLASS =
-	"-mx-page max-h-[calc(10*51px)] grow divide-y overflow-y-auto @min-[80rem]/bird:max-h-none @min-[80rem]/bird:min-h-0";
+	"-mx-page max-h-[510px] grow divide-y overflow-y-auto @min-[80rem]/bird:max-h-none @min-[80rem]/bird:min-h-0";
 const VISIT_LOG_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-[45px] flex-wrap items-center justify-between gap-2 border-b px-page";
 const VISIT_ROW_CLASS =

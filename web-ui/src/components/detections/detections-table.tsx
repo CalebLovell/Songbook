@@ -201,7 +201,7 @@ function DateSegment({
 				/>
 			) : null}
 			<span
-				className={`@min-[38rem]:min-w-[6.5rem] truncate whitespace-nowrap max-[400px]:text-sm ${value ? "" : "text-muted-foreground"}`}
+				className={`@min-[38rem]:min-w-26 truncate whitespace-nowrap max-[400px]:text-sm ${value ? "" : "text-muted-foreground"}`}
 			>
 				{value ? formatDate(value) : "Any date"}
 			</span>
@@ -649,7 +649,7 @@ export function DetectionsTable({
 			>
 				<TableHeader
 					role="rowgroup"
-					className="col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong @min-[36rem]:[scrollbar-gutter:stable] max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="@min-[36rem]:scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} role="row" className={GRID_ROW}>
@@ -683,7 +683,7 @@ export function DetectionsTable({
 									"@min-[36rem]:hidden",
 									canDelete
 										? "col-[2/-1]"
-										: `col-[1/-1] ${FIRST_COLUMN_CLASSES}`,
+										: `col-span-full ${FIRST_COLUMN_CLASSES}`,
 									"pr-page",
 								)}
 							>
@@ -709,7 +709,7 @@ export function DetectionsTable({
 					role="rowgroup"
 					aria-busy={skeleton || undefined}
 					data-scroll-reset=""
-					className="col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto [scrollbar-gutter:stable] max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
+					className="scrollbar-gutter-stable col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
 				>
 					{table.getRowModel().rows.map((row) => (
 						<TableRow

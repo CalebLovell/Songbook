@@ -1466,7 +1466,7 @@ const SKELETON_DATA: SettingsPageData = {
 };
 
 const SKELETON_VALUES_CLASS =
-	"[&_:is(input,select,textarea)]:animate-pulse! [&_:is(input,select,textarea)]:border-transparent! [&_:is(input,select,textarea)]:bg-muted! [&_:is(input,select,textarea)]:bg-none! [&_:is(input,select,textarea)]:text-transparent! [&_:is(input,textarea)::placeholder]:text-transparent! [&_[data-slot=toggle-group-item]]:animate-pulse! [&_[data-slot=toggle-group-item]]:border-paper-raised! [&_[data-slot=toggle-group-item]]:bg-muted! [&_[data-slot=toggle-group-item]]:text-transparent!";
+	"[&_:is(input,select,textarea)]:animate-pulse! [&_:is(input,select,textarea)]:border-transparent! [&_:is(input,select,textarea)]:bg-muted! [&_:is(input,select,textarea)]:bg-none! [&_:is(input,select,textarea)]:text-transparent! [&_:is(input,textarea)::placeholder]:text-transparent! **:data-[slot=toggle-group-item]:animate-pulse! **:data-[slot=toggle-group-item]:border-paper-raised! **:data-[slot=toggle-group-item]:bg-muted! **:data-[slot=toggle-group-item]:text-transparent!";
 
 export function SettingsCardsSkeleton({ tab }: { tab: SettingsTab }) {
 	return (

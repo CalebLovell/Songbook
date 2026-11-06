@@ -81,7 +81,7 @@ export function SpeciesByHourCard({
 				<div
 					className={`${CARD_HEADER_CLASS} gap-3 py-2 ${isEmpty ? "mb-page" : ""}`}
 				>
-					<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3">
+					<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
 						<Kicker className="shrink-0">Activity</Kicker>
 						{summary}
 					</div>
@@ -96,7 +96,7 @@ export function SpeciesByHourCard({
 					<div className="-mx-1 px-1">
 						<HeaderRow />
 
-						<div className="-mx-page [&>*]:px-page">
+						<div className="-mx-page *:px-page">
 							{rows.map((row) => (
 								<SpeciesHourRowView
 									key={row.comName}
@@ -246,14 +246,14 @@ export function SpeciesByHourCardSkeleton({
 			className={`@container/card pb-1! ${className}`}
 		>
 			<div className={`${CARD_HEADER_CLASS} gap-3 py-2`}>
-				<div className="flex h-[calc(0.69rem*1.5)] min-w-0 items-center gap-3">
+				<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
 					<Kicker className="shrink-0">Activity</Kicker>
 					{summary}
 				</div>
 			</div>
 			<div aria-hidden="true" className="-mx-1 px-1">
 				<HeaderRow />
-				<div className="-mx-page [&>*]:px-page">
+				<div className="-mx-page *:px-page">
 					{Array.from({ length: rows }, (_, index) => (
 						<div
 							// biome-ignore lint/suspicious/noArrayIndexKey: static decoration

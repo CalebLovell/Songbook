@@ -326,7 +326,7 @@ function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
 	return (
 		<div className="flex min-w-0 items-center gap-2.5">
 			<span className="h-4 w-px shrink-0 bg-line" aria-hidden="true" />
-			<div className="flex -translate-y-[1.5px] items-center gap-2 truncate text-[13px] text-muted-foreground">
+			<div className="flex translate-y-[-1.5px] items-center gap-2 truncate text-[13px] text-muted-foreground">
 				<span className="whitespace-nowrap">
 					{detections === undefined ? (
 						<ShellFigure />
@@ -464,7 +464,7 @@ function TimelineCards({
 	);
 }
 
-const BODY_CARD_WIDTH = "min-w-0 min-[1800px]:w-[72rem] min-[1800px]:flex-none";
+const BODY_CARD_WIDTH = "min-w-0 min-[1800px]:w-6xl min-[1800px]:flex-none";
 
 const HOUR_CARD_SIZE = "self-start";
 

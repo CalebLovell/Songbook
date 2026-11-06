@@ -9,7 +9,7 @@ import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { useCanListen } from "~/lib/use-can-listen.ts";
 
 const HERO_CARD_ROW =
-	"grid items-center gap-page sm:min-h-[7.75rem] sm:grid-cols-[9.5rem_minmax(0,1fr)]";
+	"grid items-center gap-page sm:min-h-31 sm:grid-cols-[9.5rem_minmax(0,1fr)]";
 
 const HERO_CARD_FOOTER = "sm:pl-[calc(9.5rem+var(--page-gap))]";
 

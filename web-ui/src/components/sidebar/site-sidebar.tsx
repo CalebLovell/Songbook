@@ -20,7 +20,7 @@ export function SidebarBody({
 					<Link
 						to="/"
 						onClick={onNavigate}
-						className="flex h-[calc(var(--masthead-h)-14px)] flex-col items-start px-[1.375rem] pt-1 pb-3 no-underline"
+						className="flex h-[calc(var(--masthead-h)-14px)] flex-col items-start px-5.5 pt-1 pb-3 no-underline"
 					>
 						<SongbookWordmark className="shrink-0 text-[24px] text-moss" />
 						{auth.siteName ? (
