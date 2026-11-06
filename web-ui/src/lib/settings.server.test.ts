@@ -153,7 +153,6 @@ test("reset returns every card but Station to its defaults", async () => {
 		currentTimezone: "America/Chicago",
 	});
 	assert.deepEqual(page.detection, {
-		dataModelVersion: 1,
 		speciesFrequencyThreshold: 0.03,
 		confidence: 0.7,
 		sensitivity: 1.25,
@@ -189,9 +188,9 @@ test("reset returns every card but Station to its defaults", async () => {
 	);
 });
 
-test("a station configured with a removed model loads and moves to v2.4 on save", async () => {
+test("a station configured with a removed model loads and moves to v2.4 and location model 2 on save", async () => {
 	const { file } = await fixtureConfig(
-		"MODEL=BirdNET_6K_GLOBAL_MODEL\nCONFIDENCE=0.8\n",
+		"DATA_MODEL_VERSION=1\nMODEL=BirdNET_6K_GLOBAL_MODEL\nCONFIDENCE=0.8\n",
 	);
 	const page = await loadSettingsPageData({
 		settingsPath: file,
@@ -207,6 +206,7 @@ test("a station configured with a removed model loads and moves to v2.4 on save"
 		await readFile(file, "utf8"),
 		/^MODEL=BirdNET_GLOBAL_6K_V2.4_Model_FP16$/m,
 	);
+	assert.match(await readFile(file, "utf8"), /^DATA_MODEL_VERSION=2$/m);
 });
 
 test("reset restarts each affected service once", async () => {

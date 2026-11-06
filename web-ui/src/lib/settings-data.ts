@@ -28,7 +28,6 @@ export const stationSettingsSchema = z.object({
 });
 
 export const detectionSettingsSchema = z.object({
-	dataModelVersion: z.union([z.literal(1), z.literal(2)]),
 	speciesFrequencyThreshold: z.number().finite().min(0.0005).max(0.99),
 	confidence: z.number().finite().min(0.01).max(0.99),
 	sensitivity: z.number().finite().min(0.5).max(1.5),
@@ -175,7 +174,6 @@ export type SettingsPageData = SettingsByKind & {
 
 export const SETTINGS_DEFAULTS = {
 	detection: {
-		dataModelVersion: 1,
 		speciesFrequencyThreshold: 0.03,
 		confidence: 0.7,
 		sensitivity: 1.25,

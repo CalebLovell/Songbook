@@ -54,7 +54,6 @@ export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 			"Minimum confidence",
 			"Sensitivity",
 			"Analysis overlap",
-			"Location model version",
 			"Species-frequency threshold",
 		],
 	},

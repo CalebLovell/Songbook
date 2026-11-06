@@ -635,23 +635,6 @@ function DetectionCard({
 				/>
 			</Field>
 			<Field
-				label="Location model version"
-				hint="The range model that predicts which species live near you."
-			>
-				<FieldSelect
-					value={form.values.dataModelVersion}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							dataModelVersion: Number(event.target.value) as 1 | 2,
-						})
-					}
-				>
-					<option value={1}>Version 1</option>
-					<option value={2}>Version 2</option>
-				</FieldSelect>
-			</Field>
-			<Field
 				label="Species-frequency threshold"
 				hint="Narrows candidates using location and season."
 				info={
@@ -659,9 +642,9 @@ function DetectionCard({
 						How common a species must be near you before BirdNET will consider
 						it at all. The score behind this is roughly how often birders in
 						your area report that bird this week, so even an everyday yard bird
-						sits near 0.5 — not 1.0. The 0.03 default is deliberately
-						permissive. Lower it to catch more species, raise it to cut false
-						positives. Species on Always detect skip this check entirely.
+						can sit well below 1.0. The 0.03 default is deliberately permissive.
+						Lower it to catch more species, raise it to cut false positives.
+						Species on Always detect skip this check entirely.
 					</>
 				}
 			>

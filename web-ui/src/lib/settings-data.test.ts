@@ -8,7 +8,6 @@ import {
 
 test("accepts inclusive detector boundaries", () => {
 	const settings = parseSettingsCard("detection", {
-		dataModelVersion: 2,
 		speciesFrequencyThreshold: 0.0005,
 		confidence: 0.99,
 		sensitivity: 0.5,
@@ -22,7 +21,6 @@ test("accepts inclusive detector boundaries", () => {
 
 test("rejects detector values outside their supported ranges", () => {
 	const valid = {
-		dataModelVersion: 1,
 		speciesFrequencyThreshold: 0.03,
 		confidence: 0.7,
 		sensitivity: 1.25,

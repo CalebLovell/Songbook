@@ -26,6 +26,7 @@ import {
 } from "./settings-data.ts";
 
 export const DETECTION_MODEL = "BirdNET_GLOBAL_6K_V2.4_Model_FP16";
+const LOCATION_MODEL_VERSION = "2";
 
 export function resolveSettingsPath() {
 	return process.env.BIRDNET_CONF ?? "/etc/birdnet/birdnet.conf";
@@ -86,11 +87,6 @@ export async function readSettingsPageValues(
 			timezone,
 		}),
 		detection: parseSettingsCard("detection", {
-			dataModelVersion: integerValue(
-				values,
-				"DATA_MODEL_VERSION",
-				defaults.detection.dataModelVersion,
-			),
 			speciesFrequencyThreshold: numberValue(
 				values,
 				"SF_THRESH",
@@ -217,7 +213,7 @@ function assignmentsFor<K extends SettingsCardKind>(
 			const detection = value as SettingsByKind["detection"];
 			return {
 				MODEL: DETECTION_MODEL,
-				DATA_MODEL_VERSION: String(detection.dataModelVersion),
+				DATA_MODEL_VERSION: LOCATION_MODEL_VERSION,
 				SF_THRESH: String(detection.speciesFrequencyThreshold),
 				CONFIDENCE: String(detection.confidence),
 				SENSITIVITY: String(detection.sensitivity),
