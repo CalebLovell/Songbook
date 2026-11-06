@@ -1,5 +1,7 @@
+import { VolumeX } from "lucide-react";
+
 import { CardHeader } from "~/components/card-header.tsx";
-import { EmptyNote } from "~/components/empty-state.tsx";
+import { QuietSpectrogram } from "~/components/spectrogram.tsx";
 import {
 	ClipMeta,
 	ClipMetaSkeleton,
@@ -12,6 +14,7 @@ import { EMPTY } from "~/lib/empty-messages.ts";
 import type { BestRecording } from "~/lib/species-detail.ts";
 
 const PLOT_CLASS = "min-h-32 flex-1";
+const EMPTY_PLOT_CLASS = "min-h-43 flex-1";
 
 export function BestRecordingCard({
 	recording,
@@ -31,7 +34,16 @@ export function BestRecordingCard({
 			<CardHeader title="Best recording" />
 
 			{!recording?.audioUrl ? (
-				<EmptyNote>{EMPTY.window.birdRecording}</EmptyNote>
+				<div className="mt-page flex flex-1 flex-col">
+					<QuietSpectrogram className={EMPTY_PLOT_CLASS}>
+						<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-icon-well text-moss">
+							<VolumeX aria-hidden="true" className="size-5" />
+						</div>
+						<p className="text-muted-foreground text-sm">
+							{EMPTY.window.birdRecording}
+						</p>
+					</QuietSpectrogram>
+				</div>
 			) : (
 				<div className="mt-page flex flex-1 flex-col">
 					<SpectrogramPlayer

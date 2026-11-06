@@ -12,6 +12,10 @@ const DB_CEIL = -25;
 const PAPER: [number, number, number] = [251, 253, 246];
 const MOSS: [number, number, number] = [32, 59, 20];
 
+const NOISE_WIDTH = 320;
+const NOISE_HEIGHT = 100;
+const NOISE_SEED = 7;
+
 type RenderState = "loading" | "ready" | "empty";
 
 export function Spectrogram({
@@ -94,6 +98,64 @@ export function Spectrogram({
 			) : null}
 		</div>
 	);
+}
+
+export function QuietSpectrogram({
+	className,
+	children,
+}: {
+	className?: string;
+	children: ReactNode;
+}) {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+
+	useEffect(() => {
+		if (canvasRef.current) paintNoiseFloor(canvasRef.current);
+	}, []);
+
+	return (
+		<div
+			className={`relative overflow-hidden rounded-md border border-line bg-paper ${className ?? ""}`}
+		>
+			<canvas
+				ref={canvasRef}
+				aria-hidden="true"
+				className="absolute inset-0 block h-full w-full"
+			/>
+			<div className="absolute inset-0 flex flex-col items-center justify-center gap-page px-page text-center">
+				{children}
+			</div>
+		</div>
+	);
+}
+
+function paintNoiseFloor(canvas: HTMLCanvasElement): void {
+	canvas.width = NOISE_WIDTH;
+	canvas.height = NOISE_HEIGHT;
+	const ctx = canvas.getContext("2d");
+	if (!ctx) return;
+	const image = ctx.createImageData(NOISE_WIDTH, NOISE_HEIGHT);
+
+	let seed = NOISE_SEED;
+	const random = () => {
+		seed = (seed * 16807) % 2147483647;
+		return seed / 2147483647;
+	};
+
+	for (let y = 0; y < NOISE_HEIGHT; y += 1) {
+		const depth = y / NOISE_HEIGHT;
+		for (let x = 0; x < NOISE_WIDTH; x += 1) {
+			const speck = random() > 0.985 ? 0.05 : 0;
+			const level = depth ** 7 * 0.42 * random() + speck;
+			const pixel = (y * NOISE_WIDTH + x) * 4;
+			image.data[pixel] = lerp(PAPER[0], MOSS[0], level);
+			image.data[pixel + 1] = lerp(PAPER[1], MOSS[1], level);
+			image.data[pixel + 2] = lerp(PAPER[2], MOSS[2], level);
+			image.data[pixel + 3] = 255;
+		}
+	}
+
+	ctx.putImageData(image, 0, 0);
 }
 
 function paint(canvas: HTMLCanvasElement, buffer: AudioBuffer): void {
