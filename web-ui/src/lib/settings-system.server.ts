@@ -21,12 +21,12 @@ export type SettingsSystemContext = {
 const SERVICES = {
 	station: ["birdnet_analysis.service"],
 	detection: ["birdnet_analysis.service"],
-	privacy: ["birdnet_analysis.service"],
 	audio: ["birdnet_recording.service", "livestream.service"],
 	recording: ["birdnet_recording.service", "birdnet_analysis.service"],
 	storage: [],
 	review: [],
 	highlights: [],
+	artwork: [],
 	updates: [],
 } as const satisfies Record<SettingsCardKind, readonly string[]>;
 

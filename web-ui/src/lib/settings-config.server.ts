@@ -17,6 +17,7 @@ import {
 	thresholdsFromSettings,
 } from "./highlight-thresholds.ts";
 import {
+	artworkSettingsSchema,
 	DEFAULT_REVIEW_RARE_SPECIES_MAX,
 	highlightSettingsSchema,
 	parseSettingsCard,
@@ -65,6 +66,13 @@ function integerValue(
 	return Number.isSafeInteger(parsed) ? parsed : fallback;
 }
 
+function artworkPreferenceFrom(values: Record<string, string>) {
+	return (
+		artworkSettingsSchema.safeParse({ preference: values.BIRD_ARTWORK }).data
+			?.preference ?? SETTINGS_DEFAULTS.artwork.preference
+	);
+}
+
 export async function readSettingsPageValues(
 	settingsPath = resolveSettingsPath(),
 	timezone = Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -100,12 +108,10 @@ export async function readSettingsPageValues(
 				defaults.detection.sensitivity,
 			),
 			overlap: numberValue(values, "OVERLAP", defaults.detection.overlap),
-		}),
-		privacy: parseSettingsCard("privacy", {
 			privacyThreshold: numberValue(
 				values,
 				"PRIVACY_THRESHOLD",
-				defaults.privacy.privacyThreshold,
+				defaults.detection.privacyThreshold,
 			),
 		}),
 		audio: parseSettingsCard("audio", {
@@ -175,6 +181,7 @@ export async function readSettingsPageValues(
 				defaults.highlights.vocalRatio,
 			),
 		}),
+		artwork: { preference: artworkPreferenceFrom(values) },
 		updates: parseSettingsCard("updates", {
 			automatic: values.AUTOMATIC_UPDATE?.trim() === "1",
 		}),
@@ -213,11 +220,8 @@ function assignmentsFor<K extends SettingsCardKind>(
 				CONFIDENCE: String(detection.confidence),
 				SENSITIVITY: String(detection.sensitivity),
 				OVERLAP: String(detection.overlap),
+				PRIVACY_THRESHOLD: String(detection.privacyThreshold),
 			};
-		}
-		case "privacy": {
-			const privacy = value as SettingsByKind["privacy"];
-			return { PRIVACY_THRESHOLD: String(privacy.privacyThreshold) };
 		}
 		case "audio": {
 			const audio = value as SettingsByKind["audio"];
@@ -255,6 +259,10 @@ function assignmentsFor<K extends SettingsCardKind>(
 		case "review": {
 			const review = value as SettingsByKind["review"];
 			return { REVIEW_RARE_SPECIES_MAX: String(review.rareSpeciesMax) };
+		}
+		case "artwork": {
+			const artwork = value as SettingsByKind["artwork"];
+			return { BIRD_ARTWORK: artwork.preference };
 		}
 		case "updates": {
 			const updates = value as SettingsByKind["updates"];
@@ -361,6 +369,18 @@ export async function readHighlightThresholds(
 			: HIGHLIGHT_THRESHOLDS;
 	} catch {
 		return HIGHLIGHT_THRESHOLDS;
+	}
+}
+
+export async function readArtworkPreference(
+	settingsPath = resolveSettingsPath(),
+) {
+	try {
+		return artworkPreferenceFrom(
+			parseBirdnetConfig(await readFile(settingsPath, "utf8")),
+		);
+	} catch {
+		return SETTINGS_DEFAULTS.artwork.preference;
 	}
 }
 

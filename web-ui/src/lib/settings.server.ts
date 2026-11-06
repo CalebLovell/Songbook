@@ -11,10 +11,10 @@ import {
 	writeSettingsCard,
 } from "./settings-config.server.ts";
 import {
+	type ArtworkSettings,
 	type AudioSettings,
 	type DetectionSettings,
 	type HighlightSettings,
-	type PrivacySettings,
 	parseSettingsCard,
 	RESETTABLE_CARDS,
 	type RecordingSettings,
@@ -142,13 +142,6 @@ export function saveDetectionSettings(
 	return saveSettings("detection", input, dependencies);
 }
 
-export function savePrivacySettings(
-	input: PrivacySettings,
-	dependencies: SettingsServerDependencies = {},
-) {
-	return saveSettings("privacy", input, dependencies);
-}
-
 export function saveAudioSettings(
 	input: AudioSettings,
 	dependencies: SettingsServerDependencies = {},
@@ -189,6 +182,13 @@ export function saveHighlightSettings(
 	dependencies: SettingsServerDependencies = {},
 ) {
 	return saveSettings("highlights", input, dependencies);
+}
+
+export function saveArtworkSettings(
+	input: ArtworkSettings,
+	dependencies: SettingsServerDependencies = {},
+) {
+	return saveSettings("artwork", input, dependencies);
 }
 
 export type SettingsResetResult = {

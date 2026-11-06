@@ -12,10 +12,10 @@ import { toast } from "~/components/ui/toaster.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import { formatDate } from "~/lib/date-format.ts";
 import {
+	type ArtworkSettings,
 	type AudioSettings,
 	type DetectionSettings,
 	type HighlightSettings,
-	type PrivacySettings,
 	type RecordingSettings,
 	type ReviewSettings,
 	SETTINGS_DEFAULTS,
@@ -48,12 +48,12 @@ type CardRestarter = () => Promise<{ message: string }>;
 export type SettingsSavers = {
 	station?: Saver<StationSettings>;
 	detection?: Saver<DetectionSettings>;
-	privacy?: Saver<PrivacySettings>;
 	audio?: Saver<AudioSettings>;
 	recording?: Saver<RecordingSettings>;
 	storage?: Saver<StorageSettings>;
 	review?: Saver<ReviewSettings>;
 	highlights?: Saver<HighlightSettings>;
+	artwork?: Saver<ArtworkSettings>;
 	updates?: Saver<UpdateSettings>;
 };
 
@@ -348,13 +348,6 @@ export function SettingsCards({
 				restart={restartFor("detection")}
 			/>
 		),
-		privacy: (
-			<PrivacyCard
-				initial={data.privacy}
-				save={savers.privacy}
-				restart={restartFor("privacy")}
-			/>
-		),
 		"audio-input": (
 			<AudioCard
 				initial={data.audio}
@@ -377,13 +370,6 @@ export function SettingsCards({
 				diskUsedPercent={diskUsedPercent}
 			/>
 		),
-		review: <ReviewSettingsCard initial={data.review} save={savers.review} />,
-		highlights: (
-			<HighlightsSettingsCard
-				initial={data.highlights}
-				save={savers.highlights}
-			/>
-		),
 		updates: (
 			<UpdatesSettingsCard
 				initial={data.updates}
@@ -392,6 +378,20 @@ export function SettingsCards({
 				onCheck={onCheckUpdates}
 				onInstall={onInstallUpdate}
 			/>
+		),
+		preferences: (
+			<div className="space-y-page">
+				<ArtworkSettingsCard
+					key={data.artwork.preference}
+					initial={data.artwork}
+					save={savers.artwork}
+				/>
+				<HighlightsSettingsCard
+					initial={data.highlights}
+					save={savers.highlights}
+				/>
+				<ReviewSettingsCard initial={data.review} save={savers.review} />
+			</div>
 		),
 	};
 	return (
@@ -570,7 +570,7 @@ function DetectionCard({
 	return (
 		<SettingsCard
 			title="Detection"
-			description="Tune which model predictions become saved detections."
+			description="Tune which model predictions become saved detections, and which sounds are dropped as human."
 			onSave={() => void form.submit()}
 			reset={resetControl(form)}
 			restart={restartControl(form)}
@@ -666,35 +666,6 @@ function DetectionCard({
 					}
 				/>
 			</Field>
-		</SettingsCard>
-	);
-}
-
-function PrivacyCard({
-	initial,
-	save,
-	restart,
-}: {
-	initial: PrivacySettings;
-	save?: Saver<PrivacySettings>;
-	restart?: CardRestarter;
-}) {
-	const form = useCardSave(
-		"Privacy",
-		initial,
-		save,
-		restart,
-		SETTINGS_DEFAULTS.privacy as PrivacySettings,
-	);
-	return (
-		<SettingsCard
-			title="Privacy"
-			description="Suppress chunks where the model detects likely human sounds."
-			onSave={() => void form.submit()}
-			reset={resetControl(form)}
-			restart={restartControl(form)}
-			saveDisabled={form.saveDisabled}
-		>
 			<Field
 				label="Privacy threshold"
 				hint="Speech is filtered even at 0. Higher values catch fainter voices, and drop more birds by mistake."
@@ -717,6 +688,7 @@ function PrivacyCard({
 					value={form.values.privacyThreshold}
 					onChange={(event) =>
 						form.setValues({
+							...form.values,
 							privacyThreshold: numberOr(event, form.values.privacyThreshold),
 						})
 					}
@@ -1096,6 +1068,46 @@ function ReviewSettingsCard({
 							rareSpeciesMax: numberOr(event, form.values.rareSpeciesMax),
 						})
 					}
+				/>
+			</Field>
+		</SettingsCard>
+	);
+}
+
+function ArtworkSettingsCard({
+	initial,
+	save,
+}: {
+	initial: ArtworkSettings;
+	save?: Saver<ArtworkSettings>;
+}) {
+	const form = useCardSave(
+		"Artwork",
+		initial,
+		save,
+		undefined,
+		SETTINGS_DEFAULTS.artwork,
+	);
+	return (
+		<SettingsCard
+			title="Artwork"
+			description="Choose how birds are pictured across the station, for you and anyone visiting."
+			confirmDescription="This writes the value in this card to the station's configuration. Nothing restarts: every page uses it right away."
+			onSave={() => void form.submit()}
+			reset={resetControl(form, RESET_NO_RESTART_DESCRIPTION)}
+			saveDisabled={form.saveDisabled}
+		>
+			<Field
+				label="Show birds as"
+				hint="A bird with only one of these always shows that one."
+			>
+				<FieldChoice
+					value={form.values.preference}
+					options={[
+						{ value: "illustrations", label: "Illustrations" },
+						{ value: "photos", label: "Photos" },
+					]}
+					onChange={(preference) => form.setValues({ preference })}
 				/>
 			</Field>
 		</SettingsCard>

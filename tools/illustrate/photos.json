@@ -710,6 +710,15 @@
     "source": "inaturalist",
     "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/94047457/medium.jpeg"
   },
+  "cardinalis-cardinalis": {
+    "com_name": "Northern Cardinal",
+    "credit": "no rights reserved",
+    "license": "cc0",
+    "page": "https://www.inaturalist.org/photos/66999078",
+    "sci_name": "Cardinalis cardinalis",
+    "source": "inaturalist",
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/66999078/medium.jpeg"
+  },
   "cardinalis-sinuatus": {
     "com_name": "Pyrrhuloxia",
     "credit": "no rights reserved",
@@ -997,6 +1006,15 @@
     "sci_name": "Crotophaga ani",
     "source": "inaturalist",
     "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/194955287/medium.jpeg"
+  },
+  "cyanocitta-cristata": {
+    "com_name": "Blue Jay",
+    "credit": "no rights reserved",
+    "license": "cc0",
+    "page": "https://www.inaturalist.org/photos/269951256",
+    "sci_name": "Cyanocitta cristata",
+    "source": "inaturalist",
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/269951256/medium.jpeg"
   },
   "cyanocitta-stelleri": {
     "com_name": "Steller's Jay",
@@ -1402,6 +1420,15 @@
     "sci_name": "Haemorhous cassinii",
     "source": "inaturalist",
     "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/711117123/medium.jpg"
+  },
+  "haemorhous-mexicanus": {
+    "com_name": "House Finch",
+    "credit": "no rights reserved",
+    "license": "cc0",
+    "page": "https://www.inaturalist.org/photos/176982307",
+    "sci_name": "Haemorhous mexicanus",
+    "source": "inaturalist",
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/176982307/medium.jpeg"
   },
   "haemorhous-purpureus": {
     "com_name": "Purple Finch",
@@ -2897,6 +2924,15 @@
     "source": "inaturalist",
     "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/669952328/medium.jpg"
   },
+  "spinus-tristis": {
+    "com_name": "American Goldfinch",
+    "credit": "no rights reserved",
+    "license": "cc0",
+    "page": "https://www.inaturalist.org/photos/84579952",
+    "sci_name": "Spinus tristis",
+    "source": "inaturalist",
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/84579952/medium.jpeg"
+  },
   "spiza-americana": {
     "com_name": "Dickcissel",
     "credit": "no rights reserved",
@@ -3310,6 +3346,15 @@
     "sci_name": "Vireo crassirostris",
     "source": "inaturalist",
     "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/603953194/medium.jpg"
+  },
+  "vireo-flavifrons": {
+    "com_name": "Yellow-throated Vireo",
+    "credit": "no rights reserved",
+    "license": "cc0",
+    "page": "https://www.inaturalist.org/photos/195347973",
+    "sci_name": "Vireo flavifrons",
+    "source": "inaturalist",
+    "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/195347973/medium.jpeg"
   },
   "vireo-gilvus": {
     "com_name": "Warbling Vireo",

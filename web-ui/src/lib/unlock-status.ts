@@ -25,7 +25,10 @@ function fetchStatus(): Promise<UnlockStatus> {
 }
 
 const sameStatus = (a: UnlockStatus, b: UnlockStatus) =>
-	a.unlocked === b.unlocked && a.state === b.state && a.siteName === b.siteName;
+	a.unlocked === b.unlocked &&
+	a.state === b.state &&
+	a.siteName === b.siteName &&
+	a.artwork === b.artwork;
 
 export async function unlockStatusForNavigation(): Promise<UnlockStatus> {
 	if (typeof window === "undefined") return getUnlockStatusFn();

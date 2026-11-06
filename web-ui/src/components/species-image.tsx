@@ -1,11 +1,21 @@
 import { Bird } from "lucide-react";
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-import { isPhotoUrl, paintedBoundsFor } from "~/lib/illustrations.ts";
+import {
+	type ArtworkPreference,
+	DEFAULT_ARTWORK_PREFERENCE,
+	isPhotoUrl,
+	paintedBoundsFor,
+	photoInPlaceOfPainting,
+} from "~/lib/illustrations.ts";
 import { cn } from "~/lib/utils.ts";
 
+export const ArtworkPreferenceContext = createContext<ArtworkPreference>(
+	DEFAULT_ARTWORK_PREFERENCE,
+);
+
 export function SpeciesImage({
-	imageUrl,
+	imageUrl: requestedUrl,
 	alt,
 	glyphClassName,
 	title,
@@ -20,6 +30,12 @@ export function SpeciesImage({
 	cropToPainting?: boolean;
 }) {
 	const [failedUrl, setFailedUrl] = useState<string | null>(null);
+	const preference = useContext(ArtworkPreferenceContext);
+	const preferredUrl =
+		requestedUrl && preference === "photos"
+			? photoInPlaceOfPainting(requestedUrl)
+			: requestedUrl;
+	const imageUrl = preferredUrl === failedUrl ? requestedUrl : preferredUrl;
 	const isPhoto = imageUrl ? isPhotoUrl(imageUrl) : false;
 	if (imageUrl && isPhoto && failedUrl !== imageUrl) {
 		return (

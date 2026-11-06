@@ -9,9 +9,16 @@ import {
 	resetSettings,
 	restartStation,
 	saveDetectionSettings,
-	savePrivacySettings,
 	saveStorageSettings,
 } from "./settings.server.ts";
+
+const withPrivacy = (privacyThreshold: number) => ({
+	speciesFrequencyThreshold: 0.03,
+	confidence: 0.7,
+	sensitivity: 1.25,
+	overlap: 0,
+	privacyThreshold,
+});
 
 async function fixtureConfig(contents: string) {
 	const directory = await mkdtemp(
@@ -26,15 +33,12 @@ test("invalid settings neither write configuration nor run commands", async () =
 	const { file } = await fixtureConfig("PRIVACY_THRESHOLD=0\n");
 	let commands = 0;
 	await assert.rejects(
-		savePrivacySettings(
-			{ privacyThreshold: 4 },
-			{
-				settingsPath: file,
-				runner: async () => {
-					commands++;
-				},
+		saveDetectionSettings(withPrivacy(4), {
+			settingsPath: file,
+			runner: async () => {
+				commands++;
 			},
-		),
+		}),
 	);
 	assert.equal(await readFile(file, "utf8"), "PRIVACY_THRESHOLD=0\n");
 	assert.equal(commands, 0);
@@ -42,16 +46,13 @@ test("invalid settings neither write configuration nor run commands", async () =
 
 test("a failed restart leaves saved values and reports partial success", async () => {
 	const { file } = await fixtureConfig("PRIVACY_THRESHOLD=0\n");
-	const result = await savePrivacySettings(
-		{ privacyThreshold: 2 },
-		{
-			settingsPath: file,
-			runner: async () => {
-				throw new Error("systemctl exposed output");
-			},
+	const result = await saveDetectionSettings(withPrivacy(2), {
+		settingsPath: file,
+		runner: async () => {
+			throw new Error("systemctl exposed output");
 		},
-	);
-	assert.equal(await readFile(file, "utf8"), "PRIVACY_THRESHOLD=2\n");
+	});
+	assert.match(await readFile(file, "utf8"), /^PRIVACY_THRESHOLD=2$/m);
 	assert.equal(result.status, "saved-action-failed");
 	assert.equal(result.values.privacyThreshold, 2);
 	assert.doesNotMatch(result.message, /systemctl exposed output/);
@@ -59,10 +60,10 @@ test("a failed restart leaves saved values and reports partial success", async (
 
 test("development skip is explicit while no-action cards save normally", async () => {
 	const privacy = await fixtureConfig("PRIVACY_THRESHOLD=0\n");
-	const skipped = await savePrivacySettings(
-		{ privacyThreshold: 1 },
-		{ settingsPath: privacy.file, skipSystemActions: true },
-	);
+	const skipped = await saveDetectionSettings(withPrivacy(1), {
+		settingsPath: privacy.file,
+		skipSystemActions: true,
+	});
 	assert.equal(skipped.status, "saved-restart-skipped");
 
 	const storage = await fixtureConfig(
@@ -157,8 +158,8 @@ test("reset returns every card but Station to its defaults", async () => {
 		confidence: 0.7,
 		sensitivity: 1.25,
 		overlap: 0,
+		privacyThreshold: 0,
 	});
-	assert.deepEqual(page.privacy, { privacyThreshold: 0 });
 	assert.deepEqual(page.audio, {
 		mode: "microphone",
 		recordingDevice: "default",
@@ -238,19 +239,16 @@ test("a failed restart still reports the reset that landed", async () => {
 
 test("a save that cannot restart says so in the reader's terms", async () => {
 	const { file } = await fixtureConfig("PRIVACY_THRESHOLD=0\n");
-	const refused = await savePrivacySettings(
-		{ privacyThreshold: 2 },
-		{
-			settingsPath: file,
-			runner: async () => {
-				throw new Error("boom");
-			},
+	const refused = await saveDetectionSettings(withPrivacy(2), {
+		settingsPath: file,
+		runner: async () => {
+			throw new Error("boom");
 		},
-	);
-	const declined = await savePrivacySettings(
-		{ privacyThreshold: 2 },
-		{ settingsPath: file, skipSystemActions: true },
-	);
+	});
+	const declined = await saveDetectionSettings(withPrivacy(2), {
+		settingsPath: file,
+		skipSystemActions: true,
+	});
 	assert.equal(
 		refused.message,
 		"Saved. Restart BirdNET for this to take effect.",

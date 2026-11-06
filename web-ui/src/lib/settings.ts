@@ -5,10 +5,10 @@ import {
 	loadSettingsPageData,
 	resetSettings,
 	restartStation,
+	saveArtworkSettings,
 	saveAudioSettings,
 	saveDetectionSettings,
 	saveHighlightSettings,
-	savePrivacySettings,
 	saveRecordingSettings,
 	saveReviewSettings,
 	saveStationSettings,
@@ -16,10 +16,10 @@ import {
 	saveUpdateSettings,
 } from "./settings.server.ts";
 import {
+	artworkSettingsSchema,
 	audioSettingsSchema,
 	detectionSettingsSchema,
 	highlightSettingsSchema,
-	privacySettingsSchema,
 	recordingSettingsSchema,
 	reviewSettingsSchema,
 	stationSettingsSchema,
@@ -40,11 +40,6 @@ export const saveDetectionSettingsFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
 	.validator(detectionSettingsSchema)
 	.handler(({ data }) => saveDetectionSettings(data));
-
-export const savePrivacySettingsFn = createServerFn({ method: "POST" })
-	.middleware([requireUnlocked])
-	.validator(privacySettingsSchema)
-	.handler(({ data }) => savePrivacySettings(data));
 
 export const saveAudioSettingsFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
@@ -71,6 +66,11 @@ export const saveHighlightSettingsFn = createServerFn({ method: "POST" })
 	.validator(highlightSettingsSchema)
 	.handler(({ data }) => saveHighlightSettings(data));
 
+export const saveArtworkSettingsFn = createServerFn({ method: "POST" })
+	.middleware([requireUnlocked])
+	.validator(artworkSettingsSchema)
+	.handler(({ data }) => saveArtworkSettings(data));
+
 export const saveUpdateSettingsFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
 	.validator(updateSettingsSchema)
@@ -88,12 +88,12 @@ export const restartStationFn = createServerFn({ method: "POST" })
 				.enum([
 					"station",
 					"detection",
-					"privacy",
 					"audio",
 					"recording",
 					"storage",
 					"review",
 					"highlights",
+					"artwork",
 					"updates",
 				])
 				.optional(),

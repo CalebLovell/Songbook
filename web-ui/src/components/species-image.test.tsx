@@ -3,7 +3,11 @@ import { test } from "node:test";
 
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { SpeciesImage } from "~/components/species-image.tsx";
+import {
+	ArtworkPreferenceContext,
+	SpeciesImage,
+} from "~/components/species-image.tsx";
+import type { ArtworkPreference } from "~/lib/illustrations.ts";
 
 const render = (imageUrl: string | null, cropToPainting = false) =>
 	renderToStaticMarkup(
@@ -35,6 +39,34 @@ test("a photo ignores cropToPainting", () => {
 	const html = render("https://upload.wikimedia.org/x.jpg", true);
 	assert.match(html, /<img /);
 	assert.doesNotMatch(html, /<svg/);
+});
+
+const renderPreferring = (preference: ArtworkPreference, imageUrl: string) =>
+	renderToStaticMarkup(
+		<ArtworkPreferenceContext.Provider value={preference}>
+			<SpeciesImage imageUrl={imageUrl} alt="Robin" glyphClassName="size-5" />
+		</ArtworkPreferenceContext.Provider>,
+	);
+
+test("preferring photos swaps a painting for its photo, in either pose", () => {
+	for (const painting of ["turdus-migratorius", "turdus-migratorius-2"]) {
+		const html = renderPreferring("photos", `/illustrations/${painting}.webp`);
+		assert.match(html, /src="\/photos\/turdus-migratorius\.webp"/);
+		assert.match(html, /object-cover/);
+	}
+});
+
+test("preferring illustrations keeps the painting", () => {
+	const html = renderPreferring(
+		"illustrations",
+		"/illustrations/turdus-migratorius.webp",
+	);
+	assert.match(html, /src="\/illustrations\/turdus-migratorius\.webp"/);
+});
+
+test("preferring photos keeps a painting that has no photo", () => {
+	const html = renderPreferring("photos", "/illustrations/x.webp");
+	assert.match(html, /src="\/illustrations\/x\.webp"/);
 });
 
 test("no image renders the glyph svg", () => {

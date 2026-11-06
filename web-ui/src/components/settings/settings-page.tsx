@@ -78,7 +78,6 @@ export function SettingsPage({
 	const loadedValues = JSON.stringify([
 		data.station,
 		data.detection,
-		data.privacy,
 		data.audio,
 		data.recording,
 		data.storage,

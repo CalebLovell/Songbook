@@ -23,16 +23,17 @@ import {
 	getSettingsPage,
 	resetSettingsFn,
 	restartStationFn,
+	saveArtworkSettingsFn,
 	saveAudioSettingsFn,
 	saveDetectionSettingsFn,
 	saveHighlightSettingsFn,
-	savePrivacySettingsFn,
 	saveRecordingSettingsFn,
 	saveReviewSettingsFn,
 	saveStationSettingsFn,
 	saveStorageSettingsFn,
 	saveUpdateSettingsFn,
 } from "~/lib/settings.ts";
+import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 import {
 	checkForUpdatesFn,
 	installUpdateFn,
@@ -84,12 +85,12 @@ function SettingsRoute() {
 	const { data: health } = useQuery(healthQuery);
 	const saveStation = useServerFn(saveStationSettingsFn);
 	const saveDetection = useServerFn(saveDetectionSettingsFn);
-	const savePrivacy = useServerFn(savePrivacySettingsFn);
 	const saveAudio = useServerFn(saveAudioSettingsFn);
 	const saveRecording = useServerFn(saveRecordingSettingsFn);
 	const saveStorage = useServerFn(saveStorageSettingsFn);
 	const saveReview = useServerFn(saveReviewSettingsFn);
 	const saveHighlights = useServerFn(saveHighlightSettingsFn);
+	const saveArtwork = useServerFn(saveArtworkSettingsFn);
 	const saveUpdates = useServerFn(saveUpdateSettingsFn);
 	const checkForUpdates = useServerFn(checkForUpdatesFn);
 	const installUpdate = useServerFn(installUpdateFn);
@@ -142,13 +143,18 @@ function SettingsRoute() {
 			savers={{
 				station: (values) => refreshingHealth(saveStation({ data: values })),
 				detection: (values) => saveDetection({ data: values }),
-				privacy: (values) => savePrivacy({ data: values }),
 				audio: (values) => refreshingHealth(saveAudio({ data: values })),
 				recording: (values) =>
 					refreshingHealth(saveRecording({ data: values })),
 				storage: (values) => refreshingHealth(saveStorage({ data: values })),
 				review: (values) => saveReview({ data: values }),
 				highlights: (values) => saveHighlights({ data: values }),
+				artwork: async (values) => {
+					const result = await saveArtwork({ data: values });
+					forgetUnlockStatus();
+					await router.invalidate();
+					return result;
+				},
 				updates: (values) => saveUpdates({ data: values }),
 			}}
 		/>

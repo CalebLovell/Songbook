@@ -32,7 +32,7 @@ export function SettingsReset({ onReset }: { onReset: () => Promise<void> }) {
 			{open ? (
 				<ConfirmDialog
 					title="Restore all settings to factory defaults?"
-					description="Detection, Privacy, Audio input, Recording, Storage, Highlights, and the Review queue threshold all go back to the values a fresh install writes. Any RTSP streams you have configured are cleared and the station returns to microphone input. This cannot be undone."
+					description="Detection, Audio input, Recording, Storage, Artwork, Highlights, and the Review queue threshold all go back to the values a fresh install writes. Any RTSP streams you have configured are cleared and the station returns to microphone input. This cannot be undone."
 					cancelIcon={X}
 					confirmIcon={Factory}
 					confirmLabel="Restore factory defaults"

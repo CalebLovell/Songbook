@@ -7,7 +7,10 @@ import {
 	readUnlockStatus,
 	type UnlockStatus,
 } from "./auth.server.ts";
-import { readSiteName } from "./settings-config.server.ts";
+import {
+	readArtworkPreference,
+	readSiteName,
+} from "./settings-config.server.ts";
 
 const UNAUTHORIZED_MESSAGE = "This page requires the station password.";
 
@@ -44,7 +47,11 @@ export const getUnlockStatusFn = createServerFn({ method: "GET" }).handler(
 			console.error("[auth] could not read the unlock status", error);
 			status = { unlocked: false, state: "misconfigured" };
 		}
-		return { ...status, siteName: await readSiteName() };
+		return {
+			...status,
+			siteName: await readSiteName(),
+			artwork: await readArtworkPreference(),
+		};
 	},
 );
 

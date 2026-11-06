@@ -282,11 +282,14 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Settings**: a save writes the config, then restarts the card's services. A
   refused and a declined restart read the same, and the card keeps offering Restart
   until the values are live. Reset leaves the Station card alone. One tab per card,
-  held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
+  except Preferences, which stacks the cards about taste rather than running the
+  station (Artwork, Highlights, Review); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
   never drops an unsaved edit. The toolbar's Factory defaults covers every card; a card's own
   footer reset covers only that card and goes through its normal save, and Station
   and Updates have no default to offer one. A card's Save and reset show as disabled
-  when there is nothing to do.
+  when there is nothing to do. Artwork picks illustrations or photos for the whole
+  station; `SpeciesImage` applies it, so data keeps naming the painting and no page
+  has to know.
 - **To do**: Settings lists what's broken or not yet set above its tabs, each with one
   action, and marks Settings in the sidebar; all of it is signed-in only, and with
   nothing to do no section shows. Pure checks live in `lib/health-data.ts`. A state

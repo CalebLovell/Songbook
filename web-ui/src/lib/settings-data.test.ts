@@ -12,6 +12,7 @@ test("accepts inclusive detector boundaries", () => {
 		confidence: 0.99,
 		sensitivity: 0.5,
 		overlap: 2.9,
+		privacyThreshold: 3,
 	});
 	assert.equal(settings.speciesFrequencyThreshold, 0.0005);
 	assert.equal(settings.confidence, 0.99);
@@ -25,7 +26,12 @@ test("rejects detector values outside their supported ranges", () => {
 		confidence: 0.7,
 		sensitivity: 1.25,
 		overlap: 0,
+		privacyThreshold: 0,
 	};
+	assert.doesNotThrow(() => parseSettingsCard("detection", valid));
+	assert.throws(() =>
+		parseSettingsCard("detection", { ...valid, privacyThreshold: 3.1 }),
+	);
 	assert.throws(() =>
 		parseSettingsCard("detection", { ...valid, confidence: 1 }),
 	);
@@ -141,10 +147,7 @@ test("rejects extraction longer than its recording", () => {
 	);
 });
 
-test("enforces privacy and storage boundaries", () => {
-	assert.deepEqual(parseSettingsCard("privacy", { privacyThreshold: 0 }), {
-		privacyThreshold: 0,
-	});
+test("enforces storage boundaries", () => {
 	assert.deepEqual(
 		parseSettingsCard("storage", {
 			fullDiskAction: "purge",
@@ -159,7 +162,6 @@ test("enforces privacy and storage boundaries", () => {
 			keepPerSpecies: 10,
 		},
 	);
-	assert.throws(() => parseSettingsCard("privacy", { privacyThreshold: 3.1 }));
 	assert.throws(() =>
 		parseSettingsCard("storage", {
 			fullDiskAction: "delete-everything",

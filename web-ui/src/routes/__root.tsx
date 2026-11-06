@@ -11,6 +11,7 @@ import { PullToRefresh } from "~/components/pull-to-refresh.tsx";
 import { RouteError, RouteNotFound } from "~/components/root-status.tsx";
 import { MobileNav } from "~/components/sidebar/mobile-nav.tsx";
 import { SiteSidebar } from "~/components/sidebar/site-sidebar.tsx";
+import { ArtworkPreferenceContext } from "~/components/species-image.tsx";
 import { SkipLink } from "~/components/ui/skip-link.tsx";
 import { Toaster } from "~/components/ui/toaster.tsx";
 import {
@@ -87,6 +88,7 @@ const SCROLLBAR_PROBE = `(() => {
 })()`;
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+	const { auth } = Route.useRouteContext();
 	return (
 		<html lang="en">
 			<head>
@@ -98,21 +100,23 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<SkipLink targetId={MAIN_CONTENT_ID} className="fixed top-2 left-2">
 					Skip to main content
 				</SkipLink>
-				<div className="fixed inset-0 flex overflow-hidden">
-					<SiteSidebar />
-					<div className="flex min-h-0 min-w-0 flex-1 flex-col">
-						<MobileNav />
-						<PullToRefresh>
-							<main
-								id={MAIN_CONTENT_ID}
-								tabIndex={-1}
-								className="scrollbar-gutter-stable min-h-0 flex-1 overflow-y-auto overscroll-y-contain outline-none focus-visible:outline-none"
-							>
-								{children}
-							</main>
-						</PullToRefresh>
+				<ArtworkPreferenceContext.Provider value={auth.artwork}>
+					<div className="fixed inset-0 flex overflow-hidden">
+						<SiteSidebar />
+						<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+							<MobileNav />
+							<PullToRefresh>
+								<main
+									id={MAIN_CONTENT_ID}
+									tabIndex={-1}
+									className="scrollbar-gutter-stable min-h-0 flex-1 overflow-y-auto overscroll-y-contain outline-none focus-visible:outline-none"
+								>
+									{children}
+								</main>
+							</PullToRefresh>
+						</div>
 					</div>
-				</div>
+				</ArtworkPreferenceContext.Provider>
 				<MainFocus />
 				<LiveAnnouncer />
 				<Toaster />

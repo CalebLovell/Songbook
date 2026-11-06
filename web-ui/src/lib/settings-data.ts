@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 import { HIGHLIGHT_THRESHOLDS } from "~/lib/highlight-thresholds.ts";
+import {
+	ARTWORK_PREFERENCES,
+	DEFAULT_ARTWORK_PREFERENCE,
+} from "~/lib/illustrations.ts";
 import { isKnownTimezone } from "~/lib/timezones.ts";
 
 export const DEFAULT_REVIEW_RARE_SPECIES_MAX = 10;
@@ -32,9 +36,6 @@ export const detectionSettingsSchema = z.object({
 	confidence: z.number().finite().min(0.01).max(0.99),
 	sensitivity: z.number().finite().min(0.5).max(1.5),
 	overlap: z.number().finite().min(0).max(2.9),
-});
-
-export const privacySettingsSchema = z.object({
 	privacyThreshold: z.number().finite().min(0).max(3),
 });
 
@@ -133,38 +134,42 @@ export const highlightSettingsSchema = z.object({
 	vocalRatio: z.number().finite().min(1.5).max(20),
 });
 
+export const artworkSettingsSchema = z.object({
+	preference: z.enum(ARTWORK_PREFERENCES),
+});
+
 export const updateSettingsSchema = z.object({ automatic: z.boolean() });
 
 export type StationSettings = z.infer<typeof stationSettingsSchema>;
 export type DetectionSettings = z.infer<typeof detectionSettingsSchema>;
-export type PrivacySettings = z.infer<typeof privacySettingsSchema>;
 export type AudioSettings = z.infer<typeof audioSettingsSchema>;
 export type RecordingSettings = z.infer<typeof recordingSettingsSchema>;
 export type StorageSettings = z.infer<typeof storageSettingsSchema>;
 export type ReviewSettings = z.infer<typeof reviewSettingsSchema>;
 export type HighlightSettings = z.infer<typeof highlightSettingsSchema>;
+export type ArtworkSettings = z.infer<typeof artworkSettingsSchema>;
 export type UpdateSettings = z.infer<typeof updateSettingsSchema>;
 
 export type SettingsCardKind =
 	| "station"
 	| "detection"
-	| "privacy"
 	| "audio"
 	| "recording"
 	| "storage"
 	| "review"
 	| "highlights"
+	| "artwork"
 	| "updates";
 
 export type SettingsByKind = {
 	station: StationSettings;
 	detection: DetectionSettings;
-	privacy: PrivacySettings;
 	audio: AudioSettings;
 	recording: RecordingSettings;
 	storage: StorageSettings;
 	review: ReviewSettings;
 	highlights: HighlightSettings;
+	artwork: ArtworkSettings;
 	updates: UpdateSettings;
 };
 
@@ -178,8 +183,8 @@ export const SETTINGS_DEFAULTS = {
 		confidence: 0.7,
 		sensitivity: 1.25,
 		overlap: 0,
+		privacyThreshold: 0,
 	},
-	privacy: { privacyThreshold: 0 },
 	audio: {
 		mode: "microphone",
 		recordingDevice: "default",
@@ -206,16 +211,17 @@ export const SETTINGS_DEFAULTS = {
 		regularDays: HIGHLIGHT_THRESHOLDS.consistent.streakDays,
 		vocalRatio: HIGHLIGHT_THRESHOLDS.vocal.ratio,
 	},
+	artwork: { preference: DEFAULT_ARTWORK_PREFERENCE },
 } satisfies Omit<SettingsByKind, "station" | "updates">;
 
 export const RESETTABLE_CARDS = [
 	"detection",
-	"privacy",
 	"audio",
 	"recording",
 	"storage",
 	"review",
 	"highlights",
+	"artwork",
 ] as const satisfies readonly Exclude<
 	SettingsCardKind,
 	"station" | "updates"
@@ -230,12 +236,12 @@ export type SettingsSaveResult<T> = {
 const schemas = {
 	station: stationSettingsSchema,
 	detection: detectionSettingsSchema,
-	privacy: privacySettingsSchema,
 	audio: audioSettingsSchema,
 	recording: recordingSettingsSchema,
 	storage: storageSettingsSchema,
 	review: reviewSettingsSchema,
 	highlights: highlightSettingsSchema,
+	artwork: artworkSettingsSchema,
 	updates: updateSettingsSchema,
 } as const;
 

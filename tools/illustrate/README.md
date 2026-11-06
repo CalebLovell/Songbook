@@ -101,8 +101,11 @@ licence, and no images are committed. Candidates download into
 
 To grow the list, run `candidates --top 800` (or another N), or
 `candidates --db other.db` for another database, then `sheets` and on. Only
-new species need picking. A painting always wins: a painted species never
-shows its photo.
+new species need picking. A painting wins by default: a painted species shows
+its photo only when the station's Artwork setting prefers photos. After adding
+to `references/`, run `python photos.py web` to resize those photos into
+`web-ui/public/photos/`; a painted species listed in `photos.json` instead shows
+that linked photo.
 
 ## What the pieces do
 

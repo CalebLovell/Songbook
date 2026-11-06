@@ -27,7 +27,6 @@ const saved = async <T,>(values: T) => ({
 const SAVERS = {
 	station: saved,
 	detection: saved,
-	privacy: saved,
 	audio: saved,
 	recording: saved,
 	storage: saved,
@@ -63,12 +62,12 @@ test("every card with a default offers its own reset; Station and Updates don't"
 	);
 	for (const id of [
 		"detection",
-		"privacy",
 		"audio-input",
 		"recording",
 		"storage",
 		"review",
 		"highlights",
+		"artwork",
 	]) {
 		assert.ok(resetButton(cardMarkup(markup, id)), id);
 	}

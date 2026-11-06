@@ -2,11 +2,12 @@ import type { LucideIcon } from "lucide-react";
 import {
 	Disc3,
 	HardDrive,
+	Heart,
+	Image,
 	MapPin,
 	Mic2,
 	RefreshCw,
 	SearchCheck,
-	ShieldCheck,
 	SlidersHorizontal,
 	Sparkles,
 } from "lucide-react";
@@ -16,13 +17,11 @@ import type { SearchSetting } from "~/lib/site-search.ts";
 export const SETTINGS_TABS = [
 	"station",
 	"detection",
-	"privacy",
+	"preferences",
+	"updates",
 	"audio-input",
 	"recording",
 	"storage",
-	"review",
-	"highlights",
-	"updates",
 ] as const;
 
 export type SettingsTab = (typeof SETTINGS_TABS)[number];
@@ -38,7 +37,7 @@ export function settingsCardId(title: string): string {
 	return title.toLowerCase().replaceAll(" ", "-");
 }
 
-export const SETTINGS_INDEX: SettingsIndexEntry[] = [
+const CORE_CARDS: SettingsIndexEntry[] = [
 	{
 		title: "Station",
 		tab: "station",
@@ -55,14 +54,49 @@ export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 			"Sensitivity",
 			"Analysis overlap",
 			"Species-frequency threshold",
+			"Privacy threshold",
+		],
+		keywords: ["privacy", "human", "voice"],
+	},
+];
+
+const PREFERENCE_CARDS: SettingsIndexEntry[] = [
+	{
+		title: "Artwork",
+		tab: "preferences",
+		icon: Image,
+		fields: ["Show birds as"],
+		keywords: [
+			"preferences",
+			"illustrations",
+			"paintings",
+			"photos",
+			"pictures",
 		],
 	},
 	{
-		title: "Privacy",
-		tab: "privacy",
-		icon: ShieldCheck,
-		fields: ["Privacy threshold"],
-		keywords: ["human", "voice"],
+		title: "Highlights",
+		tab: "preferences",
+		icon: Sparkles,
+		fields: ["Rare", "Returned", "Gone quiet", "Regular", "Vocal"],
+		keywords: ["preferences", "rarity", "rarities", "returns", "thresholds"],
+	},
+	{
+		title: "Review",
+		tab: "preferences",
+		icon: SearchCheck,
+		fields: ["Rare species threshold"],
+		keywords: ["preferences", "queue", "confirm", "rare"],
+	},
+];
+
+const SYSTEM_CARDS: SettingsIndexEntry[] = [
+	{
+		title: "Updates",
+		tab: "updates",
+		icon: RefreshCw,
+		fields: ["This station", "Newest release", "Automatic updates"],
+		keywords: ["version", "release", "upgrade"],
 	},
 	{
 		title: "Audio input",
@@ -95,25 +129,19 @@ export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 		],
 		keywords: ["disk", "purge"],
 	},
-	{
-		title: "Review",
-		tab: "review",
-		icon: SearchCheck,
-		fields: ["Rare species threshold"],
-		keywords: ["queue", "confirm", "rare"],
-	},
-	{
-		title: "Highlights",
-		tab: "highlights",
-		icon: Sparkles,
-		fields: ["Rare", "Returned", "Gone quiet", "Regular", "Vocal"],
-		keywords: ["rarity", "rarities", "returns", "thresholds"],
-	},
-	{
-		title: "Updates",
-		tab: "updates",
-		icon: RefreshCw,
-		fields: ["This station", "Newest release", "Automatic updates"],
-		keywords: ["version", "release", "upgrade"],
-	},
+];
+
+export const SETTINGS_INDEX: SettingsIndexEntry[] = [
+	...CORE_CARDS,
+	...PREFERENCE_CARDS,
+	...SYSTEM_CARDS,
+];
+
+export const SETTINGS_SECTIONS: Pick<
+	SettingsIndexEntry,
+	"title" | "tab" | "icon"
+>[] = [
+	...CORE_CARDS,
+	{ title: "Preferences", tab: "preferences", icon: Heart },
+	...SYSTEM_CARDS,
 ];

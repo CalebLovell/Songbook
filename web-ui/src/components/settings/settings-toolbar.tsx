@@ -2,7 +2,7 @@ import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
-import { SETTINGS_INDEX, type SettingsTab } from "./settings-index.ts";
+import { SETTINGS_SECTIONS, type SettingsTab } from "./settings-index.ts";
 
 const TABS_LABEL = "Settings section";
 
@@ -28,7 +28,7 @@ export function SettingsToolbar({
 							if (value) onTabChange(value as SettingsTab);
 						}}
 					>
-						{SETTINGS_INDEX.map(({ tab: value, title, icon: Icon }) => (
+						{SETTINGS_SECTIONS.map(({ tab: value, title, icon: Icon }) => (
 							<ToggleGroupItem key={value} value={value}>
 								<Icon
 									className="@max-[74rem]:hidden size-4"
@@ -56,8 +56,8 @@ function SettingsTabSelect({
 	onPick: (next: SettingsTab) => void;
 }) {
 	const Icon =
-		SETTINGS_INDEX.find((entry) => entry.tab === tab)?.icon ??
-		SETTINGS_INDEX[0].icon;
+		SETTINGS_SECTIONS.find((entry) => entry.tab === tab)?.icon ??
+		SETTINGS_SECTIONS[0].icon;
 	return (
 		<div className="relative @min-[57rem]:hidden shrink-0">
 			<Icon
@@ -70,7 +70,7 @@ function SettingsTabSelect({
 				onChange={(event) => onPick(event.target.value as SettingsTab)}
 				className="h-8.5 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
 			>
-				{SETTINGS_INDEX.map((entry) => (
+				{SETTINGS_SECTIONS.map((entry) => (
 					<option key={entry.tab} value={entry.tab}>
 						{entry.title}
 					</option>
