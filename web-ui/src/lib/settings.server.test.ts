@@ -8,6 +8,7 @@ import {
 	loadSettingsPageData,
 	resetSettings,
 	restartStation,
+	saveDetectionSettings,
 	savePrivacySettings,
 	saveStorageSettings,
 } from "./settings.server.ts";
@@ -79,8 +80,8 @@ test("development skip is explicit while no-action cards save normally", async (
 	assert.equal(saved.status, "saved");
 });
 
-test("loads installed model choices and normalized configuration", async () => {
-	const { directory, file } = await fixtureConfig(
+test("loads normalized configuration", async () => {
+	const { file } = await fixtureConfig(
 		[
 			'SITE_NAME="Backyard"',
 			"LATITUDE=41.1",
@@ -104,27 +105,18 @@ test("loads installed model choices and normalized configuration", async () => {
 			"MAX_FILES_SPECIES=0",
 		].join("\n"),
 	);
-	await writeFile(
-		path.join(directory, "BirdNET_GLOBAL_6K_V2.4_Model_FP16.tflite"),
-		"model",
-	);
 	const page = await loadSettingsPageData({
 		settingsPath: file,
-		modelDirectory: directory,
 		currentTimezone: "America/Chicago",
 	});
 	assert.equal(page.station.siteName, "Backyard");
 	assert.equal(page.station.timezone, "America/Chicago");
-	assert.deepEqual(
-		page.supportedModels.map((model) => model.id),
-		["BirdNET_GLOBAL_6K_V2.4_Model_FP16"],
-	);
 	assert.ok(page.supportedTimezones.includes("America/Chicago"));
 	assert.equal(page.review.rareSpeciesMax, 10);
 });
 
 test("reset returns every card but Station to its defaults", async () => {
-	const { directory, file } = await fixtureConfig(
+	const { file } = await fixtureConfig(
 		[
 			'SITE_NAME="Backyard"',
 			"LATITUDE=41.1",
@@ -158,11 +150,9 @@ test("reset returns every card but Station to its defaults", async () => {
 
 	const page = await loadSettingsPageData({
 		settingsPath: file,
-		modelDirectory: directory,
 		currentTimezone: "America/Chicago",
 	});
 	assert.deepEqual(page.detection, {
-		model: "BirdNET_GLOBAL_6K_V2.4_Model_FP16",
 		dataModelVersion: 1,
 		speciesFrequencyThreshold: 0.03,
 		confidence: 0.7,
@@ -196,6 +186,26 @@ test("reset returns every card but Station to its defaults", async () => {
 	assert.match(
 		await readFile(file, "utf8"),
 		/^BIRDWEATHER_ID=secret-that-must-survive$/m,
+	);
+});
+
+test("a station configured with a removed model loads and moves to v2.4 on save", async () => {
+	const { file } = await fixtureConfig(
+		"MODEL=BirdNET_6K_GLOBAL_MODEL\nCONFIDENCE=0.8\n",
+	);
+	const page = await loadSettingsPageData({
+		settingsPath: file,
+		currentTimezone: "America/Chicago",
+	});
+	assert.equal(page.detection.confidence, 0.8);
+
+	await saveDetectionSettings(page.detection, {
+		settingsPath: file,
+		skipSystemActions: true,
+	});
+	assert.match(
+		await readFile(file, "utf8"),
+		/^MODEL=BirdNET_GLOBAL_6K_V2.4_Model_FP16$/m,
 	);
 });
 

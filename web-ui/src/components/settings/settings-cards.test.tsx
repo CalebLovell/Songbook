@@ -14,7 +14,6 @@ import { SettingsCards, type SettingsSavers } from "./settings-cards.tsx";
 const DATA: SettingsPageData = {
 	...SETTINGS_DEFAULTS,
 	station: { siteName: "", latitude: 45, longitude: -75, timezone: "UTC" },
-	supportedModels: [],
 	supportedTimezones: ["UTC"],
 	updates: { automatic: true },
 } as SettingsPageData;

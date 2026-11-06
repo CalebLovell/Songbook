@@ -5,42 +5,6 @@ import { isKnownTimezone } from "~/lib/timezones.ts";
 
 export const DEFAULT_REVIEW_RARE_SPECIES_MAX = 10;
 
-const MODEL_IDS = [
-	"BirdNET_GLOBAL_6K_V2.4_Model_FP16",
-	"BirdNET_6K_GLOBAL_MODEL",
-	"Perch_v2",
-	"BirdNET-Go_classifier_20250916",
-] as const;
-
-export type SupportedModel = {
-	id: (typeof MODEL_IDS)[number];
-	label: string;
-	supportsRangeModel: boolean;
-};
-
-export const SUPPORTED_MODELS: readonly SupportedModel[] = [
-	{
-		id: "BirdNET_GLOBAL_6K_V2.4_Model_FP16",
-		label: "BirdNET Global 6K v2.4",
-		supportsRangeModel: true,
-	},
-	{
-		id: "BirdNET_6K_GLOBAL_MODEL",
-		label: "BirdNET Global 6K (legacy)",
-		supportsRangeModel: false,
-	},
-	{
-		id: "Perch_v2",
-		label: "Perch v2",
-		supportsRangeModel: false,
-	},
-	{
-		id: "BirdNET-Go_classifier_20250916",
-		label: "BirdNET-Go 2025 classifier",
-		supportsRangeModel: true,
-	},
-];
-
 const hasNoControlCharacters = (value: string) =>
 	[...value].every((character) => {
 		const code = character.charCodeAt(0);
@@ -64,7 +28,6 @@ export const stationSettingsSchema = z.object({
 });
 
 export const detectionSettingsSchema = z.object({
-	model: z.enum(MODEL_IDS),
 	dataModelVersion: z.union([z.literal(1), z.literal(2)]),
 	speciesFrequencyThreshold: z.number().finite().min(0.0005).max(0.99),
 	confidence: z.number().finite().min(0.01).max(0.99),
@@ -207,13 +170,11 @@ export type SettingsByKind = {
 };
 
 export type SettingsPageData = SettingsByKind & {
-	supportedModels: SupportedModel[];
 	supportedTimezones: string[];
 };
 
 export const SETTINGS_DEFAULTS = {
 	detection: {
-		model: "BirdNET_GLOBAL_6K_V2.4_Model_FP16",
 		dataModelVersion: 1,
 		speciesFrequencyThreshold: 0.03,
 		confidence: 0.7,

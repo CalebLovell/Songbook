@@ -24,7 +24,6 @@ import {
 	type SettingsSaveResult,
 	type StationSettings,
 	type StorageSettings,
-	SUPPORTED_MODELS,
 	type UpdateSettings,
 } from "~/lib/settings-data.ts";
 import { formatTimeAgo } from "~/lib/time-ago.ts";
@@ -345,7 +344,6 @@ export function SettingsCards({
 		detection: (
 			<DetectionCard
 				initial={data.detection}
-				models={data.supportedModels}
 				save={savers.detection}
 				restart={restartFor("detection")}
 			/>
@@ -555,12 +553,10 @@ function BrowserTimezoneHint({
 
 function DetectionCard({
 	initial,
-	models,
 	save,
 	restart,
 }: {
 	initial: DetectionSettings;
-	models: SettingsPageData["supportedModels"];
 	save?: Saver<DetectionSettings>;
 	restart?: CardRestarter;
 }) {
@@ -571,7 +567,6 @@ function DetectionCard({
 		restart,
 		SETTINGS_DEFAULTS.detection as DetectionSettings,
 	);
-	const selectedModel = models.find((model) => model.id === form.values.model);
 	return (
 		<SettingsCard
 			title="Detection"
@@ -581,26 +576,6 @@ function DetectionCard({
 			restart={restartControl(form)}
 			saveDisabled={form.saveDisabled}
 		>
-			<Field
-				label="Analysis model"
-				hint="The classifier that scores each chunk."
-			>
-				<FieldSelect
-					value={form.values.model}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							model: event.target.value as DetectionSettings["model"],
-						})
-					}
-				>
-					{models.map((model) => (
-						<option key={model.id} value={model.id}>
-							{model.label}
-						</option>
-					))}
-				</FieldSelect>
-			</Field>
 			<Field
 				label="Minimum confidence"
 				hint="Higher values save fewer, more confident predictions."
@@ -659,60 +634,55 @@ function DetectionCard({
 					}
 				/>
 			</Field>
-			{selectedModel?.supportsRangeModel ? (
-				<>
-					<Field
-						label="Location model version"
-						hint="The range model that predicts which species live near you."
-					>
-						<FieldSelect
-							value={form.values.dataModelVersion}
-							onChange={(event) =>
-								form.setValues({
-									...form.values,
-									dataModelVersion: Number(event.target.value) as 1 | 2,
-								})
-							}
-						>
-							<option value={1}>Version 1</option>
-							<option value={2}>Version 2</option>
-						</FieldSelect>
-					</Field>
-					<Field
-						label="Species-frequency threshold"
-						hint="Narrows candidates using location and season."
-						info={
-							<>
-								How common a species must be near you before BirdNET will
-								consider it at all. The score behind this is roughly how often
-								birders in your area report that bird this week, so even an
-								everyday yard bird sits near 0.5 — not 1.0. The 0.03 default is
-								deliberately permissive. Lower it to catch more species, raise
-								it to cut false positives. Species on Always detect skip this
-								check entirely.
-							</>
-						}
-					>
-						<FieldInput
-							type="number"
-							min={0.0005}
-							max={0.99}
-							step={0.0005}
-							required
-							value={form.values.speciesFrequencyThreshold}
-							onChange={(event) =>
-								form.setValues({
-									...form.values,
-									speciesFrequencyThreshold: numberOr(
-										event,
-										form.values.speciesFrequencyThreshold,
-									),
-								})
-							}
-						/>
-					</Field>
-				</>
-			) : null}
+			<Field
+				label="Location model version"
+				hint="The range model that predicts which species live near you."
+			>
+				<FieldSelect
+					value={form.values.dataModelVersion}
+					onChange={(event) =>
+						form.setValues({
+							...form.values,
+							dataModelVersion: Number(event.target.value) as 1 | 2,
+						})
+					}
+				>
+					<option value={1}>Version 1</option>
+					<option value={2}>Version 2</option>
+				</FieldSelect>
+			</Field>
+			<Field
+				label="Species-frequency threshold"
+				hint="Narrows candidates using location and season."
+				info={
+					<>
+						How common a species must be near you before BirdNET will consider
+						it at all. The score behind this is roughly how often birders in
+						your area report that bird this week, so even an everyday yard bird
+						sits near 0.5 — not 1.0. The 0.03 default is deliberately
+						permissive. Lower it to catch more species, raise it to cut false
+						positives. Species on Always detect skip this check entirely.
+					</>
+				}
+			>
+				<FieldInput
+					type="number"
+					min={0.0005}
+					max={0.99}
+					step={0.0005}
+					required
+					value={form.values.speciesFrequencyThreshold}
+					onChange={(event) =>
+						form.setValues({
+							...form.values,
+							speciesFrequencyThreshold: numberOr(
+								event,
+								form.values.speciesFrequencyThreshold,
+							),
+						})
+					}
+				/>
+			</Field>
 		</SettingsCard>
 	);
 }
@@ -1471,7 +1441,6 @@ const SkeletonContext = createContext(false);
 const SKELETON_DATA: SettingsPageData = {
 	...SETTINGS_DEFAULTS,
 	station: { siteName: "", latitude: 45, longitude: -75, timezone: "UTC" },
-	supportedModels: [...SUPPORTED_MODELS],
 	supportedTimezones: ["UTC"],
 	updates: { automatic: true },
 };

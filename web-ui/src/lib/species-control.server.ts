@@ -13,10 +13,7 @@ import {
 import { homedir } from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import {
-	parseBirdnetConfig,
-	resolveSettingsPath,
-} from "./settings-config.server.ts";
+import { DETECTION_MODEL } from "./settings-config.server.ts";
 import type {
 	SpeciesControlPageData,
 	SpeciesControlRow,
@@ -31,7 +28,6 @@ export type InstalledSpecies = { sciName: string; comName: string };
 type SpeciesControlDependencies = {
 	listDirectory?: string;
 	modelDirectory?: string;
-	settingsPath?: string;
 	database?: DatabaseSync;
 	databasePath?: string;
 	extractedRoot?: string;
@@ -42,8 +38,6 @@ const LIST_FILES: Record<SpeciesListName, string> = {
 	excluded: "exclude_species_list.txt",
 	whitelisted: "whitelist_species_list.txt",
 };
-
-const DEFAULT_MODEL = "BirdNET_GLOBAL_6K_V2.4_Model_FP16";
 
 export function resolveSpeciesListDirectory(): string {
 	return (
@@ -68,26 +62,16 @@ async function readTextIfPresent(filePath: string) {
 	}
 }
 
-async function configuredModel(settingsPath: string) {
-	try {
-		const values = parseBirdnetConfig(await readFile(settingsPath, "utf8"));
-		return values.MODEL?.trim() || DEFAULT_MODEL;
-	} catch (error) {
-		if ((error as NodeJS.ErrnoException).code === "ENOENT")
-			return DEFAULT_MODEL;
-		throw error;
-	}
-}
-
 export async function loadInstalledSpeciesCatalog(
 	dependencies: SpeciesControlDependencies = {},
 ): Promise<InstalledSpecies[]> {
 	const modelDirectory =
 		dependencies.modelDirectory ?? resolveSpeciesModelDirectory();
-	const settingsPath = dependencies.settingsPath ?? resolveSettingsPath();
-	const model = await configuredModel(settingsPath);
 	const [labelsText, localizedText] = await Promise.all([
-		readFile(path.join(modelDirectory, `${model}_Labels.txt`), "utf8"),
+		readFile(
+			path.join(modelDirectory, `${DETECTION_MODEL}_Labels.txt`),
+			"utf8",
+		),
 		readFile(path.join(modelDirectory, "l18n", "labels_en.json"), "utf8"),
 	]);
 	const localized = JSON.parse(localizedText) as Record<string, unknown>;

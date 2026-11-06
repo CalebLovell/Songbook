@@ -8,7 +8,6 @@ import {
 
 test("accepts inclusive detector boundaries", () => {
 	const settings = parseSettingsCard("detection", {
-		model: "BirdNET_GLOBAL_6K_V2.4_Model_FP16",
 		dataModelVersion: 2,
 		speciesFrequencyThreshold: 0.0005,
 		confidence: 0.99,
@@ -23,7 +22,6 @@ test("accepts inclusive detector boundaries", () => {
 
 test("rejects detector values outside their supported ranges", () => {
 	const valid = {
-		model: "BirdNET_GLOBAL_6K_V2.4_Model_FP16",
 		dataModelVersion: 1,
 		speciesFrequencyThreshold: 0.03,
 		confidence: 0.7,

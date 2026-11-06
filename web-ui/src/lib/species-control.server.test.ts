@@ -31,10 +31,8 @@ async function fixture() {
 			mkdir(path.join(model, "l18n"), { recursive: true }),
 		),
 	]);
-	const config = path.join(root, "birdnet.conf");
-	await writeFile(config, "MODEL=Fixture_Model\n", "utf8");
 	await writeFile(
-		path.join(model, "Fixture_Model_Labels.txt"),
+		path.join(model, "BirdNET_GLOBAL_6K_V2.4_Model_FP16_Labels.txt"),
 		["Canis latrans", "Sciurus carolinensis", "Unknownus modelii"].join("\n"),
 		"utf8",
 	);
@@ -93,7 +91,7 @@ async function fixture() {
 		0.82,
 		"squirrel-a.mp3",
 	);
-	return { root, lists, model, config, database };
+	return { root, lists, model, database };
 }
 
 test("environment overrides resolve list and model directories lazily", () => {
@@ -135,7 +133,6 @@ test("catalog contains only labels the active classifier can emit", async () => 
 		assert.deepEqual(
 			await loadInstalledSpeciesCatalog({
 				modelDirectory: item.model,
-				settingsPath: item.config,
 			}),
 			[
 				{ sciName: "Canis latrans", comName: "Coyote" },
@@ -153,7 +150,6 @@ test("page joins policy files with detection history and preserves unresolved li
 		const page = await loadSpeciesControlPage({
 			listDirectory: item.lists,
 			modelDirectory: item.model,
-			settingsPath: item.config,
 			database: item.database,
 		});
 		assert.equal(page.customMode, true);
@@ -186,7 +182,6 @@ test("missing list files are treated as empty and recorded as absent", async () 
 		const page = await loadSpeciesControlPage({
 			listDirectory: item.lists,
 			modelDirectory: item.model,
-			settingsPath: item.config,
 			database: item.database,
 		});
 		assert.equal(page.listFiles.whitelisted, false);
@@ -208,7 +203,6 @@ test("save writes canonical sorted lists, preserves unknowns, modes, and revisio
 		const page = await loadSpeciesControlPage({
 			listDirectory: item.lists,
 			modelDirectory: item.model,
-			settingsPath: item.config,
 			database: item.database,
 		});
 		const result = await saveSpeciesControlLists(
@@ -222,7 +216,6 @@ test("save writes canonical sorted lists, preserves unknowns, modes, and revisio
 			{
 				listDirectory: item.lists,
 				modelDirectory: item.model,
-				settingsPath: item.config,
 				database: item.database,
 			},
 		);
@@ -248,7 +241,6 @@ test("save writes canonical sorted lists, preserves unknowns, modes, and revisio
 				{
 					listDirectory: item.lists,
 					modelDirectory: item.model,
-					settingsPath: item.config,
 					database: item.database,
 				},
 			),
@@ -270,7 +262,6 @@ test("save removes only explicitly named unresolved tokens", async () => {
 		const dependencies = {
 			listDirectory: item.lists,
 			modelDirectory: item.model,
-			settingsPath: item.config,
 			database: item.database,
 		};
 		const page = await loadSpeciesControlPage(dependencies);
@@ -299,7 +290,6 @@ test("save enforces exclusion precedence and keeps Always species in Custom scop
 		const dependencies = {
 			listDirectory: item.lists,
 			modelDirectory: item.model,
-			settingsPath: item.config,
 			database: item.database,
 		};
 		const page = await loadSpeciesControlPage(dependencies);

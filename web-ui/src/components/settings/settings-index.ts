@@ -51,7 +51,6 @@ export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 		tab: "detection",
 		icon: SlidersHorizontal,
 		fields: [
-			"Analysis model",
 			"Minimum confidence",
 			"Sensitivity",
 			"Analysis overlap",

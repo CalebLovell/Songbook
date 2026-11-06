@@ -1,7 +1,6 @@
 import "@tanstack/react-start/server-only";
 
-import { readdir, readFile } from "node:fs/promises";
-import path from "node:path";
+import { readFile } from "node:fs/promises";
 
 import { timezoneOptions } from "~/lib/timezones.ts";
 
@@ -27,7 +26,6 @@ import {
 	type SettingsSaveResult,
 	type StationSettings,
 	type StorageSettings,
-	SUPPORTED_MODELS,
 	type UpdateSettings,
 } from "./settings-data.ts";
 import {
@@ -40,7 +38,6 @@ export { readReviewRareSpeciesMax };
 
 export type SettingsServerDependencies = {
 	settingsPath?: string;
-	modelDirectory?: string;
 	currentTimezone?: string;
 	timezoneFileExists?: boolean;
 	skipSystemActions?: boolean;
@@ -55,32 +52,6 @@ async function currentTimezone() {
 	return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
-async function installedModels(
-	modelDirectory: string,
-	configuredModel: string,
-) {
-	let names: string[] = [];
-	try {
-		names = await readdir(modelDirectory);
-	} catch (error) {
-		if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-	}
-	const installed = new Set(
-		names
-			.filter((name) => name.endsWith(".tflite"))
-			.map((name) => name.slice(0, -".tflite".length)),
-	);
-	return SUPPORTED_MODELS.filter(
-		(model) => installed.has(model.id) || model.id === configuredModel,
-	).map((model) => ({
-		...model,
-		label:
-			installed.has(model.id) || model.id !== configuredModel
-				? model.label
-				: `${model.label} (configured file missing)`,
-	}));
-}
-
 export async function loadSettingsPageData(
 	dependencies: SettingsServerDependencies = {},
 ): Promise<SettingsPageData> {
@@ -90,16 +61,8 @@ export async function loadSettingsPageData(
 			dependencies.settingsPath ?? resolveSettingsPath(),
 			timezone,
 		);
-		const modelDirectory =
-			dependencies.modelDirectory ??
-			process.env.BIRDNET_MODEL_DIR ??
-			path.resolve(process.cwd(), "../model");
 		return {
 			...settings,
-			supportedModels: await installedModels(
-				modelDirectory,
-				settings.detection.model,
-			),
 			supportedTimezones: timezoneOptions(),
 		};
 	} catch {

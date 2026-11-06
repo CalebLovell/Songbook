@@ -25,6 +25,8 @@ import {
 	type SettingsCardKind,
 } from "./settings-data.ts";
 
+export const DETECTION_MODEL = "BirdNET_GLOBAL_6K_V2.4_Model_FP16";
+
 export function resolveSettingsPath() {
 	return process.env.BIRDNET_CONF ?? "/etc/birdnet/birdnet.conf";
 }
@@ -84,7 +86,6 @@ export async function readSettingsPageValues(
 			timezone,
 		}),
 		detection: parseSettingsCard("detection", {
-			model: values.MODEL ?? defaults.detection.model,
 			dataModelVersion: integerValue(
 				values,
 				"DATA_MODEL_VERSION",
@@ -215,7 +216,7 @@ function assignmentsFor<K extends SettingsCardKind>(
 		case "detection": {
 			const detection = value as SettingsByKind["detection"];
 			return {
-				MODEL: detection.model,
+				MODEL: DETECTION_MODEL,
 				DATA_MODEL_VERSION: String(detection.dataModelVersion),
 				SF_THRESH: String(detection.speciesFrequencyThreshold),
 				CONFIDENCE: String(detection.confidence),
