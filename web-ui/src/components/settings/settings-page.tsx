@@ -1,5 +1,5 @@
 import { Settings } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
@@ -18,8 +18,28 @@ import {
 import type { SettingsTab } from "./settings-index.ts";
 import { SettingsReset } from "./settings-reset.tsx";
 import { SettingsToolbar } from "./settings-toolbar.tsx";
+import { StationToDos } from "./station-to-dos.tsx";
 
 type ResetOutcome = { message: string; needsRestart: boolean };
+
+const RESTART_TOAST_ID = "settings-reset";
+
+async function restartWithToast(onRestart: SettingsRestarter) {
+	toast.loading("Restarting BirdNET…", { id: RESTART_TOAST_ID });
+	try {
+		const result = await onRestart(undefined);
+		toast.success(result.message, { id: RESTART_TOAST_ID });
+		return true;
+	} catch (error) {
+		toast.warning(
+			error instanceof Error
+				? error.message
+				: "BirdNET could not be restarted.",
+			{ id: RESTART_TOAST_ID, duration: 10_000 },
+		);
+		return false;
+	}
+}
 
 export function SettingsPage({
 	tab,
@@ -45,6 +65,15 @@ export function SettingsPage({
 	onInstallUpdate?: () => Promise<void>;
 }) {
 	const [needsRestart, setNeedsRestart] = useState(false);
+	const [settingToReveal, setSettingToReveal] = useState<SettingsTab | null>(
+		null,
+	);
+
+	useEffect(() => {
+		if (settingToReveal !== tab) return;
+		document.getElementById(settingToReveal)?.scrollIntoView();
+		setSettingToReveal(null);
+	}, [settingToReveal, tab]);
 
 	const loadedValues = JSON.stringify([
 		data.station,
@@ -75,20 +104,8 @@ export function SettingsPage({
 										<RestartButton
 											size="lg"
 											onRestart={async () => {
-												const toastId = "settings-reset";
-												toast.loading("Restarting BirdNET…", { id: toastId });
-												try {
-													const result = await onRestart(undefined);
+												if (await restartWithToast(onRestart))
 													setNeedsRestart(false);
-													toast.success(result.message, { id: toastId });
-												} catch (error) {
-													toast.warning(
-														error instanceof Error
-															? error.message
-															: "BirdNET could not be restarted.",
-														{ id: toastId, duration: 10_000 },
-													);
-												}
 											}}
 										/>
 									) : null}
@@ -113,6 +130,16 @@ export function SettingsPage({
 						}
 					/>
 				}
+			/>
+			<StationToDos
+				toDos={health?.toDos ?? []}
+				onShowSetting={(next) => {
+					setSettingToReveal(next);
+					onTabChange(next);
+				}}
+				onRestart={async () => {
+					if (onRestart) await restartWithToast(onRestart);
+				}}
 			/>
 			<SettingsCards
 				key={loadedValues}

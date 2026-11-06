@@ -15,7 +15,7 @@ import {
 	SettingsPage,
 	SettingsPageSkeleton,
 } from "~/components/settings/settings-page.tsx";
-import { getStationHealth } from "~/lib/health.ts";
+import { stationHealthQuery } from "~/lib/health.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import { prefetchInBrowser } from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
@@ -45,8 +45,7 @@ const HEALTH_INTERVAL_MS = 30_000;
 const UPDATES_INTERVAL_MS = 5_000;
 
 const healthQuery = queryOptions({
-	queryKey: ["station-health"],
-	queryFn: () => getStationHealth(),
+	...stationHealthQuery,
 	refetchInterval: HEALTH_INTERVAL_MS,
 });
 
@@ -106,6 +105,11 @@ function SettingsRoute() {
 			replace: true,
 			resetScroll: false,
 		});
+	const refreshingHealth = async <T,>(work: Promise<T>) => {
+		const result = await work;
+		await queryClient.invalidateQueries({ queryKey: healthQuery.queryKey });
+		return result;
+	};
 
 	if (!settled) return <SettingsPageSkeleton tab={tab} onTabChange={showTab} />;
 
@@ -115,7 +119,7 @@ function SettingsRoute() {
 			onTabChange={showTab}
 			data={settled.value}
 			health={health}
-			onRestart={(card) => restart({ data: { card } })}
+			onRestart={(card) => refreshingHealth(restart({ data: { card } }))}
 			updates={updates ?? null}
 			onCheckUpdates={async () => {
 				const state = await checkForUpdates();
@@ -136,12 +140,13 @@ function SettingsRoute() {
 				};
 			}}
 			savers={{
-				station: (values) => saveStation({ data: values }),
+				station: (values) => refreshingHealth(saveStation({ data: values })),
 				detection: (values) => saveDetection({ data: values }),
 				privacy: (values) => savePrivacy({ data: values }),
-				audio: (values) => saveAudio({ data: values }),
-				recording: (values) => saveRecording({ data: values }),
-				storage: (values) => saveStorage({ data: values }),
+				audio: (values) => refreshingHealth(saveAudio({ data: values })),
+				recording: (values) =>
+					refreshingHealth(saveRecording({ data: values })),
+				storage: (values) => refreshingHealth(saveStorage({ data: values })),
 				review: (values) => saveReview({ data: values }),
 				highlights: (values) => saveHighlights({ data: values }),
 				updates: (values) => saveUpdates({ data: values }),

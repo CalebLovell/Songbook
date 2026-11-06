@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useId } from "react";
 
-import { useUpdateOffered } from "~/lib/use-update-offered.ts";
+import { useSettingsMark } from "~/lib/use-settings-mark.ts";
 
 const NAV_ROW_CLASS =
 	"group flex min-h-8.5 pointer-coarse:min-h-9 items-center gap-2.5 pointer-coarse:gap-3 rounded-(--radius) px-3 text-[0.875rem] text-[color-mix(in_oklab,var(--ink)_70%,var(--moss)_30%)] pointer-coarse:text-[1rem] no-underline hover:bg-meadow hover:text-ink data-[status=active]:bg-[color-mix(in_oklab,var(--moss)_10%,var(--meadow))] data-[status=active]:text-ink";
@@ -35,7 +35,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
 	const { auth } = useRouteContext({ from: "__root__" });
 	const id = useId();
-	const offered = useUpdateOffered(auth.unlocked);
+	const settingsMark = useSettingsMark(auth.unlocked);
 
 	return (
 		<div className="flex flex-1 flex-col px-3">
@@ -121,11 +121,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 						<Link to="/settings" {...linkProps}>
 							<NavIcon icon={Settings} />
 							Settings
-							{offered ? (
-								<UpdateDot
-									className="ml-auto"
-									label={`Update to ${offered} available`}
-								/>
+							{settingsMark ? (
+								<SettingsDot className="ml-auto" label={settingsMark} />
 							) : null}
 						</Link>
 					</>
@@ -135,7 +132,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 	);
 }
 
-export function UpdateDot({
+export function SettingsDot({
 	label,
 	className = "",
 }: {

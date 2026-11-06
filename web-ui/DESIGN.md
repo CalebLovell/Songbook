@@ -287,6 +287,15 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   footer reset covers only that card and goes through its normal save, and Station
   and Updates have no default to offer one. A card's Save and reset show as disabled
   when there is nothing to do.
+- **To do**: Settings lists what's broken or not yet set above its tabs, each with one
+  action, and marks Settings in the sidebar; all of it is signed-in only, and with
+  nothing to do no section shows. Pure checks live in `lib/health-data.ts`. A state
+  that can't be read, or a mid-restart service, is unknown and never listed, and audio
+  and the analyzer wait out 5 minutes of uptime. Audio is judged by the `StreamData`
+  folder's own mtime, because the analyzer deletes the files. A station name equal to
+  the hostname counts as unset, because the installer writes that. A purging disk
+  alarms 2 points past `PURGE_THRESHOLD`, since it rests near that line when healthy;
+  a keeping disk warns 5 points before it, since services stop there.
 
 ## Data and security
 

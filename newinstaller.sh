@@ -53,6 +53,14 @@ git clone -b $branch --depth=1 https://github.com/${REPO}.git ${HOME}/BirdNET-Pi
 $HOME/BirdNET-Pi/scripts/install_birdnet.sh
 if [ ${PIPESTATUS[0]} -eq 0 ];then
   echo "Installation completed successfully"
+  if awk -F= '/^LATITUDE=/{lat=$2} /^LONGITUDE=/{lon=$2} END{exit !(lat+0==0 && lon+0==0)}' /etc/birdnet/birdnet.conf; then
+    echo
+    echo "*** The station's location could not be set. ***"
+    echo "Until it is, BirdNET will drop most detections."
+    echo "After the reboot, sign in to the web UI and set it in Settings -> Station."
+    echo
+    sleep 10
+  fi
   sudo reboot
 else
   echo "The installation exited unsuccessfully."
