@@ -70,10 +70,6 @@ if ! [ -L /etc/birdnet/birdnet.conf ] ; then
 fi
 
 # update snippets below
-SRC="APPRISE_NOTIFICATION_BODY='(.*)'$"
-DST='APPRISE_NOTIFICATION_BODY="\1"'
-sed -i --follow-symlinks -E "s/$SRC/$DST/" /etc/birdnet/birdnet.conf
-
 if ! grep -E '^DATA_MODEL_VERSION=' /etc/birdnet/birdnet.conf &>/dev/null;then
     echo "DATA_MODEL_VERSION=1" >> /etc/birdnet/birdnet.conf
 fi
@@ -86,16 +82,6 @@ fi
 
 if ! grep -E '^RTSP_STREAM_TO_LIVESTREAM=' /etc/birdnet/birdnet.conf &>/dev/null;then
   echo "RTSP_STREAM_TO_LIVESTREAM=\"0\"" >> /etc/birdnet/birdnet.conf
-fi
-
-SRC='^APPRISE_NOTIFICATION_BODY="A \$comname \(\$sciname\)  was just detected with a confidence of \$confidence"$'
-DST='APPRISE_NOTIFICATION_BODY="A \$comname (\$sciname)  was just detected with a confidence of \$confidence (\$reason)"'
-sed -i --follow-symlinks -E "s/$SRC/$DST/" /etc/birdnet/birdnet.conf
-
-if ! [ -f $HOME/BirdNET-Pi/body.txt ];then
-  grep -E '^APPRISE_NOTIFICATION_BODY=".*"' /etc/birdnet/birdnet.conf | cut -d '"' -f 2 | sudo_with_user tee "$HOME/BirdNET-Pi/body.txt"
-  chmod g+w "$HOME/BirdNET-Pi/body.txt"
-  sed -i --follow-symlinks -E 's/^APPRISE_NOTIFICATION_BODY=/#APPRISE_NOTIFICATION_BODY=/' /etc/birdnet/birdnet.conf
 fi
 
 if ! grep -E '^INFO_SITE=' /etc/birdnet/birdnet.conf &>/dev/null;then
@@ -152,16 +138,12 @@ if ! which inotifywait &>/dev/null;then
   apt-get -y install inotify-tools
 fi
 
-apprise_version=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import apprise; print(apprise.__version__)")
-[[ $apprise_version != "1.9.5" ]] && sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install apprise==1.9.5
-version=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import suntime; print(suntime.__version__)")
-[[ $version != "1.3.2" ]] && sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install suntime==1.3.2
 PY_VERSION=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import sys; print(f'{sys.version_info[0]}{sys.version_info[1]}')")
 tf_version=$($HOME/BirdNET-Pi/birdnet/bin/python3 -c "import tflite_runtime; print(tflite_runtime.__version__)")
 if [ "$PY_VERSION" == 39 ] && [ "$tf_version" != "2.11.0" ] || [ "$PY_VERSION" != 39 ] && [ "$tf_version" != "2.17.1" ]; then
   get_tf_whl
   # include our numpy dependants so pip can figure out which numpy version to install
-  sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install $HOME/BirdNET-Pi/$WHL pandas librosa matplotlib
+  sudo_with_user $HOME/BirdNET-Pi/birdnet/bin/pip3 install $HOME/BirdNET-Pi/$WHL librosa
 fi
 
 ensure_python_package inotify inotify

@@ -24,12 +24,5 @@ class Settings(dict):
             "DATA_MODEL_VERSION": 1,
             "SENSITIVITY": 1.25,
             "SF_THRESH": 0.003,
-            "APPRISE_NOTIFICATION_TITLE": "New backyard bird!",
-            "APPRISE_NOTIFY_EACH_DETECTION": "0",
-            "APPRISE_NOTIFY_NEW_SPECIES": "0",
-            "APPRISE_NOTIFY_NEW_SPECIES_EACH_DAY": "0",
-            "APPRISE_MINIMUM_SECONDS_BETWEEN_NOTIFICATIONS_PER_SPECIES": "0",
-            "APPRISE_ONLY_NOTIFY_SPECIES_NAMES": "",
-            "APPRISE_ONLY_NOTIFY_SPECIES_NAMES_2": ""
         }
         return cls(settings)

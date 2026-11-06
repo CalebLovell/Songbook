@@ -87,17 +87,6 @@ RTSP_STREAM=
 ## RTSP_STREAM_TO_LIVESTREAM is the index, so 0 means the first stream
 RTSP_STREAM_TO_LIVESTREAM="0"
 
-#-----------------------  Apprise Miscellanous Configuration -------------------#
-
-APPRISE_NOTIFICATION_TITLE="New BirdNET-Pi Detection"
-APPRISE_NOTIFY_EACH_DETECTION=0
-APPRISE_NOTIFY_NEW_SPECIES=0
-APPRISE_WEEKLY_REPORT=1
-APPRISE_NOTIFY_NEW_SPECIES_EACH_DAY=0
-APPRISE_MINIMUM_SECONDS_BETWEEN_NOTIFICATIONS_PER_SPECIES=0
-APPRISE_ONLY_NOTIFY_SPECIES_NAMES=""
-APPRISE_ONLY_NOTIFY_SPECIES_NAMES_2=""
-
 #----------------------  Image Provider Configuration ------------------------#
 ## WIKIPEDIA or FLICKR (Flickr requires API key)
 IMAGE_PROVIDER=WIKIPEDIA
@@ -302,5 +291,3 @@ sudo ln -sf $birdnet_conf /etc/birdnet/birdnet.conf
 grep -ve '^#' -e '^$' /etc/birdnet/birdnet.conf > $my_dir/firstrun.ini
 
 source /etc/birdnet/birdnet.conf
-echo 'A $comname ($sciname)  was just detected with a confidence of $confidence ($reason)' | sudo -u $BIRDNET_USER tee "$HOME/BirdNET-Pi/body.txt"
-chmod g+w "$HOME/BirdNET-Pi/body.txt"

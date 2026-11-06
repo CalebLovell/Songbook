@@ -21,7 +21,6 @@ Changes include:
  - Backup & Restore
  - Web ui is much more responsive
  - Daily charts now include all species, not just top/bottom 10
- - Bump apprise version, so more notification type are possible
  - Swipe events on Daily Charts (by @croisez)
  - Support for 'Species range model V2.4 - V2'
  - Bookworm and Trixie support
@@ -48,7 +47,6 @@ Check out birds from around the world
 * [BirdWeather](https://app.birdweather.com) integration -- you can request a BirdWeather ID from BirdNET-Pi's "Tools" > "Settings" page
 * FTP server included
 * SQLite3 Database
-* [Apprise Notifications](https://github.com/caronc/apprise) supporting 90+ notification platforms
 * Localization supported
 
 ## Web UI
