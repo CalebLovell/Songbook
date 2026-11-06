@@ -35,24 +35,6 @@ export function countVisits(
 	return visits;
 }
 
-export function countVisitsBySpecies(
-	moments: DetectionMoment[],
-	gapMinutes: number = VISIT_GAP_MINUTES,
-): number {
-	const timestampsByName = new Map<string, string[]>();
-	for (const moment of moments) {
-		const existing = timestampsByName.get(moment.comName);
-		if (existing) existing.push(moment.timestamp);
-		else timestampsByName.set(moment.comName, [moment.timestamp]);
-	}
-
-	let total = 0;
-	for (const timestamps of timestampsByName.values()) {
-		total += countVisits(timestamps, gapMinutes);
-	}
-	return total;
-}
-
 export type Visit<Moment extends DetectionMoment> = {
 	comName: string;
 	moments: Moment[];

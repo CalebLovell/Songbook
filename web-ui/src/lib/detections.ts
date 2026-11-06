@@ -1,17 +1,6 @@
 import { rm } from "node:fs/promises";
 import { createServerFn } from "@tanstack/react-start";
-import {
-	and,
-	asc,
-	count,
-	countDistinct,
-	desc,
-	gte,
-	inArray,
-	lte,
-	or,
-	sql,
-} from "drizzle-orm";
+import { and, asc, count, desc, gte, inArray, lte, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db, openWritableDetectionsDb, sqlite } from "~/db/index.ts";
 import { type Detection, detections } from "~/db/schema.ts";
@@ -30,40 +19,6 @@ import {
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { type SpeciesLink, speciesLinkFor } from "~/lib/species-link.ts";
-
-const isToday = sql`${detections.Date} = date('now', 'localtime')`;
-const isLastHour = sql`datetime(${detections.Date} || ' ' || ${detections.Time}) >= datetime('now', '-1 hour', 'localtime')`;
-
-export type DetectionStats = {
-	total: number;
-	today: number;
-	lastHour: number;
-	speciesToday: number;
-	speciesAllTime: number;
-};
-
-export const getDetectionStats = createServerFn({ method: "GET" }).handler(
-	async (): Promise<DetectionStats> => {
-		const [{ total }] = await db.select({ total: count() }).from(detections);
-		const [{ today }] = await db
-			.select({ today: count() })
-			.from(detections)
-			.where(isToday);
-		const [{ lastHour }] = await db
-			.select({ lastHour: count() })
-			.from(detections)
-			.where(isLastHour);
-		const [{ speciesToday }] = await db
-			.select({ speciesToday: countDistinct(detections.Com_Name) })
-			.from(detections)
-			.where(isToday);
-		const [{ speciesAllTime }] = await db
-			.select({ speciesAllTime: countDistinct(detections.Com_Name) })
-			.from(detections);
-
-		return { total, today, lastHour, speciesToday, speciesAllTime };
-	},
-);
 
 export type DetectionTableRow = Omit<Detection, "Lat" | "Lon"> & {
 	rowId: number;

@@ -7,7 +7,6 @@ import {
 	type PoolSpecies,
 	pointsForAttempt,
 	QUESTIONS_PER_ROUND,
-	roundVerdict,
 	scoreRound,
 } from "./learn-round.ts";
 
@@ -127,17 +126,4 @@ test("scores an empty round at zero", () => {
 		answered: 0,
 		bestStreak: 0,
 	});
-});
-
-test("reads the verdict off first-try accuracy", () => {
-	assert.equal(roundVerdict(scoreRound([])), "No birds yet.");
-	assert.equal(roundVerdict(scoreRound([{ attempts: 1 }])), "Perfect ear.");
-	assert.equal(
-		roundVerdict(scoreRound([{ attempts: 1 }, { attempts: 4 }])),
-		"Coming along.",
-	);
-	assert.equal(
-		roundVerdict(scoreRound([{ attempts: 2 }, { attempts: 2 }])),
-		"Plenty left to learn.",
-	);
 });

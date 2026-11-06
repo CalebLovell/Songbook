@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import {
 	chmod,
-	mkdir,
 	mkdtemp,
 	readdir,
 	readFile,
@@ -14,11 +13,9 @@ import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 
 import {
-	deleteSpeciesHistory,
 	loadInstalledSpeciesCatalog,
 	loadSpeciesControlPage,
 	parseSpeciesList,
-	previewSpeciesHistoryDeletion,
 	resolveSpeciesListDirectory,
 	resolveSpeciesModelDirectory,
 	saveSpeciesControlLists,
@@ -326,108 +323,6 @@ test("save enforces exclusion precedence and keeps Always species in Custom scop
 				"utf8",
 			),
 			"Canis latrans_Coyote\n",
-		);
-	} finally {
-		item.database.close();
-	}
-});
-
-test("history deletion previews exact rows and removes reviews plus unshared assets", async () => {
-	const item = await fixture();
-	try {
-		item.database.exec(
-			"CREATE TABLE reviews (Date TEXT, Time TEXT, Com_Name TEXT, File_Name TEXT, action TEXT, confidence REAL, reviewed_at TEXT)",
-		);
-		item.database
-			.prepare("INSERT INTO reviews VALUES (?, ?, ?, ?, ?, ?, ?)")
-			.run(
-				"2026-07-31",
-				"01:00",
-				"Coyote",
-				"coyote-a.mp3",
-				"confirmed",
-				0.93,
-				"2026-07-31T02:00:00Z",
-			);
-		const extractedRoot = path.join(item.root, "Extracted");
-		for (const date of ["2026-07-30", "2026-07-31"]) {
-			const directory = path.join(extractedRoot, "By_Date", date, "Coyote");
-			await mkdir(directory, { recursive: true });
-			await writeFile(path.join(directory, "coyote-a.mp3"), "audio");
-			await writeFile(path.join(directory, "coyote-a.mp3.png"), "image");
-		}
-		const dependencies = {
-			listDirectory: item.lists,
-			modelDirectory: item.model,
-			settingsPath: item.config,
-			database: item.database,
-			extractedRoot,
-		};
-		assert.deepEqual(
-			await previewSpeciesHistoryDeletion("Canis latrans", dependencies),
-			{
-				sciName: "Canis latrans",
-				comName: "Coyote",
-				rows: 2,
-				recordings: 2,
-				assets: 4,
-			},
-		);
-		const result = await deleteSpeciesHistory(
-			{ sciName: "Canis latrans", expectedRows: 2 },
-			dependencies,
-		);
-		assert.deepEqual(result, {
-			deletedRows: 2,
-			deletedAssets: 4,
-			missingAssets: 0,
-			failedAssets: 0,
-		});
-		assert.equal(
-			item.database
-				.prepare(
-					"SELECT COUNT(*) n FROM detections WHERE Sci_Name='Canis latrans'",
-				)
-				.get()?.n,
-			0,
-		);
-		assert.equal(
-			item.database.prepare("SELECT COUNT(*) n FROM reviews").get()?.n,
-			0,
-		);
-	} finally {
-		item.database.close();
-	}
-});
-
-test("history deletion refuses changed counts and unsupported species", async () => {
-	const item = await fixture();
-	try {
-		const dependencies = {
-			listDirectory: item.lists,
-			modelDirectory: item.model,
-			settingsPath: item.config,
-			database: item.database,
-			extractedRoot: path.join(item.root, "Extracted"),
-		};
-		await assert.rejects(
-			deleteSpeciesHistory(
-				{ sciName: "Canis latrans", expectedRows: 1 },
-				dependencies,
-			),
-			/changed since the preview/i,
-		);
-		assert.equal(
-			item.database
-				.prepare(
-					"SELECT COUNT(*) n FROM detections WHERE Sci_Name='Canis latrans'",
-				)
-				.get()?.n,
-			2,
-		);
-		await assert.rejects(
-			previewSpeciesHistoryDeletion("Didelphis virginiana", dependencies),
-			/not available in the installed model/i,
 		);
 	} finally {
 		item.database.close();

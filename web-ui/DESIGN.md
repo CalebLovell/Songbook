@@ -118,8 +118,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
   `/` to focus), then the nav (Explore, Manage, then an Account link to
   `/account`), with Settings and Species control at the foot. The Live pill lives in the Live page's hero, not the chrome.
-- **Empty states**: `EmptyNote` inside a populated page; `EmptyState` only
-  when the whole page is empty.
+- **Empty states**: `EmptyNote`.
 - **Loading shells**: navigation is instant. Route loaders return their
   server calls as deferred promises (never `await` them), and each part that
   needs the data renders through `Deferred` (`components/deferred.tsx`) or

@@ -3,7 +3,6 @@ import test from "node:test";
 import {
 	applySpeciesStatus,
 	normalizeSpeciesControlSave,
-	speciesControlDeleteSchema,
 	speciesControlInputWithStatus,
 	speciesControlResetInput,
 	speciesControlSaveSchema,
@@ -139,23 +138,6 @@ test("save schema rejects invalid scientific names, oversized lists, and extra k
 	assert.equal(
 		speciesControlSaveSchema.safeParse({ ...base, filesystemPath: "C:/" })
 			.success,
-		false,
-	);
-});
-
-test("delete schema accepts only an exact scientific name and row count", () => {
-	assert.deepEqual(
-		speciesControlDeleteSchema.parse({
-			sciName: "Didelphis virginiana",
-			expectedRows: 4,
-		}),
-		{ sciName: "Didelphis virginiana", expectedRows: 4 },
-	);
-	assert.equal(
-		speciesControlDeleteSchema.safeParse({
-			sciName: " opossum ",
-			expectedRows: -1,
-		}).success,
 		false,
 	);
 });

@@ -1,15 +1,3 @@
-export function ordinal(value: number): string {
-	const lastTwo = value % 100;
-	if (lastTwo >= 11 && lastTwo <= 13) return `${value}th`;
-
-	const suffix = ["th", "st", "nd", "rd"][value % 10] ?? "th";
-	return `${value}${suffix}`;
-}
-
-export function plural(count: number, noun: string): string {
-	return `${count.toLocaleString()} ${noun}${count === 1 ? "" : "s"}`;
-}
-
 export function compactCount(count: number): string {
 	if (count < 1_000) return count.toString();
 	const units = [

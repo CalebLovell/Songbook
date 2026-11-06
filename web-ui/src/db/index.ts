@@ -7,10 +7,6 @@ import * as schema from "./schema.ts";
 
 const dbPath = process.env.BIRDNET_DB_PATH ?? "../scripts/birds.db";
 
-export function detectionsDbPath(): string {
-	return dbPath;
-}
-
 const CREATE_DETECTIONS_TABLE = `
 CREATE TABLE IF NOT EXISTS detections (
   Date DATE,

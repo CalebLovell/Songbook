@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { CardHeader } from "~/components/card-header.tsx";
 import { Card } from "~/components/ui/card.tsx";
@@ -83,30 +83,6 @@ export function ShellLines({
 				<ShellBar key={index} className={cn("h-3.5", width)} />
 			))}
 		</span>
-	);
-}
-
-export function ShellCard({
-	title,
-	children,
-	className,
-	style,
-}: {
-	title?: ReactNode;
-	children?: ReactNode;
-	className?: string;
-	style?: CSSProperties;
-}) {
-	return (
-		<Card
-			as="section"
-			aria-busy="true"
-			className={cn("", className)}
-			style={style}
-		>
-			{title ? <CardHeader title={title} /> : null}
-			{children ?? <ShellLines className="mt-2" />}
-		</Card>
 	);
 }
 

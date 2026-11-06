@@ -262,8 +262,6 @@ export const RESETTABLE_CARDS = [
 	"station" | "updates"
 >[];
 
-export type ResettableCard = (typeof RESETTABLE_CARDS)[number];
-
 export type SettingsSaveResult<T> = {
 	status: "saved" | "saved-restart-skipped" | "saved-action-failed";
 	values: T;

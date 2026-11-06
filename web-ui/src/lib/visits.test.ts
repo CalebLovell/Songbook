@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { countVisits, countVisitsBySpecies, groupVisits } from "./visits.ts";
+import { countVisits, groupVisits } from "./visits.ts";
 
 test("counts no visits without detections", () => {
 	assert.equal(countVisits([]), 0);
@@ -54,21 +54,6 @@ test("clusters across a midnight boundary", () => {
 
 test("ignores unparseable timestamps", () => {
 	assert.equal(countVisits(["not-a-timestamp", "2026-07-25 06:12:03"]), 1);
-});
-
-test("clusters each species independently", () => {
-	const moments = [
-		{ comName: "American Robin", timestamp: "2026-07-25 06:00:00" },
-		{ comName: "Northern Cardinal", timestamp: "2026-07-25 06:00:30" },
-		{ comName: "American Robin", timestamp: "2026-07-25 06:01:00" },
-		{ comName: "American Robin", timestamp: "2026-07-25 09:00:00" },
-	];
-
-	assert.equal(countVisitsBySpecies(moments), 3);
-});
-
-test("counts no visits across an empty species list", () => {
-	assert.equal(countVisitsBySpecies([]), 0);
 });
 
 test("groups each species' detections into visits, newest visit first", () => {

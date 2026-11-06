@@ -1,8 +1,5 @@
 import { SpeciesImage } from "~/components/species-image.tsx";
 
-export const LIST_ROW =
-	"flex min-h-18 items-center gap-3 rounded-md px-3 py-2 odd:bg-meadow max-[400px]:gap-2 max-[400px]:px-2";
-
 export function SpeciesThumbnail({
 	imageUrl,
 	comName,

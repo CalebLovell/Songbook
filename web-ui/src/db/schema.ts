@@ -26,5 +26,3 @@ export const reviews = sqliteTable("reviews", {
 	confidence: real("confidence"),
 	reviewed_at: text("reviewed_at").notNull(),
 });
-
-export type Review = typeof reviews.$inferSelect;

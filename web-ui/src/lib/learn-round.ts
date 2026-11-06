@@ -160,13 +160,3 @@ export function scoreRound(results: QuestionResult[]): RoundScore {
 		bestStreak,
 	};
 }
-
-export function roundVerdict({ firstTry, answered }: RoundScore): string {
-	if (answered === 0) return "No birds yet.";
-	const ratio = firstTry / answered;
-	if (ratio === 1) return "Perfect ear.";
-	if (ratio >= 0.75) return "Sharp listening.";
-	if (ratio >= 0.5) return "Coming along.";
-	if (ratio >= 0.25) return "Keep at it.";
-	return "Plenty left to learn.";
-}

@@ -32,21 +32,6 @@ export type SpeciesControlPageData = {
 	listFiles: Record<SpeciesListName, boolean>;
 };
 
-export type HistoryDeletePreview = {
-	sciName: string;
-	comName: string;
-	rows: number;
-	recordings: number;
-	assets: number;
-};
-
-export type HistoryDeleteResult = {
-	deletedRows: number;
-	deletedAssets: number;
-	missingAssets: number;
-	failedAssets: number;
-};
-
 const scientificNamePattern = /^[\p{L}][\p{L}.'-]*(?: [\p{L}][\p{L}.'-]*)+$/u;
 
 export const scientificNameSchema = z
@@ -84,21 +69,7 @@ export const speciesControlSaveSchema = z
 	})
 	.strict();
 
-export const speciesControlDeletePreviewSchema = z
-	.object({ sciName: scientificNameSchema })
-	.strict();
-
-export const speciesControlDeleteSchema = z
-	.object({
-		sciName: scientificNameSchema,
-		expectedRows: z.number().int().nonnegative().max(10_000_000),
-	})
-	.strict();
-
 export type SpeciesControlSaveInput = z.infer<typeof speciesControlSaveSchema>;
-export type SpeciesControlDeleteInput = z.infer<
-	typeof speciesControlDeleteSchema
->;
 
 export function speciesControlResetInput(
 	revision: string,

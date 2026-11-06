@@ -45,19 +45,6 @@ function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
 	);
 }
 
-function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
-	return (
-		<tfoot
-			data-slot="table-footer"
-			className={cn(
-				"border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-				className,
-			)}
-			{...props}
-		/>
-	);
-}
-
 function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
 	return (
 		<tr
@@ -97,27 +84,12 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
 	);
 }
 
-function TableCaption({
-	className,
-	...props
-}: React.ComponentProps<"caption">) {
-	return (
-		<caption
-			data-slot="table-caption"
-			className={cn("mt-4 text-muted-foreground text-sm", className)}
-			{...props}
-		/>
-	);
-}
-
 export {
 	SELECT_COLUMN_WIDTH,
 	Table,
 	TableHeader,
 	TableBody,
-	TableFooter,
 	TableHead,
 	TableRow,
 	TableCell,
-	TableCaption,
 };

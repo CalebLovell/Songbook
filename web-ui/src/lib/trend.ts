@@ -26,12 +26,6 @@ export function calendarYearFilter(year: number): SQL {
 	return sql`${detections.Date} >= ${`${year}-01-01`} AND ${detections.Date} < ${`${year + 1}-01-01`}`;
 }
 
-export function yearFilter(year: number): SQL {
-	return year === new Date().getFullYear()
-		? periodFilter("year")
-		: calendarYearFilter(year);
-}
-
 function dayBuckets(daysBack: number): { key: string; label: string }[] {
 	const pad = (value: number) => value.toString().padStart(2, "0");
 	const now = new Date();

@@ -2,7 +2,6 @@ import "@tanstack/react-start/server-only";
 
 import { createHash, randomUUID } from "node:crypto";
 import {
-	access,
 	chmod,
 	mkdir,
 	readFile,
@@ -14,26 +13,18 @@ import {
 import { homedir } from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { resolveDetectionClipPath } from "./detection-file-path.server.ts";
-import { reviewsTableExists } from "./review.server.ts";
 import {
 	parseBirdnetConfig,
 	resolveSettingsPath,
 } from "./settings-config.server.ts";
 import type {
-	HistoryDeletePreview,
-	HistoryDeleteResult,
 	SpeciesControlPageData,
 	SpeciesControlRow,
 	SpeciesControlSaveInput,
 	SpeciesHistorySummary,
 	SpeciesListName,
 } from "./species-control-data.ts";
-import {
-	normalizeSpeciesControlSave,
-	speciesControlDeletePreviewSchema,
-	speciesControlDeleteSchema,
-} from "./species-control-data.ts";
+import { normalizeSpeciesControlSave } from "./species-control-data.ts";
 
 export type InstalledSpecies = { sciName: string; comName: string };
 
@@ -439,187 +430,4 @@ export async function saveSpeciesControlLists(
 		await replaceAllLists(listDirectory, contents);
 		return { revision: (await loadLists(listDirectory, catalog)).revision };
 	});
-}
-
-type DetectionAssetRow = {
-	date: string;
-	time: string;
-	comName: string;
-	fileName: string;
-};
-
-function openWritableHistoryDatabase(dependencies: SpeciesControlDependencies) {
-	if (dependencies.database) {
-		return { database: dependencies.database, owned: false };
-	}
-	const databasePath =
-		dependencies.databasePath ??
-		process.env.BIRDNET_DB_PATH ??
-		path.resolve(process.cwd(), "../scripts/birds.db");
-	return { database: new DatabaseSync(databasePath), owned: true };
-}
-
-async function requireInstalledSpecies(
-	sciName: string,
-	dependencies: SpeciesControlDependencies,
-) {
-	const parsed = speciesControlDeletePreviewSchema.parse({ sciName });
-	const catalog = await loadInstalledSpeciesCatalog(dependencies);
-	const species = catalog.find((item) => item.sciName === parsed.sciName);
-	if (!species)
-		throw new Error("Species is not available in the installed model");
-	return species;
-}
-
-function detectionAssets(database: DatabaseSync, sciName: string) {
-	return database
-		.prepare(
-			"SELECT Date date, Time time, Com_Name comName, File_Name fileName FROM detections WHERE Sci_Name=? ORDER BY Date, Time, Com_Name, File_Name",
-		)
-		.all(sciName) as DetectionAssetRow[];
-}
-
-function uniqueRecordings(rows: DetectionAssetRow[]) {
-	const seen = new Set<string>();
-	return rows.filter((row) => {
-		const key = `${row.date}\0${row.comName}\0${row.fileName}`;
-		if (seen.has(key)) return false;
-		seen.add(key);
-		return true;
-	});
-}
-
-async function pathExists(filePath: string) {
-	try {
-		await access(filePath);
-		return true;
-	} catch {
-		return false;
-	}
-}
-
-function extractedRoot(dependencies: SpeciesControlDependencies) {
-	return path.resolve(
-		dependencies.extractedRoot ??
-			process.env.BIRDNET_EXTRACTED_DIR ??
-			"../../BirdSongs/Extracted",
-	);
-}
-
-export async function previewSpeciesHistoryDeletion(
-	sciName: string,
-	dependencies: SpeciesControlDependencies = {},
-): Promise<HistoryDeletePreview> {
-	const species = await requireInstalledSpecies(sciName, dependencies);
-	const opened = openHistoryDatabase(dependencies);
-	try {
-		const rows = detectionAssets(opened.database, sciName);
-		const recordings = uniqueRecordings(rows);
-		let assets = 0;
-		for (const recording of recordings) {
-			const filePath = resolveDetectionClipPath(extractedRoot(dependencies), {
-				date: recording.date,
-				commonName: recording.comName,
-				fileName: recording.fileName,
-			});
-			if (!filePath) continue;
-			if (await pathExists(filePath)) assets++;
-			if (await pathExists(`${filePath}.png`)) assets++;
-		}
-		return {
-			sciName,
-			comName: species.comName,
-			rows: rows.length,
-			recordings: recordings.length,
-			assets,
-		};
-	} finally {
-		if (opened.owned) opened.database.close();
-	}
-}
-
-export async function deleteSpeciesHistory(
-	input: { sciName: string; expectedRows: number },
-	dependencies: SpeciesControlDependencies = {},
-): Promise<HistoryDeleteResult> {
-	const parsed = speciesControlDeleteSchema.parse(input);
-	await requireInstalledSpecies(parsed.sciName, dependencies);
-	const opened = openWritableHistoryDatabase(dependencies);
-	let recordings: DetectionAssetRow[] = [];
-	let deletedRows = 0;
-	try {
-		opened.database.exec("BEGIN IMMEDIATE");
-		try {
-			const rows = detectionAssets(opened.database, parsed.sciName);
-			if (rows.length !== parsed.expectedRows) {
-				throw new Error(
-					"Detection history changed since the preview. Preview it again before deleting.",
-				);
-			}
-			recordings = uniqueRecordings(rows);
-			if (reviewsTableExists(opened.database)) {
-				const removeReview = opened.database.prepare(
-					"DELETE FROM reviews WHERE Date=? AND Time=? AND Com_Name=? AND File_Name=?",
-				);
-				for (const row of rows) {
-					removeReview.run(row.date, row.time, row.comName, row.fileName);
-				}
-			}
-			deletedRows = Number(
-				opened.database
-					.prepare("DELETE FROM detections WHERE Sci_Name=?")
-					.run(parsed.sciName).changes,
-			);
-			if (deletedRows !== parsed.expectedRows) {
-				throw new Error("Detection history changed while it was being deleted");
-			}
-			opened.database.exec("COMMIT");
-		} catch (error) {
-			try {
-				opened.database.exec("ROLLBACK");
-			} catch {}
-			throw error;
-		}
-
-		let deletedAssets = 0;
-		let missingAssets = 0;
-		let failedAssets = 0;
-		for (const recording of recordings) {
-			const remaining = Number(
-				opened.database
-					.prepare(
-						"SELECT COUNT(*) n FROM detections WHERE Date=? AND Com_Name=? AND File_Name=?",
-					)
-					.get(recording.date, recording.comName, recording.fileName)?.n ?? 0,
-			);
-			if (remaining > 0) continue;
-			const filePath = resolveDetectionClipPath(extractedRoot(dependencies), {
-				date: recording.date,
-				commonName: recording.comName,
-				fileName: recording.fileName,
-			});
-			if (!filePath) {
-				failedAssets += 2;
-				continue;
-			}
-			for (const asset of [filePath, `${filePath}.png`]) {
-				try {
-					await rm(asset);
-					deletedAssets++;
-				} catch (error) {
-					if ((error as NodeJS.ErrnoException).code === "ENOENT")
-						missingAssets++;
-					else failedAssets++;
-				}
-			}
-		}
-		return {
-			deletedRows,
-			deletedAssets,
-			missingAssets,
-			failedAssets,
-		};
-	} finally {
-		if (opened.owned) opened.database.close();
-	}
 }

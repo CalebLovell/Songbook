@@ -1,25 +1,6 @@
 export type HourActivity = { hour: number; count: number };
-export type BusiestHour = HourActivity;
-export type BusiestDay = { date: string; count: number };
 export type TrendBucketCount = { bucket: string; count: number };
 export type TrendPoint = TrendBucketCount & { label: string };
-export type SpeciesCount = {
-	comName: string;
-	sciName: string;
-	count: number;
-	imageUrl: string | null;
-};
-
-function parseIsoDate(value: string): Date {
-	return new Date(`${value}T00:00:00Z`);
-}
-
-const DAY_LABEL = new Intl.DateTimeFormat("en-US", {
-	month: "short",
-	day: "numeric",
-	year: "numeric",
-	timeZone: "UTC",
-});
 
 const MONTH_LABELS = [
 	"Jan",
@@ -51,36 +32,5 @@ export function buildHourActivity(rows: HourActivity[]): HourActivity[] {
 	return Array.from({ length: 24 }, (_, hour) => ({
 		hour,
 		count: countByHour.get(hour) ?? 0,
-	}));
-}
-
-export function selectBusiestHour(
-	activity: HourActivity[],
-): BusiestHour | null {
-	return activity.reduce<BusiestHour | null>(
-		(busiest, point) =>
-			point.count > 0 && (!busiest || point.count > busiest.count)
-				? point
-				: busiest,
-		null,
-	);
-}
-
-export function dayLabel(date: string): string {
-	const parsed = parseIsoDate(date);
-	return Number.isNaN(parsed.getTime()) ? date : DAY_LABEL.format(parsed);
-}
-
-export function rankingBarPercent(count: number, maximum: number): number {
-	if (count <= 0 || maximum <= 0) return 0;
-	return Math.max(2, Math.round((count / maximum) * 100));
-}
-
-export function hourActivityFromRows(
-	rows: { hourCounts: number[] }[],
-): HourActivity[] {
-	return Array.from({ length: 24 }, (_, hour) => ({
-		hour,
-		count: rows.reduce((sum, row) => sum + (row.hourCounts[hour] ?? 0), 0),
 	}));
 }
