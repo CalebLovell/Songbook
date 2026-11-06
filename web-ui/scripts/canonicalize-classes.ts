@@ -1,8 +1,10 @@
-import { spawnSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { __unstable__loadDesignSystem } from "@tailwindcss/node";
 
 const SOURCE_ROOT = "src";
+const STYLESHEET = join(SOURCE_ROOT, "styles.css");
+const ROOT_FONT_SIZE_PX = 16;
 const SKIPPED_FILES = new Set(["routeTree.gen.ts", "reference-photos.ts"]);
 const TOKEN = /[^\s"'`]+/g;
 
@@ -13,25 +15,21 @@ function sourceFiles(): string[] {
 		.map((path) => join(SOURCE_ROOT, path));
 }
 
-function canonicalForms(tokens: Set<string>): Map<string, string> {
-	const result = spawnSync(
-		"npx tailwindcss canonicalize --stream --css src/styles.css --format jsonl",
-		{
-			input: [...tokens].join("\n"),
-			encoding: "utf8",
-			shell: true,
-			maxBuffer: 256 * 1024 * 1024,
-		},
+async function canonicalForms(
+	tokens: Set<string>,
+): Promise<Map<string, string>> {
+	const designSystem = await __unstable__loadDesignSystem(
+		readFileSync(STYLESHEET, "utf8"),
+		{ base: resolve(SOURCE_ROOT) },
 	);
-	if (result.status !== 0) {
-		throw new Error(`tailwindcss canonicalize failed:\n${result.stderr}`);
-	}
 
 	const replacements = new Map<string, string>();
-	for (const line of result.stdout.split("\n")) {
-		if (!line.trim()) continue;
-		const { input, output, changed } = JSON.parse(line);
-		if (changed) replacements.set(input, output);
+	for (const token of tokens) {
+		const [canonical] = designSystem.canonicalizeCandidates([token], {
+			rem: ROOT_FONT_SIZE_PX,
+			logicalToPhysical: true,
+		});
+		if (canonical && canonical !== token) replacements.set(token, canonical);
 	}
 	return replacements;
 }
@@ -47,7 +45,7 @@ for (const source of sources.values()) {
 	}
 }
 
-const replacements = canonicalForms(tokens);
+const replacements = await canonicalForms(tokens);
 
 let changedFiles = 0;
 for (const [path, source] of sources) {

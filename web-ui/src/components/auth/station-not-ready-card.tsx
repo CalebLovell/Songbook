@@ -27,7 +27,6 @@ export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 				titleId="station-not-ready"
 				title={SIGN_IN_CARD_TITLE}
 			/>
-			{/* biome-ignore lint/a11y/useSemanticElements: <output> means the result of a calculation; this is a persistent configuration warning */}
 			<div role="status" className="flex items-start gap-2 text-bark text-sm">
 				<AlertTriangle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
 				<div className="space-y-2">

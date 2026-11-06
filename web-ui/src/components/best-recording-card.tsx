@@ -30,7 +30,7 @@ export function BestRecordingCard({
 		>
 			<CardHeader title="Best recording" />
 
-			{!recording || !recording.audioUrl ? (
+			{!recording?.audioUrl ? (
 				<EmptyNote>{EMPTY.window.birdRecording}</EmptyNote>
 			) : (
 				<div className="mt-page flex flex-1 flex-col">
