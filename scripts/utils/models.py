@@ -19,17 +19,6 @@ def get_model():
     return BirdNetV2_4(get_settings().getfloat('SENSITIVITY'))
 
 
-def get_meta_model(version=None):
-    conf = get_settings()
-    if version is None:
-        version = conf.getint('DATA_MODEL_VERSION')
-
-    if version == 1:
-        return MDataModel1(conf.getfloat('SF_THRESH'))
-    elif version == 2:
-        return MDataModel2(conf.getfloat('SF_THRESH'))
-
-
 class BirdNetV2_4:
     chunk_duration = 3
     sample_rate = 48000
@@ -42,7 +31,7 @@ class BirdNetV2_4:
         self._output_layer_idx = self.interpreter.get_output_details()[0]['index']
 
         self.labels = get_model_labels()
-        self._mdata_model = get_meta_model()
+        self._mdata_model = MDataModel(get_settings().getfloat('SF_THRESH'))
         self._sensitivity = max(0.5, min(1.0 - (sens - 1.0), 1.5))
 
     def scale(self, logits):
@@ -68,7 +57,7 @@ class BirdNetV2_4:
 
 
 class MDataModel:
-    model_name = None
+    model_name = 'BirdNET_GLOBAL_6K_V2.4_MData_Model_V2_FP16'
 
     def __init__(self, sf_thresh):
         model_path = os.path.join(MODEL_PATH, f'{self.model_name}.tflite')
@@ -116,11 +105,3 @@ class MDataModel:
     def get_species_list(self, labels):
         l_filter = self.get_species_list_details(labels)
         return [s[1].split('_')[0] for s in l_filter]
-
-
-class MDataModel1(MDataModel):
-    model_name = 'BirdNET_GLOBAL_6K_V2.4_MData_Model_FP16'
-
-
-class MDataModel2(MDataModel):
-    model_name = 'BirdNET_GLOBAL_6K_V2.4_MData_Model_V2_FP16'

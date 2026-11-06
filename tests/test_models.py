@@ -4,7 +4,7 @@ from unittest.mock import patch
 import numpy as np
 
 from scripts.utils.helpers import get_model_labels
-from scripts.utils.models import BirdNetV2_4, MDataModel1, get_model
+from scripts.utils.models import BirdNetV2_4, MDataModel, get_model
 from tests.helpers import Settings
 
 REMOVED_MODELS = ['BirdNET_6K_GLOBAL_MODEL', 'Perch_v2', 'BirdNET-Go_classifier_20250916']
@@ -23,13 +23,19 @@ class TestRemovedModelFallback(unittest.TestCase):
             with self.subTest(model=model), patch('scripts.utils.helpers._load_settings', return_value=self._settings(model)):
                 analyzer = get_model()
                 self.assertIsInstance(analyzer, BirdNetV2_4)
-                self.assertIsInstance(analyzer._mdata_model, MDataModel1)
+                self.assertIsInstance(analyzer._mdata_model, MDataModel)
 
                 silence = np.zeros(analyzer.chunk_duration * analyzer.sample_rate)
                 self.assertEqual(len(analyzer.predict(silence)), len(analyzer.labels))
 
                 analyzer.set_meta_data(52.1, 5.1, 20)
                 self.assertTrue(analyzer.get_species_list())
+
+    def test_location_filter_ignores_a_stale_version(self):
+        settings = Settings.with_defaults()
+        settings['DATA_MODEL_VERSION'] = 1
+        with patch('scripts.utils.helpers._load_settings', return_value=settings):
+            self.assertEqual(get_model()._mdata_model.model_name, 'BirdNET_GLOBAL_6K_V2.4_MData_Model_V2_FP16')
 
     def test_labels_come_from_v2_4(self):
         for model in REMOVED_MODELS:
