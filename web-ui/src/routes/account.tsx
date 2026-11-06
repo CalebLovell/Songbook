@@ -10,12 +10,12 @@ import { StationNotReadyCard } from "~/components/auth/station-not-ready-card.ts
 import { UnlockGate } from "~/components/auth/unlock-gate.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
+import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
-import { pageTitle } from "~/lib/page-title.ts";
 import { safeNext } from "~/lib/require-unlocked.ts";
 
 export const Route = createFileRoute("/account")({
-	head: () => ({ meta: [{ title: pageTitle("Account") }] }),
+	head: () => pageHead("Account"),
 	validateSearch: (search: Record<string, unknown>): { next?: string } => {
 		const next = safeNext(search.next);
 		return next ? { next } : {};

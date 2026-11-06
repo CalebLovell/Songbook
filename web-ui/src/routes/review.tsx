@@ -9,8 +9,8 @@ import {
 	ReviewWorkflowSkeleton,
 } from "~/components/review/review-workflow.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
+import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
-import { pageTitle } from "~/lib/page-title.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
 	confirmReviewDetection,
@@ -26,7 +26,7 @@ import {
 import { useSettled } from "~/lib/use-settled.ts";
 
 export const Route = createFileRoute("/review")({
-	head: () => ({ meta: [{ title: pageTitle("Review") }] }),
+	head: () => pageHead("Review"),
 	validateSearch: normalizeReviewSearch,
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),

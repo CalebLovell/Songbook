@@ -16,7 +16,7 @@ import {
 	SettingsPageSkeleton,
 } from "~/components/settings/settings-page.tsx";
 import { getStationHealth } from "~/lib/health.ts";
-import { pageTitle } from "~/lib/page-title.ts";
+import { pageHead } from "~/lib/link-preview.ts";
 import { prefetchInBrowser } from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
@@ -63,7 +63,7 @@ const settingsSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/settings")({
-	head: () => ({ meta: [{ title: pageTitle("Settings") }] }),
+	head: () => pageHead("Settings"),
 	validateSearch: settingsSearchSchema,
 	search: {
 		middlewares: [stripSearchParams({ tab: DEFAULT_SETTINGS_TAB })],

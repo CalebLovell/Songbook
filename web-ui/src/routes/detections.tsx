@@ -28,12 +28,16 @@ import {
 } from "~/lib/detection-workspace.ts";
 import { deleteDetections, getDetectionsPage } from "~/lib/detections.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
+import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
-import { pageTitle } from "~/lib/page-title.ts";
 import { useSettled } from "~/lib/use-settled.ts";
 
 export const Route = createFileRoute("/detections")({
-	head: () => ({ meta: [{ title: pageTitle("Detections") }] }),
+	head: () =>
+		pageHead(
+			"Detections",
+			"Every detection this station has logged, searchable, with recordings.",
+		),
 	validateSearch: (search) => normalizeDetectionWorkspaceSearch(search),
 	loaderDeps: ({ search }) => search,
 	loader: ({ deps }) => ({ page: getDetectionsPage({ data: deps }) }),

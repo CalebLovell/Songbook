@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { isStationOrigin } from "./csrf-origin.ts";
+import { isStationOrigin, publicOrigin } from "./csrf-origin.ts";
 
 function request(url: string, headers: Record<string, string> = {}) {
 	return new Request(url, { headers });
@@ -49,4 +49,20 @@ test("ignores forwarded headers unless the proxy is trusted", () => {
 		"x-forwarded-host": "evil.example",
 	});
 	assert.equal(isStationOrigin("https://evil.example", spoofed, false), false);
+});
+
+test("publicOrigin ignores forwarded headers unless the proxy is trusted", () => {
+	const proxied = request("http://localhost/live", {
+		"x-forwarded-proto": "https",
+		"x-forwarded-host": "birds.example",
+	});
+	assert.equal(publicOrigin(proxied, false), "http://localhost");
+	assert.equal(publicOrigin(proxied, true), "https://birds.example");
+});
+
+test("publicOrigin keeps the request's host when a proxy forwards only the scheme", () => {
+	const proxied = request("http://birds.example/live", {
+		"x-forwarded-proto": "https",
+	});
+	assert.equal(publicOrigin(proxied, true), "https://birds.example");
 });

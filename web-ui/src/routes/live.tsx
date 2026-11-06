@@ -14,12 +14,12 @@ import {
 import { SpeciesHeroCardShell } from "~/components/species-hero-card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
+import { pageHead } from "~/lib/link-preview.ts";
 import {
 	getLiveHighlights,
 	type LiveHighlights,
 } from "~/lib/live-highlights.ts";
 import { getNowSnapshot, type NowSnapshot } from "~/lib/now.ts";
-import { pageTitle } from "~/lib/page-title.ts";
 import { prefetchInBrowser } from "~/lib/query-client.ts";
 import { getStationStatus } from "~/lib/station-status.ts";
 
@@ -41,7 +41,11 @@ const statusQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/live")({
-	head: () => ({ meta: [{ title: pageTitle("Live") }] }),
+	head: () =>
+		pageHead(
+			"Live",
+			"What this station is hearing right now, identified as it sings.",
+		),
 	component: Live,
 	loader: ({ context }) => {
 		prefetchInBrowser(context.queryClient, snapshotQuery);

@@ -47,8 +47,8 @@ import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import { formatDateTime } from "~/lib/date-format.ts";
 import { getLifeListCards, type LifeListCard } from "~/lib/detections.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
+import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
-import { pageTitle } from "~/lib/page-title.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { useDraft } from "~/lib/use-draft.ts";
@@ -84,7 +84,11 @@ const speciesSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/birds/")({
-	head: () => ({ meta: [{ title: pageTitle("All Birds") }] }),
+	head: () =>
+		pageHead(
+			"All Birds",
+			"Every species this station has heard, with paintings and recordings.",
+		),
 	validateSearch: speciesSearchSchema,
 	search: {
 		middlewares: [stripSearchParams(DEFAULT_SEARCH)],

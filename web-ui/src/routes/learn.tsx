@@ -23,8 +23,8 @@ import {
 	loadResumableGame,
 	saveGame,
 } from "~/lib/learn-saved-game.ts";
+import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
-import { pageTitle } from "~/lib/page-title.ts";
 import { useHeldRound } from "~/lib/use-held-round.ts";
 
 const DEFAULT_POOL: LearnPool = "common";
@@ -34,7 +34,11 @@ const learnSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/learn")({
-	head: () => ({ meta: [{ title: pageTitle("Learn") }] }),
+	head: () =>
+		pageHead(
+			"Learn",
+			"Learn the birds at this station by ear, using their own recordings.",
+		),
 	validateSearch: learnSearchSchema,
 	search: {
 		middlewares: [stripSearchParams({ pool: DEFAULT_POOL })],

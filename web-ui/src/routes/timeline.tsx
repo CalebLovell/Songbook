@@ -34,8 +34,8 @@ import { TooltipProvider } from "~/components/ui/tooltip.tsx";
 import { getDayShareCard } from "~/lib/day-share.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import type { HighlightThresholds } from "~/lib/highlight-thresholds.ts";
+import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
-import { pageTitle } from "~/lib/page-title.ts";
 import { formatShareCard } from "~/lib/share-card.ts";
 import type { HourActivity } from "~/lib/stats-data.ts";
 import type { TimelineData, TimelineRow } from "~/lib/timeline.ts";
@@ -76,7 +76,11 @@ function resolveAnchor(period: TimelinePeriod, date: string | undefined) {
 }
 
 export const Route = createFileRoute("/timeline")({
-	head: () => ({ meta: [{ title: pageTitle("Timeline") }] }),
+	head: () =>
+		pageHead(
+			"Timeline",
+			"Every bird this station heard, hour by hour and day by day.",
+		),
 	validateSearch: timelineSearchSchema,
 	search: {
 		middlewares: [

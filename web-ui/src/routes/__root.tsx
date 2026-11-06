@@ -10,7 +10,14 @@ import { RouteError, RouteNotFound } from "~/components/root-status.tsx";
 import { MobileNav } from "~/components/sidebar/mobile-nav.tsx";
 import { SiteSidebar } from "~/components/sidebar/site-sidebar.tsx";
 import { Toaster } from "~/components/ui/toaster.tsx";
-import { pageTitle } from "~/lib/page-title.ts";
+import {
+	defaultPreviewImage,
+	previewImageMeta,
+	previewTextMeta,
+	STATION_DESCRIPTION,
+} from "~/lib/link-preview.ts";
+import { pageTitle, SITE_NAME } from "~/lib/page-title.ts";
+import { stationOrigin } from "~/lib/station-origin.ts";
 import { stationTimeZoneScript } from "~/lib/station-time.ts";
 import { unlockStatusForNavigation } from "~/lib/unlock-status.ts";
 import appCss from "../styles.css?url";
@@ -19,7 +26,7 @@ export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
 }>()({
 	beforeLoad: async () => ({ auth: await unlockStatusForNavigation() }),
-	head: () => ({
+	head: ({ match }) => ({
 		meta: [
 			{
 				charSet: "utf-8",
@@ -31,6 +38,13 @@ export const Route = createRootRouteWithContext<{
 			{
 				title: pageTitle(),
 			},
+			...previewTextMeta(pageTitle(), STATION_DESCRIPTION),
+			{ property: "og:type", content: "website" },
+			{
+				property: "og:site_name",
+				content: match.context.auth.siteName || SITE_NAME,
+			},
+			...previewImageMeta(defaultPreviewImage(stationOrigin())),
 		],
 		links: [
 			{
@@ -41,6 +55,14 @@ export const Route = createRootRouteWithContext<{
 				rel: "icon",
 				type: "image/svg+xml",
 				href: "/songbook.svg",
+			},
+			{
+				rel: "apple-touch-icon",
+				href: "/apple-touch-icon.png",
+			},
+			{
+				rel: "manifest",
+				href: "/manifest.webmanifest",
 			},
 		],
 	}),

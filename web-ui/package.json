@@ -19,6 +19,8 @@
     "lint": "biome lint --write --unsafe",
     "typecheck": "tsc --noEmit",
     "classes": "tsx scripts/canonicalize-classes.ts",
+    "link-images": "tsx scripts/render-link-images.ts",
+    "screenshots": "tsx scripts/capture-screenshots.ts",
     "clean": "npm run classes && biome check --write --unsafe && tsc --noEmit",
     "smoke": "playwright test"
   },

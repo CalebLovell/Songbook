@@ -4,7 +4,7 @@ import {
 	SpeciesControlPage,
 	SpeciesControlPageSkeleton,
 } from "~/components/species-control/species-control-page.tsx";
-import { pageTitle } from "~/lib/page-title.ts";
+import { pageHead } from "~/lib/link-preview.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
 	getSpeciesControlPage,
@@ -14,7 +14,7 @@ import { normalizeSpeciesControlWorkspaceSearch } from "~/lib/species-control-wo
 import { useSettled } from "~/lib/use-settled.ts";
 
 export const Route = createFileRoute("/species-control")({
-	head: () => ({ meta: [{ title: pageTitle("Species Control") }] }),
+	head: () => pageHead("Species Control"),
 	validateSearch: normalizeSpeciesControlWorkspaceSearch,
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),

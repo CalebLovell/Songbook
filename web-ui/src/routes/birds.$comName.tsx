@@ -58,9 +58,14 @@ import { formatDate, formatDateTime, formatTime } from "~/lib/date-format.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { heatColor, heatColorAt } from "~/lib/heatmap.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
+import {
+	previewImageMeta,
+	previewTextMeta,
+	speciesPreviewImage,
+} from "~/lib/link-preview.ts";
 import { pageTitle } from "~/lib/page-title.ts";
 import {
-	getBirdName,
+	getBirdIdentity,
 	getSpeciesDetail,
 	getSpeciesVisits,
 	type SpeciesDetail,
@@ -70,6 +75,7 @@ import {
 } from "~/lib/species-detail.ts";
 import { speciesLinkFor } from "~/lib/species-link.ts";
 import { comNameForSlug, comNameToSlug } from "~/lib/species-slug.ts";
+import { stationOrigin } from "~/lib/station-origin.ts";
 import { stationToday } from "~/lib/station-time.ts";
 import { formatTimeAgo } from "~/lib/time-ago.ts";
 import type { TrendPoint } from "~/lib/trend.ts";
@@ -113,24 +119,41 @@ export const Route = createFileRoute("/birds/$comName")({
 				visitsPage: (location.search as { visits?: number }).visits,
 			},
 		});
-		const comName =
-			comNameForSlug(params.comName) ??
-			(await getBirdName({ data: params.comName }));
-		if (!comName) {
+		const seenName = comNameForSlug(params.comName);
+		const bird = seenName
+			? { comName: seenName, sciName: null }
+			: await getBirdIdentity({ data: params.comName });
+		if (!bird) {
 			result.catch(() => {});
 			throw notFound();
 		}
-		comNameToSlug(comName);
-		return { result, comName };
+		comNameToSlug(bird.comName);
+		return { result, comName: bird.comName, sciName: bird.sciName };
 	},
-	head: ({ loaderData }) => ({
-		meta: [{ title: pageTitle(loaderData?.comName ?? "Bird") }],
-	}),
+	head: ({ loaderData }) => speciesHead(loaderData),
 	pendingMs: 1000,
 	pendingComponent: BirdPendingShell,
 	notFoundComponent: SpeciesNotFound,
 	component: BirdPage,
 });
+
+function speciesHead(bird?: { comName: string; sciName: string | null }) {
+	if (!bird) return { meta: [{ title: pageTitle("Bird") }] };
+	const { comName, sciName } = bird;
+	const description = sciName
+		? `A Songbook station's record of the ${comName} (${sciName}).`
+		: `A Songbook station's record of the ${comName}.`;
+	const image = sciName
+		? speciesPreviewImage(stationOrigin(), comName, sciName)
+		: null;
+	return {
+		meta: [
+			{ title: pageTitle(comName) },
+			...previewTextMeta(comName, description),
+			...(image ? previewImageMeta(image) : []),
+		],
+	};
+}
 
 type HeatMapWeek = {
 	days: { date: Date; point: TrendPoint | null }[];

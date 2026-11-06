@@ -60,14 +60,20 @@ export type SpeciesDetail = {
 	visitLog: VisitPage;
 };
 
-async function resolveComName(slug: string): Promise<string | null> {
+async function resolveDetectedBird(
+	slug: string,
+): Promise<CatalogSpecies | null> {
 	const rows = await db
-		.selectDistinct({ comName: detections.Com_Name })
+		.selectDistinct({
+			comName: detections.Com_Name,
+			sciName: detections.Sci_Name,
+		})
 		.from(detections);
+	return rows.find((row) => comNameToSlug(row.comName) === slug) ?? null;
+}
 
-	return (
-		rows.find((row) => comNameToSlug(row.comName) === slug)?.comName ?? null
-	);
+async function resolveComName(slug: string): Promise<string | null> {
+	return (await resolveDetectedBird(slug))?.comName ?? null;
 }
 
 function byComName(comName: string) {
@@ -181,13 +187,11 @@ async function missToResult(slug: string): Promise<SpeciesDetailResult> {
 	};
 }
 
-export const getBirdName = createServerFn({ method: "GET" })
+export const getBirdIdentity = createServerFn({ method: "GET" })
 	.validator(z.string().max(200))
 	.handler(
-		async ({ data: slug }): Promise<string | null> =>
-			(await resolveComName(slug)) ??
-			(await resolveCatalogSpecies(slug))?.comName ??
-			null,
+		async ({ data: slug }): Promise<CatalogSpecies | null> =>
+			(await resolveDetectedBird(slug)) ?? (await resolveCatalogSpecies(slug)),
 	);
 
 export type SpeciesDetailInput = {
