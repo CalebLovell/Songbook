@@ -2,7 +2,7 @@
   <img src="web-ui/public/songbook.svg" alt="Songbook" width="240" />
 </p>
 <p align="center">
-A record of every bird singing in your yard, on a Raspberry Pi.
+A record of every bird singing in your yard.
 </p>
 
 Songbook listens through a microphone around the clock, identifies birds with the

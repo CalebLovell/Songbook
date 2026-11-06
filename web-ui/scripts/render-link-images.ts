@@ -3,43 +3,38 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { SongbookWordmark } from "../src/components/sidebar/songbook-wordmark.tsx";
 
 /**
  * Renders the link-preview image and the home-screen icons into public/.
- * Run with `npm run link-images`. The inputs are the real logo and paintings,
- * so nothing here is drawn by an image model. Commit the output.
+ * Run with `npm run link-images`. The inputs are the app's real wordmark and
+ * logo, so nothing here is drawn by an image model. Commit the output.
  */
 
 const PUBLIC_DIR = path.resolve("public");
 const PAPER = "#fbfdf6";
 const MOSS = "#203b14";
 const BARK = "#472f1d";
+const SAND = "#c69a58";
 
 const publicUrl = (file: string) =>
 	pathToFileURL(path.join(PUBLIC_DIR, file)).href;
-const painting = (slug: string) => publicUrl(`illustrations/${slug}.webp`);
 
 function previewCard(): string {
+	const wordmark = renderToStaticMarkup(createElement(SongbookWordmark));
 	return `<!doctype html><html><head><meta charset="utf-8"><style>
 		* { margin: 0; box-sizing: border-box; }
-		body { width: 1200px; height: 630px; overflow: hidden; position: relative;
-			background: ${PAPER}; font-family: Georgia, 'Times New Roman', serif; }
-		.copy { position: absolute; left: 72px; top: 0; bottom: 0; width: 500px;
-			display: flex; flex-direction: column; justify-content: center; }
-		.logo { width: 148px; height: 148px; margin-left: -6px; }
-		h1 { margin-top: 12px; font-size: 92px; font-weight: 700; line-height: 1;
-			letter-spacing: -0.01em; color: ${MOSS}; }
-		p { margin-top: 24px; font-size: 34px; line-height: 1.3; color: ${BARK}; }
-		.bird { position: absolute; }
+		:root { --bark: ${BARK}; --sand: ${SAND}; }
+		body { width: 1200px; height: 630px; overflow: hidden; background: ${PAPER};
+			font-family: Georgia, 'Times New Roman', serif; display: flex;
+			flex-direction: column; align-items: center; justify-content: center; }
+		.wordmark { font-size: 162px; line-height: 0; color: ${MOSS}; }
+		p { margin-top: 18px; font-size: 38px; line-height: 1.3; color: ${BARK}; }
 	</style></head><body>
-		<div class="copy">
-			<img class="logo" src="${publicUrl("songbook.svg")}" alt="">
-			<h1>Songbook</h1>
-			<p>A record of every bird singing in your yard, on a Raspberry Pi.</p>
-		</div>
-		<img class="bird" style="width:350px;left:795px;top:-14px" src="${painting("cyanocitta-cristata")}" alt="">
-		<img class="bird" style="width:320px;left:575px;top:200px" src="${painting("spinus-tristis")}" alt="">
-		<img class="bird" style="width:370px;left:825px;top:262px" src="${painting("cardinalis-cardinalis")}" alt="">
+		<div class="wordmark">${wordmark}</div>
+		<p>A record of every bird singing in your yard.</p>
 	</body></html>`;
 }
 

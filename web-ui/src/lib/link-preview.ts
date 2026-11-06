@@ -2,7 +2,7 @@ import { illustrationUrlFor, isPhotoUrl } from "~/lib/illustrations.ts";
 import { pageTitle } from "~/lib/page-title.ts";
 
 export const STATION_DESCRIPTION =
-	"A record of every bird singing in the yard, heard and identified by a Raspberry Pi station.";
+	"A record of every bird singing in your yard.";
 
 const PREVIEW_SIZE = 400;
 
@@ -17,7 +17,7 @@ type PreviewImage = {
 export function defaultPreviewImage(origin: string): PreviewImage {
 	return {
 		url: `${origin}/og-image.png`,
-		alt: "The Songbook logo beside paintings of a goldfinch, a blue jay and a cardinal",
+		alt: "Songbook: a record of every bird singing in your yard",
 		card: "summary_large_image",
 		width: 1200,
 		height: 630,
