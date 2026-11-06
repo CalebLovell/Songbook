@@ -8,7 +8,7 @@ name: Release
 #   feat!: ... / BREAKING CHANGE: -> major  (1.4.0 -> 2.0.0)
 #   test:, docs:, chore:, refactor:, style: ... -> no release
 #
-# When there is one, it builds and signs the web UI bundle
+# When there is one, it builds the web UI bundle with its sha256 checksum
 # (scripts/package_release.sh), tags the commit, and publishes the GitHub
 # release stations update from.
 
