@@ -294,7 +294,7 @@ class InstallTest(unittest.TestCase):
     def test_flight_poses_are_listed_apart_from_perched_ones(self):
         """Catches a hero slot pointing at a flight pose that doesn't exist."""
         with tempfile.TemporaryDirectory() as tmp:
-            for name in ("a-b.png", "a-b-2.png", "c-d.png", "e-f-2.png"):
+            for name in ("a-b.webp", "a-b-2.webp", "c-d.webp", "e-f-2.webp"):
                 (Path(tmp) / name).write_bytes(b"")
             self.assertEqual(illustrate.installed_slugs(Path(tmp)), (["a-b", "c-d"], ["a-b"]))
 

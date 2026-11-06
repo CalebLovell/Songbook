@@ -110,10 +110,10 @@ class CandidateTests(unittest.TestCase):
         self.assertFalse(out["taxon_ok"])
         self.assertEqual(out["candidates"], [])
 
-    def test_candidate_urls_use_large_size(self):
+    def test_candidate_urls_use_medium_size(self):
         get = stub({"/taxa": inat_taxon(), "/observations": inat_obs(3), "commons.wikimedia": {}})
         c = photos.fetch_candidates(SP, get)["candidates"][0]
-        self.assertEqual(c["url"], "https://inaturalist-open-data.s3.amazonaws.com/photos/1/large.jpg")
+        self.assertEqual(c["url"], "https://inaturalist-open-data.s3.amazonaws.com/photos/1/medium.jpg")
         self.assertEqual(c["license"], "cc0")
         self.assertEqual(c["source"], "inaturalist")
         self.assertEqual(c["page"], "https://www.inaturalist.org/photos/1")
