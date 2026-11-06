@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type * as React from "react";
-import { useEffect, useState } from "react";
+import { useDraft } from "~/lib/use-draft.ts";
 import { cn } from "~/lib/utils.ts";
 
 export function parsePageInput(
@@ -27,8 +27,7 @@ export function PageStepper({
 	variant?: "outline" | "ghost";
 	className?: string;
 }) {
-	const [draft, setDraft] = useState(String(page));
-	useEffect(() => setDraft(String(page)), [page]);
+	const [draft, setDraft] = useDraft(String(page));
 
 	function commit() {
 		const next = parsePageInput(draft, pageCount);

@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouteContext } from "@tanstack/react-router";
 import {
 	Activity,
@@ -34,6 +35,8 @@ import {
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { cn } from "~/lib/utils.ts";
 
+const SEARCH_INDEX_FRESH_MS = 5 * 60_000;
+
 type PageEntry = SearchPage & { icon: LucideIcon; gated?: boolean };
 
 const PAGES: PageEntry[] = [
@@ -59,21 +62,15 @@ type Result =
 	| { kind: "setting"; setting: SettingsIndexEntry; field?: string };
 
 function useSearchSpecies() {
-	const [species, setSpecies] = useState<SearchSpecies[] | null>(null);
-	const requested = useRef(false);
+	const [requested, setRequested] = useState(false);
+	const { data: species } = useQuery({
+		queryKey: ["search-species"],
+		queryFn: () => getSearchSpecies(),
+		enabled: requested,
+		staleTime: SEARCH_INDEX_FRESH_MS,
+	});
 
-	function load() {
-		if (requested.current) return;
-		requested.current = true;
-		getSearchSpecies()
-			.then(setSpecies)
-			.catch((cause) => {
-				console.error(cause);
-				requested.current = false;
-			});
-	}
-
-	return { species: species ?? [], load };
+	return { species: species ?? [], load: () => setRequested(true) };
 }
 
 function useSlashShortcut(input: React.RefObject<HTMLInputElement | null>) {
@@ -129,13 +126,15 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 		];
 	}, [query, species, auth.unlocked]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: reset on query change
-	useEffect(() => setActive(0), [query]);
-
 	const open = focused && results.length > 0;
 
+	function changeQuery(next: string) {
+		setQuery(next);
+		setActive(0);
+	}
+
 	function close() {
-		setQuery("");
+		changeQuery("");
 		input.current?.blur();
 	}
 
@@ -197,7 +196,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 						autoComplete="off"
 						spellCheck={false}
 						value={query}
-						onChange={(event) => setQuery(event.target.value)}
+						onChange={(event) => changeQuery(event.target.value)}
 						onFocus={() => {
 							setFocused(true);
 							load();
@@ -212,7 +211,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 							aria-label="Clear search"
 							onMouseDown={(event) => event.preventDefault()}
 							onClick={() => {
-								setQuery("");
+								changeQuery("");
 								input.current?.focus();
 							}}
 							className="absolute top-0 right-3 bottom-3 flex w-9 items-center justify-center text-muted-foreground hover:text-foreground"

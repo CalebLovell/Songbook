@@ -1,4 +1,5 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
+import { useClientValue } from "./use-client-value.ts";
 
 type Outcome = { ok: true; value: unknown } | { ok: false; error: unknown };
 
@@ -14,23 +15,13 @@ function track(promise: Promise<unknown>) {
 	);
 }
 
-const noSubscription = () => () => {};
-
-function useHydrated(): boolean {
-	return useSyncExternalStore(
-		noSubscription,
-		() => true,
-		() => false,
-	);
-}
-
 // Not Suspense: hydration can start before the data script runs, and a boundary
 // suspended mid-hydration never leaves its shell. Waiting in state has no such race.
 export function useSettled<T>(
 	promise: Promise<T>,
 ): { value: T; current: boolean } | null {
 	track(promise);
-	const hydrated = useHydrated();
+	const hydrated = useClientValue(() => true, false);
 	const [settled, setSettled] = useState<{
 		value: T;
 		from: Promise<T>;

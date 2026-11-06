@@ -1,5 +1,5 @@
+import { useMutation } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
-import { useState } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
 
@@ -12,7 +12,8 @@ export function RestartButton({
 	label?: string;
 	size?: "default" | "lg";
 }) {
-	const [busy, setBusy] = useState(false);
+	const restart = useMutation({ mutationFn: () => onRestart() });
+	const busy = restart.isPending;
 
 	return (
 		<Button
@@ -22,14 +23,7 @@ export function RestartButton({
 			icon={RefreshCw}
 			loading={busy}
 			title="Briefly interrupts recording while BirdNET reloads its settings"
-			onClick={async () => {
-				setBusy(true);
-				try {
-					await onRestart();
-				} finally {
-					setBusy(false);
-				}
-			}}
+			onClick={() => restart.mutate()}
 		>
 			{busy ? "Restarting…" : label}
 		</Button>

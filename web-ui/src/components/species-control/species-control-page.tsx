@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import {
 	Check,
 	ChevronDown,
@@ -33,6 +34,7 @@ import {
 	type SpeciesControlWorkspaceSearch,
 } from "~/lib/species-control-workspace.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
+import { useDraft } from "~/lib/use-draft.ts";
 import { SpeciesControlDialog } from "./species-control-dialogs.tsx";
 import {
 	SPECIES_CONTROL_PAGE_SIZE,
@@ -250,12 +252,46 @@ export function SpeciesControlPage({
 		() => new Set(initialSets.whitelisted),
 	);
 	const [revision, setRevision] = useState(initialData.revision);
-	const [queryInput, setQueryInput] = useState(search.query ?? "");
+	const [queryInput, setQueryInput] = useDraft(search.query ?? "");
 	const [selected, setSelected] = useState(new Set<string>());
 	const [removedUnresolved, setRemovedUnresolved] = useState(new Set<string>());
 	const [dialog, setDialog] = useState<ProposedDialog | null>(null);
-	const [pending, setPending] = useState(false);
-	useEffect(() => setQueryInput(search.query ?? ""), [search.query]);
+	const commitMutation = useMutation({
+		mutationFn: ({
+			save,
+			input,
+		}: {
+			save: NonNullable<typeof onSave>;
+			input: SpeciesControlSaveInput;
+			messages: { success: string; failure: string; destructive?: boolean };
+			clearSelection: boolean;
+		}) => save(input),
+		onSuccess: async (result, { input, messages, clearSelection }) => {
+			setRevision(result.revision);
+			setCustom(new Set(input.custom));
+			setExcluded(new Set(input.excluded));
+			setWhitelisted(new Set(input.whitelisted));
+			if (input.removeUnresolved.length > 0) {
+				setRemovedUnresolved((current) => {
+					const next = new Set(current);
+					for (const entry of input.removeUnresolved) {
+						next.add(`${entry.list}\0${entry.raw}`);
+					}
+					return next;
+				});
+			}
+			if (clearSelection) setSelected(new Set());
+			setDialog(null);
+			await onCommitted?.();
+			if (messages.destructive) destructiveToast(messages.success);
+			else toast.success(messages.success);
+		},
+		onError: (error, { messages }) => {
+			toast.error(error instanceof Error ? error.message : messages.failure);
+			setDialog(null);
+		},
+	});
+	const pending = commitMutation.isPending;
 
 	const debouncedSetQuery = useDebouncedCallback((value: string) => {
 		onSearchChange({
@@ -336,38 +372,13 @@ export function SpeciesControlPage({
 		});
 	}
 
-	async function commit(
+	function commit(
 		input: SpeciesControlSaveInput,
 		messages: { success: string; failure: string; destructive?: boolean },
 		clearSelection = false,
 	) {
-		if (!onSave) return;
-		setPending(true);
-		try {
-			const result = await onSave(input);
-			setRevision(result.revision);
-			setCustom(new Set(input.custom));
-			setExcluded(new Set(input.excluded));
-			setWhitelisted(new Set(input.whitelisted));
-			if (input.removeUnresolved.length > 0) {
-				setRemovedUnresolved((current) => {
-					const next = new Set(current);
-					for (const entry of input.removeUnresolved) {
-						next.add(`${entry.list}\0${entry.raw}`);
-					}
-					return next;
-				});
-			}
-			if (clearSelection) setSelected(new Set());
-			setDialog(null);
-			await onCommitted?.();
-			if (messages.destructive) destructiveToast(messages.success);
-			else toast.success(messages.success);
-		} catch (error) {
-			toast.error(error instanceof Error ? error.message : messages.failure);
-			setDialog(null);
-		} finally {
-			setPending(false);
+		if (onSave) {
+			commitMutation.mutate({ save: onSave, input, messages, clearSelection });
 		}
 	}
 

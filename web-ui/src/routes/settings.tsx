@@ -1,3 +1,4 @@
+import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	stripSearchParams,
@@ -16,6 +17,7 @@ import {
 } from "~/components/settings/settings-page.tsx";
 import { getStationHealth } from "~/lib/health.ts";
 import { pageTitle } from "~/lib/page-title.ts";
+import { prefetchInBrowser } from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
 	getSettingsPage,
@@ -33,15 +35,25 @@ import {
 } from "~/lib/settings.ts";
 import {
 	checkForUpdatesFn,
-	getUpdateState,
 	installUpdateFn,
+	updateStateQuery,
 } from "~/lib/updates.ts";
-import { usePolledData } from "~/lib/use-polled-data.ts";
 import { useSettled } from "~/lib/use-settled.ts";
 
 const HEALTH_INTERVAL_MS = 30_000;
 
 const UPDATES_INTERVAL_MS = 5_000;
+
+const healthQuery = queryOptions({
+	queryKey: ["station-health"],
+	queryFn: () => getStationHealth(),
+	refetchInterval: HEALTH_INTERVAL_MS,
+});
+
+const polledUpdateStateQuery = queryOptions({
+	...updateStateQuery,
+	refetchInterval: UPDATES_INTERVAL_MS,
+});
 
 const settingsSearchSchema = z.object({
 	tab: z
@@ -58,22 +70,19 @@ export const Route = createFileRoute("/settings")({
 	},
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
-	loader: () => ({
-		data: getSettingsPage(),
-		health: getStationHealth(),
-		updates: getUpdateState(),
-	}),
+	loader: ({ context }) => {
+		prefetchInBrowser(context.queryClient, healthQuery);
+		prefetchInBrowser(context.queryClient, polledUpdateStateQuery);
+		return { data: getSettingsPage() };
+	},
 	component: SettingsRoute,
 });
 
 function SettingsRoute() {
 	const loaded = Route.useLoaderData();
 	const settled = useSettled(loaded.data);
-	const { data: health } = usePolledData(
-		getStationHealth,
-		loaded.health,
-		HEALTH_INTERVAL_MS,
-	);
+	const queryClient = useQueryClient();
+	const { data: health } = useQuery(healthQuery);
 	const saveStation = useServerFn(saveStationSettingsFn);
 	const saveDetection = useServerFn(saveDetectionSettingsFn);
 	const savePrivacy = useServerFn(savePrivacySettingsFn);
@@ -85,11 +94,7 @@ function SettingsRoute() {
 	const saveUpdates = useServerFn(saveUpdateSettingsFn);
 	const checkForUpdates = useServerFn(checkForUpdatesFn);
 	const installUpdate = useServerFn(installUpdateFn);
-	const { data: updates, replace: replaceUpdates } = usePolledData(
-		getUpdateState,
-		loaded.updates,
-		UPDATES_INTERVAL_MS,
-	);
+	const { data: updates } = useQuery(polledUpdateStateQuery);
 	const reset = useServerFn(resetSettingsFn);
 	const restart = useServerFn(restartStationFn);
 	const router = useRouter();
@@ -109,12 +114,14 @@ function SettingsRoute() {
 			tab={tab}
 			onTabChange={showTab}
 			data={settled.value}
-			health={health ?? undefined}
+			health={health}
 			onRestart={(card) => restart({ data: { card } })}
-			updates={updates}
+			updates={updates ?? null}
 			onCheckUpdates={async () => {
 				const state = await checkForUpdates();
-				replaceUpdates(state);
+				const { queryKey } = updateStateQuery;
+				await queryClient.cancelQueries({ queryKey });
+				queryClient.setQueryData(queryKey, state);
 				return state;
 			}}
 			onInstallUpdate={() => installUpdate()}

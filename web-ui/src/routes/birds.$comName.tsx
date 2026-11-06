@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	Link,
@@ -794,30 +795,18 @@ function VisitLogCard({
 	const fetchVisits = useServerFn(getSpeciesVisits);
 	const pageCount = visitPageCount(totalVisits);
 	const page = Math.min(requestedPage, pageCount);
-	const [fetched, setFetched] = useState<Record<number, VisitPage>>({});
-	const current =
-		page === 1
-			? firstPage
-			: page === loadedPage.page
-				? loadedPage
-				: fetched[page];
+	const fromLoader =
+		page === 1 ? firstPage : page === loadedPage.page ? loadedPage : undefined;
+	const { data: fetched } = useQuery({
+		queryKey: ["species-visits", comName, page],
+		queryFn: () => fetchVisits({ data: { comName, page } }),
+		enabled: !fromLoader,
+	});
+	const current = fromLoader ?? fetched;
 	const [held, setHeld] = useState(current ?? firstPage);
-	useEffect(() => {
-		if (current) setHeld(current);
-	}, [current]);
+	if (current && current !== held) setHeld(current);
 	const shown = current ?? held;
 	const offsetMs = useAgeOffset(shown.generatedAt);
-
-	useEffect(() => {
-		if (current) return;
-		let cancelled = false;
-		fetchVisits({ data: { comName, page } }).then((data) => {
-			if (!cancelled) setFetched((prev) => ({ ...prev, [data.page]: data }));
-		});
-		return () => {
-			cancelled = true;
-		};
-	}, [comName, page, current, fetchVisits]);
 
 	const loading = !current;
 	const visits = shown.visits;

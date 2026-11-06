@@ -1,3 +1,4 @@
+import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireUnlocked } from "./auth.ts";
@@ -10,6 +11,11 @@ import {
 export const getUpdateState = createServerFn({ method: "GET" })
 	.middleware([requireUnlocked])
 	.handler(() => loadUpdateState());
+
+export const updateStateQuery = queryOptions({
+	queryKey: ["update-state"],
+	queryFn: () => getUpdateState(),
+});
 
 export const checkForUpdatesFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])

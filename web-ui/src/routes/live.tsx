@@ -1,3 +1,4 @@
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
@@ -19,23 +20,37 @@ import {
 } from "~/lib/live-highlights.ts";
 import { getNowSnapshot, type NowSnapshot } from "~/lib/now.ts";
 import { pageTitle } from "~/lib/page-title.ts";
+import { prefetchInBrowser } from "~/lib/query-client.ts";
 import { getStationStatus } from "~/lib/station-status.ts";
-import { usePolledData } from "~/lib/use-polled-data.ts";
 
 const POLL_INTERVAL_MS = 10_000;
 const STATUS_INTERVAL_MS = 30_000;
 const FLASH_DURATION_MS = 2_400;
 const HIGHLIGHTS_EMPTY = EMPTY.window.last24Hours;
 
+const snapshotQuery = queryOptions({
+	queryKey: ["now-snapshot"],
+	queryFn: () => getNowSnapshot(),
+	refetchInterval: POLL_INTERVAL_MS,
+});
+
+const statusQuery = queryOptions({
+	queryKey: ["station-status"],
+	queryFn: () => getStationStatus(),
+	refetchInterval: STATUS_INTERVAL_MS,
+});
+
 export const Route = createFileRoute("/live")({
 	head: () => ({ meta: [{ title: pageTitle("Live") }] }),
 	component: Live,
-	loader: ({ context }) => ({
-		snapshot: getNowSnapshot(),
-		status: getStationStatus(),
-		highlights: getLiveHighlights(),
-		unlocked: context.auth.unlocked,
-	}),
+	loader: ({ context }) => {
+		prefetchInBrowser(context.queryClient, snapshotQuery);
+		prefetchInBrowser(context.queryClient, statusQuery);
+		return {
+			highlights: getLiveHighlights(),
+			unlocked: context.auth.unlocked,
+		};
+	},
 });
 
 function useFreshKeys(keys: string[]): Set<string> {
@@ -61,22 +76,9 @@ function useFreshKeys(keys: string[]): Set<string> {
 }
 
 function Live() {
-	const {
-		snapshot: initialSnapshot,
-		status: initialStatus,
-		highlights,
-		unlocked,
-	} = Route.useLoaderData();
-	const { data: snapshot } = usePolledData(
-		() => getNowSnapshot(),
-		initialSnapshot,
-		POLL_INTERVAL_MS,
-	);
-	const { data: status } = usePolledData(
-		() => getStationStatus(),
-		initialStatus,
-		STATUS_INTERVAL_MS,
-	);
+	const { highlights, unlocked } = Route.useLoaderData();
+	const { data: snapshot } = useQuery(snapshotQuery);
+	const { data: status } = useQuery(statusQuery);
 	const pill = status ? <LivePill status={status} /> : <LivePillSkeleton />;
 
 	if (!snapshot) return <LiveShell unlocked={unlocked} pill={pill} />;

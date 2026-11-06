@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	useRouteContext,
@@ -55,18 +56,15 @@ function Detections() {
 	const runDeletion = useServerFn(deleteDetections);
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 	const [deleteOpen, setDeleteOpen] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
 	const selectedRowIds = Object.entries(rowSelection)
 		.filter(([, isSelected]) => isSelected)
 		.map(([rowId]) => Number(rowId));
 	const selectedCount = selectedRowIds.length;
 	const isFiltered = hasActiveFilters(search);
 
-	async function confirmDeletion() {
-		setIsDeleting(true);
-
-		try {
-			const result = await runDeletion({ data: { rowIds: selectedRowIds } });
+	const deletion = useMutation({
+		mutationFn: (rowIds: number[]) => runDeletion({ data: { rowIds } }),
+		onSuccess: async (result) => {
 			setDeleteOpen(false);
 			setRowSelection({});
 			const deleted = `Deleted ${result.deletedRecords} detection${result.deletedRecords === 1 ? "" : "s"}.`;
@@ -86,14 +84,15 @@ function Detections() {
 			}
 
 			await router.invalidate();
-		} catch {
+		},
+		onError: () => {
 			toast.error("Unable to delete the selected detections.", {
 				description: "Please try again.",
 			});
-		} finally {
-			setIsDeleting(false);
-		}
-	}
+		},
+	});
+	const isDeleting = deletion.isPending;
+	const confirmDeletion = () => deletion.mutate(selectedRowIds);
 
 	return (
 		<PageWrap className="flex h-full min-h-fit flex-col gap-page">

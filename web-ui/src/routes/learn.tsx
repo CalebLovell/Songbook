@@ -4,7 +4,7 @@ import {
 	useRouter,
 } from "@tanstack/react-router";
 import { Lightbulb, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import {
 	LearnGame,
@@ -70,7 +70,6 @@ function Learn() {
 	}, [roundPromise, pool]);
 	const forPool = loaded?.pool === pool ? loaded : null;
 	const [isConfirmingNewRound, setIsConfirmingNewRound] = useState(false);
-	const [newRoundRequests, setNewRoundRequests] = useState(0);
 	const hasRound = (forPool?.data.round.questions.length ?? 0) > 0;
 	const [isRoundFinished, setIsRoundFinished] = useState(false);
 
@@ -105,29 +104,14 @@ function Learn() {
 						loaded={forPool.data}
 						pool={pool}
 						isLoadingNextRound={forPool.from !== roundPromise}
-						newRoundRequests={newRoundRequests}
-						isPaused={isConfirmingNewRound}
+						isConfirmingNewRound={isConfirmingNewRound}
+						onConfirmingDone={() => setIsConfirmingNewRound(false)}
 						onFinishedChange={setIsRoundFinished}
 					/>
 				) : (
 					<LearnGameSkeleton />
 				)}
 			</div>
-
-			{isConfirmingNewRound ? (
-				<ConfirmDialog
-					title="Restart the round?"
-					description="This round's answers and score are lost, and a new set of calls is dealt."
-					confirmIcon={RotateCcw}
-					confirmLabel="Restart"
-					destructive
-					onCancel={() => setIsConfirmingNewRound(false)}
-					onConfirm={() => {
-						setIsConfirmingNewRound(false);
-						setNewRoundRequests((count) => count + 1);
-					}}
-				/>
-			) : null}
 		</PageWrap>
 	);
 }
@@ -136,15 +120,15 @@ function LearnRoundView({
 	loaded,
 	pool,
 	isLoadingNextRound,
-	newRoundRequests,
-	isPaused,
+	isConfirmingNewRound,
+	onConfirmingDone,
 	onFinishedChange,
 }: {
 	loaded: LoadedRound;
 	pool: LearnPool;
 	isLoadingNextRound: boolean;
-	newRoundRequests: number;
-	isPaused: boolean;
+	isConfirmingNewRound: boolean;
+	onConfirmingDone: () => void;
 	onFinishedChange: (isFinished: boolean) => void;
 }) {
 	const router = useRouter();
@@ -166,28 +150,37 @@ function LearnRoundView({
 		router.invalidate();
 	};
 
-	const handledRequests = useRef(newRoundRequests);
-	useEffect(() => {
-		if (newRoundRequests === handledRequests.current) return;
-		handledRequests.current = newRoundRequests;
-		playAgain();
-	});
-
 	return round.questions.length === 0 ? (
 		<EmptyPool hasAnyDetections={loaded.hasAnyDetections} />
 	) : (
-		<LearnGame
-			key={round.id}
-			round={round}
-			rareMax={loaded.rareMax}
-			initialProgress={
-				saved?.round.id === round.id ? saved.progress : undefined
-			}
-			onProgressChange={onProgressChange}
-			onPlayAgain={playAgain}
-			isLoadingNextRound={isLoadingNextRound}
-			isPaused={isPaused}
-		/>
+		<>
+			<LearnGame
+				key={round.id}
+				round={round}
+				rareMax={loaded.rareMax}
+				initialProgress={
+					saved?.round.id === round.id ? saved.progress : undefined
+				}
+				onProgressChange={onProgressChange}
+				onPlayAgain={playAgain}
+				isLoadingNextRound={isLoadingNextRound}
+				isPaused={isConfirmingNewRound}
+			/>
+			{isConfirmingNewRound ? (
+				<ConfirmDialog
+					title="Restart the round?"
+					description="This round's answers and score are lost, and a new set of calls is dealt."
+					confirmIcon={RotateCcw}
+					confirmLabel="Restart"
+					destructive
+					onCancel={onConfirmingDone}
+					onConfirm={() => {
+						onConfirmingDone();
+						playAgain();
+					}}
+				/>
+			) : null}
+		</>
 	);
 }
 

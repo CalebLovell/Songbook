@@ -15,6 +15,11 @@ export function MobileNav() {
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
+	const [seenPathname, setSeenPathname] = useState(pathname);
+	if (pathname !== seenPathname) {
+		setSeenPathname(pathname);
+		setIsOpen(false);
+	}
 
 	useEffect(() => {
 		if (!isOpen) return;
@@ -24,11 +29,6 @@ export function MobileNav() {
 		document.addEventListener("keydown", onKeyDown);
 		return () => document.removeEventListener("keydown", onKeyDown);
 	}, [isOpen]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: close on route change
-	useEffect(() => {
-		setIsOpen(false);
-	}, [pathname]);
 
 	return (
 		<>

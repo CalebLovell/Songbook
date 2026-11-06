@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import {
@@ -35,6 +37,14 @@ const SAVERS = {
 	updates: saved,
 } as unknown as SettingsSavers;
 
+function renderWithQueryClient(element: ReactNode) {
+	return renderToStaticMarkup(
+		<QueryClientProvider client={new QueryClient()}>
+			{element}
+		</QueryClientProvider>,
+	);
+}
+
 function cardMarkup(markup: string, id: string) {
 	const start = markup.indexOf(`id="${id}"`);
 	assert.notEqual(start, -1);
@@ -49,7 +59,7 @@ function resetButton(card: string) {
 }
 
 test("every card with a default offers its own reset; Station and Updates don't", () => {
-	const markup = renderToStaticMarkup(
+	const markup = renderWithQueryClient(
 		<SettingsCards tab="station" data={DATA} savers={SAVERS} />,
 	);
 	for (const id of [
@@ -69,14 +79,14 @@ test("every card with a default offers its own reset; Station and Updates don't"
 });
 
 test("a card's reset does nothing while it already holds the defaults", () => {
-	const markup = renderToStaticMarkup(
+	const markup = renderWithQueryClient(
 		<SettingsCards tab="storage" data={DATA} savers={SAVERS} />,
 	);
 	assert.match(resetButton(cardMarkup(markup, "storage")) ?? "", /disabled=""/);
 });
 
 test("a card's reset is live once a value differs from the default", () => {
-	const markup = renderToStaticMarkup(
+	const markup = renderWithQueryClient(
 		<SettingsCards
 			tab="storage"
 			data={{
@@ -93,7 +103,7 @@ test("a card's reset is live once a value differs from the default", () => {
 });
 
 test("a card's footer runs reset first and Save last", () => {
-	const markup = renderToStaticMarkup(
+	const markup = renderWithQueryClient(
 		<SettingsCards tab="storage" data={DATA} savers={SAVERS} />,
 	);
 	const card = cardMarkup(markup, "storage");
@@ -102,7 +112,7 @@ test("a card's footer runs reset first and Save last", () => {
 });
 
 test("Save and reset look disabled while there is nothing to do", () => {
-	const markup = renderToStaticMarkup(
+	const markup = renderWithQueryClient(
 		<SettingsCards tab="storage" data={DATA} savers={SAVERS} />,
 	);
 	const save = /<button[^>]*type="submit"[^>]*>/.exec(

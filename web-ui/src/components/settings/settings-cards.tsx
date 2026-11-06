@@ -1,6 +1,7 @@
+import { useMutation } from "@tanstack/react-query";
 import { ChevronDown, Download, RefreshCw } from "lucide-react";
 import type { ChangeEvent, ComponentProps, ReactNode } from "react";
-import { createContext, useContext, useEffect, useId, useState } from "react";
+import { createContext, useContext, useId, useState } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
@@ -33,6 +34,7 @@ import {
 	type UpdateState,
 	updateBusy,
 } from "~/lib/updates-data.ts";
+import { useClientValue } from "~/lib/use-client-value.ts";
 import { RestartButton } from "./restart-button.tsx";
 import { RESET_RESTARTS_DESCRIPTION, SettingsCard } from "./settings-card.tsx";
 import { SETTINGS_TABS, type SettingsTab } from "./settings-index.ts";
@@ -74,15 +76,14 @@ function useCardSave<T>(
 	const toastId = `settings-${title}`;
 	const [values, setValues] = useState(initial);
 	const [saved, setSaved] = useState(initial);
-	const [saving, setSaving] = useState(false);
 	const [needsRestart, setNeedsRestart] = useState(false);
 
-	async function write(next: T) {
-		if (!save) return;
-		setSaving(true);
-		toast.loading(`Saving ${title.toLowerCase()} settings…`, { id: toastId });
-		try {
-			const result = await save(next);
+	const saveMutation = useMutation({
+		mutationFn: ({ saver, next }: { saver: Saver<T>; next: T }) => saver(next),
+		onMutate: () => {
+			toast.loading(`Saving ${title.toLowerCase()} settings…`, { id: toastId });
+		},
+		onSuccess: (result) => {
 			setValues(result.values);
 			setSaved(result.values);
 			const pending =
@@ -94,38 +95,45 @@ function useCardSave<T>(
 			} else {
 				toast.success(result.message, { id: toastId });
 			}
-		} catch (error) {
+		},
+		onError: (error) => {
 			toast.error(
 				error instanceof Error
 					? error.message
 					: "These settings could not be saved.",
 				{ id: toastId },
 			);
-		} finally {
-			setSaving(false);
-		}
-	}
+		},
+	});
 
-	async function applyNow() {
-		if (!restart) return;
-		setSaving(true);
-		toast.loading("Restarting BirdNET…", { id: toastId });
-		try {
-			const result = await restart();
+	const restartMutation = useMutation({
+		mutationFn: (restarter: CardRestarter) => restarter(),
+		onMutate: () => {
+			toast.loading("Restarting BirdNET…", { id: toastId });
+		},
+		onSuccess: (result) => {
 			setNeedsRestart(false);
 			toast.success(result.message, { id: toastId });
-		} catch (error) {
+		},
+		onError: (error) => {
 			toast.warning(
 				error instanceof Error
 					? error.message
 					: "BirdNET could not be restarted.",
 				{ id: toastId, duration: 10_000 },
 			);
-		} finally {
-			setSaving(false);
-		}
+		},
+	});
+
+	function write(next: T) {
+		if (save) saveMutation.mutate({ saver: save, next });
 	}
 
+	async function applyNow() {
+		if (restart) await restartMutation.mutateAsync(restart).catch(() => {});
+	}
+
+	const saving = saveMutation.isPending || restartMutation.isPending;
 	const dirty = !unchanged(values, saved);
 	const atDefaults = (current: T) =>
 		defaults !== undefined && unchanged({ ...defaults, ...current }, defaults);
@@ -134,7 +142,7 @@ function useCardSave<T>(
 		setValues,
 		submit: () => write(values),
 		resetToDefaults: () => {
-			if (defaults !== undefined) void write(defaults);
+			if (defaults !== undefined) write(defaults);
 		},
 		dirty,
 		saveDisabled: saving || !dirty,
@@ -509,12 +517,10 @@ function BrowserTimezoneHint({
 	onUse: (timezone: string) => void;
 }) {
 	const skeleton = useContext(SkeletonContext);
-	const [browserTimezone, setBrowserTimezone] = useState<string | null>(null);
-	useEffect(() => {
-		setBrowserTimezone(
-			modernTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone),
-		);
-	}, []);
+	const browserTimezone = useClientValue<string | null>(
+		() => modernTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone),
+		null,
+	);
 
 	if (
 		skeleton ||
@@ -1257,10 +1263,7 @@ function UpdatesSettingsCard({
 	const [confirming, setConfirming] = useState(false);
 	const [loadedVersion, setLoadedVersion] = useState<string | null>(null);
 	const installed = updates?.installed ?? null;
-	useEffect(() => {
-		if (installed && loadedVersion === null)
-			setLoadedVersion(installed.version);
-	}, [installed, loadedVersion]);
+	if (installed && loadedVersion === null) setLoadedVersion(installed.version);
 	const managed = updates?.managed ?? false;
 	const busy = updates ? updateBusy(updates) : false;
 	const offered = updates ? availableUpdate(updates) : null;
@@ -1269,7 +1272,30 @@ function UpdatesSettingsCard({
 		installed !== null &&
 		installed.version !== loadedVersion;
 
-	const [checking, setChecking] = useState(false);
+	const checkMutation = useMutation({
+		mutationFn: (runCheck: () => Promise<UpdateState>) => runCheck(),
+		onSuccess: (result) => {
+			if (result.state === "failed")
+				toast.error(result.message ?? "Couldn't look for updates.", {
+					id: "settings-updates",
+				});
+			else
+				toast.success(
+					result.message ??
+						(availableUpdate(result)
+							? "An update is available."
+							: "Up to date."),
+					{ id: "settings-updates" },
+				);
+		},
+		onError: (error) => {
+			toast.error(
+				error instanceof Error ? error.message : "Couldn't look for updates.",
+				{ id: "settings-updates" },
+			);
+		},
+	});
+	const checking = checkMutation.isPending;
 
 	async function run(
 		action: (() => Promise<void>) | undefined,
@@ -1285,31 +1311,8 @@ function UpdatesSettingsCard({
 		}
 	}
 
-	async function check() {
-		if (!onCheck) return;
-		setChecking(true);
-		try {
-			const result = await onCheck();
-			if (result.state === "failed")
-				toast.error(result.message ?? "Couldn't look for updates.", {
-					id: "settings-updates",
-				});
-			else
-				toast.success(
-					result.message ??
-						(availableUpdate(result)
-							? "An update is available."
-							: "Up to date."),
-					{ id: "settings-updates" },
-				);
-		} catch (error) {
-			toast.error(
-				error instanceof Error ? error.message : "Couldn't look for updates.",
-				{ id: "settings-updates" },
-			);
-		} finally {
-			setChecking(false);
-		}
+	function check() {
+		if (onCheck) checkMutation.mutate(onCheck);
 	}
 
 	return (

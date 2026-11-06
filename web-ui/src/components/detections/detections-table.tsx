@@ -8,7 +8,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { ArrowRight, Calendar, Trash2, X } from "lucide-react";
-import { type CSSProperties, useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
@@ -47,6 +47,7 @@ import {
 import type { DetectionPage, DetectionTableRow } from "~/lib/detections.ts";
 import { useShiftClickRange } from "~/lib/shift-click-range.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { useDraft } from "~/lib/use-draft.ts";
 import { cn } from "~/lib/utils.ts";
 
 type DetectionsTableProps = {
@@ -273,8 +274,7 @@ export function DetectionsFilters({
 		onSearchChange({ ...search, ...change });
 	}
 
-	const [queryInput, setQueryInput] = useState(search.species ?? "");
-	useEffect(() => setQueryInput(search.species ?? ""), [search.species]);
+	const [queryInput, setQueryInput] = useDraft(search.species ?? "");
 
 	const debouncedSetQuery = useDebouncedCallback((value: string) => {
 		updateSearch({ page: 1, species: value || undefined });

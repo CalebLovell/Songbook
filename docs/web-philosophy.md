@@ -56,6 +56,36 @@ Most bugs and most unfinished design live in the states nobody drew. Every page,
 - Controls never move under the cursor.
 - Shells are built from the card's own markup so the two can't drift apart.
 - Every read and write goes through a server function. After a write, `router.invalidate()` refreshes what's on the page.
+- Loaders own what a route needs to render. TanStack Query owns everything a loader can't: data that polls while the page is open, and data asked for on demand, such as a page inside a card or an index fetched on first focus.
+- Every write is a `useMutation`. Its pending and error state come from the mutation, never from `useState` and `try`/`finally`.
+- Create the `QueryClient` in the router factory, so server requests never share a cache, and pass it through router context. Loaders prefetch queries in the browser, so links still preload on intent.
+
+## React Hooks
+
+An effect keeps React in sync with something outside React. If nothing outside React is involved, an effect is the wrong tool. Code that runs because the user did something belongs in the event handler; code that runs because the component is on screen may belong in an effect.
+
+Before writing `useEffect`, check this list:
+
+| To do this | Use |
+| --- | --- |
+| Compute a value from props or state | A calculation during render, with `useMemo` only if it's measurably slow |
+| Reset all of a component's state when a prop changes | A `key` |
+| Keep an editable draft of a prop, or adjust some state when a prop changes | `setState` during render, guarded by a comparison with the previous value |
+| Respond to a click or submit | The event handler |
+| Trigger something in a child from a parent | Move the logic to where the event happens, never a counter prop the child watches |
+| Tell a parent about a change | The callback, in the same event handler as the state change, or lifted state |
+| Read a browser-only value | `useSyncExternalStore` with a server snapshot, which avoids a second render and a hydration mismatch |
+| Subscribe to a store outside React | `useSyncExternalStore` |
+| Load what a route renders | The route's `loader` |
+| Fetch or poll anything else | `useQuery`, never `useEffect` and `fetch` |
+| Change data on the server | `useMutation` |
+
+Effects still belong around timers, global event listeners, canvas and media elements, and cleanup on unmount.
+
+- An effect does one job. Two jobs are two effects, and an effect with a job worth naming becomes a custom hook.
+- Don't lie about dependencies. Suppressing the dependency lint usually means the logic belongs in an event handler or in render.
+- Effects that set state to trigger other effects are a design problem. Compute the next state in one place.
+- An effect that starts something asynchronous cleans up after itself, so a late result can't overwrite a newer one.
 
 ## Code
 

@@ -1,7 +1,7 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { LogOut, ShieldCheck } from "lucide-react";
-import { useState } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
@@ -16,22 +16,22 @@ export const SIGN_IN_CARD_TITLE = "Sign-in";
 export function SessionCard() {
 	const lock = useServerFn(lockFn);
 	const router = useRouter();
-	const [pending, setPending] = useState(false);
-
-	async function onSignOut() {
-		setPending(true);
-		try {
-			await lock({ data: undefined });
+	const queryClient = useQueryClient();
+	const signOut = useMutation({
+		mutationFn: () => lock({ data: undefined }),
+		onSuccess: async () => {
 			forgetUnlockStatus();
 			forgetFetchedClips();
+			queryClient.removeQueries();
 			await router.invalidate();
-		} catch (cause) {
+		},
+		onError: (cause) => {
 			console.error(cause);
 			toast.error("This browser could not be signed out.");
-		} finally {
-			setPending(false);
-		}
-	}
+		},
+	});
+	const pending = signOut.isPending;
+	const onSignOut = () => signOut.mutate();
 
 	return (
 		<Card

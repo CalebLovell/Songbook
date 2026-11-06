@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, FlaskConical, KeyRound } from "lucide-react";
@@ -18,24 +19,10 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 	const router = useRouter();
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | undefined>();
-	const [pending, setPending] = useState(false);
-	const field = useRef<HTMLInputElement>(null);
-
-	// An effect, not `autoFocus`: React doesn't apply that attribute when hydrating.
-	useEffect(() => {
-		field.current?.focus();
-	}, []);
-
-	async function onSubmit(event: React.FormEvent) {
-		event.preventDefault();
-		await signIn(password);
-	}
-
-	async function signIn(attempt: string) {
-		setPending(true);
-		setError(undefined);
-		try {
-			const result = await unlock({ data: { password: attempt } });
+	const signIn = useMutation({
+		mutationFn: (attempt: string) => unlock({ data: { password: attempt } }),
+		onMutate: () => setError(undefined),
+		onSuccess: async (result) => {
 			if (result.ok) {
 				setPassword("");
 				forgetUnlockStatus();
@@ -48,12 +35,23 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 				forgetUnlockStatus();
 				await router.invalidate();
 			}
-		} catch (cause) {
+		},
+		onError: (cause) => {
 			console.error(cause);
 			setError(messageForThrown(cause));
-		} finally {
-			setPending(false);
-		}
+		},
+	});
+	const pending = signIn.isPending;
+	const field = useRef<HTMLInputElement>(null);
+
+	// An effect, not `autoFocus`: React doesn't apply that attribute when hydrating.
+	useEffect(() => {
+		field.current?.focus();
+	}, []);
+
+	function onSubmit(event: React.FormEvent) {
+		event.preventDefault();
+		signIn.mutate(password);
 	}
 
 	return (
@@ -128,7 +126,7 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 						variant="outline"
 						icon={FlaskConical}
 						disabled={pending}
-						onClick={() => void signIn(DEV_PASSWORD)}
+						onClick={() => signIn.mutate(DEV_PASSWORD)}
 					>
 						Dev sign-in
 					</Button>

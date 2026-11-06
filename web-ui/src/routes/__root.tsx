@@ -1,5 +1,6 @@
+import type { QueryClient } from "@tanstack/react-query";
 import {
-	createRootRoute,
+	createRootRouteWithContext,
 	HeadContent,
 	ScriptOnce,
 	Scripts,
@@ -14,7 +15,9 @@ import { stationTimeZoneScript } from "~/lib/station-time.ts";
 import { unlockStatusForNavigation } from "~/lib/unlock-status.ts";
 import appCss from "../styles.css?url";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+	queryClient: QueryClient;
+}>()({
 	beforeLoad: async () => ({ auth: await unlockStatusForNavigation() }),
 	head: () => ({
 		meta: [

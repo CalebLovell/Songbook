@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { type AnyRouter, useRouter } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -15,6 +16,7 @@ type Phase = "idle" | "pulling" | "refreshing" | "settling";
 
 export function PullToRefresh({ children }: { children: ReactNode }) {
 	const router = useRouter();
+	const queryClient = useQueryClient();
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const [pull, setPull] = useState(0);
 	const [phase, setPhase] = useState<Phase>("idle");
@@ -66,7 +68,11 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 				setPhase("refreshing");
 				setPull(REST);
 				const spun = new Promise((resolve) => setTimeout(resolve, MIN_SPIN_MS));
-				Promise.allSettled([refreshPage(router), spun]).then(() => settle());
+				Promise.allSettled([
+					refreshPage(router),
+					queryClient.invalidateQueries(),
+					spun,
+				]).then(() => settle());
 			} else {
 				settle();
 			}
@@ -89,7 +95,7 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 			wrapper.removeEventListener("touchend", onTouchEnd);
 			wrapper.removeEventListener("touchcancel", onTouchEnd);
 		};
-	}, [router]);
+	}, [router, queryClient]);
 
 	const armed = phase === "refreshing" || pull >= THRESHOLD;
 

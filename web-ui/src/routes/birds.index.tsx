@@ -14,7 +14,7 @@ import {
 	Feather,
 	Volume2,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { CardHeader } from "~/components/card-header.tsx";
@@ -51,6 +51,7 @@ import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { pageTitle } from "~/lib/page-title.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { useDraft } from "~/lib/use-draft.ts";
 import { useSettled } from "~/lib/use-settled.ts";
 import { cn } from "~/lib/utils.ts";
 
@@ -139,8 +140,7 @@ function SpeciesControls() {
 	const { q: search, sort, reverse } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
-	const [queryInput, setQueryInput] = useState(search);
-	useEffect(() => setQueryInput(search), [search]);
+	const [queryInput, setQueryInput] = useDraft(search);
 
 	const debouncedSetQuery = useDebouncedCallback((value: string) => {
 		navigate({

@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Check, Copy, RotateCw, Share2, X } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useEffect, useRef, useState } from "react";
@@ -82,54 +83,27 @@ export function useShare({
 	hasData: boolean;
 	load: () => Promise<string>;
 }): ShareState {
-	const [attempt, setAttempt] = useState(0);
-	const [settled, setSettled] = useState<{
-		subject: string;
-		text: string | null;
-	} | null>(null);
-
-	const loadRef = useRef(load);
-	useEffect(() => {
-		loadRef.current = load;
+	const {
+		data: text,
+		isError,
+		isFetching,
+		refetch,
+	} = useQuery({
+		queryKey: ["share-summary", subject],
+		queryFn: load,
+		enabled: hasData,
+		staleTime: Number.POSITIVE_INFINITY,
+		gcTime: 0,
 	});
 
-	const request = hasData ? `${subject}#${attempt}` : null;
-	useEffect(() => {
-		if (request === null) return;
-		let superseded = false;
-		loadRef.current().then(
-			(text) => {
-				if (!superseded) setSettled({ subject, text });
-			},
-			() => {
-				if (superseded) return;
-				setSettled((previous) =>
-					previous?.subject === subject && previous.text !== null
-						? previous
-						: { subject, text: null },
-				);
-			},
-		);
-		return () => {
-			superseded = true;
-		};
-	}, [request, subject]);
-
 	let summary: ShareSummary = { status: "loading" };
-	if (settled?.subject === subject) {
-		summary =
-			settled.text === null
-				? { status: "failed" }
-				: { status: "ready", text: settled.text };
-	}
+	if (text !== undefined) summary = { status: "ready", text };
+	else if (isError && !isFetching) summary = { status: "failed" };
 
 	return {
 		isReady: hasData || summary.status === "ready",
 		summary,
-		retry: () => {
-			setSettled(null);
-			setAttempt((current) => current + 1);
-		},
+		retry: () => void refetch(),
 	};
 }
 

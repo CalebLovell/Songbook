@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { Factory, X } from "lucide-react";
 import { useState } from "react";
 
@@ -7,22 +8,16 @@ import { toast } from "~/components/ui/toaster.tsx";
 
 export function SettingsReset({ onReset }: { onReset: () => Promise<void> }) {
 	const [open, setOpen] = useState(false);
-	const [busy, setBusy] = useState(false);
-
-	async function confirm() {
-		setBusy(true);
-		try {
-			await onReset();
-			setOpen(false);
-		} catch {
+	const reset = useMutation({
+		mutationFn: () => onReset(),
+		onSuccess: () => setOpen(false),
+		onError: () => {
 			toast.error("Settings could not be reset.", {
 				id: "settings-reset",
 				description: "The station is unchanged.",
 			});
-		} finally {
-			setBusy(false);
-		}
-	}
+		},
+	});
 
 	return (
 		<>
@@ -42,9 +37,9 @@ export function SettingsReset({ onReset }: { onReset: () => Promise<void> }) {
 					confirmIcon={Factory}
 					confirmLabel="Restore factory defaults"
 					destructive
-					pending={busy}
+					pending={reset.isPending}
 					onCancel={() => setOpen(false)}
-					onConfirm={confirm}
+					onConfirm={() => reset.mutate()}
 				>
 					<p className="rounded-md bg-muted p-page text-muted-foreground text-xs leading-relaxed">
 						Your Station card is left as it is. Its name, coordinates, and

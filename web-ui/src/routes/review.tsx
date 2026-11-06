@@ -1,7 +1,7 @@
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CircleAlert, SearchCheck } from "lucide-react";
-import { useState } from "react";
 import { Deferred } from "~/components/deferred.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import {
@@ -49,22 +49,14 @@ function Review() {
 	const correct = useServerFn(confirmReviewDetection),
 		recategorize = useServerFn(recategorizeReviewDetection),
 		remove = useServerFn(deleteReviewDetection);
-	const [busy, setBusy] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	async function run(work: () => Promise<unknown>) {
-		setBusy(true);
-		setError(null);
-		try {
+	const change = useMutation({
+		mutationFn: async (work: () => Promise<unknown>) => {
 			await work();
 			await router.invalidate();
-		} catch {
-			setError(
-				"The detection could not be changed. Check the recording and try again.",
-			);
-		} finally {
-			setBusy(false);
-		}
-	}
+		},
+	});
+	const run = (work: () => Promise<unknown>) =>
+		change.mutateAsync(work).catch(() => {});
 	return (
 		<PageWrap className="space-y-page">
 			<PageHeaderCard
@@ -72,10 +64,10 @@ function Review() {
 				title={PAGE_HEADERS.review.title}
 				description={PAGE_HEADERS.review.description}
 			/>
-			{error ? (
+			{change.isError ? (
 				<p className="flex items-center gap-2 text-destructive text-sm">
 					<CircleAlert className="size-4" />
-					{error}
+					The detection could not be changed. Check the recording and try again.
 				</p>
 			) : null}
 			<Deferred
@@ -88,7 +80,7 @@ function Review() {
 						key={loaded.page.page}
 						page={loaded.page}
 						species={loaded.species}
-						busy={busy || !settled?.current}
+						busy={change.isPending || !settled?.current}
 						onCorrect={(rowId) => run(() => correct({ data: { rowId } }))}
 						onRecategorize={(rowId: number, item: SpeciesOption) =>
 							run(() => recategorize({ data: { rowId, ...item } }))

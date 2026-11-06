@@ -9,7 +9,6 @@ import {
 	Infinity as InfinityIcon,
 } from "lucide-react";
 
-import { useEffect, useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import {
 	TIMELINE_PERIOD_LABELS,
@@ -25,6 +24,7 @@ import {
 	type TimelineAnchor,
 	type TimelineWindow,
 } from "~/lib/timeline-window.ts";
+import { useClientValue } from "~/lib/use-client-value.ts";
 
 const PERIOD_ICONS: Record<
 	TimelinePeriod,
@@ -230,14 +230,14 @@ function WindowStepper({
 	);
 }
 
+function browserSupportsInputType(type: string): boolean {
+	const probe = document.createElement("input");
+	probe.setAttribute("type", type);
+	return probe.type === type;
+}
+
 function useNativePicker(type: string): boolean {
-	const [supported, setSupported] = useState(true);
-	useEffect(() => {
-		const probe = document.createElement("input");
-		probe.setAttribute("type", type);
-		setSupported(probe.type === type);
-	}, [type]);
-	return supported;
+	return useClientValue(() => browserSupportsInputType(type), true);
 }
 
 function pickableYears(
