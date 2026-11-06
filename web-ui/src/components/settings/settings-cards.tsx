@@ -260,7 +260,7 @@ function FieldSelect({ children, ...props }: ComponentProps<"select">) {
 			<select
 				id={id}
 				aria-describedby={hintId}
-				className="h-8.5 pointer-coarse:h-9 w-full cursor-pointer appearance-none rounded-md border border-control-line bg-card pr-8 pl-3 pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
+				className="h-8.5 pointer-coarse:h-9 w-full cursor-pointer appearance-none rounded-md border border-input bg-card pr-8 pl-3 pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
 				{...props}
 			>
 				{children}
@@ -903,7 +903,7 @@ function FieldTextarea(props: ComponentProps<"textarea">) {
 		<textarea
 			id={id}
 			aria-describedby={hintId}
-			className="block min-h-28 w-full rounded-md border border-control-line bg-card px-3 py-2 font-mono text-xs transition-colors placeholder:text-muted-foreground focus-visible:border-focus-ring focus-visible:outline-none"
+			className="block min-h-28 w-full rounded-md border border-input bg-card px-3 py-2 font-mono text-xs transition-colors placeholder:text-muted-foreground focus-visible:border-focus-ring focus-visible:outline-none"
 			{...props}
 		/>
 	);

@@ -142,7 +142,7 @@ function DateRangeFilter({
 	return (
 		<fieldset
 			aria-label="Date range"
-			className="flex h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-control-line bg-card focus-within:border-focus-ring"
+			className="flex h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring"
 		>
 			<DateSegment
 				label="From date"

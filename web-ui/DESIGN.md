@@ -46,7 +46,6 @@ for a meaning; don't write a new mix inline when one exists:
 | `--track` | unfilled remainder of a bar (moss 28%) |
 | `--hover-line` | border of a linked card on hover |
 | `--focus-ring` | keyboard focus, 2px outline, 2px offset; drawn inset (`-outline-offset-2`) on a segment of a joined control, whose group clips outside it |
-| `--control-line` | the border of a field or checkbox, where the border is what shows there is a control (moss 50%, 3:1) |
 | `--muted-foreground` | secondary text (neutral grey, black 49%) |
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
@@ -115,7 +114,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   buttons and pagers, stands 32px at most. On a touch screen (`pointer-coarse:`) the
   full-height controls step up to 36px for an easier tap; nothing is taller.
 - **Toggle group**: on = moss fill, white text; segments share borders.
-- **Input**: focus is shown by a `--focus-ring` border, not the outline.
+- **Input**: focus is shown by a `--focus-ring` border, not the outline. Fields and checkboxes keep the
+  site's light borders even though they fall short of 3:1 (WCAG 1.4.11): a darker line was tried and looked wrong.
 - **Nav rows**: active is marked by fill alone (a step deeper than the meadow
   hover), never bolder text. Gated pages stay listed with a lock icon.
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
