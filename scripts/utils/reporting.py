@@ -157,7 +157,7 @@ def bird_weather(file: ParseFileName, detections: [Detection]):
                     'soundscapeId': soundscape_id,
                     'soundscapeStartTime': detection.start, 'soundscapeEndTime': detection.stop,
                     'commonName': detection.common_name, 'scientificName': detection.scientific_name,
-                    'algorithm': '2p4' if conf['MODEL'] == 'BirdNET_GLOBAL_6K_V2.4_Model_FP16' else 'alpha',
+                    'algorithm': '2p4',
                     'confidence': detection.confidence}
 
             log.debug(data)

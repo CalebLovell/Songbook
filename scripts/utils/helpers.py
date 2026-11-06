@@ -12,6 +12,7 @@ _settings = None
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 DB_PATH = os.path.join(BASE_PATH, 'scripts/birds.db')
 MODEL_PATH = os.path.join(BASE_PATH, 'model')
+MODEL_NAME = 'BirdNET_GLOBAL_6K_V2.4_Model_FP16'
 ANALYZING_NOW = os.path.expanduser('~/BirdSongs/StreamData/analyzing_now.txt')
 
 
@@ -79,10 +80,8 @@ def save_language(labels, language):
         f.write(json.dumps(OrderedDict(sorted(labels.items())), indent=2, ensure_ascii=False))
 
 
-def get_model_labels(model=None):
-    if model is None:
-        model = get_settings()['MODEL']
-    file_name = os.path.join(MODEL_PATH, f'{model}_Labels.txt')
+def get_model_labels():
+    file_name = os.path.join(MODEL_PATH, f'{MODEL_NAME}_Labels.txt')
     with open(file_name) as f:
         labels = [line.strip() for line in f.readlines()]
     if labels and labels[0].count('_') == 1:
