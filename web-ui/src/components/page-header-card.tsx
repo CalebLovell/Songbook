@@ -60,7 +60,7 @@ export function PageHeaderCard({
 	);
 }
 
-export function PageHeaderStats({
+function PageHeaderStats({
 	stats,
 	className = "",
 	inline = false,

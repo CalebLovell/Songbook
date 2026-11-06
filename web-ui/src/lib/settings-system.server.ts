@@ -45,7 +45,7 @@ const defaultRunner: SettingsCommandRunner = (executable, args, stdin) =>
 		if (stdin !== undefined) child.stdin?.end(stdin);
 	});
 
-export function servicesFor(card?: SettingsCardKind): string[] {
+function servicesFor(card?: SettingsCardKind): string[] {
 	return card
 		? [...SERVICES[card]]
 		: [...new Set(RESETTABLE_CARDS.flatMap((kind) => SERVICES[kind]))];

@@ -18,7 +18,7 @@ import {
 	type LearnPool,
 } from "~/lib/learn-pools.ts";
 
-export const LEARN_POOL_ICONS: Record<
+const LEARN_POOL_ICONS: Record<
 	LearnPool,
 	ComponentType<{ className?: string }>
 > = {

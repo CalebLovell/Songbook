@@ -5,7 +5,7 @@ import {
 } from "~/lib/highlights-share.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 
-export type ShareWindow = "rolling" | "day";
+type ShareWindow = "rolling" | "day";
 
 export type ShareCard = {
 	date: string;

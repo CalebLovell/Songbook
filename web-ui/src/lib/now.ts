@@ -18,7 +18,7 @@ import {
 export const detectedAt = sql<string>`datetime(${detections.Date} || ' ' || ${detections.Time})`;
 export const isLast24h = sql`${detections.Date} >= date('now', '-1 day', 'localtime') and datetime(${detections.Date} || ' ' || ${detections.Time}) >= datetime('now', '-24 hours', 'localtime')`;
 
-export type NowSummary = {
+type NowSummary = {
 	detections: number;
 };
 

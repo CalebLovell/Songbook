@@ -53,7 +53,7 @@ export function HeroCardShell({
 	);
 }
 
-export function HeroPortrait({
+function HeroPortrait({
 	imageUrl,
 	comName,
 }: {

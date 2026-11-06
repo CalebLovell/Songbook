@@ -10,7 +10,7 @@ export const LEARN_POOL_LABELS: Record<LearnPool, string> = {
 	all: "All",
 };
 
-export const COMMON_SPECIES_OVER = 100;
+const COMMON_SPECIES_OVER = 100;
 
 function commonOver(rareMax: number) {
 	return Math.max(COMMON_SPECIES_OVER, rareMax);

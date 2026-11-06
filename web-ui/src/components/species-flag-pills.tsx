@@ -20,7 +20,7 @@ function withBoldNumbers(text: string): ReactNode {
 	);
 }
 
-export function newTooltip(firstHeard: string | null): ReactNode {
+function newTooltip(firstHeard: string | null): ReactNode {
 	if (firstHeard == null) return "First recorded here.";
 	return (
 		<>
@@ -29,19 +29,19 @@ export function newTooltip(firstHeard: string | null): ReactNode {
 	);
 }
 
-export function consistentTooltip(note: string | null): ReactNode {
+function consistentTooltip(note: string | null): ReactNode {
 	if (note == null) return "Heard here day in, day out.";
 	return withBoldNumbers(
 		note.endsWith("of days") ? `Heard on ${note}.` : `Heard ${note}.`,
 	);
 }
 
-export function returnedTooltip(away: string | null): ReactNode {
+function returnedTooltip(away: string | null): ReactNode {
 	if (away == null) return "Back after time missing.";
 	return withBoldNumbers(`Back after ${away} missing.`);
 }
 
-export function vocalTooltip({
+function vocalTooltip({
 	count,
 	usual,
 	period,

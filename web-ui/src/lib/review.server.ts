@@ -71,11 +71,11 @@ const CREATE_REVIEWS_TABLE = `CREATE TABLE IF NOT EXISTS reviews (
 const REVIEW_MATCHES_DETECTION =
 	"r.Date = d.Date AND r.Time = d.Time AND r.Com_Name = d.Com_Name AND r.File_Name = d.File_Name";
 
-export function ensureReviewsTable(database: DatabaseSync) {
+function ensureReviewsTable(database: DatabaseSync) {
 	database.exec(CREATE_REVIEWS_TABLE);
 }
 
-export function reviewsTableExists(database: DatabaseSync): boolean {
+function reviewsTableExists(database: DatabaseSync): boolean {
 	return (
 		database
 			.prepare(

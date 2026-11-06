@@ -58,7 +58,7 @@ export type VocalJump = {
 	period: HighlightPeriod;
 };
 
-export type SpeciesFlags = {
+type SpeciesFlags = {
 	isNew: boolean;
 	isRare: boolean;
 	isConsistent: boolean;
@@ -109,7 +109,7 @@ export function formatVocal({
 	return `${formatRate(count)} ${windowPhrase(period)}, usually ${formatRate(usual)}`;
 }
 
-export const PREVIOUS_PERIOD: Record<HighlightPeriod, string> = {
+const PREVIOUS_PERIOD: Record<HighlightPeriod, string> = {
 	live: "yesterday",
 	day: "yesterday",
 	week: "last week",

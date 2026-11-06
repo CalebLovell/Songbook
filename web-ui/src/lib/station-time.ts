@@ -8,7 +8,7 @@ function runtimeTimeZone(): string {
 	return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
-export function stationTimeZone(): string {
+function stationTimeZone(): string {
 	if (typeof window !== "undefined") {
 		return window.__songbookStationTimeZone ?? runtimeTimeZone();
 	}

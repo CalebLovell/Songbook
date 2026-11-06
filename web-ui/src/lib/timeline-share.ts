@@ -13,7 +13,7 @@ const PERIOD_NOUN: Record<TimelinePeriod, string> = {
 	all: "here",
 };
 
-export type TimelineShareRow = {
+type TimelineShareRow = {
 	comName: string;
 	hourCounts: number[];
 	totalDetections: number;

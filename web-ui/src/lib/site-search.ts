@@ -10,7 +10,7 @@ export type SearchSetting = {
 	keywords?: string[];
 };
 
-export type SettingMatch<S extends SearchSetting = SearchSetting> = {
+type SettingMatch<S extends SearchSetting = SearchSetting> = {
 	setting: S;
 	field?: string;
 };

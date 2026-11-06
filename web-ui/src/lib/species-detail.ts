@@ -26,7 +26,8 @@ import {
 import { localTimestamp, timestampToMillis } from "~/lib/visits.ts";
 
 export type { HourActivity };
-export type Visit = {
+
+type Visit = {
 	date: string;
 	time: string;
 	confidence: number | null;

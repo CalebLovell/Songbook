@@ -11,7 +11,7 @@ function rampMoss(share: number): number {
 		: moss;
 }
 
-export function heatShare(count: number, maximum: number): number {
+function heatShare(count: number, maximum: number): number {
 	if (count <= 0 || maximum <= 0) return 0;
 	if (maximum <= 1) return 1;
 	return Math.min(1, Math.log(count) / Math.log(maximum));

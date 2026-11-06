@@ -82,7 +82,7 @@ export async function writeAuthFile(
 	}
 }
 
-export function newNonce() {
+function newNonce() {
 	return randomBytes(16).toString("hex");
 }
 

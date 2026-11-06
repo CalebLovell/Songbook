@@ -5,7 +5,7 @@ import type { LearnRound } from "~/lib/learn-round.ts";
 
 type HeldRound = { round: LearnRound; pool: LearnPool };
 
-export function shouldAdoptRound(
+function shouldAdoptRound(
 	held: HeldRound,
 	incoming: HeldRound,
 	wantsNextRound: boolean,

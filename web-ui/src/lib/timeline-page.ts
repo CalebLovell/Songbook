@@ -22,7 +22,7 @@ export type TimelinePageRequest = {
 	anchor: TimelineAnchor;
 };
 
-export type TimelineBody =
+type TimelineBody =
 	| {
 			kind: "rows";
 			rows: TimelineRow[];

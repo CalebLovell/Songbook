@@ -26,7 +26,7 @@ import {
 } from "./auth-session.server.ts";
 import { UnlockThrottle } from "./auth-throttle.server.ts";
 
-export type StationAuthState = "ready" | "not-set-up" | "misconfigured";
+type StationAuthState = "ready" | "not-set-up" | "misconfigured";
 export type UnlockStatus = { unlocked: boolean; state: StationAuthState };
 export type UnlockResult =
 	| { ok: true }

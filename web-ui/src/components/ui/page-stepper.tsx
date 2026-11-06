@@ -3,10 +3,7 @@ import type * as React from "react";
 import { useDraft } from "~/lib/use-draft.ts";
 import { cn } from "~/lib/utils.ts";
 
-export function parsePageInput(
-	value: string,
-	pageCount: number,
-): number | null {
+function parsePageInput(value: string, pageCount: number): number | null {
 	const page = Number.parseInt(value.replace(/\D/g, ""), 10);
 	if (Number.isNaN(page)) return null;
 	return Math.min(Math.max(page, 1), Math.max(1, pageCount));

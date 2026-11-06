@@ -18,7 +18,7 @@ export function formatTimeAgo(elapsedMs: number): string {
 	return plural(Math.floor(elapsedMs / YEAR), "year");
 }
 
-export function formatClockTime(timestamp: string): string {
+function formatClockTime(timestamp: string): string {
 	const time = timestamp.slice(11);
 	return new Date(`1970-01-01T${time}`).toLocaleTimeString([], {
 		hour: "numeric",

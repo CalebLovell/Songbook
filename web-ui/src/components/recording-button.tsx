@@ -3,7 +3,7 @@ import { Pause, Volume2 } from "lucide-react";
 import { Button } from "~/components/ui/button.tsx";
 import { usePlayableAudio } from "~/lib/use-playable-audio.ts";
 
-export const PLAY_LABEL = "Listen";
+const PLAY_LABEL = "Listen";
 
 export function RecordingButton({
 	audioUrl,

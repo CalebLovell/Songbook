@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export const SPECIES_LIST_LIMIT = 7_000;
-export const UNRESOLVED_REMOVAL_LIMIT = 1_000;
+const SPECIES_LIST_LIMIT = 7_000;
+const UNRESOLVED_REMOVAL_LIMIT = 1_000;
 
 export type SpeciesStatus = "automatic" | "custom" | "always" | "never";
 export type SpeciesListName = "custom" | "excluded" | "whitelisted";
@@ -22,7 +22,7 @@ export type SpeciesControlRow = {
 	history: SpeciesHistorySummary;
 };
 
-export type UnresolvedSpeciesLists = Record<SpeciesListName, string[]>;
+type UnresolvedSpeciesLists = Record<SpeciesListName, string[]>;
 
 export type SpeciesControlPageData = {
 	revision: string;
@@ -34,7 +34,7 @@ export type SpeciesControlPageData = {
 
 const scientificNamePattern = /^[\p{L}][\p{L}.'-]*(?: [\p{L}][\p{L}.'-]*)+$/u;
 
-export const scientificNameSchema = z
+const scientificNameSchema = z
 	.string()
 	.min(3)
 	.max(160)

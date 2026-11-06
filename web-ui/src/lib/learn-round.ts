@@ -5,7 +5,7 @@ export const CHOICES_PER_QUESTION = 4;
 
 export const POINTS_BY_ATTEMPT = [3, 1] as const;
 
-export type PoolClip = {
+type PoolClip = {
 	date: string;
 	fileName: string;
 	detectedAt: string;

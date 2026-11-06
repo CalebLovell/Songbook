@@ -120,4 +120,4 @@ function withGlyph(
 	);
 }
 
-export { Button, buttonVariants };
+export { Button };

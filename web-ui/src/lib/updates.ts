@@ -8,7 +8,7 @@ import {
 	startUpdater,
 } from "./updates.server.ts";
 
-export const getUpdateState = createServerFn({ method: "GET" })
+const getUpdateState = createServerFn({ method: "GET" })
 	.middleware([requireUnlocked])
 	.handler(() => loadUpdateState());
 

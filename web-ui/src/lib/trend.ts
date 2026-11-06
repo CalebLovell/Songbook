@@ -16,13 +16,13 @@ const PERIOD_HOURS: Record<StatsPeriod, number | null> = {
 	all: null,
 };
 
-export function periodFilter(period: StatsPeriod): SQL {
+function periodFilter(period: StatsPeriod): SQL {
 	const hours = PERIOD_HOURS[period];
 	if (hours === null) return sql`1=1`;
 	return sql`datetime(${detections.Date} || ' ' || ${detections.Time}) >= datetime('now', ${`-${hours} hours`}, 'localtime')`;
 }
 
-export function calendarYearFilter(year: number): SQL {
+function calendarYearFilter(year: number): SQL {
 	return sql`${detections.Date} >= ${`${year}-01-01`} AND ${detections.Date} < ${`${year + 1}-01-01`}`;
 }
 
@@ -76,7 +76,7 @@ async function daysSinceEarliestDetection(extraFilter?: SQL): Promise<number> {
 	return Math.min(MAX_ALL_TIME_DAYS, Math.max(1, diffDays));
 }
 
-export async function getTrend(
+async function getTrend(
 	period: StatsPeriod,
 	extraFilter?: SQL,
 ): Promise<TrendPoint[]> {
@@ -104,7 +104,7 @@ export async function getTrend(
 	}));
 }
 
-export async function getCalendarYearTrend(
+async function getCalendarYearTrend(
 	year: number,
 	extraFilter?: SQL,
 ): Promise<TrendPoint[]> {

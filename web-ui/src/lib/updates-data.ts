@@ -1,9 +1,4 @@
-export type UpdateRunState =
-	| "idle"
-	| "checking"
-	| "updating"
-	| "failed"
-	| "updated";
+type UpdateRunState = "idle" | "checking" | "updating" | "failed" | "updated";
 
 export type UpdateState = {
 	managed: boolean;

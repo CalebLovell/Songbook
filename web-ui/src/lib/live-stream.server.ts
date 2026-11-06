@@ -1,6 +1,6 @@
 import "@tanstack/react-start/server-only";
 
-export const DEFAULT_LIVE_STREAM_URL = "http://localhost:8000/stream";
+const DEFAULT_LIVE_STREAM_URL = "http://localhost:8000/stream";
 
 export function resolveLiveStreamUrl(
 	env: NodeJS.ProcessEnv = process.env,

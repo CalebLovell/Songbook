@@ -1,4 +1,4 @@
-export const PAGE_SIZES = [25, 50, 100] as const;
+const PAGE_SIZES = [25, 50, 100] as const;
 
 export const DETECTION_SORTS = [
 	"recorded",
