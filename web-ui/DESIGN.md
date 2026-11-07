@@ -133,7 +133,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   `data` arrives -- no Suspense, so hydration can't strand a shell. Paging or
   filtering shows the skeleton too, never old rows. A skeleton stays up for at
   least 200ms through `useSkeletonMinimum`, because a brief loading moment feels
-  better than a flash; cached data skips the skeleton altogether.
+  better than a flash; cached data skips the skeleton altogether, and a full page
+  load adds no hold because the skeleton is already showing. A paged view keeps its
+  frame and pager mounted through its skeleton, so only the rows swap and paging
+  and sorting keep keyboard focus.
   Page queries spread `PAGE_QUERY`, or `FORM_QUERY` when a form seeds from the
   data once (no cached copy, so never an old revision). Neither refetches on
   focus. Data refreshes on navigation, after a change (`invalidateQueries`), and

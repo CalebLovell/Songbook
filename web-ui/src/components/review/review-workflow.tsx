@@ -76,131 +76,103 @@ const QUEUE_FOOTER_CLASS =
 
 const NAME_WIDTHS = ["w-36", "w-28", "w-40", "w-32"];
 
-export function ReviewWorkflowSkeleton() {
+function UnderReviewSkeleton() {
 	return (
-		<div className="@container/review">
-			<div className={REVIEW_GRID_CLASS}>
-				<Card
-					as="section"
-					aria-busy="true"
-					aria-label="Detection under review"
-					className={UNDER_REVIEW_CLASS}
-				>
-					<CardHeader title="Under review" />
-					<div aria-hidden="true" className={IDENTITY_ROW_CLASS}>
-						<div className={PORTRAIT_CLASS}>
-							<ShellBar className="size-full rounded-md" />
-						</div>
-						<div className={IDENTITY_TEXT_CLASS}>
-							<ShellText
-								className={`${NAME_CLASS} w-full`}
-								barClassName="w-56 max-w-full"
-							/>
-							<ShellText
-								className="w-full text-sm leading-tight"
-								barClassName="w-36"
-							/>
-							<span className={`${EBIRD_LINK_CLASS} flex`}>
-								<ShellSized className="rounded-md">
-									<Button variant="outline" size="sm">
-										<ExternalLink />
-										eBird
-									</Button>
-								</ShellSized>
-							</span>
-						</div>
-					</div>
-					<SpectrogramPlayerSkeleton
-						className={REVIEW_PLOT_CLASS}
-						aside={<ClipMetaSkeleton />}
+		<>
+			<div aria-hidden="true" className={IDENTITY_ROW_CLASS}>
+				<div className={PORTRAIT_CLASS}>
+					<ShellBar className="size-full rounded-md" />
+				</div>
+				<div className={IDENTITY_TEXT_CLASS}>
+					<ShellText
+						className={`${NAME_CLASS} w-full`}
+						barClassName="w-56 max-w-full"
 					/>
-					<div className={ACTIONS_FOOTER_CLASS}>
-						<Button
-							variant="ghost"
-							size="default"
-							className={cn(DELETE_BUTTON_CLASS, ACTION_ICON_ONLY_CLASS)}
-							disabled
-						>
-							<Trash2 />
-							<span className={ACTION_LABEL_CLASS}>Delete</span>
-						</Button>
-						<div className="ml-auto flex items-center gap-page">
-							<Button
-								variant="outline"
-								size="default"
-								className={ACTION_ICON_ONLY_CLASS}
-								disabled
-							>
-								<Shuffle />
-								<span className={ACTION_LABEL_CLASS}>Recategorize</span>
+					<ShellText
+						className="w-full text-sm leading-tight"
+						barClassName="w-36"
+					/>
+					<span className={`${EBIRD_LINK_CLASS} flex`}>
+						<ShellSized className="rounded-md">
+							<Button variant="outline" size="sm">
+								<ExternalLink />
+								eBird
 							</Button>
-							<Button size="default" disabled>
-								<ShieldCheck />
-								Correct
-							</Button>
-						</div>
-					</div>
-				</Card>
-
-				<Card
-					as="section"
-					aria-busy="true"
-					aria-label="Review queue"
-					className={QUEUE_CARD_CLASS}
-				>
-					<div className={QUEUE_HEADER_CLASS}>
-						<Kicker as="h2">In the queue</Kicker>
-						<ShellText
-							className={cn(COUNT_CLASS, "w-[1ch]")}
-							barClassName="right-0 left-auto w-full"
-						/>
-					</div>
-					<ol aria-hidden="true" className="-mx-page divide-y">
-						{Array.from({ length: REVIEW_PAGE_SIZE }, (_, index) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
-							<li key={index}>
-								<div className={QUEUE_ROW_CLASS}>
-									<ShellSized className="rounded-full">
-										<IndexDot index={88} widest={88} />
-									</ShellSized>
-									<div className="flex size-10 shrink-0 items-center justify-center">
-										<ShellBar className="size-9 rounded-md" />
-									</div>
-									<span className="min-w-0 flex-1">
-										<ShellText
-											className="font-medium"
-											barClassName={NAME_WIDTHS[index % NAME_WIDTHS.length]}
-										/>
-										<ShellText className="text-xs" barClassName="w-24" />
-									</span>
-									<span className={QUEUE_TIME_CLASS}>
-										<ShellText
-											className="w-14 text-sm"
-											barClassName="right-0 left-auto w-full"
-										/>
-										<ShellText
-											className="w-14 text-xs"
-											barClassName="right-0 left-auto w-full"
-										/>
-									</span>
-									<ShellSized className="rounded-full">
-										<ConfidencePill confidence={0.5} className="shrink-0" />
-									</ShellSized>
-								</div>
-							</li>
-						))}
-					</ol>
-					<div className={QUEUE_FOOTER_CLASS}>
-						<PageStepperShell
-							variant="ghost"
-							label="Review queue pages"
-							page={1}
-							pageCount={20}
-						/>
-					</div>
-				</Card>
+						</ShellSized>
+					</span>
+				</div>
 			</div>
-		</div>
+			<SpectrogramPlayerSkeleton
+				className={REVIEW_PLOT_CLASS}
+				aside={<ClipMetaSkeleton />}
+			/>
+			<div className={ACTIONS_FOOTER_CLASS}>
+				<Button
+					variant="ghost"
+					size="default"
+					className={cn(DELETE_BUTTON_CLASS, ACTION_ICON_ONLY_CLASS)}
+					disabled
+				>
+					<Trash2 />
+					<span className={ACTION_LABEL_CLASS}>Delete</span>
+				</Button>
+				<div className="ml-auto flex items-center gap-page">
+					<Button
+						variant="outline"
+						size="default"
+						className={ACTION_ICON_ONLY_CLASS}
+						disabled
+					>
+						<Shuffle />
+						<span className={ACTION_LABEL_CLASS}>Recategorize</span>
+					</Button>
+					<Button size="default" disabled>
+						<ShieldCheck />
+						Correct
+					</Button>
+				</div>
+			</div>
+		</>
+	);
+}
+
+function QueueRowsSkeleton() {
+	return (
+		<ol aria-hidden="true" className="-mx-page divide-y">
+			{Array.from({ length: REVIEW_PAGE_SIZE }, (_, index) => (
+				// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
+				<li key={index}>
+					<div className={QUEUE_ROW_CLASS}>
+						<ShellSized className="rounded-full">
+							<IndexDot index={88} widest={88} />
+						</ShellSized>
+						<div className="flex size-10 shrink-0 items-center justify-center">
+							<ShellBar className="size-9 rounded-md" />
+						</div>
+						<span className="min-w-0 flex-1">
+							<ShellText
+								className="font-medium"
+								barClassName={NAME_WIDTHS[index % NAME_WIDTHS.length]}
+							/>
+							<ShellText className="text-xs" barClassName="w-24" />
+						</span>
+						<span className={QUEUE_TIME_CLASS}>
+							<ShellText
+								className="w-14 text-sm"
+								barClassName="right-0 left-auto w-full"
+							/>
+							<ShellText
+								className="w-14 text-xs"
+								barClassName="right-0 left-auto w-full"
+							/>
+						</span>
+						<ShellSized className="rounded-full">
+							<ConfidencePill confidence={0.5} className="shrink-0" />
+						</ShellSized>
+					</div>
+				</li>
+			))}
+		</ol>
 	);
 }
 
@@ -259,6 +231,7 @@ function formatRecorded(date: string, time: string) {
 
 export function ReviewWorkflow({
 	page,
+	pageNumber,
 	species,
 	busy,
 	onCorrect,
@@ -266,8 +239,9 @@ export function ReviewWorkflow({
 	onDelete,
 	onPageChange,
 }: {
-	page: ReviewPage;
-	species: SpeciesOption[];
+	page: ReviewPage | null;
+	pageNumber: number;
+	species: SpeciesOption[] | undefined;
 	busy: boolean;
 	onCorrect: (rowId: number) => Promise<void>;
 	onRecategorize: (rowId: number, species: SpeciesOption) => Promise<void>;
@@ -278,21 +252,39 @@ export function ReviewWorkflow({
 	const [action, setAction] = useState<Action | null>(null);
 	const [picker, setPicker] = useState<ReviewCandidate | null>(null);
 	const [query, setQuery] = useState("");
-	const rows = page.candidates;
+
+	const shownPage = page?.page ?? pageNumber;
+	const [seenPage, setSeenPage] = useState(shownPage);
+	if (shownPage !== seenPage) {
+		setSeenPage(shownPage);
+		setIndex(0);
+		setAction(null);
+		setPicker(null);
+		setQuery("");
+	}
+
+	const [lastTotal, setLastTotal] = useState(page?.total ?? null);
+	if (page && page.total !== lastTotal) setLastTotal(page.total);
+	const total = page?.total ?? lastTotal;
+	const pageCount =
+		total === null ? null : Math.max(1, Math.ceil(total / REVIEW_PAGE_SIZE));
+	const paged = pageCount !== null && pageCount > 1;
+
+	const rows = page?.candidates ?? [];
 	const row = rows[Math.min(index, Math.max(0, rows.length - 1))];
-	const pageCount = Math.max(1, Math.ceil(page.total / page.pageSize));
-	const paged = pageCount > 1;
+	const pageOffset = (shownPage - 1) * REVIEW_PAGE_SIZE;
 	const queueNumber = (item: ReviewCandidate) =>
-		(page.page - 1) * page.pageSize + page.candidates.indexOf(item) + 1;
-	const widest = (page.page - 1) * page.pageSize + page.candidates.length;
+		pageOffset + rows.indexOf(item) + 1;
+	const widest = pageOffset + rows.length;
 	const matches = useMemo(() => {
 		const q = query.trim().toLowerCase();
+		const catalog = species ?? [];
 		return (
 			q
-				? species.filter((s) =>
+				? catalog.filter((s) =>
 						`${s.comName} ${s.sciName}`.toLowerCase().includes(q),
 					)
-				: species
+				: catalog
 		).slice(0, 100);
 	}, [query, species]);
 	async function confirm() {
@@ -303,208 +295,238 @@ export function ReviewWorkflow({
 		setAction(null);
 		setIndex(0);
 	}
-	if (!row) {
+	if (page && !row) {
+		const hasNextPage = pageCount !== null && page.page < pageCount;
 		const message = !page.hasAnyDetections
 			? EMPTY.station.detections
-			: page.page < pageCount
+			: hasNextPage
 				? EMPTY.done.reviewPage
 				: EMPTY.done.reviewQueue;
 		return (
 			<ReviewWorkflowEmpty
 				message={message}
 				total={page.total}
-				nextPage={
-					page.page < pageCount ? () => onPageChange(page.page + 1) : undefined
-				}
+				nextPage={hasNextPage ? () => onPageChange(page.page + 1) : undefined}
 			/>
 		);
 	}
-	const heard = (
+	const heard = row ? (
 		<ClipMeta
 			heardAt={formatDateTime(row.date, row.time)}
 			confidence={row.confidence}
 		/>
-	);
+	) : null;
 	return (
 		<>
 			<div className="@container/review">
 				<div className={REVIEW_GRID_CLASS}>
 					<Card
 						as="section"
+						aria-busy={!page || undefined}
 						aria-label="Detection under review"
 						className={UNDER_REVIEW_CLASS}
 					>
 						<CardHeader title="Under review" />
-						<div className={IDENTITY_ROW_CLASS}>
-							<div className={PORTRAIT_CLASS}>
-								<SpeciesImage
-									imageUrl={row.imageUrl}
-									alt={row.comName}
-									glyphClassName="size-10"
-								/>
-							</div>
-							<div className={IDENTITY_TEXT_CLASS}>
-								<h3
-									title={row.comName}
-									className={`${NAME_CLASS} w-full text-moss`}
-								>
-									<Link
-										to="/birds/$comName"
-										params={{ comName: comNameToSlug(row.comName) }}
-										className="no-underline hover:underline"
-									>
-										{row.comName}
-									</Link>
-								</h3>
-								<p
-									title={row.sciName}
-									className="w-full truncate text-bark text-sm italic leading-tight"
-								>
-									{row.sciName}
-								</p>
-								{row.speciesLink && (
-									<Button
-										asChild
-										variant="outline"
-										size="sm"
-										className={EBIRD_LINK_CLASS}
-									>
-										<a
-											href={row.speciesLink.href}
-											target="_blank"
-											rel="noreferrer"
-											aria-label={`${row.comName} on ${row.speciesLink.site}`}
+						{row ? (
+							<>
+								<div className={IDENTITY_ROW_CLASS}>
+									<div className={PORTRAIT_CLASS}>
+										<SpeciesImage
+											imageUrl={row.imageUrl}
+											alt={row.comName}
+											glyphClassName="size-10"
+										/>
+									</div>
+									<div className={IDENTITY_TEXT_CLASS}>
+										<h3
+											title={row.comName}
+											className={`${NAME_CLASS} w-full text-moss`}
 										>
-											<ExternalLink />
-											{row.speciesLink.site}
-										</a>
-									</Button>
-								)}
-							</div>
-						</div>
-
-						{row.audioAvailable ? (
-							<SpectrogramPlayer
-								key={row.rowId}
-								audioUrl={row.audioUrl}
-								speciesName={row.comName}
-								className={REVIEW_PLOT_CLASS}
-								aside={heard}
-							/>
-						) : (
-							<div>
-								<p className="grid h-40 place-items-center rounded-md border border-line border-dashed px-4 text-center text-destructive text-sm">
-									Audio unavailable. You can delete or skip this orphaned entry.
-								</p>
-								<div className="mt-page flex flex-wrap items-center justify-end gap-page">
-									{heard}
+											<Link
+												to="/birds/$comName"
+												params={{ comName: comNameToSlug(row.comName) }}
+												className="no-underline hover:underline"
+											>
+												{row.comName}
+											</Link>
+										</h3>
+										<p
+											title={row.sciName}
+											className="w-full truncate text-bark text-sm italic leading-tight"
+										>
+											{row.sciName}
+										</p>
+										{row.speciesLink && (
+											<Button
+												asChild
+												variant="outline"
+												size="sm"
+												className={EBIRD_LINK_CLASS}
+											>
+												<a
+													href={row.speciesLink.href}
+													target="_blank"
+													rel="noreferrer"
+													aria-label={`${row.comName} on ${row.speciesLink.site}`}
+												>
+													<ExternalLink />
+													{row.speciesLink.site}
+												</a>
+											</Button>
+										)}
+									</div>
 								</div>
-							</div>
-						)}
 
-						<div className={ACTIONS_FOOTER_CLASS}>
-							<Button
-								variant="ghost"
-								size="default"
-								className={cn(DELETE_BUTTON_CLASS, ACTION_ICON_ONLY_CLASS)}
-								disabled={busy}
-								onClick={() => setAction({ kind: "delete", row })}
-							>
-								<Trash2 />
-								<span className={ACTION_LABEL_CLASS}>Delete</span>
-							</Button>
-							<div className="ml-auto flex items-center gap-page">
-								<Button
-									variant="outline"
-									size="default"
-									className={ACTION_ICON_ONLY_CLASS}
-									disabled={!row.audioAvailable || busy}
-									onClick={() => setPicker(row)}
-								>
-									<Shuffle />
-									<span className={ACTION_LABEL_CLASS}>Recategorize</span>
-								</Button>
-								<Button
-									size="default"
-									disabled={!row.audioAvailable || busy}
-									onClick={() => setAction({ kind: "correct", row })}
-								>
-									<ShieldCheck />
-									Correct
-								</Button>
-							</div>
-						</div>
+								{row.audioAvailable ? (
+									<SpectrogramPlayer
+										key={row.rowId}
+										audioUrl={row.audioUrl}
+										speciesName={row.comName}
+										className={REVIEW_PLOT_CLASS}
+										aside={heard}
+									/>
+								) : (
+									<div>
+										<p className="grid h-40 place-items-center rounded-md border border-line border-dashed px-4 text-center text-destructive text-sm">
+											Audio unavailable. You can delete or skip this orphaned
+											entry.
+										</p>
+										<div className="mt-page flex flex-wrap items-center justify-end gap-page">
+											{heard}
+										</div>
+									</div>
+								)}
+
+								<div className={ACTIONS_FOOTER_CLASS}>
+									<Button
+										variant="ghost"
+										size="default"
+										className={cn(DELETE_BUTTON_CLASS, ACTION_ICON_ONLY_CLASS)}
+										disabled={busy}
+										onClick={() => setAction({ kind: "delete", row })}
+									>
+										<Trash2 />
+										<span className={ACTION_LABEL_CLASS}>Delete</span>
+									</Button>
+									<div className="ml-auto flex items-center gap-page">
+										<Button
+											variant="outline"
+											size="default"
+											className={ACTION_ICON_ONLY_CLASS}
+											disabled={!row.audioAvailable || busy || !species}
+											onClick={() => setPicker(row)}
+										>
+											<Shuffle />
+											<span className={ACTION_LABEL_CLASS}>Recategorize</span>
+										</Button>
+										<Button
+											size="default"
+											disabled={!row.audioAvailable || busy}
+											onClick={() => setAction({ kind: "correct", row })}
+										>
+											<ShieldCheck />
+											Correct
+										</Button>
+									</div>
+								</div>
+							</>
+						) : (
+							<UnderReviewSkeleton />
+						)}
 					</Card>
 
 					<Card
 						as="section"
+						aria-busy={!page || undefined}
 						aria-label="Review queue"
 						className={QUEUE_CARD_CLASS}
 					>
 						<div className={QUEUE_HEADER_CLASS}>
 							<Kicker as="h2">In the queue</Kicker>
-							<Count>{page.total}</Count>
+							{total === null ? (
+								<ShellText
+									className={cn(COUNT_CLASS, "w-[1ch]")}
+									barClassName="right-0 left-auto w-full"
+								/>
+							) : (
+								<Count>{total}</Count>
+							)}
 						</div>
-						<RowWell
-							as="ol"
-							style={
-								paged ? { minHeight: page.pageSize * ROW_HEIGHT_PX } : undefined
-							}
-							className="-mx-page divide-y"
-						>
-							{rows.map((item, i) => {
-								const current = item === row;
-								const when = formatRecorded(item.date, item.time);
-								return (
-									<li key={item.rowId}>
-										<button
-											type="button"
-											aria-current={current ? "true" : undefined}
-											onClick={() => setIndex(i)}
-											className={`${QUEUE_ROW_CLASS} text-left ${current ? "bg-row-selected" : "hover:bg-meadow"}`}
-										>
-											<IndexDot index={queueNumber(item)} widest={widest} />
-											<SpeciesThumbnail
-												imageUrl={item.imageUrl}
-												comName={item.comName}
-											/>
-											<span className="min-w-0 flex-1">
-												<span className="block truncate font-medium">
-													{item.comName}
+						{page ? (
+							<RowWell
+								as="ol"
+								style={
+									paged
+										? { minHeight: REVIEW_PAGE_SIZE * ROW_HEIGHT_PX }
+										: undefined
+								}
+								className="-mx-page divide-y"
+							>
+								{rows.map((item, i) => {
+									const current = item === row;
+									const when = formatRecorded(item.date, item.time);
+									return (
+										<li key={item.rowId}>
+											<button
+												type="button"
+												aria-current={current ? "true" : undefined}
+												onClick={() => setIndex(i)}
+												className={`${QUEUE_ROW_CLASS} text-left ${current ? "bg-row-selected" : "hover:bg-meadow"}`}
+											>
+												<IndexDot index={queueNumber(item)} widest={widest} />
+												<SpeciesThumbnail
+													imageUrl={item.imageUrl}
+													comName={item.comName}
+												/>
+												<span className="min-w-0 flex-1">
+													<span className="block truncate font-medium">
+														{item.comName}
+													</span>
+													<span className="@min-[26rem]:block hidden truncate text-bark text-xs italic">
+														{item.sciName}
+													</span>
+													<span className="block @min-[26rem]:hidden truncate text-muted-foreground text-xs tabular-nums">
+														{formatDateTime(item.date, item.time)}
+													</span>
 												</span>
-												<span className="@min-[26rem]:block hidden truncate text-bark text-xs italic">
-													{item.sciName}
+												<span className={QUEUE_TIME_CLASS}>
+													<span className="block text-sm tabular-nums">
+														{when.day}
+													</span>
+													<span className="block text-muted-foreground text-xs tabular-nums">
+														{when.clock}
+													</span>
 												</span>
-												<span className="block @min-[26rem]:hidden truncate text-muted-foreground text-xs tabular-nums">
-													{formatDateTime(item.date, item.time)}
-												</span>
-											</span>
-											<span className={QUEUE_TIME_CLASS}>
-												<span className="block text-sm tabular-nums">
-													{when.day}
-												</span>
-												<span className="block text-muted-foreground text-xs tabular-nums">
-													{when.clock}
-												</span>
-											</span>
-											<ConfidencePill
-												confidence={item.confidence}
-												className="shrink-0"
-											/>
-										</button>
-									</li>
-								);
-							})}
-						</RowWell>
+												<ConfidencePill
+													confidence={item.confidence}
+													className="shrink-0"
+												/>
+											</button>
+										</li>
+									);
+								})}
+							</RowWell>
+						) : (
+							<QueueRowsSkeleton />
+						)}
 						<div className={QUEUE_FOOTER_CLASS}>
-							<PageStepper
-								className="ml-auto"
-								variant="ghost"
-								label="Review queue pages"
-								page={page.page}
-								pageCount={pageCount}
-								onPageChange={onPageChange}
-							/>
+							{pageCount === null ? (
+								<PageStepperShell
+									variant="ghost"
+									label="Review queue pages"
+									page={1}
+									pageCount={20}
+								/>
+							) : (
+								<PageStepper
+									className="ml-auto"
+									variant="ghost"
+									label="Review queue pages"
+									page={shownPage}
+									pageCount={pageCount}
+									onPageChange={onPageChange}
+								/>
+							)}
 						</div>
 					</Card>
 				</div>

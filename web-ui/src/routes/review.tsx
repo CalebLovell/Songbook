@@ -8,10 +8,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CircleAlert, SearchCheck } from "lucide-react";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
-import {
-	ReviewWorkflow,
-	ReviewWorkflowSkeleton,
-} from "~/components/review/review-workflow.tsx";
+import { ReviewWorkflow } from "~/components/review/review-workflow.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
@@ -35,14 +32,15 @@ const reviewQuery = (data: ReviewSearch) =>
 	queryOptions({
 		...PAGE_QUERY,
 		queryKey: ["review", data],
-		queryFn: async () => {
-			const [page, species] = await Promise.all([
-				getReviewPage({ data }),
-				getReviewSpecies(),
-			]);
-			return { page, species };
-		},
+		queryFn: () => getReviewPage({ data }),
 	});
+
+const reviewSpeciesQuery = queryOptions({
+	...PAGE_QUERY,
+	staleTime: Number.POSITIVE_INFINITY,
+	queryKey: ["review-species"],
+	queryFn: () => getReviewSpecies(),
+});
 
 export const Route = createFileRoute("/review")({
 	head: () => pageHead("Review"),
@@ -52,6 +50,7 @@ export const Route = createFileRoute("/review")({
 	loaderDeps: ({ search }) => search,
 	loader: ({ context, deps }) => {
 		prefetchInBrowser(context.queryClient, reviewQuery(deps));
+		prefetchInBrowser(context.queryClient, reviewSpeciesQuery);
 	},
 	component: Review,
 });
@@ -59,7 +58,8 @@ export const Route = createFileRoute("/review")({
 function Review() {
 	const search = Route.useSearch();
 	const queue = useQuery(reviewQuery(search));
-	const loaded = useSkeletonMinimum(queue.data);
+	const page = useSkeletonMinimum(queue.data);
+	const { data: species } = useQuery(reviewSpeciesQuery);
 	const navigate = Route.useNavigate();
 	const queryClient = useQueryClient();
 	const correct = useServerFn(confirmReviewDetection),
@@ -86,24 +86,18 @@ function Review() {
 					The detection could not be changed. Check the recording and try again.
 				</p>
 			) : null}
-			{loaded ? (
-				<ReviewWorkflow
-					key={loaded.page.page}
-					page={loaded.page}
-					species={loaded.species}
-					busy={change.isPending || queue.isFetching}
-					onCorrect={(rowId) => run(() => correct({ data: { rowId } }))}
-					onRecategorize={(rowId: number, item: SpeciesOption) =>
-						run(() => recategorize({ data: { rowId, ...item } }))
-					}
-					onDelete={(rowId) => run(() => remove({ data: { rowId } }))}
-					onPageChange={(next) =>
-						navigate({ search: { ...search, page: next } })
-					}
-				/>
-			) : (
-				<ReviewWorkflowSkeleton />
-			)}
+			<ReviewWorkflow
+				page={page ?? null}
+				pageNumber={search.page}
+				species={species}
+				busy={change.isPending || queue.isFetching}
+				onCorrect={(rowId) => run(() => correct({ data: { rowId } }))}
+				onRecategorize={(rowId: number, item: SpeciesOption) =>
+					run(() => recategorize({ data: { rowId, ...item } }))
+				}
+				onDelete={(rowId) => run(() => remove({ data: { rowId } }))}
+				onPageChange={(next) => navigate({ search: { ...search, page: next } })}
+			/>
 		</PageWrap>
 	);
 }
