@@ -8,7 +8,6 @@ import {
 
 const search: DetectionWorkspaceSearch = {
 	page: 3,
-	pageSize: 100,
 	sort: "recorded",
 	direction: "desc",
 };

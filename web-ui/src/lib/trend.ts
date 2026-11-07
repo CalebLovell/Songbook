@@ -1,3 +1,4 @@
+import { dayIdFor } from "~/lib/day.ts";
 import {
 	buildHourActivity,
 	buildMonthlyTrend,
@@ -12,21 +13,18 @@ export type DayHourCount = { date: string; hour: string; count: number };
 const ROLLING_YEAR_DAYS = 365;
 
 function dayBuckets(daysBack: number): { key: string; label: string }[] {
-	const pad = (value: number) => value.toString().padStart(2, "0");
 	const now = new Date();
 	const buckets: { key: string; label: string }[] = [];
 	for (let i = daysBack - 1; i >= 0; i--) {
 		const d = new Date(now);
 		d.setDate(d.getDate() - i);
-		const key = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 		const label = d.toLocaleDateString([], { month: "short", day: "numeric" });
-		buckets.push({ key, label });
+		buckets.push({ key: dayIdFor(d), label });
 	}
 	return buckets;
 }
 
 function calendarDayBuckets(year: number): { key: string; label: string }[] {
-	const pad = (value: number) => value.toString().padStart(2, "0");
 	const buckets: { key: string; label: string }[] = [];
 	const start = new Date(year, 0, 1);
 	const daysInYear =
@@ -35,13 +33,12 @@ function calendarDayBuckets(year: number): { key: string; label: string }[] {
 	for (let index = 0; index < daysInYear; index += 1) {
 		const date = new Date(start);
 		date.setDate(start.getDate() + index);
-		const key = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 		const label = date.toLocaleDateString([], {
 			month: "short",
 			day: "numeric",
 			year: "numeric",
 		});
-		buckets.push({ key, label });
+		buckets.push({ key: dayIdFor(date), label });
 	}
 
 	return buckets;

@@ -1,3 +1,4 @@
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	Link,
@@ -15,7 +16,6 @@ import {
 	Volume2,
 } from "lucide-react";
 import { useMemo } from "react";
-import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Deferred } from "~/components/deferred.tsx";
@@ -29,14 +29,16 @@ import { SpeciesImage } from "~/components/species-image.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Count } from "~/components/ui/count.tsx";
+import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
 import {
 	PAGE_RANGE_CARD_CLASS,
 	PAGE_RANGE_CLASS,
 	PageRange,
 	PageStepper,
+	PageStepperShell,
 } from "~/components/ui/page-stepper.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
-import { SearchInput } from "~/components/ui/search-input.tsx";
+import { DebouncedSearchInput } from "~/components/ui/search-input.tsx";
 import {
 	ShellBar,
 	ShellFigure,
@@ -48,12 +50,12 @@ import { formatDateTime } from "~/lib/date-format.ts";
 import { getLifeListCards, type LifeListCard } from "~/lib/detections.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
+import { plural } from "~/lib/number-format.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
+import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
-import { useDraft } from "~/lib/use-draft.ts";
-import { useSettled } from "~/lib/use-settled.ts";
 import { cn } from "~/lib/utils.ts";
 
 const SORT_KEYS = ["count", "recent", "alpha"] as const;
@@ -84,6 +86,12 @@ const speciesSearchSchema = z.object({
 		.catch(DEFAULT_SEARCH.page),
 });
 
+const lifeListQuery = queryOptions({
+	...PAGE_QUERY,
+	queryKey: ["life-list-cards"],
+	queryFn: () => getLifeListCards(),
+});
+
 export const Route = createFileRoute("/birds/")({
 	head: () =>
 		pageHead(
@@ -95,7 +103,9 @@ export const Route = createFileRoute("/birds/")({
 		middlewares: [stripSearchParams(DEFAULT_SEARCH)],
 	},
 	component: Species,
-	loader: () => ({ cards: getLifeListCards() }),
+	loader: ({ context }) => {
+		prefetchInBrowser(context.queryClient, lifeListQuery);
+	},
 });
 
 const PAGE_SIZE = 24;
@@ -107,28 +117,26 @@ const CARD_CLASS =
 const FOOTER_CLASS = "mt-auto flex flex-wrap items-center gap-page text-sm";
 
 function Species() {
-	const { cards } = Route.useLoaderData();
+	const cards = useQuery(lifeListQuery);
 
 	return (
 		<PageWrap className="flex min-h-full flex-col gap-page">
 			<PageHeaderCard
 				icon={Feather}
 				title={PAGE_HEADERS.birds.title}
-				description={<LifeListSummary cards={cards} />}
+				description={<LifeListSummary loaded={cards.data ?? null} />}
 			/>
 
 			<SpeciesControls />
 
-			<Deferred promise={cards} shell={<SpeciesGridShell />}>
+			<Deferred query={cards} shell={<SpeciesGridShell />}>
 				{(loaded) => <SpeciesBrowser cards={loaded} />}
 			</Deferred>
 		</PageWrap>
 	);
 }
 
-function LifeListSummary({ cards }: { cards: Promise<LifeListCard[]> }) {
-	const settled = useSettled(cards);
-	const loaded = settled?.value ?? null;
+function LifeListSummary({ loaded }: { loaded: LifeListCard[] | null }) {
 	const detections = loaded?.reduce((sum, card) => sum + card.allTimeCount, 0);
 	return PAGE_HEADERS.birds.description(
 		detections === undefined ? (
@@ -145,15 +153,6 @@ function SpeciesControls() {
 	const { q: search, sort, reverse } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
-	const [queryInput, setQueryInput] = useDraft(search);
-
-	const debouncedSetQuery = useDebouncedCallback((value: string) => {
-		navigate({
-			search: (prev) => ({ ...prev, q: value, page: 1 }),
-			replace: true,
-		});
-	}, 200);
-
 	const pickSort = (next: SortKey) =>
 		navigate({
 			search: (prev) => ({ ...prev, sort: next, reverse: false, page: 1 }),
@@ -167,23 +166,16 @@ function SpeciesControls() {
 
 	return (
 		<div className="flex items-center gap-page">
-			<SearchInput
+			<DebouncedSearchInput
 				aria-label="Filter birds"
 				placeholder="Search birds..."
-				value={queryInput}
-				onChange={(e) => {
-					const value = e.target.value;
-					setQueryInput(value);
-					debouncedSetQuery(value);
-				}}
-				onClear={() => {
-					setQueryInput("");
-					debouncedSetQuery.cancel();
+				value={search}
+				onCommit={(value) =>
 					navigate({
-						search: (prev) => ({ ...prev, q: "", page: 1 }),
+						search: (prev) => ({ ...prev, q: value, page: 1 }),
 						replace: true,
-					});
-				}}
+					})
+				}
 			/>
 			<SortSelect
 				sort={sort}
@@ -217,16 +209,7 @@ function SpeciesGridShell() {
 						barClassName="w-full"
 					/>
 				</div>
-				<span className="ml-auto">
-					<ShellSized className="rounded-md">
-						<PageStepper
-							label="Bird pages"
-							page={1}
-							pageCount={2}
-							onPageChange={() => {}}
-						/>
-					</ShellSized>
-				</span>
+				<PageStepperShell label="Bird pages" page={1} pageCount={2} />
 			</div>
 		</div>
 	);
@@ -420,7 +403,12 @@ function SortSelect({
 }) {
 	const Icon = SORT_META[sort].icon;
 	return (
-		<div className="flex h-8.5 pointer-coarse:h-9 shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring sm:hidden">
+		<div
+			className={cn(
+				JOINED_CONTROL_CLASS,
+				"h-8.5 pointer-coarse:h-9 shrink-0 focus-within:border-focus-ring sm:hidden",
+			)}
+		>
 			<div className="relative">
 				<Icon
 					className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 max-[400px]:hidden"
@@ -446,7 +434,7 @@ function SortSelect({
 			<DirectionButton
 				reverse={reverse}
 				onReverse={onReverse}
-				className="w-8.5 border-l"
+				className="pointer-coarse:w-9 w-8.5 border-l"
 			/>
 		</div>
 	);
@@ -480,7 +468,7 @@ function SortTabs({
 						<ToggleGroupItem
 							key={key}
 							value={key}
-							className="data-[spacing=0]:last:rounded-r-none"
+							className="last:rounded-r-none"
 						>
 							<Icon className="size-4" />
 							{key === "alpha" ? "Alphabetical" : SORT_META[key].label}
@@ -533,6 +521,7 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 		>
 			<Link
 				to="/birds/$comName"
+				preload={false}
 				params={{ comName: comNameToSlug(card.comName) }}
 				data-card-link=""
 				className="absolute inset-0 z-0 focus-visible:outline-none"
@@ -544,7 +533,7 @@ function SpeciesCard({ card }: { card: LifeListCard }) {
 						{card.allTimeCount.toLocaleString()}
 					</div>
 					<div className={CARD_NOTE_CLASS}>
-						{card.allTimeCount === 1 ? "detection" : "detections"}
+						{plural(card.allTimeCount, "detection")}
 					</div>
 				</div>
 			</div>

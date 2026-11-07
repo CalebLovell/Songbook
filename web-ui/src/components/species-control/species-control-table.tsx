@@ -14,6 +14,7 @@ import {
 	PAGE_RANGE_YIELDS_TO_ACTIONS,
 	PageRange,
 	PageStepper,
+	PageStepperShell,
 } from "~/components/ui/page-stepper.tsx";
 import { RowCheckbox } from "~/components/ui/row-checkbox.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
@@ -38,9 +39,9 @@ import {
 	SPECIES_CONTROL_DEFAULT_DIRECTION,
 	SPECIES_CONTROL_SORTS,
 	type SpeciesControlSort,
-	type SpeciesControlSortDirection,
 } from "~/lib/species-control-workspace.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import type { SortDirection } from "~/lib/table-sort.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { cn } from "~/lib/utils.ts";
 
@@ -62,7 +63,7 @@ const STATUS_RANK: Record<SpeciesStatus, number> = {
 export function sortSpeciesControlRows(
 	rows: SpeciesControlViewRow[],
 	sort: SpeciesSortKey,
-	direction: SpeciesControlSortDirection,
+	direction: SortDirection,
 ): SpeciesControlViewRow[] {
 	const multiplier = direction === "asc" ? 1 : -1;
 	return [...rows].sort((left, right) => {
@@ -157,7 +158,7 @@ export function SpeciesControlTable({
 	pageCount: number;
 	selected: Set<string>;
 	sort: SpeciesSortKey;
-	direction: SpeciesControlSortDirection;
+	direction: SortDirection;
 	onSortChange: (key: SpeciesSortKey) => void;
 	onSelectedChange: (next: Set<string>) => void;
 	onPageChange: (page: number) => void;
@@ -344,6 +345,7 @@ export function SpeciesControlTable({
 								>
 									<Link
 										to="/birds/$comName"
+										preload={false}
 										params={{ comName: comNameToSlug(row.comName) }}
 										className="@max-xl:block @max-xl:truncate font-medium @max-xl:leading-tight no-underline hover:underline"
 									>
@@ -408,17 +410,12 @@ export function SpeciesControlTable({
 				)}
 				{actions}
 				{rows === null ? (
-					<span className="ml-auto">
-						<ShellSized className="rounded-md">
-							<PageStepper
-								variant="ghost"
-								label="Species pages"
-								page={page}
-								pageCount={pageCount}
-								onPageChange={() => {}}
-							/>
-						</ShellSized>
-					</span>
+					<PageStepperShell
+						variant="ghost"
+						label="Species pages"
+						page={page}
+						pageCount={pageCount}
+					/>
 				) : (
 					<PageStepper
 						className="ml-auto"

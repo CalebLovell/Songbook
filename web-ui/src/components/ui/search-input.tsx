@@ -1,8 +1,12 @@
 import { Search, X } from "lucide-react";
 import type * as React from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 import { Input } from "~/components/ui/input.tsx";
+import { useDraft } from "~/lib/use-draft.ts";
 import { cn } from "~/lib/utils.ts";
+
+const COMMIT_DELAY_MS = 200;
 
 type SearchInputProps = Omit<React.ComponentProps<"input">, "value"> & {
 	value: string;
@@ -36,4 +40,31 @@ function SearchInput({
 	);
 }
 
-export { SearchInput };
+function DebouncedSearchInput({
+	value,
+	onCommit,
+	...props
+}: Omit<SearchInputProps, "onClear" | "onChange"> & {
+	onCommit: (value: string) => void;
+}) {
+	const [draft, setDraft] = useDraft(value);
+	const commitLater = useDebouncedCallback(onCommit, COMMIT_DELAY_MS);
+
+	return (
+		<SearchInput
+			{...props}
+			value={draft}
+			onChange={(event) => {
+				setDraft(event.target.value);
+				commitLater(event.target.value);
+			}}
+			onClear={() => {
+				setDraft("");
+				commitLater.cancel();
+				onCommit("");
+			}}
+		/>
+	);
+}
+
+export { DebouncedSearchInput, SearchInput };

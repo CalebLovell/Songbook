@@ -1,4 +1,9 @@
 import {
+	keepPreviousData,
+	queryOptions,
+	useQuery,
+} from "@tanstack/react-query";
+import {
 	createFileRoute,
 	stripSearchParams,
 	useRouteContext,
@@ -36,6 +41,7 @@ import { EMPTY } from "~/lib/empty-messages.ts";
 import type { HighlightThresholds } from "~/lib/highlight-thresholds.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
+import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { formatShareCard } from "~/lib/share-card.ts";
 import type { HourActivity } from "~/lib/stats-data.ts";
 import type { TimelineData, TimelineRow } from "~/lib/timeline.ts";
@@ -52,7 +58,6 @@ import {
 	spelledDate,
 	windowFor,
 } from "~/lib/timeline-window.ts";
-import { useSettled } from "~/lib/use-settled.ts";
 
 const DEFAULT_PERIOD: TimelinePeriod = "day";
 
@@ -75,6 +80,13 @@ function resolveAnchor(period: TimelinePeriod, date: string | undefined) {
 	return period === "day" ? date : currentAnchor(period);
 }
 
+const timelineQuery = (data: { period: TimelinePeriod; anchor: string }) =>
+	queryOptions({
+		...PAGE_QUERY,
+		queryKey: ["timeline", data],
+		queryFn: () => getTimelinePage({ data }),
+	});
+
 export const Route = createFileRoute("/timeline")({
 	head: () =>
 		pageHead(
@@ -91,16 +103,21 @@ export const Route = createFileRoute("/timeline")({
 		period: search.period,
 		anchor: resolveAnchor(search.period, search.date),
 	}),
-	loader: ({ deps }) => ({ page: getTimelinePage({ data: deps }) }),
+	loader: ({ context, deps }) => {
+		prefetchInBrowser(context.queryClient, timelineQuery(deps));
+	},
 	component: Timeline,
 });
 
 function Timeline() {
-	const { page } = Route.useLoaderData();
-	const settled = useSettled(page);
 	const search = Route.useSearch();
 	const { period, view } = search;
 	const anchor = resolveAnchor(period, search.date);
+	const page = useQuery({
+		...timelineQuery({ period, anchor }),
+		placeholderData: keepPreviousData,
+	});
+	const current = page.isPlaceholderData ? null : (page.data ?? null);
 	const navigate = Route.useNavigate();
 
 	const show = (next: {
@@ -114,7 +131,7 @@ function Timeline() {
 			resetScroll: false,
 		});
 
-	if (settled?.current && settled.value.body.kind === "not-a-date") {
+	if (current?.body.kind === "not-a-date") {
 		return <NotADate date={anchor} />;
 	}
 
@@ -122,8 +139,8 @@ function Timeline() {
 		<TooltipProvider>
 			<PageWrap className="space-y-page">
 				<TimelineHeader
-					data={settled?.current ? settled.value : null}
-					staleData={settled?.value ?? null}
+					data={current}
+					staleData={page.data ?? null}
 					period={period}
 					anchor={anchor}
 					viewSwitch={
@@ -136,7 +153,7 @@ function Timeline() {
 				/>
 
 				<Deferred
-					promise={page}
+					query={page}
 					shellAfterMs={SHELL_DELAY_MS}
 					shell={<TimelineCardsShell period={period} view={view} />}
 				>
@@ -187,7 +204,7 @@ function TimelineCardsShell({
 				/>
 				<DetectionsByHourCardSkeleton
 					info={HOUR_CARD_INFO}
-					className={HOUR_CARD_SIZE}
+					className="self-start"
 				/>
 			</div>
 		</div>
@@ -201,13 +218,6 @@ const HOUR_CARD_INFO = (
 		valleys show when it is most quiet.
 	</p>
 );
-
-const PERIOD_NOUNS: Record<Exclude<TimelinePeriod, "all">, string> = {
-	day: "day",
-	week: "week",
-	month: "month",
-	year: "year",
-};
 
 type JumpTarget = {
 	anchor: string;
@@ -229,7 +239,7 @@ function jumpTarget(data: TimelinePageData): JumpTarget | null {
 	return {
 		anchor,
 		direction,
-		noun: PERIOD_NOUNS[period],
+		noun: period,
 		label:
 			period === "day" ? spelledDate(anchor) : windowFor(period, anchor).label,
 	};
@@ -464,11 +474,7 @@ function TimelineCards({
 					activity={hourActivity}
 					emptyMessage={emptyMessage}
 					info={HOUR_CARD_INFO}
-					className={
-						hourActivity.some((point) => point.count > 0)
-							? HOUR_CARD_SIZE
-							: "self-start"
-					}
+					className="self-start"
 				/>
 			</div>
 		</div>
@@ -476,8 +482,6 @@ function TimelineCards({
 }
 
 const BODY_CARD_WIDTH = "min-w-0 min-[1800px]:w-6xl min-[1800px]:flex-none";
-
-const HOUR_CARD_SIZE = "self-start";
 
 const VIEW_META: Record<
 	TimelineView,

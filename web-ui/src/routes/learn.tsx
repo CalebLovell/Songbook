@@ -1,10 +1,11 @@
 import {
-	createFileRoute,
-	stripSearchParams,
-	useRouter,
-} from "@tanstack/react-router";
+	keepPreviousData,
+	queryOptions,
+	useQuery,
+} from "@tanstack/react-query";
+import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { Lightbulb, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { z } from "zod";
 import {
 	LearnGame,
@@ -15,16 +16,15 @@ import { LearnPoolSelector } from "~/components/learn/learn-layout.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
+import { toast } from "~/components/ui/toaster.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { getLearnRound } from "~/lib/learn.ts";
 import { LEARN_POOLS, type LearnPool } from "~/lib/learn-pools.ts";
-import {
-	type GameProgress,
-	loadResumableGame,
-	saveGame,
-} from "~/lib/learn-saved-game.ts";
+import type { GameProgress } from "~/lib/learn-progress.ts";
+import { loadResumableGame, saveGame } from "~/lib/learn-saved-game.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
+import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { useHeldRound } from "~/lib/use-held-round.ts";
 
 const DEFAULT_POOL: LearnPool = "common";
@@ -32,6 +32,13 @@ const DEFAULT_POOL: LearnPool = "common";
 const learnSearchSchema = z.object({
 	pool: z.enum(LEARN_POOLS).default(DEFAULT_POOL).catch(DEFAULT_POOL),
 });
+
+const learnRoundQuery = (pool: LearnPool) =>
+	queryOptions({
+		...PAGE_QUERY,
+		queryKey: ["learn-round", pool],
+		queryFn: () => getLearnRound({ data: pool }),
+	});
 
 export const Route = createFileRoute("/learn")({
 	head: () =>
@@ -44,38 +51,27 @@ export const Route = createFileRoute("/learn")({
 		middlewares: [stripSearchParams({ pool: DEFAULT_POOL })],
 	},
 	loaderDeps: ({ search }) => ({ pool: search.pool }),
-	loader: ({ deps }) => ({ round: getLearnRound({ data: deps.pool }) }),
+	loader: ({ context, deps }) => {
+		prefetchInBrowser(context.queryClient, learnRoundQuery(deps.pool));
+	},
 	component: Learn,
 });
 
 type LoadedRound = Awaited<ReturnType<typeof getLearnRound>>;
 
 function Learn() {
-	const { round: roundPromise } = Route.useLoaderData();
 	const { pool } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
-	const [loaded, setLoaded] = useState<{
-		data: LoadedRound;
-		pool: LearnPool;
-		from: Promise<LoadedRound>;
-	} | null>(null);
-	useEffect(() => {
-		let cancelled = false;
-		roundPromise.then(
-			(data) => {
-				if (!cancelled) setLoaded({ data, pool, from: roundPromise });
-			},
-			() => {},
-		);
-		return () => {
-			cancelled = true;
-		};
-	}, [roundPromise, pool]);
-	const forPool = loaded?.pool === pool ? loaded : null;
+	const roundQuery = useQuery({
+		...learnRoundQuery(pool),
+		placeholderData: keepPreviousData,
+	});
+	const forPool = roundQuery.isPlaceholderData ? undefined : roundQuery.data;
 	const [isConfirmingNewRound, setIsConfirmingNewRound] = useState(false);
-	const hasRound = (forPool?.data.round.questions.length ?? 0) > 0;
+	const hasRound = (forPool?.round.questions.length ?? 0) > 0;
 	const [isRoundFinished, setIsRoundFinished] = useState(false);
+	const dealNextRound = async () => (await roundQuery.refetch()).isSuccess;
 
 	return (
 		<PageWrap>
@@ -87,7 +83,7 @@ function Learn() {
 
 			<LearnPoolSelector
 				pool={pool}
-				poolCounts={loaded?.data.poolCounts ?? null}
+				poolCounts={roundQuery.data?.poolCounts ?? null}
 				onPoolChange={(value) => {
 					navigate({
 						search: (previous) => ({ ...previous, pool: value }),
@@ -105,9 +101,10 @@ function Learn() {
 				{forPool ? (
 					<LearnRoundView
 						key={pool}
-						loaded={forPool.data}
+						loaded={forPool}
 						pool={pool}
-						isLoadingNextRound={forPool.from !== roundPromise}
+						isLoadingNextRound={roundQuery.isFetching}
+						dealNextRound={dealNextRound}
 						isConfirmingNewRound={isConfirmingNewRound}
 						onConfirmingDone={() => setIsConfirmingNewRound(false)}
 						onFinishedChange={setIsRoundFinished}
@@ -124,6 +121,7 @@ function LearnRoundView({
 	loaded,
 	pool,
 	isLoadingNextRound,
+	dealNextRound,
 	isConfirmingNewRound,
 	onConfirmingDone,
 	onFinishedChange,
@@ -131,13 +129,13 @@ function LearnRoundView({
 	loaded: LoadedRound;
 	pool: LearnPool;
 	isLoadingNextRound: boolean;
+	dealNextRound: () => Promise<boolean>;
 	isConfirmingNewRound: boolean;
 	onConfirmingDone: () => void;
 	onFinishedChange: (isFinished: boolean) => void;
 }) {
-	const router = useRouter();
 	const [saved] = useState(() => loadResumableGame(pool, loaded.round));
-	const { round, requestNextRound } = useHeldRound(
+	const { round, requestNextRound, cancelNextRound } = useHeldRound(
 		loaded.round,
 		pool,
 		saved?.round,
@@ -145,15 +143,19 @@ function LearnRoundView({
 	const onProgressChange = useCallback(
 		(progress: GameProgress) => {
 			saveGame(pool, { round, progress });
-			onFinishedChange(progress.isFinished);
+			onFinishedChange(progress.phase === "finished");
 		},
 		[pool, round, onFinishedChange],
 	);
 	const dealtByPlayer = useRef(false);
-	const playAgain = () => {
+	const playAgain = async () => {
 		dealtByPlayer.current = true;
 		requestNextRound();
-		router.invalidate();
+		if (await dealNextRound()) return;
+		cancelNextRound();
+		toast.error("A new round couldn't be dealt.", {
+			description: "Please try again.",
+		});
 	};
 
 	return round.questions.length === 0 ? (

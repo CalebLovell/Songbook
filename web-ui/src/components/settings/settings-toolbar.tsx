@@ -1,6 +1,6 @@
-import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { IconSelect } from "~/components/ui/icon-select.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import { SETTINGS_SECTIONS, type SettingsTab } from "./settings-index.ts";
 
@@ -55,31 +55,20 @@ function SettingsTabSelect({
 	tab: SettingsTab;
 	onPick: (next: SettingsTab) => void;
 }) {
-	const Icon =
-		SETTINGS_SECTIONS.find((entry) => entry.tab === tab)?.icon ??
-		SETTINGS_SECTIONS[0].icon;
 	return (
-		<div className="relative @min-[57rem]:hidden shrink-0">
-			<Icon
-				className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2"
-				aria-hidden="true"
-			/>
-			<select
-				aria-label={TABS_LABEL}
-				value={tab}
-				onChange={(event) => onPick(event.target.value as SettingsTab)}
-				className="h-8.5 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
-			>
-				{SETTINGS_SECTIONS.map((entry) => (
-					<option key={entry.tab} value={entry.tab}>
-						{entry.title}
-					</option>
-				))}
-			</select>
-			<ChevronDown
-				className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground"
-				aria-hidden="true"
-			/>
-		</div>
+		<IconSelect
+			icon={
+				SETTINGS_SECTIONS.find((entry) => entry.tab === tab)?.icon ??
+				SETTINGS_SECTIONS[0].icon
+			}
+			label={TABS_LABEL}
+			value={tab}
+			onChange={onPick}
+			className="@min-[57rem]:hidden"
+			options={SETTINGS_SECTIONS.map((entry) => ({
+				value: entry.tab,
+				label: entry.title,
+			}))}
+		/>
 	);
 }

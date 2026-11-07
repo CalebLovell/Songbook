@@ -34,6 +34,7 @@ import {
 	updateBusy,
 } from "~/lib/updates-data.ts";
 import { useClientValue } from "~/lib/use-client-value.ts";
+import { errorMessage } from "~/lib/utils.ts";
 import { RestartButton } from "./restart-button.tsx";
 import { RESET_RESTARTS_DESCRIPTION, SettingsCard } from "./settings-card.tsx";
 import { SETTINGS_TABS, type SettingsTab } from "./settings-index.ts";
@@ -76,6 +77,12 @@ function useCardSave<T>(
 	const [values, setValues] = useState(initial);
 	const [saved, setSaved] = useState(initial);
 	const [needsRestart, setNeedsRestart] = useState(false);
+	const [seenInitial, setSeenInitial] = useState(initial);
+	if (!unchanged(initial, seenInitial)) {
+		setSeenInitial(initial);
+		setSaved(initial);
+		if (unchanged(values, saved)) setValues(initial);
+	}
 
 	const saveMutation = useMutation({
 		mutationFn: ({ saver, next }: { saver: Saver<T>; next: T }) => saver(next),
@@ -96,12 +103,9 @@ function useCardSave<T>(
 			}
 		},
 		onError: (error) => {
-			toast.error(
-				error instanceof Error
-					? error.message
-					: "These settings could not be saved.",
-				{ id: toastId },
-			);
+			toast.error(errorMessage(error, "These settings could not be saved."), {
+				id: toastId,
+			});
 		},
 	});
 
@@ -115,12 +119,10 @@ function useCardSave<T>(
 			toast.success(result.message, { id: toastId });
 		},
 		onError: (error) => {
-			toast.warning(
-				error instanceof Error
-					? error.message
-					: "BirdNET could not be restarted.",
-				{ id: toastId, duration: 10_000 },
-			);
+			toast.warning(errorMessage(error, "BirdNET could not be restarted."), {
+				id: toastId,
+				duration: 10_000,
+			});
 		},
 	});
 
@@ -143,7 +145,6 @@ function useCardSave<T>(
 		resetToDefaults: () => {
 			if (defaults !== undefined) write(defaults);
 		},
-		dirty,
 		saveDisabled: saving || !dirty,
 		resetDisabled: saving || !save || (atDefaults(values) && atDefaults(saved)),
 		needsRestart: needsRestart && restart !== undefined,
@@ -1265,10 +1266,9 @@ function UpdatesSettingsCard({
 				);
 		},
 		onError: (error) => {
-			toast.error(
-				error instanceof Error ? error.message : "Couldn't look for updates.",
-				{ id: "settings-updates" },
-			);
+			toast.error(errorMessage(error, "Couldn't look for updates."), {
+				id: "settings-updates",
+			});
 		},
 	});
 	const checking = checkMutation.isPending;
@@ -1281,7 +1281,7 @@ function UpdatesSettingsCard({
 		try {
 			await action();
 		} catch (error) {
-			toast.error(error instanceof Error ? error.message : failure, {
+			toast.error(errorMessage(error, failure), {
 				id: "settings-updates",
 			});
 		}

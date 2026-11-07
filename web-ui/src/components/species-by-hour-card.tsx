@@ -199,6 +199,7 @@ function SpeciesHourRowView({
 					</div>
 					<Link
 						to="/birds/$comName"
+						preload={false}
 						params={{ comName: comNameToSlug(row.comName) }}
 						className="min-w-0 truncate font-semibold text-sm no-underline hover:underline"
 					>
@@ -257,14 +258,13 @@ function HeatRow({ row, heatMax }: { row: SpeciesHourRow; heatMax: number }) {
 }
 
 const NAME_WIDTHS = ["w-40", "w-28", "w-36", "w-32", "w-44", "w-24"];
+const SKELETON_ROWS = 15;
 
 export function SpeciesByHourCardSkeleton({
 	summary,
-	rows = 15,
 	className = "",
 }: {
 	summary?: ReactNode;
-	rows?: number;
 	className?: string;
 }) {
 	return (
@@ -285,7 +285,7 @@ export function SpeciesByHourCardSkeleton({
 			<div aria-hidden="true" className="-mx-1 px-1">
 				<HeaderRow />
 				<div className="-mx-page *:px-page">
-					{Array.from({ length: rows }, (_, index) => (
+					{Array.from({ length: SKELETON_ROWS }, (_, index) => (
 						<div
 							// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 							key={index}

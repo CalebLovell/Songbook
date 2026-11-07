@@ -17,7 +17,11 @@ import {
 } from "~/components/settings/settings-page.tsx";
 import { stationHealthQuery } from "~/lib/health.ts";
 import { pageHead } from "~/lib/link-preview.ts";
-import { prefetchInBrowser } from "~/lib/query-client.ts";
+import {
+	FORM_QUERY,
+	prefetchInBrowser,
+	refreshAllData,
+} from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
 	getSettingsPage,
@@ -39,7 +43,6 @@ import {
 	installUpdateFn,
 	updateStateQuery,
 } from "~/lib/updates.ts";
-import { useSettled } from "~/lib/use-settled.ts";
 
 const HEALTH_INTERVAL_MS = 30_000;
 
@@ -53,6 +56,12 @@ const healthQuery = queryOptions({
 const polledUpdateStateQuery = queryOptions({
 	...updateStateQuery,
 	refetchInterval: UPDATES_INTERVAL_MS,
+});
+
+const settingsPageQuery = queryOptions({
+	...FORM_QUERY,
+	queryKey: ["settings-page"],
+	queryFn: () => getSettingsPage(),
 });
 
 const settingsSearchSchema = z.object({
@@ -73,14 +82,12 @@ export const Route = createFileRoute("/settings")({
 	loader: ({ context }) => {
 		prefetchInBrowser(context.queryClient, healthQuery);
 		prefetchInBrowser(context.queryClient, polledUpdateStateQuery);
-		return { data: getSettingsPage() };
 	},
 	component: SettingsRoute,
 });
 
 function SettingsRoute() {
-	const loaded = Route.useLoaderData();
-	const settled = useSettled(loaded.data);
+	const { data: page } = useQuery(settingsPageQuery);
 	const queryClient = useQueryClient();
 	const { data: health } = useQuery(healthQuery);
 	const saveStation = useServerFn(saveStationSettingsFn);
@@ -106,21 +113,21 @@ function SettingsRoute() {
 			replace: true,
 			resetScroll: false,
 		});
-	const refreshingHealth = async <T,>(work: Promise<T>) => {
+	const refreshingData = async <T,>(work: Promise<T>) => {
 		const result = await work;
-		await queryClient.invalidateQueries({ queryKey: healthQuery.queryKey });
+		await queryClient.invalidateQueries();
 		return result;
 	};
 
-	if (!settled) return <SettingsPageSkeleton tab={tab} onTabChange={showTab} />;
+	if (!page) return <SettingsPageSkeleton tab={tab} onTabChange={showTab} />;
 
 	return (
 		<SettingsPage
 			tab={tab}
 			onTabChange={showTab}
-			data={settled.value}
+			data={page}
 			health={health}
-			onRestart={(card) => refreshingHealth(restart({ data: { card } }))}
+			onRestart={(card) => refreshingData(restart({ data: { card } }))}
 			updates={updates ?? null}
 			onCheckUpdates={async () => {
 				const state = await checkForUpdates();
@@ -132,30 +139,28 @@ function SettingsRoute() {
 			onInstallUpdate={() => installUpdate()}
 			onReset={async () => {
 				const result = await reset({});
-				await router.invalidate();
-				await router.state.matches.find((match) => match.routeId === Route.id)
-					?.loaderData?.data;
+				await refreshAllData(router, queryClient);
 				return {
 					message: result.message,
 					needsRestart: result.status !== "reset",
 				};
 			}}
 			savers={{
-				station: (values) => refreshingHealth(saveStation({ data: values })),
-				detection: (values) => saveDetection({ data: values }),
-				audio: (values) => refreshingHealth(saveAudio({ data: values })),
-				recording: (values) =>
-					refreshingHealth(saveRecording({ data: values })),
-				storage: (values) => refreshingHealth(saveStorage({ data: values })),
-				review: (values) => saveReview({ data: values }),
-				highlights: (values) => saveHighlights({ data: values }),
+				station: (values) => refreshingData(saveStation({ data: values })),
+				detection: (values) => refreshingData(saveDetection({ data: values })),
+				audio: (values) => refreshingData(saveAudio({ data: values })),
+				recording: (values) => refreshingData(saveRecording({ data: values })),
+				storage: (values) => refreshingData(saveStorage({ data: values })),
+				review: (values) => refreshingData(saveReview({ data: values })),
+				highlights: (values) =>
+					refreshingData(saveHighlights({ data: values })),
 				artwork: async (values) => {
 					const result = await saveArtwork({ data: values });
 					forgetUnlockStatus();
-					await router.invalidate();
+					await refreshAllData(router, queryClient);
 					return result;
 				},
-				updates: (values) => saveUpdates({ data: values }),
+				updates: (values) => refreshingData(saveUpdates({ data: values })),
 			}}
 		/>
 	);

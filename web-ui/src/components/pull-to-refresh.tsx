@@ -1,27 +1,38 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { type AnyRouter, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
+import {
+	INITIAL_PULL_STATE,
+	PULL_THRESHOLD,
+	type PullEvent,
+	pullTransition,
+} from "~/lib/pull-refresh-machine.ts";
+import { refreshAllData } from "~/lib/query-client.ts";
 import { cn } from "~/lib/utils.ts";
 
-const RESISTANCE = 0.5;
-const THRESHOLD = 64;
-const MAX_PULL = 96;
-const REST = 56;
 const MIN_SPIN_MS = 600;
+const SETTLE_MS = 180;
 const SIZE = 36;
-
-type Phase = "idle" | "pulling" | "refreshing" | "settling";
 
 export function PullToRefresh({ children }: { children: ReactNode }) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const wrapperRef = useRef<HTMLDivElement>(null);
-	const [pull, setPull] = useState(0);
-	const [phase, setPhase] = useState<Phase>("idle");
-	const phaseRef = useRef<Phase>("idle");
-	phaseRef.current = phase;
+	const [state, setState] = useState(INITIAL_PULL_STATE);
+	const stateRef = useRef(state);
+	const { phase, pull } = state;
+
+	// A ref as well as state: touchmove must decide on preventDefault before React renders.
+	function send(event: PullEvent) {
+		const next = pullTransition(stateRef.current, event);
+		stateRef.current = next;
+		setState(next);
+		return next;
+	}
+	const sendRef = useRef(send);
+	sendRef.current = send;
 
 	useEffect(() => {
 		const wrapper = wrapperRef.current;
@@ -29,82 +40,69 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 		if (!wrapper || !scroller) return;
 		if (!window.matchMedia("(pointer: coarse)").matches) return;
 
-		let start: { x: number; y: number } | null = null;
-		let engaged = false;
-		let distance = 0;
-
 		function onTouchStart(event: TouchEvent) {
-			start = null;
-			engaged = false;
-			if (phaseRef.current !== "idle" || event.touches.length !== 1) return;
-			if (scrolledAbove(event.target, scroller as HTMLElement)) return;
 			const touch = event.touches[0];
-			start = { x: touch.clientX, y: touch.clientY };
+			sendRef.current({
+				type: "touchStart",
+				point: { x: touch.clientX, y: touch.clientY },
+				fingers: event.touches.length,
+				atTop: !scrolledAbove(event.target, scroller as HTMLElement),
+			});
 		}
 
 		function onTouchMove(event: TouchEvent) {
-			if (!start) return;
 			const touch = event.touches[0];
-			const dx = touch.clientX - start.x;
-			const dy = touch.clientY - start.y;
-			if (!engaged) {
-				if (dy <= 0 || Math.abs(dx) > dy) {
-					start = null;
-					return;
-				}
-				engaged = true;
-				setPhase("pulling");
-			}
-			if (event.cancelable) event.preventDefault();
-			distance = Math.min(MAX_PULL, Math.max(0, dy * RESISTANCE));
-			setPull(distance);
+			const next = sendRef.current({
+				type: "touchMove",
+				point: { x: touch.clientX, y: touch.clientY },
+			});
+			if (next.phase === "pulling" && event.cancelable) event.preventDefault();
 		}
 
-		function onTouchEnd() {
-			if (!engaged) return;
-			start = null;
-			engaged = false;
-			if (distance >= THRESHOLD) {
-				setPhase("refreshing");
-				setPull(REST);
-				const spun = new Promise((resolve) => setTimeout(resolve, MIN_SPIN_MS));
-				Promise.allSettled([
-					refreshPage(router),
-					queryClient.invalidateQueries(),
-					spun,
-				]).then(() => settle());
-			} else {
-				settle();
-			}
-			distance = 0;
-		}
-
-		function settle() {
-			setPhase("settling");
-			setPull(0);
-			setTimeout(() => setPhase("idle"), 180);
-		}
+		const onTouchEnd = () => sendRef.current({ type: "touchEnd" });
+		const onTouchCancel = () => sendRef.current({ type: "touchCancel" });
 
 		wrapper.addEventListener("touchstart", onTouchStart, { passive: true });
 		wrapper.addEventListener("touchmove", onTouchMove, { passive: false });
 		wrapper.addEventListener("touchend", onTouchEnd);
-		wrapper.addEventListener("touchcancel", onTouchEnd);
+		wrapper.addEventListener("touchcancel", onTouchCancel);
 		return () => {
 			wrapper.removeEventListener("touchstart", onTouchStart);
 			wrapper.removeEventListener("touchmove", onTouchMove);
 			wrapper.removeEventListener("touchend", onTouchEnd);
-			wrapper.removeEventListener("touchcancel", onTouchEnd);
+			wrapper.removeEventListener("touchcancel", onTouchCancel);
 		};
-	}, [router, queryClient]);
+	}, []);
 
-	const armed = phase === "refreshing" || pull >= THRESHOLD;
+	useEffect(() => {
+		if (phase !== "refreshing") return;
+		let cancelled = false;
+		const spun = new Promise((resolve) => setTimeout(resolve, MIN_SPIN_MS));
+		Promise.allSettled([refreshAllData(router, queryClient), spun]).then(() => {
+			if (!cancelled) sendRef.current({ type: "refreshDone" });
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [phase, router, queryClient]);
+
+	useEffect(() => {
+		if (phase !== "settling") return;
+		const timer = setTimeout(
+			() => sendRef.current({ type: "settled" }),
+			SETTLE_MS,
+		);
+		return () => clearTimeout(timer);
+	}, [phase]);
+
+	const armed = phase === "refreshing" || pull >= PULL_THRESHOLD;
 
 	return (
 		<div
 			ref={wrapperRef}
 			className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
 		>
-			{phase !== "idle" && (
+			{phase !== "idle" && phase !== "tracking" && (
 				<output
 					aria-hidden={phase !== "refreshing"}
 					className={cn(
@@ -120,7 +118,7 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 						height: SIZE,
 						top: -SIZE,
 						transform: `translate(-50%, ${pull}px)`,
-						opacity: Math.min(1, pull / (THRESHOLD * 0.6)),
+						opacity: Math.min(1, pull / (PULL_THRESHOLD * 0.6)),
 					}}
 				>
 					<RefreshCw
@@ -128,7 +126,7 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 						style={
 							phase === "refreshing"
 								? undefined
-								: { transform: `rotate(${(pull / THRESHOLD) * 270}deg)` }
+								: { transform: `rotate(${(pull / PULL_THRESHOLD) * 270}deg)` }
 						}
 					/>
 					{phase === "refreshing" && (
@@ -149,16 +147,4 @@ function scrolledAbove(target: EventTarget | null, scroller: HTMLElement) {
 		node = node.parentElement;
 	}
 	return false;
-}
-
-async function refreshPage(router: AnyRouter) {
-	await router.invalidate();
-	const pending = router.state.matches.flatMap((match) =>
-		match.loaderData && typeof match.loaderData === "object"
-			? Object.values(match.loaderData).filter(
-					(value): value is Promise<unknown> => value instanceof Promise,
-				)
-			: [],
-	);
-	await Promise.allSettled(pending);
 }

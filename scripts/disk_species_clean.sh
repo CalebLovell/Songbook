@@ -36,7 +36,6 @@ fi
 # In the base folders (that corresponds to the BirdSongs/By_date)
 # Look for all folders that have the correct species names whatever the date
 # Look for files that have the correct format (containing a date), and that have an extension
-# For all That are not *.png (as the objective is to limit the number of audio files)
 # That were not taken in the past 7 days (= that don't contain the date from that past 7 days). $dateformat is configured as a different variables, as ubuntu accepts "5 days" while alpine accepts only "5"
 # That are not included in the file disk_check_exclude.txt that lists files protected from purge
 # If the specie name had a "-" in it, it must be converted to "=" to ensure that we have always the same number of "-" separated fields in the filename
@@ -44,7 +43,6 @@ fi
 # Sort by date (1 for year, 2 for month, 3 for days)
 # Remove the top x files, corresponding to the files best matching the criteria of confidence + age ; this corresponds to the number of file to keep (in addition to protected files
 # Rename species that had a = in their name to - (we don't need anymore - separated fields)
-# Duplicate all lines to append .png at the end, to remove the linked png
 # This appends a fake "temp" file, so that the sudo rm has at least one file to delete and does not hang
 # Delete files, then once all files are deleted echo the number of remaining files
 
@@ -55,7 +53,6 @@ while read -r species; do
     # Dummy file to execute the rm using xargs even if no files are there. Best solution found for code speed
     touch temp
     find */"$species" -type f -name "*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]*.*" \
-        -not -name "*.png" \
         -not -name "*$(date -d "-7$dateformat" '+%Y-%m-%d')*" \
         -not -name "*$(date -d "-6$dateformat" '+%Y-%m-%d')*" \
         -not -name "*$(date -d "-5$dateformat" '+%Y-%m-%d')*" \
@@ -69,9 +66,7 @@ while read -r species; do
         sort -t'-' -k4,4nr -k1,1nr -k2,2nr -k3,3nr |
         tail -n +"$((max_files_species + 1))" |
         sed "s|$species_san|$species|g" |
-        sed 'p; s/\(\.[^.]*\)$/\1.png/' |
         awk 'BEGIN{print "temp"} {print}' |
-        xargs sudo rm && echo "success ($(find */"$species" -type f -name "*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]*.*" \
-        -not -name "*.png" | wc -l)) remaining" || echo "failed ($?)"
+        xargs sudo rm && echo "success ($(find */"$species" -type f -name "*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]*.*" | wc -l)) remaining" || echo "failed ($?)"
 # rm to be changed to touch or echo if you want to test without deletion
 done <<<"$sanitized_names"

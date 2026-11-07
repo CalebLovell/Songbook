@@ -3,21 +3,26 @@ import {
 	Check,
 	ChevronDown,
 	CircleAlert,
+	type LucideIcon,
 	RotateCcw,
 	SlidersHorizontal,
 	Trash2,
 	X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
 import { CardHeader } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
+import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
-import { SearchInput } from "~/components/ui/search-input.tsx";
+import {
+	DebouncedSearchInput,
+	SearchInput,
+} from "~/components/ui/search-input.tsx";
+import { SelectionBar } from "~/components/ui/selection-bar.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
@@ -35,8 +40,7 @@ import {
 } from "~/lib/species-control-workspace.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
-import { useDraft } from "~/lib/use-draft.ts";
-import { SpeciesControlDialog } from "./species-control-dialogs.tsx";
+import { errorMessage } from "~/lib/utils.ts";
 import {
 	SPECIES_CONTROL_PAGE_SIZE,
 	SpeciesControlTable,
@@ -122,7 +126,77 @@ type ProposedDialog =
 			input: SpeciesControlSaveInput;
 			raw: string;
 	  }
-	| { kind: "reset" };
+	| { kind: "reset"; input: SpeciesControlSaveInput };
+
+type CommitMessages = {
+	success: string;
+	failure: string;
+	destructive?: boolean;
+};
+
+function dialogContent(dialog: ProposedDialog): {
+	title: string;
+	description: string;
+	confirmIcon: LucideIcon;
+	confirmLabel: string;
+	clearSelection: boolean;
+	messages: CommitMessages;
+} {
+	switch (dialog.kind) {
+		case "status":
+			return {
+				title: `Set ${dialog.count} species to ${dialog.label}?`,
+				description: "The selected species will use this status immediately.",
+				confirmIcon: Check,
+				confirmLabel: `Apply ${dialog.label}`,
+				clearSelection: true,
+				messages: {
+					success: `Set ${dialog.count} species to ${dialog.label}.`,
+					failure: "Species statuses could not be saved.",
+				},
+			};
+		case "import":
+			return {
+				title: "Import these species lists?",
+				description:
+					"The imported statuses will replace the current lists immediately.",
+				confirmIcon: Check,
+				confirmLabel: "Import lists",
+				clearSelection: true,
+				messages: {
+					success: "Imported the species lists.",
+					failure: "Species lists could not be imported.",
+				},
+			};
+		case "remove-unresolved":
+			return {
+				title: "Remove this unmatched entry?",
+				description: `${dialog.raw} will be removed from its species list immediately.`,
+				confirmIcon: Trash2,
+				confirmLabel: "Remove entry",
+				clearSelection: false,
+				messages: {
+					success: `Removed ${dialog.raw}.`,
+					failure: "The unmatched entry could not be removed.",
+					destructive: true,
+				},
+			};
+		case "reset":
+			return {
+				title: "Reset all species lists?",
+				description:
+					"This immediately clears the Custom, Never detect, and Always detect lists. This action cannot be undone.",
+				confirmIcon: RotateCcw,
+				confirmLabel: "Reset lists",
+				clearSelection: true,
+				messages: {
+					success: "Cleared all species lists.",
+					failure: "Species lists could not be reset.",
+					destructive: true,
+				},
+			};
+	}
+}
 
 const BULK_STATUS_ACTIONS: Array<{
 	status: SpeciesStatus;
@@ -164,25 +238,12 @@ export function SpeciesSelectionBar({
 	onStatus: (status: SpeciesStatus) => void;
 }) {
 	return (
-		<fieldset
-			aria-label="Set selected species status"
-			className="flex h-8 pointer-coarse:h-9 w-fit min-w-0 overflow-hidden rounded-md border border-input bg-card text-sm *:focus-visible:-outline-offset-2"
+		<SelectionBar
+			label="Set selected species status"
+			count={count}
+			onClear={onClear}
+			className="min-w-0"
 		>
-			<span className="flex items-center gap-[0.5ch] @xl:px-3 px-2 text-muted-foreground">
-				<span className="font-semibold text-foreground tabular-nums">
-					{count}
-				</span>
-				<span className="sr-only @xl:not-sr-only">selected</span>
-			</span>
-			<button
-				type="button"
-				aria-label="Clear selection"
-				title="Clear selection"
-				onClick={onClear}
-				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-			>
-				<X className="size-4" aria-hidden="true" />
-			</button>
 			{BULK_STATUS_ACTIONS.map((action) => (
 				<button
 					key={action.status}
@@ -215,7 +276,7 @@ export function SpeciesSelectionBar({
 					className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground"
 				/>
 			</span>
-		</fieldset>
+		</SelectionBar>
 	);
 }
 
@@ -239,21 +300,14 @@ export function SpeciesControlPage({
 	onSave,
 	onCommitted,
 }: { initialData: SpeciesControlPageData } & PageAdapters) {
-	const initialSets = useMemo(
-		() => ({
-			custom: setFrom(initialData, "custom"),
-			excluded: setFrom(initialData, "excluded"),
-			whitelisted: setFrom(initialData, "whitelisted"),
-		}),
-		[initialData],
+	const [custom, setCustom] = useState(() => setFrom(initialData, "custom"));
+	const [excluded, setExcluded] = useState(() =>
+		setFrom(initialData, "excluded"),
 	);
-	const [custom, setCustom] = useState(() => new Set(initialSets.custom));
-	const [excluded, setExcluded] = useState(() => new Set(initialSets.excluded));
-	const [whitelisted, setWhitelisted] = useState(
-		() => new Set(initialSets.whitelisted),
+	const [whitelisted, setWhitelisted] = useState(() =>
+		setFrom(initialData, "whitelisted"),
 	);
 	const [revision, setRevision] = useState(initialData.revision);
-	const [queryInput, setQueryInput] = useDraft(search.query ?? "");
 	const [selected, setSelected] = useState(new Set<string>());
 	const [removedUnresolved, setRemovedUnresolved] = useState(new Set<string>());
 	const [dialog, setDialog] = useState<ProposedDialog | null>(null);
@@ -264,7 +318,7 @@ export function SpeciesControlPage({
 		}: {
 			save: NonNullable<typeof onSave>;
 			input: SpeciesControlSaveInput;
-			messages: { success: string; failure: string; destructive?: boolean };
+			messages: CommitMessages;
 			clearSelection: boolean;
 		}) => save(input),
 		onSuccess: async (result, { input, messages, clearSelection }) => {
@@ -288,19 +342,11 @@ export function SpeciesControlPage({
 			else toast.success(messages.success);
 		},
 		onError: (error, { messages }) => {
-			toast.error(error instanceof Error ? error.message : messages.failure);
+			toast.error(errorMessage(error, messages.failure));
 			setDialog(null);
 		},
 	});
-	const pending = commitMutation.isPending;
-
-	const debouncedSetQuery = useDebouncedCallback((value: string) => {
-		onSearchChange({
-			...search,
-			page: 1,
-			query: value.trim() || undefined,
-		});
-	}, 200);
+	const proposed = dialog ? dialogContent(dialog) : null;
 
 	const viewRows = useMemo<SpeciesControlViewRow[]>(
 		() =>
@@ -374,16 +420,6 @@ export function SpeciesControlPage({
 		});
 	}
 
-	function commit(
-		input: SpeciesControlSaveInput,
-		messages: { success: string; failure: string; destructive?: boolean },
-		clearSelection = false,
-	) {
-		if (onSave) {
-			commitMutation.mutate({ save: onSave, input, messages, clearSelection });
-		}
-	}
-
 	function importLists(text: string) {
 		try {
 			const known = new Set(initialData.rows.map((row) => row.sciName));
@@ -395,31 +431,21 @@ export function SpeciesControlPage({
 				const scientific = separator > 0 ? trimmed.slice(0, separator) : "";
 				return known.has(scientific) ? scientific : null;
 			};
+			const importedList = (value: unknown, current: Set<string>) =>
+				new Set(
+					Array.isArray(value)
+						? value
+								.map(normalizeImported)
+								.filter((name): name is string => name !== null)
+						: current,
+				);
 			const parsed = text.trimStart().startsWith("{")
 				? (JSON.parse(text) as Record<string, unknown>)
 				: { custom: text.split(/\r?\n/) };
 			const imported = {
-				custom: Array.isArray(parsed.custom)
-					? new Set(
-							parsed.custom
-								.map(normalizeImported)
-								.filter((value): value is string => value !== null),
-						)
-					: new Set(custom),
-				excluded: Array.isArray(parsed.excluded)
-					? new Set(
-							parsed.excluded
-								.map(normalizeImported)
-								.filter((value): value is string => value !== null),
-						)
-					: new Set(excluded),
-				whitelisted: Array.isArray(parsed.whitelisted)
-					? new Set(
-							parsed.whitelisted
-								.map(normalizeImported)
-								.filter((value): value is string => value !== null),
-						)
-					: new Set(whitelisted),
+				custom: importedList(parsed.custom, custom),
+				excluded: importedList(parsed.excluded, excluded),
+				whitelisted: importedList(parsed.whitelisted, whitelisted),
 			};
 			for (const name of imported.excluded) {
 				imported.custom.delete(name);
@@ -474,26 +500,28 @@ export function SpeciesControlPage({
 				/>
 
 				<div data-layout="species-control-toolbar" className={TOOLBAR_CLASS}>
-					<SearchInput
+					<DebouncedSearchInput
 						aria-label="Search installed species"
 						className={SEARCH_CLASS}
 						placeholder="Search species control..."
-						value={queryInput}
-						onChange={(event) => {
-							const value = event.target.value;
-							setQueryInput(value);
-							debouncedSetQuery(value);
-						}}
-						onClear={() => {
-							setQueryInput("");
-							debouncedSetQuery.cancel();
-							onSearchChange({ ...search, page: 1, query: undefined });
-						}}
+						value={search.query ?? ""}
+						onCommit={(value) =>
+							onSearchChange({
+								...search,
+								page: 1,
+								query: value.trim() || undefined,
+							})
+						}
 					/>
 					<SpeciesControlTools
 						onImport={importLists}
 						onExport={exportLists}
-						onReset={() => setDialog({ kind: "reset" })}
+						onReset={() =>
+							setDialog({
+								kind: "reset",
+								input: speciesControlResetInput(revision),
+							})
+						}
 					/>
 				</div>
 			</div>
@@ -597,88 +625,24 @@ export function SpeciesControlPage({
 				</Card>
 			) : null}
 
-			{dialog?.kind === "status" ? (
-				<SpeciesControlDialog
-					title={`Set ${dialog.count} species to ${dialog.label}?`}
-					description="The selected species will use this status immediately."
-					cancelIcon={X}
-					confirmIcon={Check}
-					confirmLabel={`Apply ${dialog.label}`}
-					pending={pending}
+			{dialog && proposed ? (
+				<ConfirmDialog
+					title={proposed.title}
+					description={proposed.description}
+					confirmIcon={proposed.confirmIcon}
+					confirmLabel={proposed.confirmLabel}
+					destructive={proposed.messages.destructive}
+					pending={commitMutation.isPending}
 					onCancel={() => setDialog(null)}
-					onConfirm={() =>
-						commit(
-							dialog.input,
-							{
-								success: `Set ${dialog.count} species to ${dialog.label}.`,
-								failure: "Species statuses could not be saved.",
-							},
-							true,
-						)
-					}
-				/>
-			) : null}
-			{dialog?.kind === "import" ? (
-				<SpeciesControlDialog
-					title="Import these species lists?"
-					description="The imported statuses will replace the current lists immediately."
-					cancelIcon={X}
-					confirmIcon={Check}
-					confirmLabel="Import lists"
-					pending={pending}
-					onCancel={() => setDialog(null)}
-					onConfirm={() =>
-						commit(
-							dialog.input,
-							{
-								success: "Imported the species lists.",
-								failure: "Species lists could not be imported.",
-							},
-							true,
-						)
-					}
-				/>
-			) : null}
-			{dialog?.kind === "remove-unresolved" ? (
-				<SpeciesControlDialog
-					title="Remove this unmatched entry?"
-					description={`${dialog.raw} will be removed from its species list immediately.`}
-					cancelIcon={X}
-					confirmIcon={Trash2}
-					confirmLabel="Remove entry"
-					destructive
-					pending={pending}
-					onCancel={() => setDialog(null)}
-					onConfirm={() =>
-						commit(dialog.input, {
-							success: `Removed ${dialog.raw}.`,
-							failure: "The unmatched entry could not be removed.",
-							destructive: true,
-						})
-					}
-				/>
-			) : null}
-			{dialog?.kind === "reset" ? (
-				<SpeciesControlDialog
-					title="Reset all species lists?"
-					description="This immediately clears the Custom, Never detect, and Always detect lists. This action cannot be undone."
-					cancelIcon={X}
-					confirmIcon={RotateCcw}
-					confirmLabel="Reset lists"
-					destructive
-					pending={pending}
-					onCancel={() => setDialog(null)}
-					onConfirm={() =>
-						commit(
-							speciesControlResetInput(revision),
-							{
-								success: "Cleared all species lists.",
-								failure: "Species lists could not be reset.",
-								destructive: true,
-							},
-							true,
-						)
-					}
+					onConfirm={() => {
+						if (!onSave) return;
+						commitMutation.mutate({
+							save: onSave,
+							input: dialog.input,
+							messages: proposed.messages,
+							clearSelection: proposed.clearSelection,
+						});
+					}}
 				/>
 			) : null}
 		</PageWrap>

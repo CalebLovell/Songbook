@@ -1,5 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type * as React from "react";
+import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
+import { ShellSized } from "~/components/ui/shell.tsx";
 import { useDraft } from "~/lib/use-draft.ts";
 import { cn } from "~/lib/utils.ts";
 
@@ -44,7 +46,7 @@ export function PageStepper({
 			className={cn(
 				"flex h-8 pointer-coarse:h-9 w-fit shrink-0 pointer-coarse:text-base text-sm max-[359px]:min-w-0 max-[359px]:shrink",
 				variant === "outline" &&
-					"overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring",
+					cn(JOINED_CONTROL_CLASS, "focus-within:border-focus-ring"),
 				className,
 			)}
 		>
@@ -85,6 +87,32 @@ export function PageStepper({
 				onClick={() => onPageChange(page + 1)}
 			/>
 		</nav>
+	);
+}
+
+export function PageStepperShell({
+	page,
+	pageCount,
+	label,
+	variant,
+}: {
+	page: number;
+	pageCount: number;
+	label?: string;
+	variant?: "outline" | "ghost";
+}) {
+	return (
+		<span className="ml-auto">
+			<ShellSized className="rounded-md">
+				<PageStepper
+					variant={variant}
+					label={label}
+					page={page}
+					pageCount={pageCount}
+					onPageChange={() => {}}
+				/>
+			</ShellSized>
+		</span>
 	);
 }
 

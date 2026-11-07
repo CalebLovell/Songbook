@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { beforeEach, test } from "node:test";
 
+import { FRESH_PROGRESS } from "~/lib/learn-progress.ts";
 import type { LearnRound } from "~/lib/learn-round.ts";
 import {
-	FRESH_PROGRESS,
 	loadResumableGame,
 	loadSavedGame,
 	type SavedGame,
@@ -55,7 +55,13 @@ test("a saved game comes back as it was, for its own pool only", () => {
 });
 
 test("a save that can't drive the game reads as none", () => {
-	sessionStorage.setItem("learn-game:v1:rare", "{not json");
+	sessionStorage.setItem("learn-game:v2:rare", "{not json");
+	assert.equal(loadSavedGame("rare"), null);
+
+	sessionStorage.setItem(
+		"learn-game:v2:rare",
+		JSON.stringify({ round, progress: { ...game.progress, phase: "bored" } }),
+	);
 	assert.equal(loadSavedGame("rare"), null);
 
 	saveGame("rare", { round, progress: { ...game.progress, index: 2 } });

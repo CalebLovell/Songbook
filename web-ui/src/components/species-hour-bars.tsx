@@ -1,4 +1,5 @@
 import { heatColorAt } from "~/lib/heatmap.ts";
+import { plural } from "~/lib/number-format.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
@@ -48,7 +49,7 @@ export function SpeciesHourBars({
 						<div
 							key={`bar-${hour}`}
 							data-hour-bar=""
-							title={`${hourLabel(hour)} — ${count.toLocaleString()} ${count === 1 ? "detection" : "detections"}`}
+							title={`${hourLabel(hour)} — ${count.toLocaleString()} ${plural(count, "detection")}`}
 							className="flex-1 rounded-t-[1px]"
 							style={
 								isZero

@@ -1,4 +1,4 @@
-import { and, lt, sql } from "drizzle-orm";
+import { and, between, gt, lt, type SQL, sql } from "drizzle-orm";
 
 import { db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
@@ -73,42 +73,33 @@ export async function loadTimelineNav(
 	period: TimelinePeriod,
 	window: TimelineWindow | null,
 ): Promise<TimelineNav> {
-	const [[neighbours], [stationBounds]] = await Promise.all([
+	const edgeDay = async (edge: SQL, where?: SQL) => {
+		const [row] = await db
+			.select({ day: sql<string | null>`${edge}` })
+			.from(detections)
+			.where(where);
+		return row.day;
+	};
+	const earliest = sql`min(${detections.Date})`;
+	const latest = sql`max(${detections.Date})`;
+
+	const [prev, next, inside, first, last] = await Promise.all([
+		window ? edgeDay(latest, lt(detections.Date, window.start)) : null,
+		window ? edgeDay(earliest, gt(detections.Date, window.end)) : null,
 		window
-			? db
-					.select({
-						prev: sql<
-							string | null
-						>`max(case when ${detections.Date} < ${window.start} then ${detections.Date} end)`,
-						next: sql<
-							string | null
-						>`min(case when ${detections.Date} > ${window.end} then ${detections.Date} end)`,
-						inside: sql<
-							string | null
-						>`max(case when ${detections.Date} between ${window.start} and ${window.end} then ${detections.Date} end)`,
-					})
-					.from(detections)
-			: Promise.resolve([{ prev: null, next: null, inside: null }]),
-		db
-			.select({
-				first: sql<string | null>`min(${detections.Date})`,
-				last: sql<string | null>`max(${detections.Date})`,
-			})
-			.from(detections),
+			? edgeDay(latest, between(detections.Date, window.start, window.end))
+			: null,
+		edgeDay(earliest),
+		edgeDay(latest),
 	]);
 
 	return {
 		window,
-		prevAnchor: neighbours.prev ? anchorForDay(period, neighbours.prev) : null,
-		nextAnchor: neighbours.next ? anchorForDay(period, neighbours.next) : null,
-		lastActiveDay: window
-			? (neighbours.inside ?? neighbours.next ?? neighbours.prev)
-			: stationBounds.last,
-		stationRange:
-			stationBounds.first && stationBounds.last
-				? { first: stationBounds.first, last: stationBounds.last }
-				: null,
-		hasAnyDetections: stationBounds.first !== null,
+		prevAnchor: prev ? anchorForDay(period, prev) : null,
+		nextAnchor: next ? anchorForDay(period, next) : null,
+		lastActiveDay: window ? (inside ?? next ?? prev) : last,
+		stationRange: first && last ? { first, last } : null,
+		hasAnyDetections: first !== null,
 	};
 }
 
@@ -136,64 +127,58 @@ export async function loadTimelineData({
 		period === "all" ? [] : precedingWindows(period, anchor, longest);
 	const tallyFrom = beforeWindows.at(-1)?.start ?? window?.start ?? null;
 
-	const [rows, tallyRows, beforeRows, lifetimeRows, streakRows, nav] =
-		await Promise.all([
-			db
-				.select({
-					comName: detections.Com_Name,
-					sciName: detections.Sci_Name,
-					hour: sql<string>`strftime('%H', ${detections.Time})`,
-					count: sql<number>`count(*)`,
-				})
-				.from(detections)
-				.where(inWindow)
-				.groupBy(
-					detections.Com_Name,
-					detections.Sci_Name,
-					sql`strftime('%H', ${detections.Time})`,
-				),
-			db
-				.select({
-					date: detections.Date,
-					comName: detections.Com_Name,
-					count: sql<number>`count(*)`,
-				})
-				.from(detections)
-				.where(
-					window && tallyFrom
-						? and(
-								sql`${detections.Date} >= ${tallyFrom}`,
-								sql`${detections.Date} <= ${window.end}`,
-							)
-						: undefined,
-				)
-				.groupBy(detections.Date, detections.Com_Name),
-			window
-				? db
-						.select({
-							comName: detections.Com_Name,
-							lastBefore: sql<string>`max(${detections.Date})`,
-						})
-						.from(detections)
-						.where(lt(detections.Date, window.start))
-						.groupBy(detections.Com_Name)
-				: Promise.resolve([]),
-			db
-				.select({
-					comName: detections.Com_Name,
-					lifetime: sql<number>`count(*)`,
-				})
-				.from(detections)
-				.groupBy(detections.Com_Name),
-			period === "day" && window
-				? db
-						.select({ date: detections.Date, comName: detections.Com_Name })
-						.from(detections)
-						.where(lt(detections.Date, window.start))
-						.groupBy(detections.Date, detections.Com_Name)
-				: Promise.resolve([]),
-			loadTimelineNav(period, window),
-		]);
+	const [rows, tallyRows, historyRows, streakRows, nav] = await Promise.all([
+		db
+			.select({
+				comName: detections.Com_Name,
+				sciName: detections.Sci_Name,
+				hour: sql<string>`strftime('%H', ${detections.Time})`,
+				count: sql<number>`count(*)`,
+			})
+			.from(detections)
+			.where(inWindow)
+			.groupBy(
+				detections.Com_Name,
+				detections.Sci_Name,
+				sql`strftime('%H', ${detections.Time})`,
+			),
+		db
+			.select({
+				date: detections.Date,
+				comName: detections.Com_Name,
+				count: sql<number>`count(*)`,
+			})
+			.from(detections)
+			.where(
+				window && tallyFrom
+					? and(
+							sql`${detections.Date} >= ${tallyFrom}`,
+							sql`${detections.Date} <= ${window.end}`,
+						)
+					: undefined,
+			)
+			.groupBy(detections.Date, detections.Com_Name),
+		db
+			.select({
+				comName: detections.Com_Name,
+				lifetime: sql<number>`count(*)`,
+				lastBefore: window
+					? sql<
+							string | null
+						>`max(case when ${detections.Date} < ${window.start} then ${detections.Date} end)`
+					: sql<string | null>`null`,
+			})
+			.from(detections)
+			.groupBy(detections.Com_Name),
+		period === "day" && window
+			? db
+					.select({ date: detections.Date, comName: detections.Com_Name })
+					.from(detections)
+					.where(lt(detections.Date, window.start))
+					.groupBy(detections.Date, detections.Com_Name)
+			: Promise.resolve([]),
+		loadTimelineNav(period, window),
+	]);
 
 	const bySpecies = new Map<
 		string,
@@ -238,14 +223,17 @@ export async function loadTimelineData({
 
 	const awayDays = new Map<string, number>();
 	const silentDays = new Map<string, number>();
-	for (const { comName, lastBefore } of beforeRows) {
+	const heardBefore = new Set<string>();
+	for (const { comName, lastBefore } of historyRows) {
+		if (lastBefore === null) continue;
+		heardBefore.add(comName);
 		const firstDay = firstDayByName.get(comName);
 		if (firstDay) awayDays.set(comName, daysInRange(lastBefore, firstDay) - 1);
 		else silentDays.set(comName, daysInRange(lastBefore, windowEnd) - 1);
 	}
 
 	const lifetimeByName = new Map(
-		lifetimeRows.map((row) => [row.comName, row.lifetime]),
+		historyRows.map((row) => [row.comName, row.lifetime]),
 	);
 	const hourCounts = Array.from({ length: 24 }, (_, hour) =>
 		Array.from(bySpecies.values()).reduce(
@@ -268,7 +256,7 @@ export async function loadTimelineData({
 
 			hourCounts,
 			lifetime: lifetimeByName,
-			heardBefore: new Set(beforeRows.map((row) => row.comName)),
+			heardBefore,
 			awayDays,
 			silentDays,
 		},

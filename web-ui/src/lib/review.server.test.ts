@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import * as fileSystem from "node:fs/promises";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -248,7 +247,6 @@ test("recategorizing a shared recording copies assets for the selected row", asy
 	mkdirSync(oldDir, { recursive: true });
 	const oldAudio = path.join(oldDir, "Scarlet_Tanager-a.mp3");
 	writeFileSync(oldAudio, "shared audio");
-	writeFileSync(`${oldAudio}.png`, "shared image");
 	await recategorizeDetection(
 		database,
 		root,
@@ -265,8 +263,6 @@ test("recategorizing a shared recording copies assets for the selected row", asy
 	);
 	assert.equal(readFileSync(oldAudio, "utf8"), "shared audio");
 	assert.equal(readFileSync(newAudio, "utf8"), "shared audio");
-	assert.equal(existsSync(`${oldAudio}.png`), true);
-	assert.equal(existsSync(`${newAudio}.png`), true);
 	assert.equal(
 		database.prepare("SELECT Confidence FROM detections WHERE rowid=1").get()
 			?.Confidence,
@@ -281,14 +277,16 @@ test("recategorizing a shared recording copies assets for the selected row", asy
 	database.close();
 });
 
-test("recategorization restores audio when moving the spectrogram fails", async () => {
+test("recategorization restores audio when updating the detection fails", async () => {
 	const database = fixture();
+	database.exec(
+		"CREATE TRIGGER locked BEFORE UPDATE ON detections BEGIN SELECT RAISE(ABORT, 'detection locked'); END",
+	);
 	const root = await mkdtemp(path.join(tmpdir(), "birdnet-review-rollback-"));
 	const oldDir = path.join(root, "By_Date", "2026-07-27", "Scarlet_Tanager");
 	mkdirSync(oldDir, { recursive: true });
 	const oldAudio = path.join(oldDir, "Scarlet_Tanager-a.mp3");
 	writeFileSync(oldAudio, "audio");
-	writeFileSync(`${oldAudio}.png`, "image");
 	await assert.rejects(
 		recategorizeDetection(
 			database,
@@ -296,19 +294,10 @@ test("recategorization restores audio when moving the spectrogram fails", async 
 			1,
 			{ sciName: "Cyanocitta cristata", comName: "Blue Jay" },
 			[{ sciName: "Cyanocitta cristata", comName: "Blue Jay" }],
-			{
-				...fileSystem,
-				rename: async (oldPath, newPath) => {
-					if (oldPath.toString().endsWith(".png"))
-						throw new Error("spectrogram locked");
-					await fileSystem.rename(oldPath, newPath);
-				},
-			},
 		),
-		/spectrogram locked/,
+		/detection locked/,
 	);
 	assert.equal(readFileSync(oldAudio, "utf8"), "audio");
-	assert.equal(existsSync(`${oldAudio}.png`), true);
 	assert.equal(
 		database.prepare("SELECT Com_Name FROM detections WHERE rowid=1").get()
 			?.Com_Name,

@@ -158,7 +158,12 @@ export const getSpeciesVisits = createServerFn({ method: "GET" })
 
 export type SpeciesDetailResult =
 	| { status: "detected"; detail: SpeciesDetail }
-	| { status: "undetected"; comName: string; sciName: string }
+	| {
+			status: "undetected";
+			comName: string;
+			sciName: string;
+			speciesLink: SpeciesLink | null;
+	  }
 	| { status: "unknown" };
 
 async function resolveCatalogSpecies(
@@ -179,6 +184,7 @@ async function missToResult(slug: string): Promise<SpeciesDetailResult> {
 		status: "undetected",
 		comName: known.comName,
 		sciName: known.sciName,
+		speciesLink: speciesLinkFor(known.sciName),
 	};
 }
 

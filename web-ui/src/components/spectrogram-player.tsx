@@ -12,7 +12,7 @@ import {
 
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { recordingActionLabel } from "~/components/recording-button.tsx";
-import { Spectrogram } from "~/components/spectrogram.tsx";
+import { clamp01, Spectrogram } from "~/components/spectrogram.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
@@ -68,7 +68,7 @@ export function SpectrogramPlayer({
 	durationRef.current = duration;
 
 	function paint(fraction: number) {
-		const clamped = Math.min(Math.max(fraction, 0), 1);
+		const clamped = clamp01(fraction);
 		const seconds = clamped * (durationRef.current ?? 0);
 		if (playheadRef.current)
 			playheadRef.current.style.transform = `translateX(${clamped * 100}%)`;
@@ -100,6 +100,7 @@ export function SpectrogramPlayer({
 		fetchAudioBlob(audioUrl).then(
 			(blob) => {
 				if (cancelled) return;
+				if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
 				objectUrlRef.current = URL.createObjectURL(blob);
 				audio.addEventListener(
 					"loadedmetadata",
@@ -169,7 +170,7 @@ export function SpectrogramPlayer({
 	}, []);
 
 	function seekTo(fraction: number) {
-		const clamped = Math.min(Math.max(fraction, 0), 1);
+		const clamped = clamp01(fraction);
 		const audio = audioRef.current;
 		if (audio && audio.duration > 0)
 			audio.currentTime = clamped * audio.duration;
@@ -308,6 +309,7 @@ export function SpectrogramPlayer({
 					if (!audioRef.current?.ended) dispatch({ type: "mediaPaused" });
 				}}
 				onEnded={() => dispatch({ type: "mediaEnded" })}
+				onError={() => dispatch({ type: "loadFailed" })}
 				onSeeking={() => {
 					if (state.status !== "playing") paintFromAudio();
 				}}

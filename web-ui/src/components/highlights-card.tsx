@@ -31,6 +31,7 @@ import type {
 	HighlightBird,
 	SpeciesHighlightKind,
 } from "~/lib/highlights-data.ts";
+import { plural } from "~/lib/number-format.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 
 export function HighlightsCard({
@@ -207,7 +208,7 @@ function ActivityNote({
 	tip?: HighlightGuideEntry;
 }) {
 	const { direction, percent, baselineLabel, count, delta } = highlight;
-	const noun = (n: number) => (n === 1 ? "detection" : "detections");
+	const noun = (n: number) => plural(n, "detection");
 
 	return (
 		<Note

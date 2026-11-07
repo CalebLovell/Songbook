@@ -8,6 +8,7 @@ import type { StationHealth } from "~/lib/health-data.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import type { SettingsPageData } from "~/lib/settings-data.ts";
 import type { UpdateState } from "~/lib/updates-data.ts";
+import { errorMessage } from "~/lib/utils.ts";
 import { RestartButton } from "./restart-button.tsx";
 import {
 	SettingsCards,
@@ -31,12 +32,10 @@ async function restartWithToast(onRestart: SettingsRestarter) {
 		toast.success(result.message, { id: RESTART_TOAST_ID });
 		return true;
 	} catch (error) {
-		toast.warning(
-			error instanceof Error
-				? error.message
-				: "BirdNET could not be restarted.",
-			{ id: RESTART_TOAST_ID, duration: 10_000 },
-		);
+		toast.warning(errorMessage(error, "BirdNET could not be restarted."), {
+			id: RESTART_TOAST_ID,
+			duration: 10_000,
+		});
 		return false;
 	}
 }
@@ -65,6 +64,7 @@ export function SettingsPage({
 	onInstallUpdate?: () => Promise<void>;
 }) {
 	const [needsRestart, setNeedsRestart] = useState(false);
+	const [factoryResets, setFactoryResets] = useState(0);
 	const [settingToReveal, setSettingToReveal] = useState<SettingsTab | null>(
 		null,
 	);
@@ -74,17 +74,6 @@ export function SettingsPage({
 		document.getElementById(settingToReveal)?.scrollIntoView();
 		setSettingToReveal(null);
 	}, [settingToReveal, tab]);
-
-	const loadedValues = JSON.stringify([
-		data.station,
-		data.detection,
-		data.audio,
-		data.recording,
-		data.storage,
-		data.review,
-		data.highlights,
-		data.updates,
-	]);
 
 	return (
 		<PageWrap className="space-y-page">
@@ -111,6 +100,7 @@ export function SettingsPage({
 									<SettingsReset
 										onReset={async () => {
 											const outcome = await onReset();
+											setFactoryResets((count) => count + 1);
 											setNeedsRestart(outcome.needsRestart);
 											if (outcome.needsRestart) {
 												toast.warning(outcome.message, {
@@ -141,7 +131,7 @@ export function SettingsPage({
 				}}
 			/>
 			<SettingsCards
-				key={loadedValues}
+				key={factoryResets}
 				tab={tab}
 				data={data}
 				savers={savers}

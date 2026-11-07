@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
-export type LiveAudioState =
-	| "idle"
-	| "connecting"
-	| "playing"
-	| "paused"
-	| "offline";
+import {
+	CONNECT_TIMEOUT_MS,
+	INITIAL_LIVE_AUDIO_STATE,
+	liveAudioTransition,
+	STALL_TIMEOUT_MS,
+} from "~/lib/live-audio-machine.ts";
 
 const MIN_GAIN_PERCENT = 100;
 const MAX_GAIN_PERCENT = 400;
@@ -18,29 +18,40 @@ export function useLiveAudio(streamUrl: string) {
 	const compressorRef = useRef<DynamicsCompressorNode | null>(null);
 	const analyserRef = useRef<AnalyserNode | null>(null);
 
-	const [state, setState] = useState<LiveAudioState>("idle");
+	const [state, dispatch] = useReducer(
+		liveAudioTransition,
+		INITIAL_LIVE_AUDIO_STATE,
+	);
 	const [gainPercent, setGainPercentState] = useState(MIN_GAIN_PERCENT);
 	const [compression, setCompressionState] = useState(false);
 	const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
-	const [hasFailed, setHasFailed] = useState(false);
 	const connectStartedAt = useRef(0);
-	const failTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
-		undefined,
-	);
 
-	const fail = useCallback(() => {
-		clearTimeout(failTimer.current);
-		const wait = connectStartedAt.current + MIN_CONNECTING_MS - Date.now();
-		const goOffline = () => {
-			setState("offline");
-			setHasFailed(true);
-		};
-		if (wait <= 0) {
-			goOffline();
-			return;
-		}
-		failTimer.current = setTimeout(goOffline, wait);
-	}, []);
+	useEffect(() => {
+		const { status } = state;
+		const timer =
+			status === "connecting"
+				? setTimeout(
+						() => dispatch({ type: "connectTimedOut" }),
+						CONNECT_TIMEOUT_MS,
+					)
+				: status === "stalled"
+					? setTimeout(
+							() => dispatch({ type: "stallTimedOut" }),
+							STALL_TIMEOUT_MS,
+						)
+					: status === "failing"
+						? setTimeout(
+								() => dispatch({ type: "failureShown" }),
+								connectStartedAt.current + MIN_CONNECTING_MS - Date.now(),
+							)
+						: undefined;
+		return () => clearTimeout(timer);
+	}, [state]);
+
+	useEffect(() => {
+		if (state.status === "offline") audioRef.current?.pause();
+	}, [state.status]);
 
 	const relink = useCallback((withCompression: boolean) => {
 		const gain = gainRef.current;
@@ -84,22 +95,22 @@ export function useLiveAudio(streamUrl: string) {
 	const play = useCallback(async () => {
 		const audio = audioRef.current;
 		if (!audio) return;
-		clearTimeout(failTimer.current);
+		const reconnect = state.status === "offline";
 		connectStartedAt.current = Date.now();
-		setState("connecting");
+		dispatch({ type: "listen" });
 		try {
 			const session = (navigator as { audioSession?: { type: string } })
 				.audioSession;
 			if (session) session.type = "playback";
 			ensureGraph();
 			if (!audio.src) audio.src = streamUrl;
-			else if (audio.error) audio.load();
+			else if (reconnect || audio.error) audio.load();
 			// Both start inside the tap: iOS Safari refuses a play() after an awaited resume().
 			await Promise.all([ctxRef.current?.resume(), audio.play()]);
 		} catch {
-			fail();
+			dispatch({ type: "failed" });
 		}
-	}, [ensureGraph, fail, streamUrl]);
+	}, [ensureGraph, state.status, streamUrl]);
 
 	const pause = useCallback(() => {
 		audioRef.current?.pause();
@@ -132,7 +143,6 @@ export function useLiveAudio(streamUrl: string) {
 
 	useEffect(() => {
 		return () => {
-			clearTimeout(failTimer.current);
 			ctxRef.current?.close();
 			ctxRef.current = null;
 			gainRef.current = null;
@@ -144,7 +154,6 @@ export function useLiveAudio(streamUrl: string) {
 	return {
 		audioRef,
 		state,
-		hasFailed,
 		gainPercent,
 		setGainPercent,
 		compression,
@@ -152,13 +161,9 @@ export function useLiveAudio(streamUrl: string) {
 		analyser,
 		play,
 		pause,
-		onPlaying: () => {
-			setState("playing");
-			setHasFailed(false);
-		},
-		onPause: () =>
-			setState((s) => (s === "offline" || s === "connecting" ? s : "paused")),
-		onError: fail,
-		onWaiting: () => setState((s) => (s === "playing" ? s : "connecting")),
+		onPlaying: () => dispatch({ type: "mediaPlaying" }),
+		onPause: () => dispatch({ type: "mediaPaused" }),
+		onError: () => dispatch({ type: "failed" }),
+		onWaiting: () => dispatch({ type: "mediaWaiting" }),
 	};
 }

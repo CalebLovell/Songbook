@@ -1,6 +1,7 @@
 import type { AnyRouter } from "@tanstack/react-router";
 
 import { getUnlockStatusFn } from "~/lib/auth.ts";
+import { refreshAllData } from "~/lib/query-client.ts";
 
 export type UnlockStatus = Awaited<ReturnType<typeof getUnlockStatusFn>>;
 
@@ -38,7 +39,9 @@ export async function unlockStatusForNavigation(): Promise<UnlockStatus> {
 	const shown = known;
 	fetchStatus().then(
 		(fresh) => {
-			if (!sameStatus(fresh, shown)) void router?.invalidate();
+			if (!sameStatus(fresh, shown) && router) {
+				void refreshAllData(router, router.options.context.queryClient);
+			}
 		},
 		() => {},
 	);

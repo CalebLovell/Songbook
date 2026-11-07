@@ -1,10 +1,13 @@
 import { Download, type LucideIcon, RotateCcw, Upload } from "lucide-react";
 import { useRef } from "react";
 
+import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
+import { cn } from "~/lib/utils.ts";
+
 const GROUP_CLASS =
-	"flex h-8.5 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card pointer-coarse:text-base text-sm @min-[38rem]:self-auto self-start lg:ml-auto";
+	"h-8.5 pointer-coarse:h-9 w-fit shrink-0 pointer-coarse:text-base text-sm @min-[38rem]:self-auto self-start lg:ml-auto";
 const SEGMENT_CLASS =
-	"flex items-center gap-2 @max-[30rem]:px-3 px-3.5 hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:-outline-offset-2 [&+&]:border-input [&+&]:border-l";
+	"flex items-center gap-2 @max-[30rem]:px-3 px-3.5 hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent [&+&]:border-input [&+&]:border-l";
 const LISTS_WORD = "@max-[30rem]:hidden";
 
 export function SpeciesControlTools({
@@ -18,7 +21,7 @@ export function SpeciesControlTools({
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	return (
-		<div className={GROUP_CLASS}>
+		<div className={cn(JOINED_CONTROL_CLASS, GROUP_CLASS)}>
 			<input
 				ref={inputRef}
 				className="sr-only"

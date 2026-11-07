@@ -60,6 +60,17 @@ export function shareTotals({
 
 const MEDALS = ["🥇", "🥈", "🥉"] as const;
 
+export function shareLeaderboard(
+	ranked: { comName: string; count: number }[],
+): string[] {
+	return ranked
+		.slice(0, MEDALS.length)
+		.map(
+			({ comName, count }, index) =>
+				`${MEDALS[index]}  ${comName} · ${count.toLocaleString()}`,
+		);
+}
+
 export function formatShareCard(card: ShareCard): string {
 	const window = card.window ?? "rolling";
 	const header = shareHeader(
@@ -82,12 +93,7 @@ export function formatShareCard(card: ShareCard): string {
 		highlights: card.highlights ?? [],
 	});
 
-	const leaderboard = card.topSpecies
-		.slice(0, MEDALS.length)
-		.map(
-			(species, index) =>
-				`${MEDALS[index]}  ${species.comName} · ${species.count.toLocaleString()}`,
-		);
+	const leaderboard = shareLeaderboard(card.topSpecies);
 
 	const highlights = formatHighlightLines(card.highlights ?? []);
 

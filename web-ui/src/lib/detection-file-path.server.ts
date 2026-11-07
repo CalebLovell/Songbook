@@ -1,5 +1,6 @@
 import "@tanstack/react-start/server-only";
 
+import { rm } from "node:fs/promises";
 import path from "node:path";
 
 import { commonNameSafe } from "~/lib/audio.ts";
@@ -38,4 +39,20 @@ export function resolveDetectionClipPath(
 	);
 
 	return candidate.startsWith(`${resolvedRoot}${path.sep}`) ? candidate : null;
+}
+
+export async function removeClipFile(
+	root: string,
+	clip: DetectionClipIdentity,
+): Promise<"deleted" | "missing" | "failed"> {
+	const filePath = resolveDetectionClipPath(root, clip);
+	if (!filePath) return "failed";
+	try {
+		await rm(filePath);
+		return "deleted";
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code === "ENOENT"
+			? "missing"
+			: "failed";
+	}
 }

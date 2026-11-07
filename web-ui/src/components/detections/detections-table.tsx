@@ -8,20 +8,22 @@ import {
 } from "@tanstack/react-table";
 import { ArrowRight, Calendar, Trash2, X } from "lucide-react";
 import { type CSSProperties, type ReactNode, useId } from "react";
-import { useDebouncedCallback } from "use-debounce";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
+import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
 import {
 	PAGE_RANGE_CLASS,
 	PAGE_RANGE_NARROW_HIDDEN,
 	PAGE_RANGE_YIELDS_TO_ACTIONS,
 	PageRange,
 	PageStepper,
+	PageStepperShell,
 } from "~/components/ui/page-stepper.tsx";
 import { RowCheckbox } from "~/components/ui/row-checkbox.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
-import { SearchInput } from "~/components/ui/search-input.tsx";
+import { DebouncedSearchInput } from "~/components/ui/search-input.tsx";
+import { SelectionBar } from "~/components/ui/selection-bar.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { SkipLink } from "~/components/ui/skip-link.tsx";
 import {
@@ -35,20 +37,21 @@ import {
 } from "~/components/ui/table.tsx";
 import { SortButton, SortMenu } from "~/components/ui/table-sort.tsx";
 import { audioUrlFor } from "~/lib/audio.ts";
-import { formatDate, formatDateTime } from "~/lib/date-format.ts";
+import { formatDate, formatDateTime, formatTime } from "~/lib/date-format.ts";
 import {
 	DETECTION_DEFAULT_DIRECTION,
 	DETECTION_SORTS,
+	DETECTIONS_PAGE_SIZE,
 	type DetectionWorkspaceSearch,
 	type DetectionWorkspaceSort,
 	detectionRowKey,
 	nextDetectionSort,
 } from "~/lib/detection-workspace.ts";
 import type { DetectionPage, DetectionTableRow } from "~/lib/detections.ts";
+import { plural } from "~/lib/number-format.ts";
 import { useShiftClickRange } from "~/lib/shift-click-range.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
-import { useDraft } from "~/lib/use-draft.ts";
 import { cn } from "~/lib/utils.ts";
 
 type DetectionsTableProps = {
@@ -105,18 +108,6 @@ function gridColumns(canDelete: boolean, canListen: boolean): CSSProperties {
 	} as CSSProperties;
 }
 
-function recordedLabel(row: DetectionTableRow): string {
-	return formatDateTime(row.Date, row.Time);
-}
-
-function clockLabel(row: DetectionTableRow): string {
-	return formatDateTime(row.Date, row.Time).split(", ").at(-1) ?? row.Time;
-}
-
-function dayLabel(row: DetectionTableRow): string {
-	return formatDate(row.Date);
-}
-
 const LISTEN_LABEL = "hidden @xl:inline";
 const LISTEN_SQUARE = "@max-xl:w-7 @max-xl:px-0";
 
@@ -142,13 +133,15 @@ function DateRangeFilter({
 	return (
 		<fieldset
 			aria-label="Date range"
-			className="flex h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring"
+			className={cn(
+				JOINED_CONTROL_CLASS,
+				"h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 focus-within:border-focus-ring",
+			)}
 		>
 			<DateSegment
 				label="From date"
 				value={from}
 				max={to}
-				showIcon
 				onChange={(value) => onChange({ from: value, to })}
 			/>
 			<span
@@ -161,7 +154,6 @@ function DateRangeFilter({
 				label="To date"
 				value={to}
 				min={from}
-				showIcon
 				onChange={(value) => onChange({ from, to: value })}
 			/>
 			<button
@@ -183,24 +175,20 @@ function DateSegment({
 	value,
 	min,
 	max,
-	showIcon = false,
 	onChange,
 }: {
 	label: string;
 	value: string | undefined;
 	min?: string;
 	max?: string;
-	showIcon?: boolean;
 	onChange: (value: string | undefined) => void;
 }) {
 	return (
 		<div className="relative flex min-w-0 @min-[38rem]:flex-none flex-1 items-center @min-[38rem]:justify-start justify-center gap-2 @min-[38rem]:px-3 px-2 pointer-coarse:text-base text-sm transition-colors hover:bg-accent max-[400px]:px-1">
-			{showIcon ? (
-				<Calendar
-					className="size-4 shrink-0 text-muted-foreground max-[400px]:hidden"
-					aria-hidden="true"
-				/>
-			) : null}
+			<Calendar
+				className="size-4 shrink-0 text-muted-foreground max-[400px]:hidden"
+				aria-hidden="true"
+			/>
 			<span
 				className={`@min-[38rem]:min-w-26 truncate whitespace-nowrap max-[400px]:text-sm ${value ? "" : "text-muted-foreground"}`}
 			>
@@ -248,7 +236,7 @@ function ariaSortFor(
 	return search.direction === "asc" ? "ascending" : "descending";
 }
 
-function SelectionBar({
+function DetectionSelectionBar({
 	count,
 	onClear,
 	onDelete,
@@ -257,37 +245,23 @@ function SelectionBar({
 	onClear: () => void;
 	onDelete: () => void;
 }) {
-	const noun = count === 1 ? "detection" : "detections";
 	return (
-		<fieldset
-			aria-label="Selected detections"
-			className="flex h-8 pointer-coarse:h-9 w-fit shrink-0 overflow-hidden rounded-md border border-input bg-card text-sm *:focus-visible:-outline-offset-2"
+		<SelectionBar
+			label="Selected detections"
+			count={count}
+			onClear={onClear}
+			className="shrink-0"
 		>
-			<span className="flex items-center gap-[0.5ch] @xl:px-3 px-2 text-muted-foreground">
-				<span className="font-semibold text-foreground tabular-nums">
-					{count}
-				</span>
-				<span className="sr-only @xl:not-sr-only">selected</span>
-			</span>
 			<button
 				type="button"
-				aria-label="Clear selection"
-				title="Clear selection"
-				onClick={onClear}
-				className="flex pointer-coarse:w-9 w-8 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-			>
-				<X className="size-4" aria-hidden="true" />
-			</button>
-			<button
-				type="button"
-				aria-label={`Delete ${count} selected ${noun}`}
+				aria-label={`Delete ${count} selected ${plural(count, "detection")}`}
 				onClick={onDelete}
 				className="flex @xl:w-auto pointer-coarse:w-9 w-8 items-center justify-center gap-2 border-input border-l @xl:px-3 text-destructive hover:bg-destructive/10"
 			>
 				<Trash2 className="size-4" aria-hidden="true" />
 				<span className="sr-only @xl:not-sr-only">Delete</span>
 			</button>
-		</fieldset>
+		</SelectionBar>
 	);
 }
 
@@ -299,29 +273,16 @@ export function DetectionsFilters({
 		onSearchChange({ ...search, ...change });
 	}
 
-	const [queryInput, setQueryInput] = useDraft(search.species ?? "");
-
-	const debouncedSetQuery = useDebouncedCallback((value: string) => {
-		updateSearch({ page: 1, species: value || undefined });
-	}, 200);
-
 	return (
 		<div className="@container">
 			<div className="flex @min-[38rem]:flex-row flex-col @min-[38rem]:items-center @min-[38rem]:justify-between gap-page">
-				<SearchInput
+				<DebouncedSearchInput
 					aria-label="Search detections"
 					placeholder="Search detections..."
-					value={queryInput}
-					onChange={(event) => {
-						const value = event.target.value;
-						setQueryInput(value);
-						debouncedSetQuery(value);
-					}}
-					onClear={() => {
-						setQueryInput("");
-						debouncedSetQuery.cancel();
-						updateSearch({ page: 1, species: undefined });
-					}}
+					value={search.species ?? ""}
+					onCommit={(value) =>
+						updateSearch({ page: 1, species: value || undefined })
+					}
 				/>
 				<div className="@min-[38rem]:w-auto w-full">
 					<DateRangeFilter
@@ -336,7 +297,7 @@ export function DetectionsFilters({
 }
 
 const SKELETON_ROWS = Array.from(
-	{ length: 100 },
+	{ length: DETECTIONS_PAGE_SIZE },
 	() => ({}) as DetectionTableRow,
 );
 
@@ -449,12 +410,7 @@ export function DetectionsTable({
 	}
 
 	function sortBy(sort: DetectionWorkspaceSort) {
-		const next = nextDetectionSort(search, sort);
-		updateSearch({
-			page: next.page,
-			sort: next.sort,
-			direction: next.direction,
-		});
+		updateSearch(nextDetectionSort(search, sort));
 	}
 
 	const selectColumn: ColumnDef<DetectionTableRow> = {
@@ -490,8 +446,9 @@ export function DetectionsTable({
 		enableHiding: false,
 	};
 
-	const firstIndex = (search.page - 1) * search.pageSize + 1;
-	const lastIndex = firstIndex + (page?.rows.length ?? search.pageSize) - 1;
+	const firstIndex = (search.page - 1) * DETECTIONS_PAGE_SIZE + 1;
+	const lastIndex =
+		firstIndex + (page?.rows.length ?? DETECTIONS_PAGE_SIZE) - 1;
 	const indexColumn: ColumnDef<DetectionTableRow> = {
 		id: "index",
 		header: () => (
@@ -549,6 +506,7 @@ export function DetectionsTable({
 				<>
 					<Link
 						to="/birds/$comName"
+						preload={false}
 						params={{ comName: comNameToSlug(row.original.Com_Name) }}
 						className="@max-xl:block @max-xl:truncate font-medium @max-xl:leading-tight no-underline hover:underline"
 					>
@@ -588,17 +546,20 @@ export function DetectionsTable({
 			cell: ({ row }) => (
 				<Link
 					to="/timeline"
+					preload={false}
 					search={{ period: "day", date: row.original.Date }}
 					className="text-sm tabular-nums no-underline hover:underline"
 				>
 					<span className="flex @xl:hidden flex-col items-end">
-						<span className="leading-tight">{clockLabel(row.original)}</span>
+						<span className="leading-tight">
+							{formatTime(row.original.Time)}
+						</span>
 						<span className="text-muted-foreground text-xs leading-tight">
-							{dayLabel(row.original)}
+							{formatDate(row.original.Date)}
 						</span>
 					</span>
 					<span className="@xl:inline hidden">
-						{recordedLabel(row.original)}
+						{formatDateTime(row.original.Date, row.original.Time)}
 					</span>
 				</Link>
 			),
@@ -647,19 +608,22 @@ export function DetectionsTable({
 						}) as ColumnDef<DetectionTableRow>,
 				)
 			: columns,
-		data: page?.rows ?? SKELETON_ROWS.slice(0, search.pageSize),
+		data: page?.rows ?? SKELETON_ROWS,
 		getCoreRowModel: getCoreRowModel(),
 		getRowId: skeleton ? (_, index) => `skeleton-${index}` : detectionRowKey,
 		manualPagination: true,
 		manualSorting: true,
 		enableRowSelection: true,
-		pageCount: Math.max(1, Math.ceil((page?.total ?? 0) / search.pageSize)),
+		pageCount: Math.max(
+			1,
+			Math.ceil((page?.total ?? 0) / DETECTIONS_PAGE_SIZE),
+		),
 		onRowSelectionChange,
 		state: { rowSelection },
 	});
 
 	const pageCount = page
-		? Math.max(1, Math.ceil(page.total / search.pageSize))
+		? Math.max(1, Math.ceil(page.total / DETECTIONS_PAGE_SIZE))
 		: 1000;
 	const selectionShown = canDelete && selectedCount > 0;
 	useAnnounceChange(
@@ -669,7 +633,7 @@ export function DetectionsTable({
 	);
 	useAnnounceChange(
 		page
-			? `${page.total.toLocaleString()} ${page.total === 1 ? "detection" : "detections"}`
+			? `${page.total.toLocaleString()} ${plural(page.total, "detection")}`
 			: null,
 	);
 	return (
@@ -803,24 +767,19 @@ export function DetectionsTable({
 					</div>
 				)}
 				{selectionShown ? (
-					<SelectionBar
+					<DetectionSelectionBar
 						count={selectedCount}
 						onClear={() => onRowSelectionChange({})}
 						onDelete={onDeleteSelected}
 					/>
 				) : null}
 				{skeleton ? (
-					<span className="ml-auto">
-						<ShellSized className="rounded-md">
-							<PageStepper
-								variant="ghost"
-								label="Detections pages"
-								page={search.page}
-								pageCount={pageCount}
-								onPageChange={() => {}}
-							/>
-						</ShellSized>
-					</span>
+					<PageStepperShell
+						variant="ghost"
+						label="Detections pages"
+						page={search.page}
+						pageCount={pageCount}
+					/>
 				) : (
 					<PageStepper
 						className="ml-auto"

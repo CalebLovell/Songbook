@@ -7,7 +7,10 @@ import type { DatabaseSync } from "node:sqlite";
 
 import { audioUrlFor } from "~/lib/audio.ts";
 import { CONFIDENT_MIN } from "~/lib/confidence.ts";
-import { resolveDetectionClipPath } from "~/lib/detection-file-path.server.ts";
+import {
+	removeClipFile,
+	resolveDetectionClipPath,
+} from "~/lib/detection-file-path.server.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import {
 	parseSpeciesCatalog,
@@ -271,7 +274,7 @@ export async function recategorizeDetection(
 	});
 	if (!oldPath || !newPath || !existsSync(oldPath))
 		throw new Error("Recording audio is unavailable");
-	if (existsSync(newPath) || existsSync(`${newPath}.png`))
+	if (existsSync(newPath))
 		throw new Error("Replacement recording already exists");
 	const references = Number(
 		database
@@ -281,19 +284,12 @@ export async function recategorizeDetection(
 			.get(row.date, row.comName, row.fileName)?.n ?? 0,
 	);
 	const shared = references > 1;
-	const hasImage = existsSync(`${oldPath}.png`);
 	let audioPlaced = false;
-	let imagePlaced = false;
 	await files.mkdir(path.dirname(newPath), { recursive: true });
 	try {
 		if (shared) await files.copyFile(oldPath, newPath);
 		else await files.rename(oldPath, newPath);
 		audioPlaced = true;
-		if (hasImage) {
-			if (shared) await files.copyFile(`${oldPath}.png`, `${newPath}.png`);
-			else await files.rename(`${oldPath}.png`, `${newPath}.png`);
-			imagePlaced = true;
-		}
 		const result = database
 			.prepare(
 				"UPDATE detections SET Sci_Name=?, Com_Name=?, File_Name=? WHERE rowid=?",
@@ -307,26 +303,16 @@ export async function recategorizeDetection(
 			"recategorized",
 		);
 	} catch (error) {
-		const rollbackErrors: unknown[] = [];
-		if (imagePlaced)
-			try {
-				if (shared) await files.rm(`${newPath}.png`, { force: true });
-				else await files.rename(`${newPath}.png`, `${oldPath}.png`);
-			} catch (rollbackError) {
-				rollbackErrors.push(rollbackError);
-			}
 		if (audioPlaced)
 			try {
 				if (shared) await files.rm(newPath, { force: true });
 				else await files.rename(newPath, oldPath);
 			} catch (rollbackError) {
-				rollbackErrors.push(rollbackError);
+				throw new AggregateError(
+					[error, rollbackError],
+					"Recategorization failed and the recording could not be restored",
+				);
 			}
-		if (rollbackErrors.length > 0)
-			throw new AggregateError(
-				[error, ...rollbackErrors],
-				"Recategorization failed and assets could not be fully restored",
-			);
 		throw error;
 	}
 }
@@ -352,22 +338,14 @@ export async function deleteDetectionDirectly(
 		missingFiles = 0,
 		failedFiles = 0;
 	if (references === 0) {
-		const filePath = resolveDetectionClipPath(extractedRoot, {
+		const outcome = await removeClipFile(extractedRoot, {
 			date: row.date,
 			commonName: row.comName,
 			fileName: row.fileName,
 		});
-		if (!filePath) failedFiles++;
-		else
-			for (const asset of [filePath, `${filePath}.png`])
-				try {
-					await rm(asset);
-					deletedFiles++;
-				} catch (error) {
-					if ((error as NodeJS.ErrnoException).code === "ENOENT")
-						missingFiles++;
-					else failedFiles++;
-				}
+		if (outcome === "deleted") deletedFiles++;
+		else if (outcome === "missing") missingFiles++;
+		else failedFiles++;
 	}
 	return {
 		deletedRecords: Number(result.changes),

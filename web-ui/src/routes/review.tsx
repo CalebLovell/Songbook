@@ -1,5 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import {
+	queryOptions,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CircleAlert, SearchCheck } from "lucide-react";
 import { Deferred } from "~/components/deferred.tsx";
@@ -11,6 +16,7 @@ import {
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
+import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
 	confirmReviewDetection,
@@ -20,39 +26,48 @@ import {
 	recategorizeReviewDetection,
 } from "~/lib/review.ts";
 import {
-	normalizeReviewSearch,
+	type ReviewSearch,
+	reviewSearchSchema,
 	type SpeciesOption,
 } from "~/lib/review-data.ts";
-import { useSettled } from "~/lib/use-settled.ts";
+
+const reviewQuery = (data: ReviewSearch) =>
+	queryOptions({
+		...PAGE_QUERY,
+		queryKey: ["review", data],
+		queryFn: async () => {
+			const [page, species] = await Promise.all([
+				getReviewPage({ data }),
+				getReviewSpecies(),
+			]);
+			return { page, species };
+		},
+	});
 
 export const Route = createFileRoute("/review")({
 	head: () => pageHead("Review"),
-	validateSearch: normalizeReviewSearch,
+	validateSearch: reviewSearchSchema,
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
 	loaderDeps: ({ search }) => search,
-	loader: ({ deps }) => ({
-		queue: Promise.all([
-			getReviewPage({ data: deps }),
-			getReviewSpecies(),
-		]).then(([page, species]) => ({ page, species })),
-	}),
+	loader: ({ context, deps }) => {
+		prefetchInBrowser(context.queryClient, reviewQuery(deps));
+	},
 	component: Review,
 });
 
 function Review() {
-	const { queue } = Route.useLoaderData();
-	const settled = useSettled(queue);
 	const search = Route.useSearch();
+	const queue = useQuery(reviewQuery(search));
 	const navigate = Route.useNavigate();
-	const router = useRouter();
+	const queryClient = useQueryClient();
 	const correct = useServerFn(confirmReviewDetection),
 		recategorize = useServerFn(recategorizeReviewDetection),
 		remove = useServerFn(deleteReviewDetection);
 	const change = useMutation({
 		mutationFn: async (work: () => Promise<unknown>) => {
 			await work();
-			await router.invalidate();
+			await queryClient.invalidateQueries();
 		},
 	});
 	const run = (work: () => Promise<unknown>) =>
@@ -72,7 +87,7 @@ function Review() {
 			) : null}
 			<Deferred
 				key={JSON.stringify(search)}
-				promise={queue}
+				query={queue}
 				shell={<ReviewWorkflowSkeleton />}
 			>
 				{(loaded) => (
@@ -80,7 +95,7 @@ function Review() {
 						key={loaded.page.page}
 						page={loaded.page}
 						species={loaded.species}
-						busy={change.isPending || !settled?.current}
+						busy={change.isPending || queue.isFetching}
 						onCorrect={(rowId) => run(() => correct({ data: { rowId } }))}
 						onRecategorize={(rowId: number, item: SpeciesOption) =>
 							run(() => recategorize({ data: { rowId, ...item } }))

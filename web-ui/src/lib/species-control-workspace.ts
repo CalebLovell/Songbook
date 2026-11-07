@@ -1,3 +1,8 @@
+import { z } from "zod";
+
+import { pageParam, textParam } from "~/lib/search-schema.ts";
+import { nextSort, type SortDirection } from "~/lib/table-sort.ts";
+
 export const SPECIES_CONTROL_SORTS = [
 	"species",
 	"scientific",
@@ -6,18 +11,21 @@ export const SPECIES_CONTROL_SORTS = [
 ] as const;
 
 export type SpeciesControlSort = (typeof SPECIES_CONTROL_SORTS)[number];
-export type SpeciesControlSortDirection = "asc" | "desc";
 
-export type SpeciesControlWorkspaceSearch = {
-	page: number;
-	sort: SpeciesControlSort;
-	direction: SpeciesControlSortDirection;
-	query?: string;
-};
+export const speciesControlWorkspaceSearchSchema = z.object({
+	page: pageParam,
+	sort: z.enum(SPECIES_CONTROL_SORTS).default("species").catch("species"),
+	direction: z.enum(["asc", "desc"]).default("asc").catch("asc"),
+	query: textParam,
+});
+
+export type SpeciesControlWorkspaceSearch = z.output<
+	typeof speciesControlWorkspaceSearchSchema
+>;
 
 export const SPECIES_CONTROL_DEFAULT_DIRECTION: Record<
 	SpeciesControlSort,
-	SpeciesControlSortDirection
+	SortDirection
 > = {
 	species: "asc",
 	scientific: "asc",
@@ -25,41 +33,9 @@ export const SPECIES_CONTROL_DEFAULT_DIRECTION: Record<
 	status: "asc",
 };
 
-function isSpeciesControlSort(value: unknown): value is SpeciesControlSort {
-	return SPECIES_CONTROL_SORTS.includes(value as SpeciesControlSort);
-}
-
-export function normalizeSpeciesControlWorkspaceSearch(
-	input: Record<string, unknown>,
-): SpeciesControlWorkspaceSearch {
-	const rawPage = Number(input.page);
-	const page =
-		Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1;
-	const sort = isSpeciesControlSort(input.sort) ? input.sort : "species";
-	const direction = input.direction === "desc" ? "desc" : "asc";
-	const query = input.query == null ? "" : String(input.query).trim();
-
-	return {
-		page,
-		sort,
-		direction,
-		...(query ? { query } : {}),
-	};
-}
-
 export function nextSpeciesControlSort(
 	search: SpeciesControlWorkspaceSearch,
 	sort: SpeciesControlSort,
 ): SpeciesControlWorkspaceSearch {
-	return {
-		...search,
-		page: 1,
-		sort,
-		direction:
-			search.sort === sort
-				? search.direction === "asc"
-					? "desc"
-					: "asc"
-				: SPECIES_CONTROL_DEFAULT_DIRECTION[sort],
-	};
+	return nextSort(search, sort, SPECIES_CONTROL_DEFAULT_DIRECTION);
 }

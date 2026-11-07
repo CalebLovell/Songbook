@@ -2,7 +2,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { Deferred, ShellReveal } from "~/components/deferred.tsx";
+import { Deferred } from "~/components/deferred.tsx";
 import { HighlightsCard } from "~/components/highlights-card.tsx";
 import { CurrentBirdCard } from "~/components/now/current-bird-card.tsx";
 import { LiveAudioCard } from "~/components/now/live-audio-card.tsx";
@@ -16,12 +16,9 @@ import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { announce } from "~/lib/announce.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
-import {
-	getLiveHighlights,
-	type LiveHighlights,
-} from "~/lib/live-highlights.ts";
+import { getLiveHighlights } from "~/lib/live-highlights.ts";
 import { getNowSnapshot, type NowSnapshot } from "~/lib/now.ts";
-import { prefetchInBrowser } from "~/lib/query-client.ts";
+import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { getStationStatus } from "~/lib/station-status.ts";
 
 const POLL_INTERVAL_MS = 10_000;
@@ -53,6 +50,12 @@ const statusQuery = queryOptions({
 	refetchInterval: STATUS_INTERVAL_MS,
 });
 
+const highlightsQuery = queryOptions({
+	...PAGE_QUERY,
+	queryKey: ["live-highlights"],
+	queryFn: () => getLiveHighlights(),
+});
+
 export const Route = createFileRoute("/live")({
 	head: () =>
 		pageHead(
@@ -63,10 +66,8 @@ export const Route = createFileRoute("/live")({
 	loader: ({ context }) => {
 		prefetchInBrowser(context.queryClient, snapshotQuery);
 		prefetchInBrowser(context.queryClient, statusQuery);
-		return {
-			highlights: getLiveHighlights(),
-			unlocked: context.auth.unlocked,
-		};
+		prefetchInBrowser(context.queryClient, highlightsQuery);
+		return { unlocked: context.auth.unlocked };
 	},
 });
 
@@ -93,20 +94,13 @@ function useFreshKeys(keys: string[]): Set<string> {
 }
 
 function Live() {
-	const { highlights, unlocked } = Route.useLoaderData();
+	const { unlocked } = Route.useLoaderData();
 	const { data: snapshot } = useQuery(snapshotQuery);
 	const { data: status } = useQuery(statusQuery);
 	const pill = status ? <LivePill status={status} /> : <LivePillSkeleton />;
 
 	if (!snapshot) return <LiveShell unlocked={unlocked} pill={pill} />;
-	return (
-		<LiveBody
-			snapshot={snapshot}
-			highlights={highlights}
-			unlocked={unlocked}
-			pill={pill}
-		/>
-	);
+	return <LiveBody snapshot={snapshot} unlocked={unlocked} pill={pill} />;
 }
 
 function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
@@ -119,13 +113,13 @@ function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
 
 				<div className="grid grid-cols-1 gap-page">
 					<LiveAudioCard unlocked={unlocked} />
-					<ShellReveal>
+					<div>
 						<HighlightsCard
 							highlights={null}
 							period="live"
 							emptyMessage={HIGHLIGHTS_EMPTY}
 						/>
-					</ShellReveal>
+					</div>
 				</div>
 			</div>
 		</PageWrap>
@@ -134,15 +128,14 @@ function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
 
 function LiveBody({
 	snapshot,
-	highlights,
 	unlocked,
 	pill,
 }: {
 	snapshot: NowSnapshot;
-	highlights: Promise<LiveHighlights>;
 	unlocked: boolean;
 	pill: ReactNode;
 }) {
+	const highlights = useQuery(highlightsQuery);
 	const freshKeys = useFreshKeys(snapshot.recent.map((row) => row.key));
 
 	useAnnounceNewBird(snapshot.current?.comName ?? null);
@@ -172,7 +165,7 @@ function LiveBody({
 					<LiveAudioCard unlocked={unlocked} />
 
 					<Deferred
-						promise={highlights}
+						query={highlights}
 						shell={
 							<HighlightsCard
 								highlights={null}

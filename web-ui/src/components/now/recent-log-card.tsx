@@ -152,6 +152,7 @@ export function RecentLogCard({
 									<div className="flex min-w-0 items-baseline gap-1.5">
 										<Link
 											to="/birds/$comName"
+											preload={false}
 											params={{ comName: visit.speciesSlug }}
 											className="block min-w-0 max-w-fit truncate font-medium no-underline hover:underline"
 										>

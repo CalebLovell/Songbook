@@ -10,17 +10,14 @@ import {
 	loadSpeciesCatalog,
 	recategorizeDetection,
 } from "~/lib/review.server.ts";
-import {
-	normalizeReviewSearch,
-	type SpeciesOption,
-} from "~/lib/review-data.ts";
+import { reviewSearchSchema, type SpeciesOption } from "~/lib/review-data.ts";
 import { readReviewRareSpeciesMax } from "~/lib/settings.server.ts";
 
 const rowIdSchema = z.object({ rowId: z.number().int().positive() });
 
 export const getReviewPage = createServerFn({ method: "GET" })
 	.middleware([requireUnlocked])
-	.validator((input: Record<string, unknown>) => normalizeReviewSearch(input))
+	.validator(reviewSearchSchema)
 	.handler(async ({ data }) =>
 		loadReviewPage(
 			sqlite,
