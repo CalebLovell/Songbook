@@ -36,28 +36,41 @@ function candidateClips(
 	database: DatabaseSync,
 	comName?: string,
 ): BestRecording[] {
-	const statement = database.prepare(`
-		SELECT comName, sciName, date, time, confidence, fileName
-		FROM (
-			SELECT
-				Com_Name AS comName,
-				Sci_Name AS sciName,
-				Date AS date,
-				Time AS time,
-				Confidence AS confidence,
-				File_Name AS fileName,
-				ROW_NUMBER() OVER (PARTITION BY Com_Name ORDER BY Confidence DESC, Date DESC, Time DESC) AS rn
-			FROM detections
-			${comName === undefined ? "" : "WHERE Com_Name = ?"}
-		)
-		WHERE rn <= ?
-		ORDER BY comName, rn
-	`);
-	const rows =
-		comName === undefined
-			? statement.all(CANDIDATE_CLIPS_PER_SPECIES)
-			: statement.all(comName, CANDIDATE_CLIPS_PER_SPECIES);
-	return rows as BestRecording[];
+	if (comName !== undefined) {
+		return database
+			.prepare(`
+				SELECT
+					Com_Name AS comName,
+					Sci_Name AS sciName,
+					Date AS date,
+					Time AS time,
+					Confidence AS confidence,
+					File_Name AS fileName
+				FROM detections
+				WHERE Com_Name = ?
+				ORDER BY Confidence DESC, Date DESC, Time DESC
+				LIMIT ?
+			`)
+			.all(comName, CANDIDATE_CLIPS_PER_SPECIES) as BestRecording[];
+	}
+	return database
+		.prepare(`
+			SELECT comName, sciName, date, time, confidence, fileName
+			FROM (
+				SELECT
+					Com_Name AS comName,
+					Sci_Name AS sciName,
+					Date AS date,
+					Time AS time,
+					Confidence AS confidence,
+					File_Name AS fileName,
+					ROW_NUMBER() OVER (PARTITION BY Com_Name ORDER BY Confidence DESC, Date DESC, Time DESC) AS rn
+				FROM detections
+			)
+			WHERE rn <= ?
+			ORDER BY comName, rn
+		`)
+		.all(CANDIDATE_CLIPS_PER_SPECIES) as BestRecording[];
 }
 
 function isOnDisk(extractedRoot: string, clip: BestRecording): boolean {
@@ -102,31 +115,54 @@ function publicCandidates(
 			voiceScore: null,
 		}));
 	}
-	const statement = database.prepare(`
-		SELECT comName, sciName, date, time, confidence, fileName, voiceScore
-		FROM (
-			SELECT
-				d.Com_Name AS comName,
-				d.Sci_Name AS sciName,
-				d.Date AS date,
-				d.Time AS time,
-				d.Confidence AS confidence,
-				d.File_Name AS fileName,
-				v.voice_score AS voiceScore,
-				ROW_NUMBER() OVER (PARTITION BY d.Com_Name ORDER BY d.Confidence DESC, d.Date DESC, d.Time DESC) AS rn
-			FROM detections d
-			LEFT JOIN voice_checks v ON v.Date = d.Date AND v.File_Name = d.File_Name
-			WHERE (v.voice_score IS NULL OR v.voice_score <= ?)
-			${comName === undefined ? "" : "AND d.Com_Name = ?"}
-		)
-		WHERE rn <= ?
-		ORDER BY comName, rn
-	`);
-	const rows =
-		comName === undefined
-			? statement.all(VOICE_SCORE_LIMIT, CANDIDATE_CLIPS_PER_SPECIES)
-			: statement.all(VOICE_SCORE_LIMIT, comName, CANDIDATE_CLIPS_PER_SPECIES);
-	return rows as PublicCandidate[];
+	// The unary + drops d.Date's DATE affinity, which otherwise stops this join
+	// using voice_checks' primary key and rescans that table for every detection.
+	const checkedDetections = `
+		detections d
+		LEFT JOIN voice_checks v ON v.Date = +d.Date AND v.File_Name = d.File_Name
+		WHERE (v.voice_score IS NULL OR v.voice_score <= ?)
+	`;
+	if (comName !== undefined) {
+		return database
+			.prepare(`
+				SELECT
+					d.Com_Name AS comName,
+					d.Sci_Name AS sciName,
+					d.Date AS date,
+					d.Time AS time,
+					d.Confidence AS confidence,
+					d.File_Name AS fileName,
+					v.voice_score AS voiceScore
+				FROM ${checkedDetections}
+				AND d.Com_Name = ?
+				ORDER BY d.Confidence DESC, d.Date DESC, d.Time DESC
+				LIMIT ?
+			`)
+			.all(
+				VOICE_SCORE_LIMIT,
+				comName,
+				CANDIDATE_CLIPS_PER_SPECIES,
+			) as PublicCandidate[];
+	}
+	return database
+		.prepare(`
+			SELECT comName, sciName, date, time, confidence, fileName, voiceScore
+			FROM (
+				SELECT
+					d.Com_Name AS comName,
+					d.Sci_Name AS sciName,
+					d.Date AS date,
+					d.Time AS time,
+					d.Confidence AS confidence,
+					d.File_Name AS fileName,
+					v.voice_score AS voiceScore,
+					ROW_NUMBER() OVER (PARTITION BY d.Com_Name ORDER BY d.Confidence DESC, d.Date DESC, d.Time DESC) AS rn
+				FROM ${checkedDetections}
+			)
+			WHERE rn <= ?
+			ORDER BY comName, rn
+		`)
+		.all(VOICE_SCORE_LIMIT, CANDIDATE_CLIPS_PER_SPECIES) as PublicCandidate[];
 }
 
 export function publicRecordings(

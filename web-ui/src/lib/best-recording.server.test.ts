@@ -251,3 +251,63 @@ test("a failed check saves nothing, so the clip stays private", async () => {
 		false,
 	);
 });
+
+test("naming a species picks the same clips as reading every species", () => {
+	const { database, root } = fixture(
+		[
+			["2026-06-30", "06:00:00", "Blue Jay", 0.9, "older.wav"],
+			["2026-07-30", "06:00:00", "Blue Jay", 0.9, "newer.wav"],
+			["2026-07-30", "05:00:00", "Blue Jay", 0.9, "earlier.wav"],
+			["2026-07-01", "06:00:00", "Blue Jay", null, "unscored.wav"],
+			["2026-07-01", "06:00:00", "House Finch", 0.7, "finch.wav"],
+		],
+		["older.wav", "newer.wav", "earlier.wav", "unscored.wav", "finch.wav"],
+	);
+	saveVoiceCheck(
+		database,
+		{ date: "2026-07-30", fileName: "newer.wav" },
+		0.9,
+		"t",
+	);
+	saveVoiceCheck(
+		database,
+		{ date: "2026-07-30", fileName: "earlier.wav" },
+		0,
+		"t",
+	);
+
+	const everySpecies = publicRecordings(database, root);
+	const blueJay = publicRecordings(database, root, "Blue Jay");
+	assert.equal(blueJay.recordings.get("Blue Jay")?.fileName, "earlier.wav");
+	assert.deepEqual(
+		blueJay.recordings.get("Blue Jay"),
+		everySpecies.recordings.get("Blue Jay"),
+	);
+	assert.deepEqual(
+		bestRecordings(database, root, "Blue Jay").get("Blue Jay"),
+		bestRecordings(database, root).get("Blue Jay"),
+	);
+});
+
+test("voice checks join a station's DATE column", () => {
+	const database = new DatabaseSync(":memory:");
+	database.exec(
+		"CREATE TABLE detections (Date DATE, Time TIME, Sci_Name TEXT, Com_Name TEXT, Confidence FLOAT, File_Name TEXT)",
+	);
+	database
+		.prepare("INSERT INTO detections VALUES (?, ?, ?, ?, ?, ?)")
+		.run("2026-07-01", "06:00:00", "sci", "Blue Jay", 0.9, "jay.wav");
+	const root = mkdtempSync(path.join(tmpdir(), "best-recording-"));
+	const dir = path.join(root, "By_Date", "2026-07-01", "Blue_Jay");
+	mkdirSync(dir, { recursive: true });
+	writeFileSync(path.join(dir, "jay.wav"), "");
+	saveVoiceCheck(database, { date: "2026-07-01", fileName: "jay.wav" }, 0, "t");
+
+	const { recordings, unchecked } = publicRecordings(
+		database,
+		root,
+		"Blue Jay",
+	);
+	assert.equal(recordings.get("Blue Jay")?.fileName, "jay.wav");
+	assert.deepEqual(unchecked, []);
+});
