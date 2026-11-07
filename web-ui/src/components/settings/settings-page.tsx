@@ -1,5 +1,5 @@
 import { Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
@@ -51,6 +51,7 @@ export function SettingsPage({
 	updates,
 	onCheckUpdates,
 	onInstallUpdate,
+	dataTab,
 }: {
 	tab: SettingsTab;
 	onTabChange: (next: SettingsTab) => void;
@@ -62,6 +63,7 @@ export function SettingsPage({
 	updates?: UpdateState | null;
 	onCheckUpdates?: () => Promise<UpdateState>;
 	onInstallUpdate?: () => Promise<void>;
+	dataTab?: ReactNode;
 }) {
 	const [needsRestart, setNeedsRestart] = useState(false);
 	const [factoryResets, setFactoryResets] = useState(0);
@@ -140,6 +142,7 @@ export function SettingsPage({
 				updates={updates}
 				onCheckUpdates={onCheckUpdates}
 				onInstallUpdate={onInstallUpdate}
+				dataTab={dataTab}
 			/>
 		</PageWrap>
 	);
@@ -148,9 +151,11 @@ export function SettingsPage({
 export function SettingsPageSkeleton({
 	tab,
 	onTabChange,
+	dataTab,
 }: {
 	tab: SettingsTab;
 	onTabChange: (next: SettingsTab) => void;
+	dataTab?: ReactNode;
 }) {
 	return (
 		<PageWrap className="space-y-page">
@@ -170,7 +175,7 @@ export function SettingsPageSkeleton({
 					/>
 				}
 			/>
-			<SettingsCardsSkeleton tab={tab} />
+			<SettingsCardsSkeleton tab={tab} dataTab={dataTab} />
 		</PageWrap>
 	);
 }

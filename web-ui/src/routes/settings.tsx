@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { DataCards } from "~/components/settings/data-cards.tsx";
 import {
 	DEFAULT_SETTINGS_TAB,
 	SETTINGS_TABS,
@@ -120,7 +121,12 @@ function SettingsRoute() {
 		return result;
 	};
 
-	if (!page) return <SettingsPageSkeleton tab={tab} onTabChange={showTab} />;
+	const dataTab = <DataCards active={tab === "data"} />;
+
+	if (!page)
+		return (
+			<SettingsPageSkeleton tab={tab} onTabChange={showTab} dataTab={dataTab} />
+		);
 
 	return (
 		<SettingsPage
@@ -128,6 +134,7 @@ function SettingsRoute() {
 			onTabChange={showTab}
 			data={page}
 			health={health}
+			dataTab={dataTab}
 			onRestart={(card) => refreshingData(restart({ data: { card } }))}
 			updates={updates ?? null}
 			onCheckUpdates={async () => {

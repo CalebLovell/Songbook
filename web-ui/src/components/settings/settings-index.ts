@@ -1,12 +1,16 @@
 import type { LucideIcon } from "lucide-react";
 import {
+	Database,
 	Disc3,
+	Download,
+	FileDown,
 	HardDrive,
 	Heart,
 	Image,
 	MapPin,
 	Mic2,
 	RefreshCw,
+	RotateCcw,
 	SearchCheck,
 	SlidersHorizontal,
 	Sparkles,
@@ -22,6 +26,7 @@ export const SETTINGS_TABS = [
 	"audio-input",
 	"recording",
 	"storage",
+	"data",
 ] as const;
 
 export type SettingsTab = (typeof SETTINGS_TABS)[number];
@@ -131,10 +136,35 @@ const SYSTEM_CARDS: SettingsIndexEntry[] = [
 	},
 ];
 
+const DATA_CARDS: SettingsIndexEntry[] = [
+	{
+		title: "Backup",
+		tab: "data",
+		icon: Download,
+		fields: ["What to include", "Download backup"],
+		keywords: ["data", "save", "copy", "download"],
+	},
+	{
+		title: "Restore",
+		tab: "data",
+		icon: RotateCcw,
+		fields: ["Backup file", "Safety copy"],
+		keywords: ["data", "import", "upload", "move", "new station", "undo"],
+	},
+	{
+		title: "Export detections",
+		tab: "data",
+		icon: FileDown,
+		fields: ["From", "To", "Species"],
+		keywords: ["data", "csv", "spreadsheet", "download"],
+	},
+];
+
 export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 	...CORE_CARDS,
 	...PREFERENCE_CARDS,
 	...SYSTEM_CARDS,
+	...DATA_CARDS,
 ];
 
 export const SETTINGS_SECTIONS: Pick<
@@ -144,4 +174,5 @@ export const SETTINGS_SECTIONS: Pick<
 	...CORE_CARDS,
 	{ title: "Preferences", tab: "preferences", icon: Heart },
 	...SYSTEM_CARDS,
+	{ title: "Data", tab: "data", icon: Database },
 ];
