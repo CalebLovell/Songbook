@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /web-ui
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: fix
+      include: scope
+    groups:
+      web-ui:
+        patterns: ["*"]
+    # Held on purpose: retest these by hand before bumping.
+    ignore:
+      - dependency-name: "@biomejs/biome"
+      - dependency-name: nitro
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
