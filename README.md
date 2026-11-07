@@ -182,7 +182,9 @@ sudo systemctl edit birdnet_web_ui.service
 Environment=WEB_UI_TRUSTED_PROXY=1
 ```
 
-Only set this behind a proxy. Without one, visitors could fake their address.
+Only set this behind a proxy running on the Pi itself, such as `cloudflared`. The
+app trusts forwarded addresses only from a connection on the same machine, so
+other devices on your network can't fake theirs.
 
 ## Backup and restore
 

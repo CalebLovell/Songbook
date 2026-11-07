@@ -2,9 +2,32 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+	clientAddress,
 	forwardedClientAddress,
 	isPrivateAddress,
 } from "./auth-policy.server.ts";
+
+const forgedHeaders = new Headers({ "cf-connecting-ip": "203.0.113.9" });
+
+test("uses forwarded headers when a trusted proxy connects from this machine", () => {
+	for (const peer of ["::1", "127.0.0.1", "::ffff:127.0.0.1"]) {
+		assert.equal(clientAddress(peer, forgedHeaders, true), "203.0.113.9", peer);
+	}
+});
+
+test("ignores forwarded headers from other machines on the network", () => {
+	for (const peer of ["192.168.1.20", "fd00::1", "198.51.100.7"]) {
+		assert.equal(clientAddress(peer, forgedHeaders, true), peer);
+	}
+});
+
+test("ignores forwarded headers when no proxy is trusted", () => {
+	assert.equal(clientAddress("::1", forgedHeaders, false), "::1");
+});
+
+test("falls back to the peer when a trusted proxy sends no client address", () => {
+	assert.equal(clientAddress("::1", new Headers(), true), "::1");
+});
 
 test("recognises loopback and RFC1918 addresses as private", () => {
 	for (const ip of [

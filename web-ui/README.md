@@ -23,7 +23,7 @@ npm run build
 | `BIRDNET_CONF` | `/etc/birdnet/birdnet.conf` | Station configuration read and written by the Settings page. |
 | `BIRDNET_DB_PATH` | `../scripts/birds.db` | The detections database. |
 | `BIRDNET_AUTH_CONF` | `/etc/birdnet/web-ui/auth.conf` (`.dev/auth.conf` under `npm run dev`) | Where the web UI password hash lives. |
-| `WEB_UI_TRUSTED_PROXY` | unset | When set, `X-Forwarded-For` is trusted for identifying the client address. Set it only when something you control actually terminates TLS in front of the app -- trusting the header without a proxy lets a client spoof its own address and evade unlock throttling. |
+| `WEB_UI_TRUSTED_PROXY` | unset | When set, forwarded headers identify the client address, but only on connections from the same machine. Set it when a proxy on the Pi, such as `cloudflared`, sits in front of the app. A proxy on another machine isn't trusted, so all its visitors would count as one address for unlock throttling. |
 
 ## Signing in during development
 

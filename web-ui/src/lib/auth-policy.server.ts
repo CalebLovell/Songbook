@@ -25,9 +25,24 @@ export function isPrivateAddress(ip: string | undefined) {
 	return false;
 }
 
-export function forwardedClientAddress(headers: {
-	get(name: string): string | null | undefined;
-}) {
+type HeaderReader = { get(name: string): string | null | undefined };
+
+function isLoopbackAddress(ip: string | undefined) {
+	if (!ip) return false;
+	const address = normalize(ip);
+	return address === "::1" || /^127\.\d+\.\d+\.\d+$/.test(address);
+}
+
+export function clientAddress(
+	peer: string | undefined,
+	headers: HeaderReader,
+	trustedProxy: boolean,
+) {
+	if (!trustedProxy || !isLoopbackAddress(peer)) return peer;
+	return forwardedClientAddress(headers) ?? peer;
+}
+
+export function forwardedClientAddress(headers: HeaderReader) {
 	const cloudflare = headers.get("cf-connecting-ip")?.trim();
 	if (cloudflare) return cloudflare;
 	const hops = (headers.get("x-forwarded-for") ?? "")

@@ -16,7 +16,7 @@ import {
 	resolveAuthPath,
 	verifyPassword,
 } from "./auth-file.server.ts";
-import { forwardedClientAddress } from "./auth-policy.server.ts";
+import { clientAddress } from "./auth-policy.server.ts";
 import {
 	COOKIE_MAX_AGE_SECONDS,
 	sessionNeedsRenewal,
@@ -62,11 +62,11 @@ function getThrottle() {
 }
 
 function resolveClientIp() {
-	if (process.env.WEB_UI_TRUSTED_PROXY) {
-		const forwarded = forwardedClientAddress(getRequestHeaders());
-		if (forwarded) return forwarded;
-	}
-	return getRequestIP();
+	return clientAddress(
+		getRequestIP(),
+		getRequestHeaders(),
+		Boolean(process.env.WEB_UI_TRUSTED_PROXY),
+	);
 }
 
 const UNKNOWN_CLIENT = "unknown";
