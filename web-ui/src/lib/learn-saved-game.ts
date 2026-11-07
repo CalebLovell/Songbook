@@ -1,25 +1,11 @@
 import type { LearnPool } from "~/lib/learn-pools.ts";
-import type { LearnRound, QuestionResult } from "~/lib/learn-round.ts";
-
-export type GameProgress = {
-	index: number;
-	wrongGuesses: string[];
-	isSolved: boolean;
-	results: QuestionResult[];
-	isFinished: boolean;
-};
-
-export const FRESH_PROGRESS: GameProgress = {
-	index: 0,
-	wrongGuesses: [],
-	isSolved: false,
-	results: [],
-	isFinished: false,
-};
+import type { GameProgress } from "~/lib/learn-progress.ts";
+import type { LearnRound } from "~/lib/learn-round.ts";
 
 export type SavedGame = { round: LearnRound; progress: GameProgress };
 
-const KEY_PREFIX = "learn-game:v1:";
+const KEY_PREFIX = "learn-game:v2:";
+const PHASES: readonly unknown[] = ["guessing", "solved", "finished"];
 
 function isSavedGame(value: unknown): value is SavedGame {
 	if (typeof value !== "object" || value === null) return false;
@@ -33,8 +19,7 @@ function isSavedGame(value: unknown): value is SavedGame {
 		progress.index < round.questions.length &&
 		Array.isArray(progress.wrongGuesses) &&
 		Array.isArray(progress.results) &&
-		typeof progress.isSolved === "boolean" &&
-		typeof progress.isFinished === "boolean"
+		PHASES.includes(progress.phase)
 	);
 }
 

@@ -1,41 +1,36 @@
 import { type ReactNode, useEffect, useState } from "react";
 
-import { useSettled } from "~/lib/use-settled.ts";
-
 export const SHELL_DELAY_MS = 300;
 
 export function Deferred<T>({
-	promise,
+	query,
 	shell,
 	className,
 	shellAfterMs,
 	children,
 }: {
-	promise: Promise<T>;
+	query: { data: T | undefined; isPlaceholderData: boolean };
 	shell: ReactNode;
 	className?: string;
 	shellAfterMs?: number;
 	children: (value: T) => ReactNode;
 }) {
-	const settled = useSettled(promise);
-	const stale = settled !== null && !settled.current;
-	const waitedOut = useWaitedOut(promise, stale, shellAfterMs);
-	if (!settled || waitedOut) {
+	const waitedOut = useWaitedOut(query.isPlaceholderData, shellAfterMs);
+	if (query.data === undefined || waitedOut) {
 		return <div className={className}>{shell}</div>;
 	}
-	return children(settled.value);
+	return children(query.data);
 }
 
-function useWaitedOut(
-	promise: Promise<unknown>,
-	stale: boolean,
-	ms: number | undefined,
-): boolean {
-	const [expired, setExpired] = useState<Promise<unknown> | null>(null);
+function useWaitedOut(stale: boolean, ms: number | undefined): boolean {
+	const [expired, setExpired] = useState(false);
 	useEffect(() => {
 		if (!stale || ms === undefined) return;
-		const timeout = setTimeout(() => setExpired(promise), ms);
-		return () => clearTimeout(timeout);
-	}, [promise, stale, ms]);
-	return stale && expired === promise;
+		const timeout = setTimeout(() => setExpired(true), ms);
+		return () => {
+			clearTimeout(timeout);
+			setExpired(false);
+		};
+	}, [stale, ms]);
+	return stale && expired;
 }

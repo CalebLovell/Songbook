@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	Link,
@@ -67,6 +67,7 @@ import {
 } from "~/lib/link-preview.ts";
 import { plural } from "~/lib/number-format.ts";
 import { pageTitle } from "~/lib/page-title.ts";
+import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import {
 	getBirdIdentity,
 	getSpeciesDetail,
@@ -108,30 +109,41 @@ const speciesDetailSearchSchema = z.object({
 	visits: z.coerce.number().int().min(1).default(1).catch(1),
 });
 
+// visitsPage stays out of the key: it only seeds the visit log, which fetches
+// any other page itself.
+const speciesDetailQuery = (data: {
+	comNameSlug: string;
+	year: number;
+	visitsPage?: number;
+}) =>
+	queryOptions({
+		...PAGE_QUERY,
+		queryKey: ["species-detail", data.comNameSlug, data.year],
+		queryFn: () => getSpeciesDetail({ data }),
+	});
+
 export const Route = createFileRoute("/birds/$comName")({
 	validateSearch: speciesDetailSearchSchema,
 	search: {
 		middlewares: [stripSearchParams({ year: DEFAULT_YEAR, visits: 1 })],
 	},
 	loaderDeps: ({ search }) => ({ year: search.year }),
-	loader: async ({ params, deps, location }) => {
-		const result = getSpeciesDetail({
-			data: {
+	loader: async ({ context, params, deps, location }) => {
+		prefetchInBrowser(
+			context.queryClient,
+			speciesDetailQuery({
 				comNameSlug: params.comName,
 				year: deps.year,
 				visitsPage: (location.search as { visits?: number }).visits,
-			},
-		});
+			}),
+		);
 		const seenName = comNameForSlug(params.comName);
 		const bird = seenName
 			? { comName: seenName, sciName: null }
 			: await getBirdIdentity({ data: params.comName });
-		if (!bird) {
-			result.catch(() => {});
-			throw notFound();
-		}
+		if (!bird) throw notFound();
 		comNameToSlug(bird.comName);
-		return { result, comName: bird.comName, sciName: bird.sciName };
+		return { comName: bird.comName, sciName: bird.sciName };
 	},
 	head: ({ loaderData }) => speciesHead(loaderData),
 	pendingMs: 1000,
@@ -210,13 +222,16 @@ function buildHeatMap(history: TrendPoint[]): {
 }
 
 function BirdPage() {
-	const { result } = Route.useLoaderData();
-	const { year } = Route.useSearch();
+	const { comName: comNameSlug } = Route.useParams();
+	const { year, visits: visitsPage } = Route.useSearch();
+	const result = useQuery(
+		speciesDetailQuery({ comNameSlug, year, visitsPage }),
+	);
 
 	return (
 		<Deferred
 			key={year}
-			promise={result}
+			query={result}
 			shell={<SpeciesDetailShell year={year} />}
 		>
 			{(loaded) => <BirdResult result={loaded} />}

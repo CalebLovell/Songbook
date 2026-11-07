@@ -1,3 +1,4 @@
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	Link,
@@ -51,10 +52,10 @@ import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import { plural } from "~/lib/number-format.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
+import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
-import { useSettled } from "~/lib/use-settled.ts";
 import { cn } from "~/lib/utils.ts";
 
 const SORT_KEYS = ["count", "recent", "alpha"] as const;
@@ -85,6 +86,12 @@ const speciesSearchSchema = z.object({
 		.catch(DEFAULT_SEARCH.page),
 });
 
+const lifeListQuery = queryOptions({
+	...PAGE_QUERY,
+	queryKey: ["life-list-cards"],
+	queryFn: () => getLifeListCards(),
+});
+
 export const Route = createFileRoute("/birds/")({
 	head: () =>
 		pageHead(
@@ -96,7 +103,9 @@ export const Route = createFileRoute("/birds/")({
 		middlewares: [stripSearchParams(DEFAULT_SEARCH)],
 	},
 	component: Species,
-	loader: () => ({ cards: getLifeListCards() }),
+	loader: ({ context }) => {
+		prefetchInBrowser(context.queryClient, lifeListQuery);
+	},
 });
 
 const PAGE_SIZE = 24;
@@ -108,28 +117,26 @@ const CARD_CLASS =
 const FOOTER_CLASS = "mt-auto flex flex-wrap items-center gap-page text-sm";
 
 function Species() {
-	const { cards } = Route.useLoaderData();
+	const cards = useQuery(lifeListQuery);
 
 	return (
 		<PageWrap className="flex min-h-full flex-col gap-page">
 			<PageHeaderCard
 				icon={Feather}
 				title={PAGE_HEADERS.birds.title}
-				description={<LifeListSummary cards={cards} />}
+				description={<LifeListSummary loaded={cards.data ?? null} />}
 			/>
 
 			<SpeciesControls />
 
-			<Deferred promise={cards} shell={<SpeciesGridShell />}>
+			<Deferred query={cards} shell={<SpeciesGridShell />}>
 				{(loaded) => <SpeciesBrowser cards={loaded} />}
 			</Deferred>
 		</PageWrap>
 	);
 }
 
-function LifeListSummary({ cards }: { cards: Promise<LifeListCard[]> }) {
-	const settled = useSettled(cards);
-	const loaded = settled?.value ?? null;
+function LifeListSummary({ loaded }: { loaded: LifeListCard[] | null }) {
 	const detections = loaded?.reduce((sum, card) => sum + card.allTimeCount, 0);
 	return PAGE_HEADERS.birds.description(
 		detections === undefined ? (

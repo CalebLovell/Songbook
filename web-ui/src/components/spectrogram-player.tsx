@@ -100,6 +100,7 @@ export function SpectrogramPlayer({
 		fetchAudioBlob(audioUrl).then(
 			(blob) => {
 				if (cancelled) return;
+				if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
 				objectUrlRef.current = URL.createObjectURL(blob);
 				audio.addEventListener(
 					"loadedmetadata",
@@ -308,6 +309,7 @@ export function SpectrogramPlayer({
 					if (!audioRef.current?.ended) dispatch({ type: "mediaPaused" });
 				}}
 				onEnded={() => dispatch({ type: "mediaEnded" })}
+				onError={() => dispatch({ type: "loadFailed" })}
 				onSeeking={() => {
 					if (state.status !== "playing") paintFromAudio();
 				}}

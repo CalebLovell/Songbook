@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, FlaskConical, KeyRound } from "lucide-react";
@@ -17,6 +17,7 @@ import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 	const unlock = useServerFn(unlockFn);
 	const router = useRouter();
+	const queryClient = useQueryClient();
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | undefined>();
 	const signIn = useMutation({
@@ -26,6 +27,7 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 			if (result.ok) {
 				setPassword("");
 				forgetUnlockStatus();
+				queryClient.removeQueries();
 				await router.invalidate();
 				onUnlock?.();
 				return;

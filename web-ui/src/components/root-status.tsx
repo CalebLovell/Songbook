@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	type ErrorComponentProps,
 	useNavigate,
@@ -14,6 +15,7 @@ import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { announce } from "~/lib/announce.ts";
 import { isUnauthorizedError } from "~/lib/auth.ts";
 import { pageTitle } from "~/lib/page-title.ts";
+import { refreshAllData } from "~/lib/query-client.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 
 function useStatusTitle(title: string) {
@@ -53,6 +55,7 @@ export function RouteNotFound() {
 
 export function RouteError({ error }: ErrorComponentProps) {
 	const router = useRouter();
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 	const signedOut = isUnauthorizedError(error);
 	useStatusTitle(signedOut ? "Sign in" : "This page couldn't load");
@@ -78,7 +81,7 @@ export function RouteError({ error }: ErrorComponentProps) {
 							variant="outline"
 							size="sm"
 							icon={RotateCcw}
-							onClick={() => router.invalidate()}
+							onClick={() => refreshAllData(router, queryClient)}
 						>
 							Try again
 						</Button>

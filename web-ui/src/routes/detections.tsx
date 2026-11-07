@@ -1,9 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
 import {
-	createFileRoute,
-	useRouteContext,
-	useRouter,
-} from "@tanstack/react-router";
+	keepPreviousData,
+	queryOptions,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { RowSelectionState } from "@tanstack/react-table";
 import { AudioWaveform, X } from "lucide-react";
@@ -31,7 +33,14 @@ import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import { plural } from "~/lib/number-format.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
-import { useSettled } from "~/lib/use-settled.ts";
+import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
+
+const detectionsQuery = (data: DetectionWorkspaceSearch) =>
+	queryOptions({
+		...PAGE_QUERY,
+		queryKey: ["detections", data],
+		queryFn: () => getDetectionsPage({ data }),
+	});
 
 export const Route = createFileRoute("/detections")({
 	head: () =>
@@ -41,7 +50,9 @@ export const Route = createFileRoute("/detections")({
 		),
 	validateSearch: detectionWorkspaceSearchSchema,
 	loaderDeps: ({ search }) => search,
-	loader: ({ deps }) => ({ page: getDetectionsPage({ data: deps }) }),
+	loader: ({ context, deps }) => {
+		prefetchInBrowser(context.queryClient, detectionsQuery(deps));
+	},
 	component: Detections,
 });
 
@@ -49,12 +60,14 @@ const TABLE_CARD_CLASS =
 	"flex min-h-80 flex-col overflow-hidden [--card-edge:min(var(--page-gap),0.75rem)]";
 
 function Detections() {
-	const { page: pagePromise } = Route.useLoaderData();
-	const settled = useSettled(pagePromise);
-	const page = settled?.current ? settled.value : null;
 	const search = Route.useSearch();
+	const pageQuery = useQuery({
+		...detectionsQuery(search),
+		placeholderData: keepPreviousData,
+	});
+	const page = pageQuery.isPlaceholderData ? null : (pageQuery.data ?? null);
 	const navigate = Route.useNavigate();
-	const router = useRouter();
+	const queryClient = useQueryClient();
 	const { auth } = useRouteContext({ from: "__root__" });
 	const canDelete = auth.unlocked;
 	const canListen = auth.unlocked;
@@ -88,7 +101,7 @@ function Detections() {
 				});
 			}
 
-			await router.invalidate();
+			await queryClient.invalidateQueries();
 		},
 		onError: () => {
 			toast.error("Unable to delete the selected detections.", {
@@ -118,7 +131,7 @@ function Detections() {
 			</div>
 
 			<Deferred
-				promise={pagePromise}
+				query={pageQuery}
 				shellAfterMs={SHELL_DELAY_MS}
 				className="flex min-h-0 flex-1 flex-col"
 				shell={

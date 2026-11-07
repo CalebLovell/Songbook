@@ -127,10 +127,15 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Empty states**: `EmptyNote`. The bird page's Best recording card instead keeps
   its plot: `QuietSpectrogram`, a faint noise floor with a muted icon and the message
   centered, and no controls. It stays generic, never saying why a clip is missing.
-- **Loading shells**: navigation is instant. Route loaders return their
-  server calls as deferred promises (never `await` them), and each part that
-  needs the data renders through `Deferred` (`components/deferred.tsx`) or
-  `useSettled` -- state, not Suspense, so hydration can't strand a shell.
+- **Loading shells**: navigation is instant. Page data lives in React Query,
+  never in loader promises: a loader only calls `prefetchInBrowser`, and each
+  part that needs the data renders through `useQuery` and `Deferred`
+  (`components/deferred.tsx`) -- no Suspense, so hydration can't strand a shell.
+  Page queries spread `PAGE_QUERY`, or `FORM_QUERY` when a form seeds from the
+  data once (no cached copy, so never an old revision). Neither refetches on
+  focus. Data refreshes on navigation, after a change (`invalidateQueries`), and
+  on pull to refresh or sign-in changes (`refreshAllData`). Loaders still `await`
+  what `head` or `notFound` needs.
   Anything that doesn't depend on the data (titles, labels, controls driven
   by the URL) renders as itself at once. Every card that fetches has a
   `…Skeleton` beside it, built from the card's own markup and shared class

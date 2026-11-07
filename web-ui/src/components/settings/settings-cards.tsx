@@ -77,6 +77,12 @@ function useCardSave<T>(
 	const [values, setValues] = useState(initial);
 	const [saved, setSaved] = useState(initial);
 	const [needsRestart, setNeedsRestart] = useState(false);
+	const [seenInitial, setSeenInitial] = useState(initial);
+	if (!unchanged(initial, seenInitial)) {
+		setSeenInitial(initial);
+		setSaved(initial);
+		if (unchanged(values, saved)) setValues(initial);
+	}
 
 	const saveMutation = useMutation({
 		mutationFn: ({ saver, next }: { saver: Saver<T>; next: T }) => saver(next),

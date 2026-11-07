@@ -25,12 +25,13 @@ export function useHeldRound(
 	});
 	const [wantsNextRound, setWantsNextRound] = useState(false);
 	const requestNextRound = () => setWantsNextRound(true);
+	const cancelNextRound = () => setWantsNextRound(false);
 
 	if (shouldAdoptRound(held, { round, pool }, wantsNextRound)) {
 		setHeld({ round, pool });
 		setWantsNextRound(false);
-		return { round, requestNextRound };
+		return { round, requestNextRound, cancelNextRound };
 	}
 
-	return { round: held.round, requestNextRound };
+	return { round: held.round, requestNextRound, cancelNextRound };
 }

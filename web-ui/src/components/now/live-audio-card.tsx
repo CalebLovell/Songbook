@@ -11,6 +11,11 @@ import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Toggle } from "~/components/ui/toggle.tsx";
+import {
+	liveAudioIsConnecting,
+	liveAudioIsPlaying,
+	liveAudioReadout,
+} from "~/lib/live-audio-machine.ts";
 import { type Rgb, rampColor } from "~/lib/spectrogram.ts";
 import { useLiveAudio } from "~/lib/use-live-audio.ts";
 
@@ -42,18 +47,10 @@ function CardShell({
 
 function PlayerPanel() {
 	const live = useLiveAudio(STREAM_URL);
-	const isPlaying = live.state === "playing";
-	const isOffline = live.state === "offline";
-	const isConnecting = live.state === "connecting";
-	const readout = isConnecting
-		? live.hasFailed
-			? "Retrying…"
-			: "Connecting…"
-		: isPlaying
-			? "Live"
-			: isOffline
-				? "Offline"
-				: "Live feed";
+	const isPlaying = liveAudioIsPlaying(live.state);
+	const isOffline = live.state.status === "offline";
+	const isConnecting = liveAudioIsConnecting(live.state);
+	const readout = liveAudioReadout(live.state);
 
 	return (
 		<CardShell status={isOffline ? "Stream unavailable" : null}>

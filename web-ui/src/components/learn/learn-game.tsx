@@ -24,6 +24,12 @@ import {
 	learnPoolMeanings,
 } from "~/lib/learn-pools.ts";
 import {
+	FRESH_PROGRESS,
+	type GameProgress,
+	progressAfterAdvance,
+	progressAfterGuess,
+} from "~/lib/learn-progress.ts";
+import {
 	CHOICES_PER_QUESTION,
 	type LearnChoice,
 	type LearnQuestion,
@@ -34,7 +40,6 @@ import {
 	type QuestionResult,
 	scoreRound,
 } from "~/lib/learn-round.ts";
-import { FRESH_PROGRESS, type GameProgress } from "~/lib/learn-saved-game.ts";
 
 const QUIZ_GRID_CLASS =
 	"grid grid-cols-[minmax(0,1fr)] @3xl/quiz:grid-cols-[minmax(0,1fr)_24rem] @7xl/quiz:grid-cols-[minmax(914px,1fr)_minmax(20rem,38rem)] items-start gap-page";
@@ -252,7 +257,9 @@ export function LearnGame({
 		focusClipOnStart ? "clip" : null,
 	);
 	const justFinished = useRef(false);
-	const { index, wrongGuesses, isSolved, results, isFinished } = progress;
+	const { index, wrongGuesses, results } = progress;
+	const isSolved = progress.phase === "solved";
+	const isFinished = progress.phase === "finished";
 
 	useEffect(() => {
 		onProgressChange?.(progress);
@@ -270,51 +277,40 @@ export function LearnGame({
 
 	const guess = useCallback(
 		(choice: LearnChoice) => {
-			if (!question || isSolved || wrongGuesses.includes(choice.sciName))
-				return;
+			if (!question) return;
+			const next = progressAfterGuess(
+				progress,
+				choice.sciName,
+				question.answerSciName,
+			);
+			if (next === progress) return;
 
-			if (choice.sciName === question.answerSciName) {
-				const points = pointsForAttempt(wrongGuesses.length + 1);
+			if (next.phase === "solved") {
+				const points = pointsForAttempt(progress.wrongGuesses.length + 1);
 				announce(
 					`Correct: ${choice.comName}. ${points} ${points === 1 ? "point" : "points"}.`,
 				);
 				focusAfterRender.current = "next";
-				setProgress((previous) => ({
-					...previous,
-					results: [
-						...previous.results,
-						{ attempts: previous.wrongGuesses.length + 1 },
-					],
-					isSolved: true,
-				}));
-				return;
+			} else {
+				announce(`Not the ${choice.comName}. Try again.`);
 			}
-
-			announce(`Not the ${choice.comName}. Try again.`);
-			setProgress((previous) => ({
-				...previous,
-				wrongGuesses: [...previous.wrongGuesses, choice.sciName],
-			}));
+			setProgress(next);
 		},
-		[question, isSolved, wrongGuesses],
+		[question, progress],
 	);
 
 	const advance = useCallback(() => {
-		if (!isSolved) return;
-		if (index + 1 >= round.questions.length) {
+		const next = progressAfterAdvance(progress, round.questions.length);
+		if (next === progress) return;
+
+		if (next.phase === "finished") {
 			justFinished.current = true;
-			setProgress((previous) => ({ ...previous, isFinished: true }));
-			return;
+		} else {
+			announce(`Bird ${next.index + 1} of ${round.questions.length}.`);
+			focusAfterRender.current = "clip";
 		}
-		announce(`Bird ${index + 2} of ${round.questions.length}.`);
-		focusAfterRender.current = "clip";
-		setProgress((previous) => ({
-			...previous,
-			index: previous.index + 1,
-			wrongGuesses: [],
-			isSolved: false,
-		}));
-	}, [isSolved, index, round.questions.length]);
+		setProgress(next);
+	}, [progress, round.questions.length]);
 
 	useEffect(() => {
 		if (isFinished || isPaused) return;

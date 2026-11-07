@@ -28,6 +28,21 @@ const RUN_STATES: readonly UpdateRunState[] = [
 	"updated",
 ];
 
+const INTERRUPTED_AFTER_MS = 30 * 60_000;
+const INTERRUPTED_MESSAGE =
+	"The last update stopped before it finished. Check again to see where the station stands.";
+
+function wasInterrupted(
+	state: UpdateRunState,
+	updatedAt: string | null,
+	now: number,
+) {
+	if (state !== "checking" && state !== "updating") return false;
+	return (
+		updatedAt !== null && now - Date.parse(updatedAt) > INTERRUPTED_AFTER_MS
+	);
+}
+
 function parseJson(text: string | null): Record<string, unknown> | null {
 	if (!text) return null;
 	try {
@@ -46,6 +61,7 @@ const text = (value: unknown) =>
 export function parseUpdateState(
 	installedText: string | null,
 	statusText: string | null,
+	now = Date.now(),
 ): UpdateState {
 	const installed = parseJson(installedText);
 	const status = parseJson(statusText);
@@ -53,7 +69,9 @@ export function parseUpdateState(
 		status?.latest && typeof status.latest === "object"
 			? (status.latest as Record<string, unknown>)
 			: null;
-	const state = RUN_STATES.find((value) => value === status?.state) ?? "idle";
+	const written = RUN_STATES.find((value) => value === status?.state) ?? "idle";
+	const interrupted = wasInterrupted(written, text(status?.updatedAt), now);
+	const state = interrupted ? "failed" : written;
 	return {
 		managed: true,
 		installed:
@@ -71,7 +89,7 @@ export function parseUpdateState(
 				: null,
 		checkedAt: text(status?.checkedAt),
 		state,
-		message: text(status?.message),
+		message: interrupted ? INTERRUPTED_MESSAGE : text(status?.message),
 		target: state === "updating" ? text(status?.target) : null,
 	};
 }
