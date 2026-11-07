@@ -20,7 +20,10 @@ import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { type SpeciesLink, speciesLinkFor } from "~/lib/species-link.ts";
 
-export type DetectionTableRow = Omit<Detection, "Lat" | "Lon"> & {
+export type DetectionTableRow = Omit<
+	Detection,
+	"Lat" | "Lon" | "Cutoff" | "Week" | "Sens" | "Overlap"
+> & {
 	rowId: number;
 };
 
@@ -116,10 +119,6 @@ export const getDetectionsPage = createServerFn({ method: "GET" })
 				Sci_Name: detections.Sci_Name,
 				Com_Name: detections.Com_Name,
 				Confidence: detections.Confidence,
-				Cutoff: detections.Cutoff,
-				Week: detections.Week,
-				Sens: detections.Sens,
-				Overlap: detections.Overlap,
 				File_Name: detections.File_Name,
 			})
 			.from(detections)
