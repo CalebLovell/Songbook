@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import {
 	type ColumnDef,
-	getCoreRowModel,
 	type OnChangeFn,
 	type RowSelectionState,
-	useReactTable,
+	rowSelectionFeature,
+	tableFeatures,
+	useTable,
 } from "@tanstack/react-table";
 import { ArrowRight, Calendar, Trash2, X } from "lucide-react";
 import { type CSSProperties, type ReactNode, useId, useState } from "react";
@@ -53,6 +54,10 @@ import { useShiftClickRange } from "~/lib/shift-click-range.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { cn } from "~/lib/utils.ts";
+
+const TABLE_FEATURES = tableFeatures({ rowSelectionFeature });
+
+type DetectionColumn = ColumnDef<typeof TABLE_FEATURES, DetectionTableRow>;
 
 type DetectionsTableProps = {
 	page: DetectionPage | null;
@@ -413,7 +418,7 @@ export function DetectionsTable({
 		updateSearch(nextDetectionSort(search, sort));
 	}
 
-	const selectColumn: ColumnDef<DetectionTableRow> = {
+	const selectColumn: DetectionColumn = {
 		id: "select",
 		header: ({ table }) => (
 			<RowCheckbox
@@ -443,13 +448,12 @@ export function DetectionsTable({
 				}}
 			/>
 		),
-		enableHiding: false,
 	};
 
 	const firstIndex = (search.page - 1) * DETECTIONS_PAGE_SIZE + 1;
 	const lastIndex =
 		firstIndex + (page?.rows.length ?? DETECTIONS_PAGE_SIZE) - 1;
-	const indexColumn: ColumnDef<DetectionTableRow> = {
+	const indexColumn: DetectionColumn = {
 		id: "index",
 		header: () => (
 			<>
@@ -463,10 +467,9 @@ export function DetectionsTable({
 				widest={Math.max(lastIndex, TABLE_INDEX_FLOOR)}
 			/>
 		),
-		enableHiding: false,
 	};
 
-	const audioColumn: ColumnDef<DetectionTableRow> = {
+	const audioColumn: DetectionColumn = {
 		id: "audio",
 		header: () => <span className="sr-only @xl:not-sr-only">Recording</span>,
 		cell: ({ row }) => (
@@ -484,10 +487,9 @@ export function DetectionsTable({
 				/>
 			</div>
 		),
-		enableHiding: false,
 	};
 
-	const columns: ColumnDef<DetectionTableRow>[] = [
+	const columns: DetectionColumn[] = [
 		...(canDelete ? [selectColumn] : []),
 		indexColumn,
 		{
@@ -592,7 +594,8 @@ export function DetectionsTable({
 	];
 
 	const skeleton = page === null;
-	const table = useReactTable({
+	const table = useTable({
+		features: TABLE_FEATURES,
 		columns: skeleton
 			? columns.map(
 					(column) =>
@@ -605,19 +608,12 @@ export function DetectionsTable({
 									widestIndex={Math.max(lastIndex, TABLE_INDEX_FLOOR)}
 								/>
 							),
-						}) as ColumnDef<DetectionTableRow>,
+						}) as DetectionColumn,
 				)
 			: columns,
 		data: page?.rows ?? SKELETON_ROWS,
-		getCoreRowModel: getCoreRowModel(),
 		getRowId: skeleton ? (_, index) => `skeleton-${index}` : detectionRowKey,
-		manualPagination: true,
-		manualSorting: true,
 		enableRowSelection: true,
-		pageCount: Math.max(
-			1,
-			Math.ceil((page?.total ?? 0) / DETECTIONS_PAGE_SIZE),
-		),
 		onRowSelectionChange,
 		state: { rowSelection },
 	});
@@ -729,7 +725,7 @@ export function DetectionsTable({
 								row.getIsSelected() ? "bg-row-selected" : "bg-card",
 							)}
 						>
-							{row.getVisibleCells().map((cell, index) => (
+							{row.getAllCells().map((cell, index) => (
 								<TableCell
 									key={cell.id}
 									role="cell"
