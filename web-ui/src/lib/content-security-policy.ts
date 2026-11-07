@@ -1,4 +1,5 @@
 const REFERENCE_PHOTO_ORIGIN = "https://inaturalist-open-data.s3.amazonaws.com";
+const WEB_ANALYTICS_BEACON_ORIGIN = "https://static.cloudflareinsights.com";
 
 const ALWAYS = [
 	"object-src 'none'",
@@ -17,7 +18,7 @@ export function contentSecurityPolicy({
 	if (dev) return ALWAYS.join("; ");
 	return [
 		"default-src 'self'",
-		`script-src 'self' 'nonce-${nonce}'`,
+		`script-src 'self' 'nonce-${nonce}' ${WEB_ANALYTICS_BEACON_ORIGIN}`,
 		"style-src 'self' 'unsafe-inline'",
 		`img-src 'self' data: blob: ${REFERENCE_PHOTO_ORIGIN}`,
 		"media-src 'self' blob:",

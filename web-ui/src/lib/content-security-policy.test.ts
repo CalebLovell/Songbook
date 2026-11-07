@@ -12,11 +12,12 @@ function directives(policy: string) {
 	);
 }
 
-test("production scripts need the request's nonce or our own origin", () => {
+test("production inline scripts need the request's nonce", () => {
 	const policy = directives(
 		contentSecurityPolicy({ nonce: "abc", dev: false }),
 	);
-	assert.equal(policy.get("script-src"), "'self' 'nonce-abc'");
+	assert.doesNotMatch(policy.get("script-src") ?? "", /unsafe-inline/);
+	assert.match(policy.get("script-src") ?? "", /'nonce-abc'/);
 });
 
 test("production blocks plugins, base rewrites, framing and outside connections", () => {
@@ -40,6 +41,16 @@ test("reference photos and in-memory clips still load", () => {
 		/https:\/\/inaturalist-open-data\.s3\.amazonaws\.com/,
 	);
 	assert.match(policy.get("media-src") ?? "", /blob:/);
+});
+
+test("the Cloudflare Web Analytics beacon is the only outside script allowed", () => {
+	const policy = directives(
+		contentSecurityPolicy({ nonce: "abc", dev: false }),
+	);
+	assert.equal(
+		policy.get("script-src"),
+		"'self' 'nonce-abc' https://static.cloudflareinsights.com",
+	);
 });
 
 test("the dev server keeps its inline scripts and hot reload connection", () => {
