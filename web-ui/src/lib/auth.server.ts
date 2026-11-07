@@ -81,6 +81,14 @@ function issueSession(auth: AuthFile) {
 	});
 }
 
+export async function isSignedIn(): Promise<boolean> {
+	try {
+		return (await readUnlockStatus()).unlocked;
+	} catch {
+		return false;
+	}
+}
+
 export async function readUnlockStatus(): Promise<UnlockStatus> {
 	const loaded = await loadAuth();
 	if (loaded.state !== "ready") return { unlocked: false, state: loaded.state };

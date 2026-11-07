@@ -302,7 +302,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   refused and a declined restart read the same, and the card keeps offering Restart
   until the values are live. Reset leaves the Station card alone. One tab per card,
   except Preferences, which stacks the cards about taste rather than running the
-  station (Artwork, Highlights, Review); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
+  station (Artwork, Highlights, Review), and Data (Backup, Restore, Export detections); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
   never drops an unsaved edit. The toolbar's Factory defaults covers every card; a card's own
   footer reset covers only that card and goes through its normal save, and Station
   and Updates have no default to offer one. A card's Save and reset show as disabled
@@ -340,6 +340,17 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Public reads never carry `Lat` or `Lon`**: the coordinates are the owner's home.
 - **Passwords**: there is no default. The file is written temp-then-rename at 0600,
   the CLI reads stdin and never argv, and an unreadable file is an error, not "unset".
+- **Backups** carry the database, the settings cards that describe the data, species
+  lists and optionally clips, as a tar whose last entry holds every file's checksum,
+  so a cut-off download fails the check. Passwords and the Audio input and Updates
+  cards never travel: they belong to the machine. Add to `backupSettingsSchema` only
+  what a new station should inherit.
+- **Restores** never touch live data until a backup has passed every check and the
+  owner has seen what's in it. The database is replaced inside one transaction on the
+  existing file, so a failure changes nothing and open connections stay valid. A
+  safety copy is written first; a failure rolls back from it, and it stays until the
+  owner undoes or deletes it, which a further restore waits on. Work files live in
+  `Songbook-data` beside `Extracted`, so clips move by rename, on the same disk.
 - **Client addresses** come from proxy headers only under `WEB_UI_TRUSTED_PROXY`, and
   then only `CF-Connecting-IP` or the last `X-Forwarded-For` hop. Only off-LAN
   failures feed the global throttle, so a remote attacker can't lock the owner out.

@@ -15,9 +15,9 @@ test("every settings tab has exactly one section, in tab order", () => {
 	);
 });
 
-test("a card outside Preferences has its tab as its anchor id", () => {
+test("a card on its own tab has that tab as its anchor id", () => {
 	for (const entry of SETTINGS_INDEX) {
-		if (entry.tab !== "preferences")
+		if (entry.tab !== "preferences" && entry.tab !== "data")
 			assert.equal(entry.tab, settingsCardId(entry.title));
 	}
 });

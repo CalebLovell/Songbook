@@ -44,7 +44,7 @@ export type SettingsServerDependencies = {
 	runner?: SettingsCommandRunner;
 };
 
-async function currentTimezone() {
+export async function currentTimezone() {
 	try {
 		const configured = (await readFile("/etc/timezone", "utf8")).trim();
 		if (configured) return configured;

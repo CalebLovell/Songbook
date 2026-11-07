@@ -169,7 +169,7 @@ function resetControl(
 	};
 }
 
-function Field({
+export function Field({
 	label,
 	hint,
 	info,
@@ -253,7 +253,7 @@ function FieldInput({
 	);
 }
 
-function FieldSelect({ children, ...props }: ComponentProps<"select">) {
+export function FieldSelect({ children, ...props }: ComponentProps<"select">) {
 	const { id, hintId } = useContext(FieldContext);
 	return (
 		<div className="relative">
@@ -273,7 +273,7 @@ function FieldSelect({ children, ...props }: ComponentProps<"select">) {
 	);
 }
 
-function FieldChoice<T extends string>({
+export function FieldChoice<T extends string>({
 	value,
 	options,
 	onChange,
@@ -321,6 +321,7 @@ export function SettingsCards({
 	updates = null,
 	onCheckUpdates,
 	onInstallUpdate,
+	dataTab = null,
 }: {
 	tab: SettingsTab;
 	data: SettingsPageData;
@@ -330,6 +331,7 @@ export function SettingsCards({
 	updates?: UpdateState | null;
 	onCheckUpdates?: () => Promise<UpdateState>;
 	onInstallUpdate?: () => Promise<void>;
+	dataTab?: ReactNode;
 }) {
 	const restartFor = (card: SettingsCardKind): CardRestarter | undefined =>
 		restarter ? () => restarter(card) : undefined;
@@ -394,6 +396,7 @@ export function SettingsCards({
 				<ReviewSettingsCard initial={data.review} save={savers.review} />
 			</div>
 		),
+		data: dataTab,
 	};
 	return (
 		<>
@@ -1443,11 +1446,22 @@ const SKELETON_DATA: SettingsPageData = {
 const SKELETON_VALUES_CLASS =
 	"[&_:is(input,select,textarea)]:animate-pulse! [&_:is(input,select,textarea)]:border-transparent! [&_:is(input,select,textarea)]:bg-muted! [&_:is(input,select,textarea)]:bg-none! [&_:is(input,select,textarea)]:text-transparent! [&_:is(input,textarea)::placeholder]:text-transparent! **:data-[slot=toggle-group-item]:animate-pulse! **:data-[slot=toggle-group-item]:border-paper-raised! **:data-[slot=toggle-group-item]:bg-muted! **:data-[slot=toggle-group-item]:text-transparent!";
 
-export function SettingsCardsSkeleton({ tab }: { tab: SettingsTab }) {
+export function SettingsCardsSkeleton({
+	tab,
+	dataTab,
+}: {
+	tab: SettingsTab;
+	dataTab?: ReactNode;
+}) {
 	return (
 		<div inert aria-busy="true" className={SKELETON_VALUES_CLASS}>
 			<SkeletonContext.Provider value={true}>
-				<SettingsCards tab={tab} data={SKELETON_DATA} savers={{}} />
+				<SettingsCards
+					tab={tab}
+					data={SKELETON_DATA}
+					savers={{}}
+					dataTab={dataTab}
+				/>
 			</SkeletonContext.Provider>
 		</div>
 	);

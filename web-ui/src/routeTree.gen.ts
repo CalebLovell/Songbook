@@ -19,6 +19,9 @@ import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as ApiLiveStreamRouteImport } from './routes/api/live-stream'
 import { Route as BirdsIndexRouteImport } from './routes/birds.index'
 import { Route as BirdsComNameRouteImport } from './routes/birds.$comName'
+import { Route as ApiDataBackupRouteImport } from './routes/api/data/backup'
+import { Route as ApiDataExportRouteImport } from './routes/api/data/export'
+import { Route as ApiDataRestoreRouteImport } from './routes/api/data/restore'
 import { Route as ApiAudioDateSpeciesAndFileRouteImport } from './routes/api/audio/$date/$speciesAndFile'
 
 const IndexRoute = IndexRouteImport.update({
@@ -81,6 +84,21 @@ const BirdsComNameRoute = BirdsComNameRouteImport.update({
   path: '/birds/$comName',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDataBackupRoute = ApiDataBackupRouteImport.update({
+  id: '/api/data/backup',
+  path: '/api/data/backup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDataExportRoute = ApiDataExportRouteImport.update({
+  id: '/api/data/export',
+  path: '/api/data/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDataRestoreRoute = ApiDataRestoreRouteImport.update({
+  id: '/api/data/restore',
+  path: '/api/data/restore',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAudioDateSpeciesAndFileRoute =
   ApiAudioDateSpeciesAndFileRouteImport.update({
     id: '/api/audio/$date/$speciesAndFile',
@@ -101,6 +119,9 @@ export interface FileRoutesByFullPath {
   '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
   '/birds/': typeof BirdsIndexRoute
+  '/api/data/backup': typeof ApiDataBackupRoute
+  '/api/data/export': typeof ApiDataExportRoute
+  '/api/data/restore': typeof ApiDataRestoreRoute
   '/api/audio/$date/$speciesAndFile': typeof ApiAudioDateSpeciesAndFileRoute
 }
 export interface FileRoutesByTo {
@@ -116,6 +137,9 @@ export interface FileRoutesByTo {
   '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
   '/birds': typeof BirdsIndexRoute
+  '/api/data/backup': typeof ApiDataBackupRoute
+  '/api/data/export': typeof ApiDataExportRoute
+  '/api/data/restore': typeof ApiDataRestoreRoute
   '/api/audio/$date/$speciesAndFile': typeof ApiAudioDateSpeciesAndFileRoute
 }
 export interface FileRoutesById {
@@ -132,6 +156,9 @@ export interface FileRoutesById {
   '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
   '/birds/': typeof BirdsIndexRoute
+  '/api/data/backup': typeof ApiDataBackupRoute
+  '/api/data/export': typeof ApiDataExportRoute
+  '/api/data/restore': typeof ApiDataRestoreRoute
   '/api/audio/$date/$speciesAndFile': typeof ApiAudioDateSpeciesAndFileRoute
 }
 export interface FileRouteTypes {
@@ -149,6 +176,9 @@ export interface FileRouteTypes {
     | '/api/live-stream'
     | '/birds/$comName'
     | '/birds/'
+    | '/api/data/backup'
+    | '/api/data/export'
+    | '/api/data/restore'
     | '/api/audio/$date/$speciesAndFile'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -164,6 +194,9 @@ export interface FileRouteTypes {
     | '/api/live-stream'
     | '/birds/$comName'
     | '/birds'
+    | '/api/data/backup'
+    | '/api/data/export'
+    | '/api/data/restore'
     | '/api/audio/$date/$speciesAndFile'
   id:
     | '__root__'
@@ -179,6 +212,9 @@ export interface FileRouteTypes {
     | '/api/live-stream'
     | '/birds/$comName'
     | '/birds/'
+    | '/api/data/backup'
+    | '/api/data/export'
+    | '/api/data/restore'
     | '/api/audio/$date/$speciesAndFile'
   fileRoutesById: FileRoutesById
 }
@@ -195,6 +231,9 @@ export interface RootRouteChildren {
   ApiLiveStreamRoute: typeof ApiLiveStreamRoute
   BirdsComNameRoute: typeof BirdsComNameRoute
   BirdsIndexRoute: typeof BirdsIndexRoute
+  ApiDataBackupRoute: typeof ApiDataBackupRoute
+  ApiDataExportRoute: typeof ApiDataExportRoute
+  ApiDataRestoreRoute: typeof ApiDataRestoreRoute
   ApiAudioDateSpeciesAndFileRoute: typeof ApiAudioDateSpeciesAndFileRoute
 }
 
@@ -284,6 +323,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BirdsComNameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/data/backup': {
+      id: '/api/data/backup'
+      path: '/api/data/backup'
+      fullPath: '/api/data/backup'
+      preLoaderRoute: typeof ApiDataBackupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/data/export': {
+      id: '/api/data/export'
+      path: '/api/data/export'
+      fullPath: '/api/data/export'
+      preLoaderRoute: typeof ApiDataExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/data/restore': {
+      id: '/api/data/restore'
+      path: '/api/data/restore'
+      fullPath: '/api/data/restore'
+      preLoaderRoute: typeof ApiDataRestoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/audio/$date/$speciesAndFile': {
       id: '/api/audio/$date/$speciesAndFile'
       path: '/api/audio/$date/$speciesAndFile'
@@ -307,6 +367,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLiveStreamRoute: ApiLiveStreamRoute,
   BirdsComNameRoute: BirdsComNameRoute,
   BirdsIndexRoute: BirdsIndexRoute,
+  ApiDataBackupRoute: ApiDataBackupRoute,
+  ApiDataExportRoute: ApiDataExportRoute,
+  ApiDataRestoreRoute: ApiDataRestoreRoute,
   ApiAudioDateSpeciesAndFileRoute: ApiAudioDateSpeciesAndFileRoute,
 }
 export const routeTree = rootRouteImport

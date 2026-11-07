@@ -70,6 +70,29 @@ export async function restartServices(
 	return { attempted: true, skipped: false };
 }
 
+const RECORDING_SERVICES = [
+	"birdnet_recording.service",
+	"birdnet_analysis.service",
+];
+
+export async function stopStationServices(
+	context: SettingsSystemContext = {},
+	runner: SettingsCommandRunner = defaultRunner,
+) {
+	if (skipRequested(context)) return { attempted: false, skipped: true };
+	await runner("sudo", ["systemctl", "stop", ...RECORDING_SERVICES]);
+	return { attempted: true, skipped: false };
+}
+
+export async function startStationServices(
+	context: SettingsSystemContext = {},
+	runner: SettingsCommandRunner = defaultRunner,
+) {
+	if (skipRequested(context)) return { attempted: false, skipped: true };
+	await runner("sudo", ["systemctl", "start", ...RECORDING_SERVICES]);
+	return { attempted: true, skipped: false };
+}
+
 export async function runCardSystemActions(
 	kind: SettingsCardKind,
 	context: SettingsSystemContext = {},
