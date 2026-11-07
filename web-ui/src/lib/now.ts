@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, avg, count, desc, sql } from "drizzle-orm";
+import { avg, count, desc, sql } from "drizzle-orm";
 
 import { db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
@@ -63,98 +63,76 @@ export type NowSnapshot = {
 
 export const RECENT_LIMIT = 10;
 
-type LatestRow = {
+function detectionKey(row: { detectedAt: string; fileName: string }): string {
+	return `${row.detectedAt}-${row.fileName}`;
+}
+
+type WindowRow = {
 	comName: string;
 	sciName: string;
 	date: string;
 	detectedAt: string;
 	confidence: number | null;
 	fileName: string;
+	timestamp: string;
 };
 
-function detectionKey(row: { detectedAt: string; fileName: string }): string {
-	return `${row.detectedAt}-${row.fileName}`;
-}
-
 async function buildCurrentBird(
-	latest: LatestRow,
+	latest: WindowRow,
+	windowRows: WindowRow[],
 	generatedAtMs: number,
 	withAudio: boolean,
 ): Promise<CurrentBird> {
-	const isSameSpecies = sql`${detections.Com_Name} = ${latest.comName}`;
-	// The unary + keeps SQLite off the Com_Name index, so the Date/Time index narrows
-	// the window instead of reading every detection of a common bird.
-	const inWindowSameSpecies = and(
-		isLast24h,
-		sql`+${detections.Com_Name} = ${latest.comName}`,
-	);
-
-	const [[totals], [allTime], moments, imageUrl] = await Promise.all([
-		db
-			.select({
-				countLast24h: count(),
-				firstHeard: sql<
-					string | null
-				>`min(datetime(${detections.Date} || ' ' || ${detections.Time}))`,
-			})
-			.from(detections)
-			.where(inWindowSameSpecies),
-		db
-			.select({
-				allTimeCount: count(),
-				averageConfidence: avg(detections.Confidence),
-			})
-			.from(detections)
-			.where(isSameSpecies),
-		db
-			.select({ timestamp: detectedAt })
-			.from(detections)
-			.where(inWindowSameSpecies),
-		illustrationUrlFor(latest.sciName, "flight"),
-	]);
+	const [allTime] = await db
+		.select({
+			allTimeCount: count(),
+			averageConfidence: avg(detections.Confidence),
+		})
+		.from(detections)
+		.where(sql`${detections.Com_Name} = ${latest.comName}`);
+	const moments = windowRows
+		.filter((row) => row.comName === latest.comName)
+		.map((row) => row.detectedAt);
 
 	return {
 		key: detectionKey(latest),
 		comName: latest.comName,
 		sciName: latest.sciName,
 		speciesSlug: comNameToSlug(latest.comName),
-		imageUrl,
+		imageUrl: illustrationUrlFor(latest.sciName, "flight"),
 		detectedAt: latest.detectedAt,
 		ageMs: generatedAtMs - timestampToMillis(latest.detectedAt),
 		confidence: latest.confidence,
 		audioUrl: withAudio
 			? audioUrlFor(latest.date, latest.comName, latest.fileName)
 			: null,
-		countLast24h: totals.countLast24h,
-		visitsLast24h: countVisits(moments.map((moment) => moment.timestamp)),
+		countLast24h: moments.length,
+		visitsLast24h: countVisits(moments),
 		averageConfidence:
 			allTime.averageConfidence != null
 				? Number(allTime.averageConfidence)
 				: null,
-		firstHeardLast24h: totals.firstHeard,
+		firstHeardLast24h: moments.reduce((earliest, moment) =>
+			moment < earliest ? moment : earliest,
+		),
 		allTimeCount: allTime.allTimeCount,
 	};
 }
 
-type WindowRow = LatestRow & { timestamp: string };
-
-const detectionColumns = {
-	comName: detections.Com_Name,
-	sciName: detections.Sci_Name,
-	date: detections.Date,
-	detectedAt,
-	confidence: detections.Confidence,
-	fileName: detections.File_Name,
-};
-
-async function getLatestRow(): Promise<LatestRow | undefined> {
-	const [latest] = await db
-		.select(detectionColumns)
+async function getWindowRows(): Promise<WindowRow[]> {
+	const rows = await db
+		.select({
+			comName: detections.Com_Name,
+			sciName: detections.Sci_Name,
+			date: detections.Date,
+			detectedAt,
+			confidence: detections.Confidence,
+			fileName: detections.File_Name,
+		})
 		.from(detections)
 		.where(isLast24h)
-		.orderBy(desc(detections.Date), desc(detections.Time))
-		.limit(1);
-	return latest;
+		.orderBy(desc(detections.Date), desc(detections.Time));
+	return rows.map((row) => ({ ...row, timestamp: row.detectedAt }));
 }
 
 async function hasAnyDetections(): Promise<boolean> {
@@ -163,19 +141,6 @@ async function hasAnyDetections(): Promise<boolean> {
 		.from(detections)
 		.limit(1);
 	return row !== undefined;
-}
-
-async function getWindowVisits(heroKey: string | undefined) {
-	const rows: WindowRow[] = (
-		await db.select(detectionColumns).from(detections).where(isLast24h)
-	).map((row) => ({ ...row, timestamp: row.detectedAt }));
-
-	const visits = groupVisits(rows);
-	const log = visits.filter(
-		(visit) =>
-			detectionKey(visit.moments[visit.moments.length - 1]) !== heroKey,
-	);
-	return { rows, visits, log };
 }
 
 function buildRecentVisits(
@@ -214,20 +179,23 @@ export const getNowSnapshot = createServerFn({ method: "GET" }).handler(
 		const generatedAtDate = new Date();
 		const generatedAtMs = generatedAtDate.getTime();
 
-		const latest = await getLatestRow();
+		const rows = await getWindowRows();
+		const latest = rows.at(0);
 		const withAudio = await canHearEveryClip();
-		const [current, window, anyDetections] = await Promise.all([
-			latest ? buildCurrentBird(latest, generatedAtMs, withAudio) : null,
-			getWindowVisits(latest ? detectionKey(latest) : undefined),
-			latest ? true : hasAnyDetections(),
-		]);
+		const heroKey = latest && detectionKey(latest);
+		const log = groupVisits(rows).filter(
+			(visit) =>
+				detectionKey(visit.moments[visit.moments.length - 1]) !== heroKey,
+		);
 
 		return {
 			generatedAt: localTimestamp(generatedAtDate),
-			current,
-			hasAnyDetections: anyDetections,
-			summary: { detections: window.rows.length },
-			recent: await buildRecentVisits(window.log, generatedAtMs, withAudio),
+			current: latest
+				? await buildCurrentBird(latest, rows, generatedAtMs, withAudio)
+				: null,
+			hasAnyDetections: latest ? true : await hasAnyDetections(),
+			summary: { detections: rows.length },
+			recent: await buildRecentVisits(log, generatedAtMs, withAudio),
 		};
 	},
 );
