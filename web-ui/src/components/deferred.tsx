@@ -1,21 +1,18 @@
 import { type ReactNode, useEffect, useState } from "react";
 
 import { useSettled } from "~/lib/use-settled.ts";
-import { cn } from "~/lib/utils.ts";
 
 export const SHELL_DELAY_MS = 300;
 
 export function Deferred<T>({
 	promise,
 	shell,
-	inline = false,
 	className,
 	shellAfterMs,
 	children,
 }: {
 	promise: Promise<T>;
 	shell: ReactNode;
-	inline?: boolean;
 	className?: string;
 	shellAfterMs?: number;
 	children: (value: T) => ReactNode;
@@ -24,11 +21,7 @@ export function Deferred<T>({
 	const stale = settled !== null && !settled.current;
 	const waitedOut = useWaitedOut(promise, stale, shellAfterMs);
 	if (!settled || waitedOut) {
-		return (
-			<ShellReveal inline={inline} className={className}>
-				{shell}
-			</ShellReveal>
-		);
+		return <div className={className}>{shell}</div>;
 	}
 	return children(settled.value);
 }
@@ -45,21 +38,4 @@ function useWaitedOut(
 		return () => clearTimeout(timeout);
 	}, [promise, stale, ms]);
 	return stale && expired === promise;
-}
-
-export function ShellReveal({
-	inline = false,
-	className,
-	children,
-}: {
-	inline?: boolean;
-	className?: string;
-	children: ReactNode;
-}) {
-	const Wrapper = inline ? "span" : "div";
-	return (
-		<Wrapper className={cn(inline && "inline-block", className)}>
-			{children}
-		</Wrapper>
-	);
 }

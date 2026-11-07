@@ -1,3 +1,7 @@
+export function plural(count: number, one: string, many = `${one}s`): string {
+	return count === 1 ? one : many;
+}
+
 export function compactCount(count: number): string {
 	if (count < 1_000) return count.toString();
 	const units = [

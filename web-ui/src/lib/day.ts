@@ -1,6 +1,6 @@
 import { localTimestamp } from "~/lib/visits.ts";
 
-const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+export const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 export function isDayId(value: string): boolean {
 	if (!DAY_PATTERN.test(value)) return false;

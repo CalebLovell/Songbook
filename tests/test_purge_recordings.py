@@ -56,7 +56,6 @@ class PurgeTests(unittest.TestCase):
         self.by_date = os.path.join(self.tmp.name, "By_Date")
         for conf in (91, 72, 55):
             touch(self.by_date, f"2026-07-01/Robin/Robin-{conf}-2026-07-01-birdnet-0700{conf}.mp3")
-        touch(self.by_date, "2026-07-01/Robin/Robin-55-2026-07-01-birdnet-070055.mp3.png")
         touch(self.by_date, "2026-07-02/Wren/Wren-40-2026-07-02-birdnet-080000.mp3")
 
     def tearDown(self):

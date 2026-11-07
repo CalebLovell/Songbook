@@ -32,11 +32,14 @@ import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
 import { Input } from "~/components/ui/input.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
 import { ModalDialog } from "~/components/ui/modal-dialog.tsx";
-import { PageStepper } from "~/components/ui/page-stepper.tsx";
+import {
+	PageStepper,
+	PageStepperShell,
+} from "~/components/ui/page-stepper.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { formatConfidence } from "~/lib/confidence.ts";
-import { formatDate, formatDateTime } from "~/lib/date-format.ts";
+import { formatDate, formatDateTime, formatTime } from "~/lib/date-format.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import type { ReviewCandidate, ReviewPage } from "~/lib/review.server.ts";
 import { REVIEW_PAGE_SIZE, type SpeciesOption } from "~/lib/review-data.ts";
@@ -188,17 +191,12 @@ export function ReviewWorkflowSkeleton() {
 						))}
 					</ol>
 					<div className={QUEUE_FOOTER_CLASS}>
-						<span className="ml-auto">
-							<ShellSized className="rounded-md">
-								<PageStepper
-									variant="ghost"
-									label="Review queue pages"
-									page={1}
-									pageCount={20}
-									onPageChange={() => {}}
-								/>
-							</ShellSized>
-						</span>
+						<PageStepperShell
+							variant="ghost"
+							label="Review queue pages"
+							page={1}
+							pageCount={20}
+						/>
 					</div>
 				</Card>
 			</div>
@@ -255,7 +253,7 @@ type Action =
 function formatRecorded(date: string, time: string) {
 	return {
 		day: formatDate(date),
-		clock: formatDateTime(date, time).split(", ").at(-1) ?? time,
+		clock: formatTime(time),
 	};
 }
 

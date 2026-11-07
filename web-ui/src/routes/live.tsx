@@ -2,7 +2,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { Deferred, ShellReveal } from "~/components/deferred.tsx";
+import { Deferred } from "~/components/deferred.tsx";
 import { HighlightsCard } from "~/components/highlights-card.tsx";
 import { CurrentBirdCard } from "~/components/now/current-bird-card.tsx";
 import { LiveAudioCard } from "~/components/now/live-audio-card.tsx";
@@ -119,13 +119,13 @@ function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
 
 				<div className="grid grid-cols-1 gap-page">
 					<LiveAudioCard unlocked={unlocked} />
-					<ShellReveal>
+					<div>
 						<HighlightsCard
 							highlights={null}
 							period="live"
 							emptyMessage={HIGHLIGHTS_EMPTY}
 						/>
-					</ShellReveal>
+					</div>
 				</div>
 			</div>
 		</PageWrap>

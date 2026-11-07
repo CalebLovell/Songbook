@@ -89,6 +89,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 				<div className="min-w-0 flex-1">
 					<Link
 						to="/birds/$comName"
+						preload={false}
 						params={{ comName: comNameToSlug(item.comName) }}
 						className="block max-w-fit truncate font-medium no-underline hover:underline"
 					>
@@ -128,14 +129,13 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 }
 
 const NAME_WIDTHS = ["w-32", "w-24", "w-36", "w-28"];
+const SKELETON_TILES = 9;
 
 export function SpeciesGridSkeleton({
 	summary,
-	tiles = 9,
 	className = "",
 }: {
 	summary?: ReactNode;
-	tiles?: number;
 	className?: string;
 }) {
 	return (
@@ -154,7 +154,7 @@ export function SpeciesGridSkeleton({
 				</div>
 			</div>
 			<ul aria-hidden="true" className={LIST_CLASS}>
-				{Array.from({ length: tiles }, (_, index) => (
+				{Array.from({ length: SKELETON_TILES }, (_, index) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 					<li key={index} className={TILE_CLASS}>
 						<div className="flex min-w-0 items-center gap-3 max-[400px]:gap-2">

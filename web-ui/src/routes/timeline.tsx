@@ -187,7 +187,7 @@ function TimelineCardsShell({
 				/>
 				<DetectionsByHourCardSkeleton
 					info={HOUR_CARD_INFO}
-					className={HOUR_CARD_SIZE}
+					className="self-start"
 				/>
 			</div>
 		</div>
@@ -201,13 +201,6 @@ const HOUR_CARD_INFO = (
 		valleys show when it is most quiet.
 	</p>
 );
-
-const PERIOD_NOUNS: Record<Exclude<TimelinePeriod, "all">, string> = {
-	day: "day",
-	week: "week",
-	month: "month",
-	year: "year",
-};
 
 type JumpTarget = {
 	anchor: string;
@@ -229,7 +222,7 @@ function jumpTarget(data: TimelinePageData): JumpTarget | null {
 	return {
 		anchor,
 		direction,
-		noun: PERIOD_NOUNS[period],
+		noun: period,
 		label:
 			period === "day" ? spelledDate(anchor) : windowFor(period, anchor).label,
 	};
@@ -464,11 +457,7 @@ function TimelineCards({
 					activity={hourActivity}
 					emptyMessage={emptyMessage}
 					info={HOUR_CARD_INFO}
-					className={
-						hourActivity.some((point) => point.count > 0)
-							? HOUR_CARD_SIZE
-							: "self-start"
-					}
+					className="self-start"
 				/>
 			</div>
 		</div>
@@ -476,8 +465,6 @@ function TimelineCards({
 }
 
 const BODY_CARD_WIDTH = "min-w-0 min-[1800px]:w-6xl min-[1800px]:flex-none";
-
-const HOUR_CARD_SIZE = "self-start";
 
 const VIEW_META: Record<
 	TimelineView,

@@ -23,12 +23,13 @@ import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
 import {
 	type DetectionWorkspaceSearch,
+	detectionWorkspaceSearchSchema,
 	hasActiveFilters,
-	normalizeDetectionWorkspaceSearch,
 } from "~/lib/detection-workspace.ts";
 import { deleteDetections, getDetectionsPage } from "~/lib/detections.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
+import { plural } from "~/lib/number-format.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { useSettled } from "~/lib/use-settled.ts";
 
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/detections")({
 			"Detections",
 			"Every detection this station has logged, searchable, with recordings.",
 		),
-	validateSearch: (search) => normalizeDetectionWorkspaceSearch(search),
+	validateSearch: detectionWorkspaceSearchSchema,
 	loaderDeps: ({ search }) => search,
 	loader: ({ deps }) => ({ page: getDetectionsPage({ data: deps }) }),
 	component: Detections,
@@ -71,10 +72,10 @@ function Detections() {
 		onSuccess: async (result) => {
 			setDeleteOpen(false);
 			setRowSelection({});
-			const deleted = `Deleted ${result.deletedRecords} detection${result.deletedRecords === 1 ? "" : "s"}.`;
+			const deleted = `Deleted ${result.deletedRecords} ${plural(result.deletedRecords, "detection")}.`;
 			if (result.failedFiles > 0) {
 				toast.warning(deleted, {
-					description: `${result.failedFiles} audio file${result.failedFiles === 1 ? "" : "s"} could not be removed.`,
+					description: `${result.failedFiles} audio ${plural(result.failedFiles, "file")} could not be removed.`,
 				});
 			} else {
 				destructiveToast(deleted);
@@ -158,7 +159,6 @@ function Detections() {
 												species: undefined,
 												from: undefined,
 												to: undefined,
-												minConfidence: undefined,
 											},
 											replace: true,
 										})

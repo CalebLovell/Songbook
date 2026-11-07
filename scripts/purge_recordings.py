@@ -20,7 +20,6 @@ EXCLUDE_FILE = os.path.join(BASE_PATH, 'scripts/disk_check_exclude.txt')
 # for the sake of a single new recording.
 HEADROOM = 2
 BATCH = 25
-SIDECARS = ('.png', '.json')
 NAME = re.compile(r'-(\d{1,3})-(\d{4}-\d{2}-\d{2})-birdnet-')
 
 
@@ -36,8 +35,6 @@ def recordings(by_date):
             if not os.path.isdir(species_dir):
                 continue
             for name in os.listdir(species_dir):
-                if name.endswith(SIDECARS):
-                    continue
                 match = NAME.search(name)
                 confidence = int(match.group(1)) if match else 0
                 found.append((f'{date}/{species}/{name}', species, confidence, date))
@@ -63,12 +60,10 @@ def used_percent(path):
 
 
 def remove(by_date, relative):
-    path = os.path.join(by_date, relative)
-    for file in (path, *(path + suffix for suffix in SIDECARS)):
-        try:
-            os.remove(file)
-        except FileNotFoundError:
-            pass
+    try:
+        os.remove(os.path.join(by_date, relative))
+    except FileNotFoundError:
+        pass
 
 
 def remove_empty_dirs(by_date):

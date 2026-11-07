@@ -10,7 +10,6 @@ export function RecordingButton({
 	iconOnly = false,
 	speciesName,
 	size = "xs",
-	iconSize = "icon-xs",
 	variant = "outline",
 	labelClassName,
 	className = "",
@@ -19,7 +18,6 @@ export function RecordingButton({
 	iconOnly?: boolean;
 	speciesName?: string;
 	size?: "xs" | "sm" | "default";
-	iconSize?: "icon-xs" | "icon-lg";
 	variant?: "outline" | "default";
 	labelClassName?: string;
 	className?: string;
@@ -38,7 +36,7 @@ export function RecordingButton({
 		<>
 			<Button
 				variant={variant}
-				size={iconOnly ? iconSize : size}
+				size={iconOnly ? "icon-xs" : size}
 				className={`shrink-0 ${className}`}
 				icon={isPlaying ? Pause : Volume2}
 				loading={isLoading}

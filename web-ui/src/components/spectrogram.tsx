@@ -207,7 +207,7 @@ function paint(canvas: HTMLCanvasElement, buffer: AudioBuffer): void {
 	ctx.putImageData(image, 0, 0);
 }
 
-function clamp01(value: number): number {
+export function clamp01(value: number): number {
 	return value < 0 ? 0 : value > 1 ? 1 : value;
 }
 

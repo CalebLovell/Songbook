@@ -19,7 +19,6 @@ export function getRouter() {
 		scrollRestoration: true,
 		scrollToTopSelectors: ["#app-scroll", "[data-scroll-reset]"],
 		defaultPreload: "intent",
-		defaultPreloadStaleTime: 0,
 		defaultPendingMs: 0,
 		defaultPendingMinMs: 0,
 		ssr: { nonce: getGlobalStartContext()?.cspNonce },

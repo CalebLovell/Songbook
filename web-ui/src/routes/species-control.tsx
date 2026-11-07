@@ -10,12 +10,12 @@ import {
 	getSpeciesControlPage,
 	saveSpeciesControl,
 } from "~/lib/species-control.ts";
-import { normalizeSpeciesControlWorkspaceSearch } from "~/lib/species-control-workspace.ts";
+import { speciesControlWorkspaceSearchSchema } from "~/lib/species-control-workspace.ts";
 import { useSettled } from "~/lib/use-settled.ts";
 
 export const Route = createFileRoute("/species-control")({
 	head: () => pageHead("Species Control"),
-	validateSearch: normalizeSpeciesControlWorkspaceSearch,
+	validateSearch: speciesControlWorkspaceSearchSchema,
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
 	loader: () => ({ page: getSpeciesControlPage() }),

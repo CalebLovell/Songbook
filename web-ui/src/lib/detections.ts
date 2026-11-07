@@ -1,4 +1,3 @@
-import { rm } from "node:fs/promises";
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, count, desc, gte, inArray, lte, or, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -10,11 +9,12 @@ import { requireUnlocked } from "~/lib/auth.ts";
 import { hearableRecordings } from "~/lib/clip-access.server.ts";
 import {
 	type DetectionClipIdentity,
-	resolveDetectionClipPath,
+	removeClipFile,
 } from "~/lib/detection-file-path.server.ts";
 import {
+	DETECTIONS_PAGE_SIZE,
 	type DetectionWorkspaceSearch,
-	normalizeDetectionWorkspaceSearch,
+	detectionWorkspaceSearchSchema,
 } from "~/lib/detection-workspace.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
@@ -65,9 +65,6 @@ async function detectionFilters(search: DetectionWorkspaceSearch) {
 		}
 		filters.push(clauses.length > 0 ? or(...clauses) : sql`1 = 0`);
 	}
-	if (search.minConfidence !== undefined) {
-		filters.push(gte(detections.Confidence, search.minConfidence));
-	}
 	if (search.from) filters.push(gte(detections.Date, search.from));
 	if (search.to) filters.push(lte(detections.Date, search.to));
 	return filters.length > 0 ? and(...filters) : undefined;
@@ -102,9 +99,7 @@ function detectionOrder(
 }
 
 export const getDetectionsPage = createServerFn({ method: "GET" })
-	.validator((input: Record<string, unknown>) =>
-		normalizeDetectionWorkspaceSearch(input),
-	)
+	.validator(detectionWorkspaceSearchSchema)
 	.handler(async ({ data }): Promise<DetectionPage> => {
 		const filters = await detectionFilters(data);
 		const [{ total }] = await db
@@ -124,8 +119,8 @@ export const getDetectionsPage = createServerFn({ method: "GET" })
 			.from(detections)
 			.where(filters)
 			.orderBy(...detectionOrder(data))
-			.limit(data.pageSize)
-			.offset((data.page - 1) * data.pageSize);
+			.limit(DETECTIONS_PAGE_SIZE)
+			.offset((data.page - 1) * DETECTIONS_PAGE_SIZE);
 
 		return { rows, total };
 	});
@@ -205,22 +200,10 @@ async function deleteUnreferencedClips(
 			);
 		if (references > 0) continue;
 
-		const filePath = resolveDetectionClipPath(extractedDir(), clip);
-		if (!filePath) {
-			failedFiles += 1;
-			continue;
-		}
-
-		try {
-			await rm(filePath);
-			deletedFiles += 1;
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-				missingFiles += 1;
-			} else {
-				failedFiles += 1;
-			}
-		}
+		const outcome = await removeClipFile(extractedDir(), clip);
+		if (outcome === "deleted") deletedFiles += 1;
+		else if (outcome === "missing") missingFiles += 1;
+		else failedFiles += 1;
 	}
 
 	return { deletedFiles, missingFiles, failedFiles };

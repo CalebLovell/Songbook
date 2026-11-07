@@ -1,6 +1,5 @@
 import {
 	Binoculars,
-	ChevronDown,
 	Footprints,
 	Gem,
 	Infinity as InfinityIcon,
@@ -10,6 +9,7 @@ import type { ComponentType } from "react";
 
 import { Button } from "~/components/ui/button.tsx";
 import { Count } from "~/components/ui/count.tsx";
+import { IconSelect } from "~/components/ui/icon-select.tsx";
 import { ShellFigure } from "~/components/ui/shell.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import {
@@ -102,31 +102,19 @@ function PoolSelect({
 	poolCounts: PoolCounts;
 	onPoolChange: (pool: LearnPool) => void;
 }) {
-	const Icon = LEARN_POOL_ICONS[pool];
 	return (
-		<div className="relative shrink-0 sm:hidden">
-			<Icon
-				className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2"
-				aria-hidden="true"
-			/>
-			<select
-				aria-label="Which birds"
-				value={pool}
-				onChange={(event) => onPoolChange(event.target.value as LearnPool)}
-				className="h-8.5 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none"
-			>
-				{LEARN_POOLS.map((option) => (
-					<option key={option} value={option}>
-						{poolCounts
-							? `${LEARN_POOL_LABELS[option]} (${poolCounts[option]})`
-							: LEARN_POOL_LABELS[option]}
-					</option>
-				))}
-			</select>
-			<ChevronDown
-				className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground"
-				aria-hidden="true"
-			/>
-		</div>
+		<IconSelect
+			icon={LEARN_POOL_ICONS[pool]}
+			label="Which birds"
+			value={pool}
+			onChange={onPoolChange}
+			className="sm:hidden"
+			options={LEARN_POOLS.map((option) => ({
+				value: option,
+				label: poolCounts
+					? `${LEARN_POOL_LABELS[option]} (${poolCounts[option]})`
+					: LEARN_POOL_LABELS[option],
+			}))}
+		/>
 	);
 }

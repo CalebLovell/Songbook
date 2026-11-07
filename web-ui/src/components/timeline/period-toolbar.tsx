@@ -2,13 +2,14 @@ import {
 	Calendar,
 	CalendarDays,
 	CalendarRange,
-	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
 	Clock,
 	Infinity as InfinityIcon,
 } from "lucide-react";
 
+import { IconSelect } from "~/components/ui/icon-select.tsx";
+import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import {
 	TIMELINE_PERIOD_LABELS,
@@ -25,6 +26,7 @@ import {
 	type TimelineWindow,
 } from "~/lib/timeline-window.ts";
 import { useClientValue } from "~/lib/use-client-value.ts";
+import { cn } from "~/lib/utils.ts";
 
 const PERIOD_ICONS: Record<
 	TimelinePeriod,
@@ -124,30 +126,19 @@ function PeriodSelect({
 	period: TimelinePeriod;
 	onPick: (next: TimelinePeriod) => void;
 }) {
-	const Icon = PERIOD_ICONS[period];
 	return (
-		<div className="relative shrink-0 min-[800px]:hidden">
-			<Icon
-				className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 max-[400px]:hidden"
-				aria-hidden="true"
-			/>
-			<select
-				aria-label="Period"
-				value={period}
-				onChange={(event) => onPick(event.target.value as TimelinePeriod)}
-				className="h-8.5 pointer-coarse:h-9 cursor-pointer appearance-none rounded-md border border-input bg-card pr-7 pl-8 font-medium pointer-coarse:text-base text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-focus-ring focus-visible:outline-none max-[400px]:pl-2.5"
-			>
-				{TIMELINE_PERIODS.map((value) => (
-					<option key={value} value={value}>
-						{TIMELINE_PERIOD_LABELS[value]}
-					</option>
-				))}
-			</select>
-			<ChevronDown
-				className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground"
-				aria-hidden="true"
-			/>
-		</div>
+		<IconSelect
+			icon={PERIOD_ICONS[period]}
+			label="Period"
+			value={period}
+			onChange={onPick}
+			iconHiddenWhenNarrow
+			className="min-[800px]:hidden"
+			options={TIMELINE_PERIODS.map((value) => ({
+				value,
+				label: TIMELINE_PERIOD_LABELS[value],
+			}))}
+		/>
 	);
 }
 
@@ -171,7 +162,12 @@ function WindowStepper({
 	const overlay = "absolute inset-0 size-full cursor-pointer opacity-0";
 
 	return (
-		<div className="flex h-8.5 pointer-coarse:h-9 min-w-0 max-w-64 flex-1 overflow-hidden rounded-md border border-input bg-card focus-within:border-focus-ring max-[480px]:max-w-none max-[480px]:basis-full">
+		<div
+			className={cn(
+				JOINED_CONTROL_CLASS,
+				"h-8.5 pointer-coarse:h-9 min-w-0 max-w-64 flex-1 focus-within:border-focus-ring max-[480px]:max-w-none max-[480px]:basis-full",
+			)}
+		>
 			<JoinedStep
 				direction="prev"
 				label={`Previous ${label.toLowerCase()}`}
@@ -275,7 +271,7 @@ function JoinedStep({
 			title={label}
 			disabled={target === null}
 			onClick={() => target && onPick(target)}
-			className={`flex w-8.5 shrink-0 items-center justify-center border-input hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
+			className={`flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 ${direction === "prev" ? "border-r" : "border-l"}`}
 		>
 			<Icon className="size-4" aria-hidden="true" />
 		</button>

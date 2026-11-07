@@ -42,6 +42,7 @@ import {
 	PAGE_ROW_CLASS,
 	PageRange,
 	PageStepper,
+	PageStepperShell,
 } from "~/components/ui/page-stepper.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
@@ -55,6 +56,7 @@ import {
 import { YearSelector } from "~/components/year-selector.tsx";
 import { formatConfidence } from "~/lib/confidence.ts";
 import { formatDate, formatDateTime, formatTime } from "~/lib/date-format.ts";
+import { dayIdFor } from "~/lib/day.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { heatColor, heatColorAt } from "~/lib/heatmap.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
@@ -63,6 +65,7 @@ import {
 	previewTextMeta,
 	speciesPreviewImage,
 } from "~/lib/link-preview.ts";
+import { plural } from "~/lib/number-format.ts";
 import { pageTitle } from "~/lib/page-title.ts";
 import {
 	getBirdIdentity,
@@ -73,7 +76,7 @@ import {
 	type VisitPage,
 	visitPageCount,
 } from "~/lib/species-detail.ts";
-import { speciesLinkFor } from "~/lib/species-link.ts";
+import type { SpeciesLink } from "~/lib/species-link.ts";
 import { comNameForSlug, comNameToSlug } from "~/lib/species-slug.ts";
 import { stationOrigin } from "~/lib/station-origin.ts";
 import { stationToday } from "~/lib/station-time.ts";
@@ -164,11 +167,6 @@ function dateForBucket(bucket: string): Date {
 	return new Date(`${bucket.slice(0, 10)}T00:00:00`);
 }
 
-function bucketForDate(date: Date): string {
-	const pad = (value: number) => value.toString().padStart(2, "0");
-	return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
 function buildHeatMap(history: TrendPoint[]): {
 	weeks: HeatMapWeek[];
 	maximum: number;
@@ -198,8 +196,7 @@ function buildHeatMap(history: TrendPoint[]): {
 			const date = new Date(weekStart);
 			date.setDate(date.getDate() + day);
 			if (date > end) break;
-			const key = bucketForDate(date);
-			days.push({ date, point: points.get(key) ?? null });
+			days.push({ date, point: points.get(dayIdFor(date)) ?? null });
 			const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
 			if (date.getDate() <= 7 && !seenMonths.has(monthKey)) {
 				monthLabel = date.toLocaleDateString([], { month: "short" });
@@ -238,7 +235,11 @@ function BirdResult({
 }) {
 	if (result.status === "undetected") {
 		return (
-			<UndetectedSpecies comName={result.comName} sciName={result.sciName} />
+			<UndetectedSpecies
+				comName={result.comName}
+				sciName={result.sciName}
+				speciesLink={result.speciesLink}
+			/>
 		);
 	}
 	if (result.status !== "detected") return <SpeciesNotFound />;
@@ -406,17 +407,12 @@ function VisitLogSkeleton() {
 						<div className={`${PAGE_RANGE_CLASS} ${PAGE_RANGE_NARROW_HIDDEN}`}>
 							<ShellText className="w-36" barClassName="w-full" />
 						</div>
-						<span className="ml-auto">
-							<ShellSized className="rounded-md">
-								<PageStepper
-									variant="ghost"
-									label="Visit log pages"
-									page={1}
-									pageCount={100}
-									onPageChange={() => {}}
-								/>
-							</ShellSized>
-						</span>
+						<PageStepperShell
+							variant="ghost"
+							label="Visit log pages"
+							page={1}
+							pageCount={100}
+						/>
 					</div>
 				</div>
 			</Card>
@@ -427,9 +423,11 @@ function VisitLogSkeleton() {
 function UndetectedSpecies({
 	comName,
 	sciName,
+	speciesLink,
 }: {
 	comName: string;
 	sciName: string;
+	speciesLink: SpeciesLink | null;
 }) {
 	return (
 		<PageWrap className="pt-0">
@@ -459,7 +457,7 @@ function UndetectedSpecies({
 						it is heard.
 					</p>
 					<SpeciesActions
-						speciesLink={speciesLinkFor(sciName)}
+						speciesLink={speciesLink}
 						comName={comName}
 						size="sm"
 					/>
@@ -721,8 +719,9 @@ function HeatMapDay({
 	isTabStop: boolean;
 }) {
 	const count = point?.count ?? 0;
-	const dateLabel = formatDate(bucketForDate(date));
-	const noun = count === 1 ? "detection" : "detections";
+	const day = dayIdFor(date);
+	const dateLabel = formatDate(day);
+	const noun = plural(count, "detection");
 	const label = `${dateLabel}: ${count.toLocaleString()} ${noun}`;
 	const fill = { backgroundColor: heatColor(count, maximum) };
 
@@ -732,7 +731,8 @@ function HeatMapDay({
 				{count > 0 ? (
 					<Link
 						to="/timeline"
-						search={{ period: "day", date: bucketForDate(date) }}
+						preload={false}
+						search={{ period: "day", date: day }}
 						aria-label={label}
 						tabIndex={isTabStop ? 0 : -1}
 						className="block"
@@ -813,12 +813,12 @@ function StationRecord({ detail }: { detail: SpeciesDetail }) {
 	return (
 		<p className="text-muted-foreground text-xs tabular-nums">
 			<Count>{detail.totalDetections.toLocaleString()}</Count>{" "}
-			{detail.totalDetections === 1 ? "detection" : "detections"}
+			{plural(detail.totalDetections, "detection")}
 			{days === null ? null : (
 				<>
 					{" "}
-					over <Count>{days.toLocaleString()}</Count>{" "}
-					{days === 1 ? "day" : "days"} on record
+					over <Count>{days.toLocaleString()}</Count> {plural(days, "day")} on
+					record
 				</>
 			)}
 		</p>
@@ -908,6 +908,7 @@ function VisitLogCard({
 									<div className="min-w-0 flex-1 text-sm">
 										<Link
 											to="/timeline"
+											preload={false}
 											search={{ period: "day", date: visit.date }}
 											className="block max-w-fit truncate font-medium no-underline hover:underline"
 										>

@@ -3,6 +3,7 @@ import {
 	type HighlightThresholds,
 	lookbackFor,
 } from "~/lib/highlight-thresholds.ts";
+import { plural } from "~/lib/number-format.ts";
 
 export const MAX_NAMED_BIRDS = 10;
 
@@ -117,10 +118,6 @@ const PREVIOUS_PERIOD: Record<HighlightPeriod, string> = {
 	year: "last year",
 	all: "",
 };
-
-function plural(count: number, one: string, many: string): string {
-	return count === 1 ? one : many;
-}
 
 const recorded = (day: DayTally) => day.size > 0;
 

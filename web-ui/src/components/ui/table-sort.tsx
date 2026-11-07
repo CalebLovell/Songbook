@@ -6,7 +6,9 @@ import {
 	ChevronDown,
 } from "lucide-react";
 
-type SortDirection = "asc" | "desc";
+import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
+import type { SortDirection } from "~/lib/table-sort.ts";
+import { cn } from "~/lib/utils.ts";
 
 export function SortMenu<Sort extends string>({
 	label,
@@ -29,7 +31,12 @@ export function SortMenu<Sort extends string>({
 }) {
 	const DirectionIcon = reversed ? ArrowUpNarrowWide : ArrowDownWideNarrow;
 	return (
-		<div className="ml-auto flex h-7 w-fit overflow-hidden rounded-md border border-input bg-card font-normal pointer-coarse:text-base text-sm">
+		<div
+			className={cn(
+				JOINED_CONTROL_CLASS,
+				"ml-auto h-7 pointer-coarse:h-9 w-fit font-normal pointer-coarse:text-base text-sm",
+			)}
+		>
 			<div className="relative flex">
 				<select
 					aria-label={label}
@@ -37,7 +44,7 @@ export function SortMenu<Sort extends string>({
 					onChange={(event) =>
 						sort !== event.target.value && onSort(event.target.value as Sort)
 					}
-					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 leading-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:-outline-offset-2"
+					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 leading-none transition-colors hover:bg-accent hover:text-accent-foreground"
 				>
 					{sorts.map((option) => (
 						<option key={option} value={option}>
@@ -56,7 +63,7 @@ export function SortMenu<Sort extends string>({
 				aria-pressed={reversed}
 				title={direction === "asc" ? "Ascending" : "Descending"}
 				onClick={onFlip}
-				className="flex w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:-outline-offset-2 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
+				className="flex pointer-coarse:w-9 w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
 			>
 				<DirectionIcon className="size-3.5" aria-hidden="true" />
 			</button>

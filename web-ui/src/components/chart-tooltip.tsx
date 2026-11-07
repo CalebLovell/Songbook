@@ -1,5 +1,7 @@
 import type { TooltipContentProps } from "recharts";
 
+import { plural } from "~/lib/number-format.ts";
+
 export function ChartValueTooltip({
 	active,
 	label,
@@ -13,8 +15,6 @@ export function ChartValueTooltip({
 	const shown = active && raw != null && !Number.isNaN(value);
 
 	const bucket = formatLabel ? formatLabel(label) : String(label ?? "");
-	const noun = value === 1 ? "detection" : "detections";
-
 	return (
 		<div
 			aria-hidden
@@ -27,7 +27,7 @@ export function ChartValueTooltip({
 			{shown && (
 				<>
 					<span className="font-semibold">{bucket}</span>
-					{` — ${value.toLocaleString()} ${noun}`}
+					{` — ${value.toLocaleString()} ${plural(value, "detection")}`}
 				</>
 			)}
 		</div>

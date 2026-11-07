@@ -4,6 +4,7 @@ import {
 	useRouteContext,
 } from "@tanstack/react-router";
 import { UserRound } from "lucide-react";
+import { z } from "zod";
 
 import { SessionCard } from "~/components/auth/session-card.tsx";
 import { StationNotReadyCard } from "~/components/auth/station-not-ready-card.tsx";
@@ -16,10 +17,9 @@ import { safeNext } from "~/lib/require-unlocked.ts";
 
 export const Route = createFileRoute("/account")({
 	head: () => pageHead("Account"),
-	validateSearch: (search: Record<string, unknown>): { next?: string } => {
-		const next = safeNext(search.next);
-		return next ? { next } : {};
-	},
+	validateSearch: z.object({
+		next: z.unknown().transform(safeNext).optional(),
+	}),
 	component: Account,
 });
 

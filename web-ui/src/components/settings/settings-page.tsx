@@ -8,6 +8,7 @@ import type { StationHealth } from "~/lib/health-data.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import type { SettingsPageData } from "~/lib/settings-data.ts";
 import type { UpdateState } from "~/lib/updates-data.ts";
+import { errorMessage } from "~/lib/utils.ts";
 import { RestartButton } from "./restart-button.tsx";
 import {
 	SettingsCards,
@@ -31,12 +32,10 @@ async function restartWithToast(onRestart: SettingsRestarter) {
 		toast.success(result.message, { id: RESTART_TOAST_ID });
 		return true;
 	} catch (error) {
-		toast.warning(
-			error instanceof Error
-				? error.message
-				: "BirdNET could not be restarted.",
-			{ id: RESTART_TOAST_ID, duration: 10_000 },
-		);
+		toast.warning(errorMessage(error, "BirdNET could not be restarted."), {
+			id: RESTART_TOAST_ID,
+			duration: 10_000,
+		});
 		return false;
 	}
 }

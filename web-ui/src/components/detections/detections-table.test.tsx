@@ -8,7 +8,7 @@ import { DetectionsTable } from "~/components/detections/detections-table.tsx";
 const html = renderToStaticMarkup(
 	<DetectionsTable
 		page={{ rows: [], total: 0 }}
-		search={{ page: 1, pageSize: 100, sort: "recorded", direction: "desc" }}
+		search={{ page: 1, sort: "recorded", direction: "desc" }}
 		onSearchChange={() => {}}
 		rowSelection={{ "1": true }}
 		onRowSelectionChange={() => {}}

@@ -11,7 +11,7 @@ on claude.ai.
 
 - **Paper for content.** Content sits on `Card`s (`ui/card.tsx`: white, `--line`
   hairline, 4px radius, `p-page`) on the paper ground. Cards never nest: a figure row
-  inside a card uses `PageHeaderStats inline`, not more cards.
+  inside a card stays flat, not more cards.
 - **The sidebar is an inset card** on desktop (`site-sidebar.tsx`), with paper
   around it. Page content fills the remaining width; no max-width column.
 - **Show the bird.** Any list of species uses the species-row idiom:
@@ -23,11 +23,14 @@ on claude.ai.
   shows the plain muted bird glyph (`SpeciesImage`), never initials or a
   tinted box.
 - **One instrument.** Every figure is the same size, face and weight
-  (`PageHeaderCard` stats: kicker label + 20px semibold tabular value).
+  (kicker label + 20px semibold tabular value).
   Where a row of figure cards gets too narrow, the whole row steps down to
   16px (and, narrowest, drops the icon) rather than truncating a value.
 - **Stable under the cursor.** Fixed slots and floored line boxes, so data
   arriving never shifts a control.
+- **Zod guards the edges, both ways.** What comes in and what goes out is checked
+  against a Zod schema, never by hand-written checks. Every search param and server
+  function input follows this; server function outputs still need bringing in line.
 
 ## Color
 
@@ -45,7 +48,7 @@ for a meaning; don't write a new mix inline when one exists:
 | `--line` | every border and hairline (moss 15%) |
 | `--track` | unfilled remainder of a bar (moss 28%) |
 | `--hover-line` | border of a linked card on hover |
-| `--focus-ring` | keyboard focus, 2px outline, 2px offset; drawn inset (`-outline-offset-2`) on a segment of a joined control, whose group clips outside it |
+| `--focus-ring` | keyboard focus, 2px outline, 2px offset; drawn inset on a segment of a joined control (`JOINED_CONTROL_CLASS`), whose group clips outside it |
 | `--muted-foreground` | secondary text (neutral grey, black 49%) |
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
@@ -312,6 +315,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **The gate is on the server.** Route checks only decide what renders; every gated
   server function chains `requireUnlocked`. Any failure to read auth means locked,
   never open.
+- **Zod checks every input.** Search params and server function inputs are Zod
+  schemas, never hand-written checks. A bad search param falls back with `.catch()`
+  rather than failing the page; shared params live in `lib/search-schema.ts`.
 - **Clips can carry voices.** Signed out, only each species' best recording plays,
   enforced in `/api/audio`. Audio responses are `private, no-cache`, and fetched
   clips are forgotten on sign-out.

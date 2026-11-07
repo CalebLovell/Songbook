@@ -19,15 +19,12 @@ import {
 	getReviewSpecies,
 	recategorizeReviewDetection,
 } from "~/lib/review.ts";
-import {
-	normalizeReviewSearch,
-	type SpeciesOption,
-} from "~/lib/review-data.ts";
+import { reviewSearchSchema, type SpeciesOption } from "~/lib/review-data.ts";
 import { useSettled } from "~/lib/use-settled.ts";
 
 export const Route = createFileRoute("/review")({
 	head: () => pageHead("Review"),
-	validateSearch: normalizeReviewSearch,
+	validateSearch: reviewSearchSchema,
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
 	loaderDeps: ({ search }) => search,

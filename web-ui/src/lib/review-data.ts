@@ -1,20 +1,12 @@
-import { commonNameSafe } from "~/lib/audio.ts";
+import { z } from "zod";
 
-export type ReviewSearch = { page: number };
+import { commonNameSafe } from "~/lib/audio.ts";
+import { pageParam } from "~/lib/search-schema.ts";
+
+export const reviewSearchSchema = z.object({ page: pageParam });
+export type ReviewSearch = z.output<typeof reviewSearchSchema>;
 export const REVIEW_PAGE_SIZE = 10;
 export type SpeciesOption = { sciName: string; comName: string };
-
-export function normalizeReviewSearch(
-	input: Record<string, unknown>,
-): ReviewSearch {
-	const page =
-		typeof input.page === "number" &&
-		Number.isSafeInteger(input.page) &&
-		input.page >= 1
-			? input.page
-			: 1;
-	return { page };
-}
 
 export function parseSpeciesCatalog(text: string): SpeciesOption[] {
 	const parsed = JSON.parse(text) as Record<string, unknown>;

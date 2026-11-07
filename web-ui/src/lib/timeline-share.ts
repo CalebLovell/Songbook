@@ -1,6 +1,10 @@
 import type { Highlight } from "~/lib/highlights-data.ts";
 import { formatHighlightLines } from "~/lib/highlights-share.ts";
-import { shareHeader, shareTotals } from "~/lib/share-card.ts";
+import {
+	shareHeader,
+	shareLeaderboard,
+	shareTotals,
+} from "~/lib/share-card.ts";
 import type { TimelinePeriod } from "~/lib/timeline-periods.ts";
 
 const HOURS = 24;
@@ -26,8 +30,6 @@ export type TimelineShareCard = {
 	highlights: Highlight[];
 	stationName?: string;
 };
-
-const MEDALS = ["🥇", "🥈", "🥉"] as const;
 
 function hourTotals(rows: TimelineShareRow[]): number[] {
 	const totals = Array.from({ length: HOURS }, () => 0);
@@ -62,17 +64,13 @@ export function formatTimelineShareCard(card: TimelineShareCard): string {
 		highlights: card.highlights,
 	});
 
-	const leaderboard = [...rows]
-		.sort((a, b) => b.totalDetections - a.totalDetections)
-		.slice(0, MEDALS.length)
-		.map(
-			(row, index) =>
-				`${MEDALS[index]}  ${row.comName} · ${row.totalDetections.toLocaleString()}`,
-		);
+	const leaderboard = shareLeaderboard(
+		[...rows]
+			.sort((a, b) => b.totalDetections - a.totalDetections)
+			.map((row) => ({ comName: row.comName, count: row.totalDetections })),
+	);
 
-	const highlights: string[] = [];
-
-	highlights.push(...formatHighlightLines(card.highlights));
+	const highlights = formatHighlightLines(card.highlights);
 
 	return [
 		header,
