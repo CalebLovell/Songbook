@@ -125,16 +125,7 @@ function Detections() {
 				/>
 			</div>
 
-			{!page ? (
-				<DetectionsTableShell
-					search={search}
-					canDelete={canDelete}
-					canListen={canListen}
-					onSearchChange={(nextSearch) =>
-						navigate({ search: nextSearch, replace: true })
-					}
-				/>
-			) : page.total === 0 ? (
+			{page?.total === 0 ? (
 				<Card as="section" aria-label="Detection results" className="shrink-0">
 					<CardHeader title="Detections" />
 					<EmptyNote>
@@ -168,17 +159,18 @@ function Detections() {
 			) : (
 				<Card
 					as="section"
+					aria-busy={!page || undefined}
 					aria-label="Detection results"
 					className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 				>
 					<DetectionsTable
-						page={page}
+						page={page ?? null}
 						search={search}
 						onSearchChange={(nextSearch) =>
 							navigate({ search: nextSearch, replace: true })
 						}
 						rowSelection={rowSelection}
-						onRowSelectionChange={setRowSelection}
+						onRowSelectionChange={page ? setRowSelection : () => {}}
 						canDelete={canDelete}
 						canListen={canListen}
 						onDeleteSelected={() => setDeleteOpen(true)}
@@ -195,37 +187,5 @@ function Detections() {
 				/>
 			) : null}
 		</PageWrap>
-	);
-}
-
-function DetectionsTableShell({
-	search,
-	canDelete,
-	canListen,
-	onSearchChange,
-}: {
-	search: DetectionWorkspaceSearch;
-	canDelete: boolean;
-	canListen: boolean;
-	onSearchChange: (search: DetectionWorkspaceSearch) => void;
-}) {
-	return (
-		<Card
-			as="section"
-			aria-busy="true"
-			aria-label="Detection results"
-			className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
-		>
-			<DetectionsTable
-				page={null}
-				search={search}
-				onSearchChange={onSearchChange}
-				rowSelection={{}}
-				onRowSelectionChange={() => {}}
-				canDelete={canDelete}
-				canListen={canListen}
-				onDeleteSelected={() => {}}
-			/>
-		</Card>
 	);
 }

@@ -15,7 +15,10 @@ import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { announce } from "~/lib/announce.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
-import { getLiveHighlights } from "~/lib/live-highlights.ts";
+import {
+	getLiveHighlights,
+	type LiveHighlights,
+} from "~/lib/live-highlights.ts";
 import { getNowSnapshot, type NowSnapshot } from "~/lib/now.ts";
 import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { getStationStatus } from "~/lib/station-status.ts";
@@ -97,10 +100,18 @@ function Live() {
 	const { unlocked } = Route.useLoaderData();
 	const snapshot = useSkeletonMinimum(useQuery(snapshotQuery).data);
 	const status = useSkeletonMinimum(useQuery(statusQuery).data);
+	const highlights = useSkeletonMinimum(useQuery(highlightsQuery).data);
 	const pill = status ? <LivePill status={status} /> : <LivePillSkeleton />;
 
 	if (!snapshot) return <LiveShell unlocked={unlocked} pill={pill} />;
-	return <LiveBody snapshot={snapshot} unlocked={unlocked} pill={pill} />;
+	return (
+		<LiveBody
+			snapshot={snapshot}
+			highlights={highlights}
+			unlocked={unlocked}
+			pill={pill}
+		/>
+	);
 }
 
 function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
@@ -128,14 +139,15 @@ function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
 
 function LiveBody({
 	snapshot,
+	highlights,
 	unlocked,
 	pill,
 }: {
 	snapshot: NowSnapshot;
+	highlights: LiveHighlights | undefined;
 	unlocked: boolean;
 	pill: ReactNode;
 }) {
-	const highlights = useSkeletonMinimum(useQuery(highlightsQuery).data);
 	const freshKeys = useFreshKeys(snapshot.recent.map((row) => row.key));
 
 	useAnnounceNewBird(snapshot.current?.comName ?? null);

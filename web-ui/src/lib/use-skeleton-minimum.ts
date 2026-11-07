@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 
+import { useClientValue } from "~/lib/use-client-value.ts";
+
 const MINIMUM_SKELETON_MS = 200;
 
 export function useSkeletonMinimum<T>(data: T | undefined): T | undefined {
-	const [phase, setPhase] = useState<"content" | "holding" | "waiting">(
-		data === undefined ? "holding" : "content",
-	);
+	const isClientMount = useClientValue(() => true, false);
+	const [phase, setPhase] = useState<"content" | "holding" | "waiting">(() => {
+		if (data !== undefined) return "content";
+		return isClientMount ? "holding" : "waiting";
+	});
 	if (data === undefined && phase === "content") setPhase("holding");
 	if (data !== undefined && phase === "waiting") setPhase("content");
 

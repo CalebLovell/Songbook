@@ -7,7 +7,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { ArrowRight, Calendar, Trash2, X } from "lucide-react";
-import { type CSSProperties, type ReactNode, useId } from "react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
@@ -622,9 +622,14 @@ export function DetectionsTable({
 		state: { rowSelection },
 	});
 
-	const pageCount = page
+	const loadedPageCount = page
 		? Math.max(1, Math.ceil(page.total / DETECTIONS_PAGE_SIZE))
-		: 1000;
+		: null;
+	const [lastPageCount, setLastPageCount] = useState(loadedPageCount);
+	if (loadedPageCount !== null && loadedPageCount !== lastPageCount) {
+		setLastPageCount(loadedPageCount);
+	}
+	const pageCount = loadedPageCount ?? lastPageCount;
 	const selectionShown = canDelete && selectedCount > 0;
 	useAnnounceChange(
 		selectedCount > 0
@@ -773,12 +778,12 @@ export function DetectionsTable({
 						onDelete={onDeleteSelected}
 					/>
 				) : null}
-				{skeleton ? (
+				{pageCount === null ? (
 					<PageStepperShell
 						variant="ghost"
 						label="Detections pages"
 						page={search.page}
-						pageCount={pageCount}
+						pageCount={1000}
 					/>
 				) : (
 					<PageStepper
