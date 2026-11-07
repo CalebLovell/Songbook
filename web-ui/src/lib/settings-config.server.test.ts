@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import {
 	chmod,
 	lstat,
@@ -86,6 +87,58 @@ test("updates only Station assignments and preserves the document", async () => 
 	assert.match(after, /^RTSP_STREAM="rtsp:\/\/bird:secret@camera\/live"$/m);
 	assert.equal((await stat(file)).mode & 0o777, originalMode);
 	assert.deepEqual(await readdir(path.dirname(file)), ["birdnet.conf"]);
+});
+
+const SHELL_ACTIVE_NAMES = [
+	"x$(echo RAN)",
+	"x`echo RAN`",
+	"cost $HOME",
+	'quote " and back\\slash',
+	"trailing\\",
+];
+
+async function saveSiteName(siteName: string, file: string) {
+	await writeSettingsCard(
+		"station",
+		{ siteName, latitude: 1, longitude: 2, timezone: "America/Chicago" },
+		file,
+	);
+}
+
+test("bash reads a saved site name literally instead of running it", async (t) => {
+	const probe = spawnSync("bash", ["-c", "echo ok"], { encoding: "utf8" });
+	if (probe.stdout?.trim() !== "ok") {
+		t.skip("bash isn't available");
+		return;
+	}
+	for (const siteName of SHELL_ACTIVE_NAMES) {
+		const file = await fixtureConfig('SITE_NAME="Backyard"\n');
+		await saveSiteName(siteName, file);
+		const sourced = spawnSync(
+			"bash",
+			["-c", 'source "$1" && printf %s "$SITE_NAME"', "probe", file],
+			{ encoding: "utf8" },
+		);
+		assert.equal(sourced.stdout, siteName);
+	}
+});
+
+test("a saved site name reads back unchanged in the web UI", async () => {
+	for (const siteName of SHELL_ACTIVE_NAMES) {
+		const file = await fixtureConfig('SITE_NAME="Backyard"\n');
+		await saveSiteName(siteName, file);
+		const parsed = parseBirdnetConfig(await readFile(file, "utf8"));
+		assert.equal(parsed.SITE_NAME, siteName);
+	}
+});
+
+test("replacement patterns in a value don't rewrite the rest of the file", async () => {
+	const file = await fixtureConfig('BEFORE=1\nSITE_NAME="Backyard"\nAFTER=2\n');
+	await saveSiteName("a$&b$'c$`d", file);
+	const after = await readFile(file, "utf8");
+	assert.equal(after.split("\n").length, 6);
+	assert.equal(parseBirdnetConfig(after).SITE_NAME, "a$&b$'c$`d");
+	assert.equal(parseBirdnetConfig(after).AFTER, "2");
 });
 
 test("saves through a symlinked config into the real file", async (t) => {

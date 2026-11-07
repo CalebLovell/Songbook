@@ -34,7 +34,7 @@ function decodeShellValue(value: string) {
 	if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) {
 		return value
 			.slice(1, -1)
-			.replace(/\\(["\\])/g, (_match, escaped: string) => escaped);
+			.replace(/\\(["\\$`])/g, (_match, escaped: string) => escaped);
 	}
 	return value;
 }
@@ -196,7 +196,7 @@ export async function readSettingsPageValues(
 }
 
 function quoteShellValue(value: string) {
-	return `"${value.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
+	return `"${value.replace(/[\\"$`]/g, (character) => `\\${character}`)}"`;
 }
 
 function assignmentsFor<K extends SettingsCardKind>(
@@ -286,7 +286,7 @@ function replaceAssignments(text: string, assignments: Record<string, string>) {
 	for (const [key, value] of Object.entries(assignments)) {
 		const expression = new RegExp(`^${key}=.*$`, "m");
 		if (expression.test(updated))
-			updated = updated.replace(expression, `${key}=${value}`);
+			updated = updated.replace(expression, () => `${key}=${value}`);
 		else {
 			if (updated.length > 0 && !updated.endsWith("\n")) updated += "\n";
 			updated += `${key}=${value}\n`;
