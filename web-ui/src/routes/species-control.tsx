@@ -13,6 +13,7 @@ import {
 	saveSpeciesControl,
 } from "~/lib/species-control.ts";
 import { speciesControlWorkspaceSearchSchema } from "~/lib/species-control-workspace.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const speciesControlQuery = queryOptions({
 	...FORM_QUERY,
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/species-control")({
 });
 
 function SpeciesControlRoute() {
-	const { data: page } = useQuery(speciesControlQuery);
+	const page = useSkeletonMinimum(useQuery(speciesControlQuery).data);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 	const save = useServerFn(saveSpeciesControl);

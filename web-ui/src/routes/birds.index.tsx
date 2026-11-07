@@ -18,7 +18,6 @@ import {
 import { useMemo } from "react";
 import { z } from "zod";
 import { CardHeader } from "~/components/card-header.tsx";
-import { Deferred } from "~/components/deferred.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import {
@@ -56,6 +55,7 @@ import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 import { cn } from "~/lib/utils.ts";
 
 const SORT_KEYS = ["count", "recent", "alpha"] as const;
@@ -117,21 +117,19 @@ const CARD_CLASS =
 const FOOTER_CLASS = "mt-auto flex flex-wrap items-center gap-page text-sm";
 
 function Species() {
-	const cards = useQuery(lifeListQuery);
+	const cards = useSkeletonMinimum(useQuery(lifeListQuery).data);
 
 	return (
 		<PageWrap className="flex min-h-full flex-col gap-page">
 			<PageHeaderCard
 				icon={Feather}
 				title={PAGE_HEADERS.birds.title}
-				description={<LifeListSummary loaded={cards.data ?? null} />}
+				description={<LifeListSummary loaded={cards ?? null} />}
 			/>
 
 			<SpeciesControls />
 
-			<Deferred query={cards} shell={<SpeciesGridShell />}>
-				{(loaded) => <SpeciesBrowser cards={loaded} />}
-			</Deferred>
+			{cards ? <SpeciesBrowser cards={cards} /> : <SpeciesGridShell />}
 		</PageWrap>
 	);
 }

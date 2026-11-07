@@ -26,6 +26,7 @@ import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { useHeldRound } from "~/lib/use-held-round.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const DEFAULT_POOL: LearnPool = "common";
 
@@ -67,7 +68,9 @@ function Learn() {
 		...learnRoundQuery(pool),
 		placeholderData: keepPreviousData,
 	});
-	const forPool = roundQuery.isPlaceholderData ? undefined : roundQuery.data;
+	const forPool = useSkeletonMinimum(
+		roundQuery.isPlaceholderData ? undefined : roundQuery.data,
+	);
 	const [isConfirmingNewRound, setIsConfirmingNewRound] = useState(false);
 	const hasRound = (forPool?.round.questions.length ?? 0) > 0;
 	const [isRoundFinished, setIsRoundFinished] = useState(false);

@@ -10,7 +10,6 @@ import {
 } from "@tanstack/react-router";
 import { ArrowRight, CalendarRange, LayoutDashboard, List } from "lucide-react";
 import { z } from "zod";
-import { Deferred, SHELL_DELAY_MS } from "~/components/deferred.tsx";
 import {
 	DetectionsByHourCard,
 	DetectionsByHourCardSkeleton,
@@ -58,6 +57,7 @@ import {
 	spelledDate,
 	windowFor,
 } from "~/lib/timeline-window.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const DEFAULT_PERIOD: TimelinePeriod = "day";
 
@@ -117,7 +117,8 @@ function Timeline() {
 		...timelineQuery({ period, anchor }),
 		placeholderData: keepPreviousData,
 	});
-	const current = page.isPlaceholderData ? null : (page.data ?? null);
+	const current =
+		useSkeletonMinimum(page.isPlaceholderData ? undefined : page.data) ?? null;
 	const navigate = Route.useNavigate();
 
 	const show = (next: {
@@ -152,26 +153,20 @@ function Timeline() {
 					onChange={show}
 				/>
 
-				<Deferred
-					query={page}
-					shellAfterMs={SHELL_DELAY_MS}
-					shell={<TimelineCardsShell period={period} view={view} />}
-				>
-					{(data) =>
-						data.body.kind === "not-a-date" ? null : (
-							<TimelineCards
-								rows={data.body.rows}
-								highlights={data.body.highlights}
-								thresholds={data.body.thresholds}
-								period={data.period}
-								jumpTo={jumpTarget(data)}
-								windowLabel={data.window?.label ?? null}
-								stationEmpty={!data.hasAnyDetections}
-								view={view}
-							/>
-						)
-					}
-				</Deferred>
+				{!current ? (
+					<TimelineCardsShell period={period} view={view} />
+				) : (
+					<TimelineCards
+						rows={current.body.rows}
+						highlights={current.body.highlights}
+						thresholds={current.body.thresholds}
+						period={current.period}
+						jumpTo={jumpTarget(current)}
+						windowLabel={current.window?.label ?? null}
+						stationEmpty={!current.hasAnyDetections}
+						view={view}
+					/>
+				)}
 			</PageWrap>
 		</TooltipProvider>
 	);

@@ -16,7 +16,6 @@ import {
 } from "~/components/best-recording-card.tsx";
 import { CardHeader } from "~/components/card-header.tsx";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
-import { Deferred } from "~/components/deferred.tsx";
 import {
 	DetectionsByHourCard,
 	DetectionsByHourCardSkeleton,
@@ -85,6 +84,7 @@ import { formatTimeAgo } from "~/lib/time-ago.ts";
 import type { TrendPoint } from "~/lib/trend.ts";
 import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const CURRENT_YEAR = Number(stationToday().slice(0, 4));
 const MIN_YEAR = 2000;
@@ -228,14 +228,12 @@ function BirdPage() {
 		speciesDetailQuery({ comNameSlug, year, visitsPage }),
 	);
 
-	return (
-		<Deferred
-			key={year}
-			query={result}
-			shell={<SpeciesDetailShell year={year} />}
-		>
-			{(loaded) => <BirdResult result={loaded} />}
-		</Deferred>
+	const loaded = useSkeletonMinimum(result.data);
+
+	return loaded ? (
+		<BirdResult key={year} result={loaded} />
+	) : (
+		<SpeciesDetailShell year={year} />
 	);
 }
 

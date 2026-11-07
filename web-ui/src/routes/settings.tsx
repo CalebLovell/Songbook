@@ -43,6 +43,7 @@ import {
 	installUpdateFn,
 	updateStateQuery,
 } from "~/lib/updates.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const HEALTH_INTERVAL_MS = 30_000;
 
@@ -87,7 +88,7 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsRoute() {
-	const { data: page } = useQuery(settingsPageQuery);
+	const page = useSkeletonMinimum(useQuery(settingsPageQuery).data);
 	const queryClient = useQueryClient();
 	const { data: health } = useQuery(healthQuery);
 	const saveStation = useServerFn(saveStationSettingsFn);

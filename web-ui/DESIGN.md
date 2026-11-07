@@ -129,8 +129,11 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   centered, and no controls. It stays generic, never saying why a clip is missing.
 - **Loading shells**: navigation is instant. Page data lives in React Query,
   never in loader promises: a loader only calls `prefetchInBrowser`, and each
-  part that needs the data renders through `useQuery` and `Deferred`
-  (`components/deferred.tsx`) -- no Suspense, so hydration can't strand a shell.
+  part that needs the data calls `useQuery` and renders its `…Skeleton` until
+  `data` arrives -- no Suspense, so hydration can't strand a shell. Paging or
+  filtering shows the skeleton too, never old rows. A skeleton stays up for at
+  least 200ms through `useSkeletonMinimum`, because a brief loading moment feels
+  better than a flash; cached data skips the skeleton altogether.
   Page queries spread `PAGE_QUERY`, or `FORM_QUERY` when a form seeds from the
   data once (no cached copy, so never an old revision). Neither refetches on
   focus. Data refreshes on navigation, after a change (`invalidateQueries`), and

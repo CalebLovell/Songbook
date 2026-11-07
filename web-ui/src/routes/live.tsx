@@ -2,7 +2,6 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { Deferred } from "~/components/deferred.tsx";
 import { HighlightsCard } from "~/components/highlights-card.tsx";
 import { CurrentBirdCard } from "~/components/now/current-bird-card.tsx";
 import { LiveAudioCard } from "~/components/now/live-audio-card.tsx";
@@ -20,6 +19,7 @@ import { getLiveHighlights } from "~/lib/live-highlights.ts";
 import { getNowSnapshot, type NowSnapshot } from "~/lib/now.ts";
 import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { getStationStatus } from "~/lib/station-status.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const POLL_INTERVAL_MS = 10_000;
 const STATUS_INTERVAL_MS = 30_000;
@@ -95,8 +95,8 @@ function useFreshKeys(keys: string[]): Set<string> {
 
 function Live() {
 	const { unlocked } = Route.useLoaderData();
-	const { data: snapshot } = useQuery(snapshotQuery);
-	const { data: status } = useQuery(statusQuery);
+	const snapshot = useSkeletonMinimum(useQuery(snapshotQuery).data);
+	const status = useSkeletonMinimum(useQuery(statusQuery).data);
 	const pill = status ? <LivePill status={status} /> : <LivePillSkeleton />;
 
 	if (!snapshot) return <LiveShell unlocked={unlocked} pill={pill} />;
@@ -135,7 +135,7 @@ function LiveBody({
 	unlocked: boolean;
 	pill: ReactNode;
 }) {
-	const highlights = useQuery(highlightsQuery);
+	const highlights = useSkeletonMinimum(useQuery(highlightsQuery).data);
 	const freshKeys = useFreshKeys(snapshot.recent.map((row) => row.key));
 
 	useAnnounceNewBird(snapshot.current?.comName ?? null);
@@ -164,25 +164,12 @@ function LiveBody({
 				<div className="grid grid-cols-1 gap-page">
 					<LiveAudioCard unlocked={unlocked} />
 
-					<Deferred
-						query={highlights}
-						shell={
-							<HighlightsCard
-								highlights={null}
-								period="live"
-								emptyMessage={HIGHLIGHTS_EMPTY}
-							/>
-						}
-					>
-						{(judged) => (
-							<HighlightsCard
-								highlights={judged.highlights}
-								thresholds={judged.thresholds}
-								period="live"
-								emptyMessage={HIGHLIGHTS_EMPTY}
-							/>
-						)}
-					</Deferred>
+					<HighlightsCard
+						highlights={highlights?.highlights ?? null}
+						thresholds={highlights?.thresholds}
+						period="live"
+						emptyMessage={HIGHLIGHTS_EMPTY}
+					/>
 				</div>
 			</div>
 		</PageWrap>

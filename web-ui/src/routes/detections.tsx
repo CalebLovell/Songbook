@@ -1,5 +1,4 @@
 import {
-	keepPreviousData,
 	queryOptions,
 	useMutation,
 	useQuery,
@@ -11,7 +10,6 @@ import type { RowSelectionState } from "@tanstack/react-table";
 import { AudioWaveform, X } from "lucide-react";
 import { useState } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
-import { Deferred, SHELL_DELAY_MS } from "~/components/deferred.tsx";
 import { DeleteDetectionsDialog } from "~/components/detections/delete-detections-dialog.tsx";
 import {
 	DetectionsFilters,
@@ -34,6 +32,7 @@ import { pageHead } from "~/lib/link-preview.ts";
 import { plural } from "~/lib/number-format.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const detectionsQuery = (data: DetectionWorkspaceSearch) =>
 	queryOptions({
@@ -61,11 +60,7 @@ const TABLE_CARD_CLASS =
 
 function Detections() {
 	const search = Route.useSearch();
-	const pageQuery = useQuery({
-		...detectionsQuery(search),
-		placeholderData: keepPreviousData,
-	});
-	const page = pageQuery.isPlaceholderData ? null : (pageQuery.data ?? null);
+	const page = useSkeletonMinimum(useQuery(detectionsQuery(search)).data);
 	const navigate = Route.useNavigate();
 	const queryClient = useQueryClient();
 	const { auth } = useRouteContext({ from: "__root__" });
@@ -130,79 +125,66 @@ function Detections() {
 				/>
 			</div>
 
-			<Deferred
-				query={pageQuery}
-				shellAfterMs={SHELL_DELAY_MS}
-				className="flex min-h-0 flex-1 flex-col"
-				shell={
-					<DetectionsTableShell
+			{!page ? (
+				<DetectionsTableShell
+					search={search}
+					canDelete={canDelete}
+					canListen={canListen}
+					onSearchChange={(nextSearch) =>
+						navigate({ search: nextSearch, replace: true })
+					}
+				/>
+			) : page.total === 0 ? (
+				<Card as="section" aria-label="Detection results" className="shrink-0">
+					<CardHeader title="Detections" />
+					<EmptyNote>
+						{isFiltered
+							? EMPTY.filter.detectionsFilters
+							: EMPTY.station.detections}
+					</EmptyNote>
+					{isFiltered ? (
+						<Button
+							variant="outline"
+							size="sm"
+							icon={X}
+							className="mt-page"
+							onClick={() =>
+								navigate({
+									search: {
+										...search,
+										page: 1,
+										species: undefined,
+										from: undefined,
+										to: undefined,
+									},
+									replace: true,
+								})
+							}
+						>
+							Clear filters
+						</Button>
+					) : null}
+				</Card>
+			) : (
+				<Card
+					as="section"
+					aria-label="Detection results"
+					className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
+				>
+					<DetectionsTable
+						page={page}
 						search={search}
-						canDelete={canDelete}
-						canListen={canListen}
 						onSearchChange={(nextSearch) =>
 							navigate({ search: nextSearch, replace: true })
 						}
+						rowSelection={rowSelection}
+						onRowSelectionChange={setRowSelection}
+						canDelete={canDelete}
+						canListen={canListen}
+						onDeleteSelected={() => setDeleteOpen(true)}
 					/>
-				}
-			>
-				{(loaded) =>
-					loaded.total === 0 ? (
-						<Card
-							as="section"
-							aria-label="Detection results"
-							className="shrink-0"
-						>
-							<CardHeader title="Detections" />
-							<EmptyNote>
-								{isFiltered
-									? EMPTY.filter.detectionsFilters
-									: EMPTY.station.detections}
-							</EmptyNote>
-							{isFiltered ? (
-								<Button
-									variant="outline"
-									size="sm"
-									icon={X}
-									className="mt-page"
-									onClick={() =>
-										navigate({
-											search: {
-												...search,
-												page: 1,
-												species: undefined,
-												from: undefined,
-												to: undefined,
-											},
-											replace: true,
-										})
-									}
-								>
-									Clear filters
-								</Button>
-							) : null}
-						</Card>
-					) : (
-						<Card
-							as="section"
-							aria-label="Detection results"
-							className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
-						>
-							<DetectionsTable
-								page={loaded}
-								search={search}
-								onSearchChange={(nextSearch) =>
-									navigate({ search: nextSearch, replace: true })
-								}
-								rowSelection={rowSelection}
-								onRowSelectionChange={setRowSelection}
-								canDelete={canDelete}
-								canListen={canListen}
-								onDeleteSelected={() => setDeleteOpen(true)}
-							/>
-						</Card>
-					)
-				}
-			</Deferred>
+				</Card>
+			)}
 
 			{deleteOpen ? (
 				<DeleteDetectionsDialog

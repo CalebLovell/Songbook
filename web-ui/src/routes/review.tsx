@@ -7,7 +7,6 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CircleAlert, SearchCheck } from "lucide-react";
-import { Deferred } from "~/components/deferred.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import {
 	ReviewWorkflow,
@@ -30,6 +29,7 @@ import {
 	reviewSearchSchema,
 	type SpeciesOption,
 } from "~/lib/review-data.ts";
+import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const reviewQuery = (data: ReviewSearch) =>
 	queryOptions({
@@ -59,6 +59,7 @@ export const Route = createFileRoute("/review")({
 function Review() {
 	const search = Route.useSearch();
 	const queue = useQuery(reviewQuery(search));
+	const loaded = useSkeletonMinimum(queue.data);
 	const navigate = Route.useNavigate();
 	const queryClient = useQueryClient();
 	const correct = useServerFn(confirmReviewDetection),
@@ -85,28 +86,24 @@ function Review() {
 					The detection could not be changed. Check the recording and try again.
 				</p>
 			) : null}
-			<Deferred
-				key={JSON.stringify(search)}
-				query={queue}
-				shell={<ReviewWorkflowSkeleton />}
-			>
-				{(loaded) => (
-					<ReviewWorkflow
-						key={loaded.page.page}
-						page={loaded.page}
-						species={loaded.species}
-						busy={change.isPending || queue.isFetching}
-						onCorrect={(rowId) => run(() => correct({ data: { rowId } }))}
-						onRecategorize={(rowId: number, item: SpeciesOption) =>
-							run(() => recategorize({ data: { rowId, ...item } }))
-						}
-						onDelete={(rowId) => run(() => remove({ data: { rowId } }))}
-						onPageChange={(next) =>
-							navigate({ search: { ...search, page: next } })
-						}
-					/>
-				)}
-			</Deferred>
+			{loaded ? (
+				<ReviewWorkflow
+					key={loaded.page.page}
+					page={loaded.page}
+					species={loaded.species}
+					busy={change.isPending || queue.isFetching}
+					onCorrect={(rowId) => run(() => correct({ data: { rowId } }))}
+					onRecategorize={(rowId: number, item: SpeciesOption) =>
+						run(() => recategorize({ data: { rowId, ...item } }))
+					}
+					onDelete={(rowId) => run(() => remove({ data: { rowId } }))}
+					onPageChange={(next) =>
+						navigate({ search: { ...search, page: next } })
+					}
+				/>
+			) : (
+				<ReviewWorkflowSkeleton />
+			)}
 		</PageWrap>
 	);
 }
