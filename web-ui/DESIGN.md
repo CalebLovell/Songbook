@@ -262,7 +262,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Polling**: one request at a time, none in a hidden tab, and an answer older
   than the latest is dropped. Full-table reads such as Highlights run from the route
   loader, never on a poll. SQLite is synchronous, so a slow query holds the whole
-  server; time filters keep a bare `Date` bound the index can seek on.
+  server; time filters keep a bare `Date` bound the index can seek on. Repeated
+  reads go through `lib/shared-read.ts`: keyed on `PRAGMA data_version` where the
+  answer comes from the database, always with a maximum age, because the clock moves
+  and clips leave the disk without a commit. Clock-derived fields are stamped per
+  response. `detections.Date` has `DATE` affinity, so a join to a `TEXT` date column
+  needs `+d.Date` to use the other table's key.
 - **Timeline**: every real day draws the normal page, whether quiet, ahead or before
   the station. The arrows walk one window at a time with no limit, and a period
   switch re-anchors on the latest day in the window with detections. Only a Daily

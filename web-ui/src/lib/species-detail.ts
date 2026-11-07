@@ -17,13 +17,8 @@ import {
 import { loadInstalledSpeciesCatalog } from "~/lib/species-control.server.ts";
 import { type SpeciesLink, speciesLinkFor } from "~/lib/species-link.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
-import { buildHourActivity, type HourActivity } from "~/lib/stats-data.ts";
-import {
-	getDetectionYears,
-	getMonthlyTrend,
-	getYearTrend,
-	type TrendPoint,
-} from "~/lib/trend.ts";
+import type { HourActivity } from "~/lib/stats-data.ts";
+import { deriveSpeciesTrends, type TrendPoint } from "~/lib/trend.ts";
 import { localTimestamp, timestampToMillis } from "~/lib/visits.ts";
 
 export type { HourActivity };
@@ -82,21 +77,13 @@ function byComName(comName: string) {
 	return sql`${detections.Com_Name} = ${comName}`;
 }
 
-async function getHourActivity(
-	filter: ReturnType<typeof byComName>,
-): Promise<HourActivity[]> {
-	const rows = await db
-		.select({
-			hour: sql<string>`strftime('%H', ${detections.Time})`,
-			count: sql<number>`count(*)`,
-		})
+function getDayHourCounts(filter: ReturnType<typeof byComName>) {
+	const hour = sql<string>`strftime('%H', ${detections.Time})`;
+	return db
+		.select({ date: detections.Date, hour, count: sql<number>`count(*)` })
 		.from(detections)
 		.where(filter)
-		.groupBy(sql`strftime('%H', ${detections.Time})`);
-
-	return buildHourActivity(
-		rows.map((row) => ({ hour: Number(row.hour), count: row.count })),
-	);
+		.groupBy(detections.Date, hour);
 }
 
 export const VISITS_PAGE_SIZE = 100;
@@ -241,44 +228,37 @@ export const getSpeciesDetail = createServerFn({ method: "GET" })
 				visitPageCount(totals.totalDetections),
 			);
 
-			const [
-				[first],
-				[last],
-				recentVisits,
-				availableYears,
-				history,
-				detectionTrend,
-				hourActivity,
-				logVisits,
-			] = await Promise.all([
-				db
-					.select({
-						date: detections.Date,
-						time: detections.Time,
-						confidence: detections.Confidence,
-					})
-					.from(detections)
-					.where(filter)
-					.orderBy(detections.Date, detections.Time)
-					.limit(1),
-				db
-					.select({
-						date: detections.Date,
-						time: detections.Time,
-						confidence: detections.Confidence,
-					})
-					.from(detections)
-					.where(filter)
-					.orderBy(desc(detections.Date), desc(detections.Time))
-					.limit(1),
-				getVisitPage(comName, 1, generatedAtDate),
-				getDetectionYears(filter),
-				getYearTrend(year, filter),
-				getMonthlyTrend(filter),
-				getHourActivity(filter),
-				logPage === 1 ? null : getVisitPage(comName, logPage, generatedAtDate),
-			]);
+			const [[first], [last], recentVisits, dayHourCounts, logVisits] =
+				await Promise.all([
+					db
+						.select({
+							date: detections.Date,
+							time: detections.Time,
+							confidence: detections.Confidence,
+						})
+						.from(detections)
+						.where(filter)
+						.orderBy(detections.Date, detections.Time)
+						.limit(1),
+					db
+						.select({
+							date: detections.Date,
+							time: detections.Time,
+							confidence: detections.Confidence,
+						})
+						.from(detections)
+						.where(filter)
+						.orderBy(desc(detections.Date), desc(detections.Time))
+						.limit(1),
+					getVisitPage(comName, 1, generatedAtDate),
+					getDayHourCounts(filter),
+					logPage === 1
+						? null
+						: getVisitPage(comName, logPage, generatedAtDate),
+				]);
 			const generatedAt = localTimestamp(generatedAtDate);
+			const { availableYears, history, detectionTrend, hourActivity } =
+				deriveSpeciesTrends(dayHourCounts, year);
 
 			const detail: SpeciesDetail = {
 				comName,
