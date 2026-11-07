@@ -8,21 +8,32 @@ export type UnlockStatus = Awaited<ReturnType<typeof getUnlockStatusFn>>;
 let router: AnyRouter | null = null;
 let known: UnlockStatus | null = null;
 let inFlight: Promise<UnlockStatus> | null = null;
+let wasForgotten = false;
 
 export function registerUnlockStatusRouter(next: AnyRouter) {
 	router = next;
 }
 
 function fetchStatus(): Promise<UnlockStatus> {
-	inFlight ??= getUnlockStatusFn()
+	if (inFlight) return inFlight;
+	const request: Promise<UnlockStatus> = getUnlockStatusFn()
 		.then((status) => {
-			known = status;
+			if (inFlight === request) known = status;
 			return status;
 		})
 		.finally(() => {
-			inFlight = null;
+			if (inFlight === request) inFlight = null;
 		});
-	return inFlight;
+	inFlight = request;
+	return request;
+}
+
+function statusSentWithPage(): UnlockStatus | null {
+	if (wasForgotten) return null;
+	const root = router?.state.matches.find(
+		(match) => match.routeId === "__root__",
+	);
+	return root?.context?.auth ?? null;
 }
 
 const sameStatus = (a: UnlockStatus, b: UnlockStatus) =>
@@ -34,9 +45,9 @@ const sameStatus = (a: UnlockStatus, b: UnlockStatus) =>
 export async function unlockStatusForNavigation(): Promise<UnlockStatus> {
 	if (typeof window === "undefined") return getUnlockStatusFn();
 
-	if (!known) return fetchStatus();
+	const shown = known ?? statusSentWithPage();
+	if (!shown) return fetchStatus();
 
-	const shown = known;
 	fetchStatus().then(
 		(fresh) => {
 			if (!sameStatus(fresh, shown) && router) {
@@ -50,4 +61,6 @@ export async function unlockStatusForNavigation(): Promise<UnlockStatus> {
 
 export function forgetUnlockStatus() {
 	known = null;
+	inFlight = null;
+	wasForgotten = true;
 }
