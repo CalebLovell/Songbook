@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Moon, Sun, Sunrise, Sunset } from "lucide-react";
 import type { ReactNode } from "react";
 import { CARD_HEADER_CLASS } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
@@ -6,6 +7,7 @@ import { SpeciesFlagPills } from "~/components/species-flag-pills.tsx";
 import { SpeciesImage } from "~/components/species-image.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
+import { Hint } from "~/components/ui/hint.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
 import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
 import { TooltipProvider } from "~/components/ui/tooltip.tsx";
@@ -13,6 +15,7 @@ import { heatColor, heatInk, heatMaximum } from "~/lib/heatmap.ts";
 import type { VocalJump } from "~/lib/highlights-data.ts";
 import { compactCount } from "~/lib/number-format.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { formatSunClock, type WindowSun } from "~/lib/sun-times.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 import { cn } from "~/lib/utils.ts";
 
@@ -57,12 +60,14 @@ function hourTickParts(hour: number): { number: string; meridiem: string } {
 
 export function SpeciesByHourCard({
 	rows,
+	sun,
 	emptyMessage,
 	emptyAction,
 	summary,
 	className = "",
 }: {
 	rows: SpeciesHourRow[];
+	sun?: WindowSun;
 	emptyMessage: string;
 	emptyAction?: ReactNode;
 	summary?: ReactNode;
@@ -81,11 +86,14 @@ export function SpeciesByHourCard({
 				<div
 					className={`${CARD_HEADER_CLASS} gap-3 py-2 ${isEmpty ? "mb-page" : ""}`}
 				>
-					<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
-						<Kicker as="h2" className="shrink-0">
-							Activity
-						</Kicker>
-						{summary}
+					<div className="flex h-6 min-w-0 flex-1 flex-wrap content-start items-center justify-between gap-x-3 gap-y-6 overflow-hidden">
+						<div className="flex h-6 min-w-0 items-center gap-3">
+							<Kicker as="h2" className="shrink-0">
+								Activity
+							</Kicker>
+							{summary}
+						</div>
+						{sun?.available ? <HeaderSunTimes sun={sun} /> : null}
 					</div>
 				</div>
 
@@ -97,6 +105,7 @@ export function SpeciesByHourCard({
 				) : (
 					<div className="-mx-1 px-1">
 						<SpeciesHourDataTable rows={rows} />
+						{sun?.available ? <SunRow sun={sun} /> : null}
 						<HeaderRow />
 
 						<div className="-mx-page *:px-page">
@@ -162,6 +171,103 @@ function HeaderRow() {
 					))}
 				</div>
 			</div>
+		</div>
+	);
+}
+
+type DaylightSun = Extract<WindowSun, { available: true }>;
+
+function SunRow({ sun }: { sun: DaylightSun }) {
+	return (
+		<div className="@min-[56rem]/card:flex hidden items-center pt-2">
+			<div className={`h-4 ${LABEL_LAYOUT}`} />
+			<div className="flex-none">
+				<div
+					className="grid h-4 items-center"
+					style={{ gridTemplateColumns: HOUR_GRID_COLUMNS }}
+				>
+					{HOURS.map((hour) => (
+						<SunMark key={`sun-${hour}`} hour={hour} sun={sun} />
+					))}
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function HeaderSunTimes({ sun }: { sun: DaylightSun }) {
+	return (
+		<p className="flex h-6 shrink-0 translate-y-[-1.5px] items-center gap-2 whitespace-nowrap text-[13px] text-muted-foreground">
+			{sun.days > 1 ? <span>avg</span> : null}
+			<Sunrise aria-hidden="true" className="size-3.5 shrink-0" />
+			<HeaderSunTime event="Sunrise" minutes={sun.sunriseMinutes} />
+			<span
+				className="size-0.75 shrink-0 rounded-full bg-muted-foreground opacity-60"
+				aria-hidden="true"
+			/>
+			<Sunset aria-hidden="true" className="size-3.5 shrink-0" />
+			<HeaderSunTime event="Sunset" minutes={sun.sunsetMinutes} />
+		</p>
+	);
+}
+
+function HeaderSunTime({
+	event,
+	minutes,
+}: {
+	event: "Sunrise" | "Sunset";
+	minutes: number;
+}) {
+	const [clock, meridiem] = formatSunClock(minutes).split(" ");
+	return (
+		<span>
+			<span className="sr-only">{event} </span>
+			<Count>{clock}</Count> {meridiem?.toLowerCase()}
+		</span>
+	);
+}
+
+function sunTimeLabel(
+	event: "Sunrise" | "Sunset",
+	minutes: number,
+	days: number,
+) {
+	return `${event}${days > 1 ? ", avg" : ""} ${formatSunClock(minutes)}`;
+}
+
+function SunMark({ hour, sun }: { hour: number; sun: DaylightSun }) {
+	if (hour === sun.sunriseHour || hour === sun.sunsetHour) {
+		const isSunrise = hour === sun.sunriseHour;
+		const Icon = isSunrise ? Sunrise : Sunset;
+		const label = sunTimeLabel(
+			isSunrise ? "Sunrise" : "Sunset",
+			isSunrise ? sun.sunriseMinutes : sun.sunsetMinutes,
+			sun.days,
+		);
+		return (
+			<div className="flex justify-center">
+				<Hint content={label}>
+					<button
+						type="button"
+						aria-label={label}
+						className="flex size-4 cursor-default items-center justify-center"
+					>
+						<Icon aria-hidden="true" className="size-3 text-moss" />
+					</button>
+				</Hint>
+			</div>
+		);
+	}
+	const isDay = hour > sun.sunriseHour && hour < sun.sunsetHour;
+	const Icon = isDay ? Sun : Moon;
+	return (
+		<div aria-hidden="true" className="flex justify-center">
+			<Icon
+				className={cn(
+					"size-3",
+					isDay ? "text-moss" : "text-muted-foreground opacity-60",
+				)}
+			/>
 		</div>
 	);
 }

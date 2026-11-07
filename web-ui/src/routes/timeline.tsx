@@ -43,6 +43,7 @@ import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { formatShareCard } from "~/lib/share-card.ts";
 import type { HourActivity } from "~/lib/stats-data.ts";
+import type { WindowSun } from "~/lib/sun-times.ts";
 import type { TimelineData, TimelineRow } from "~/lib/timeline.ts";
 import { getTimelinePage, type TimelinePageData } from "~/lib/timeline-page.ts";
 import {
@@ -160,6 +161,7 @@ function Timeline() {
 						rows={current.body.rows}
 						highlights={current.body.highlights}
 						thresholds={current.body.thresholds}
+						sun={current.body.sun}
 						period={current.period}
 						jumpTo={jumpTarget(current)}
 						windowLabel={current.window?.label ?? null}
@@ -372,6 +374,7 @@ function TimelineCards({
 	rows,
 	highlights,
 	thresholds,
+	sun,
 	period,
 	jumpTo,
 	windowLabel,
@@ -381,6 +384,7 @@ function TimelineCards({
 	rows: TimelineRow[];
 	highlights: TimelineData["highlights"];
 	thresholds: HighlightThresholds;
+	sun: WindowSun;
 	period: TimelinePeriod;
 	jumpTo: JumpTarget | null;
 	windowLabel: string | null;
@@ -439,6 +443,7 @@ function TimelineCards({
 		view === "hours" ? (
 			<SpeciesByHourCard
 				rows={rows}
+				sun={sun}
 				emptyMessage={emptyMessage}
 				emptyAction={emptyAction}
 				summary={summary}
