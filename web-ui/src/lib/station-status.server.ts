@@ -3,6 +3,7 @@ import "@tanstack/react-start/server-only";
 import { spawn } from "node:child_process";
 
 import type { ServiceState } from "./health-data.ts";
+import { shareRead } from "./shared-read.ts";
 import type { StationStatus } from "./station-status.ts";
 
 const LIVE_SERVICES = ["birdnet_recording.service", "birdnet_analysis.service"];
@@ -10,6 +11,9 @@ const LIVE_SERVICES = ["birdnet_recording.service", "birdnet_analysis.service"];
 const ANALYZER_SERVICE = "birdnet_analysis.service";
 
 const TIMEOUT_MS = 3_000;
+
+// Shorter than the 30s poll on /live, so a lone viewer still gets a fresh read each time.
+const STATION_STATUS_TTL_MS = 25_000;
 
 export function readAnalyzerState(): Promise<ServiceState | null> {
 	return new Promise((resolve) => {
@@ -58,7 +62,7 @@ export function readAnalyzerState(): Promise<ServiceState | null> {
 	});
 }
 
-export function readStationStatus(): Promise<StationStatus> {
+function queryStationStatus(): Promise<StationStatus> {
 	return new Promise((resolve) => {
 		let settled = false;
 		const finish = (status: StationStatus) => {
@@ -87,3 +91,8 @@ export function readStationStatus(): Promise<StationStatus> {
 		child.once("exit", (code) => finish(code === 0 ? "live" : "offline"));
 	});
 }
+
+export const readStationStatus = shareRead(
+	queryStationStatus,
+	STATION_STATUS_TTL_MS,
+);
