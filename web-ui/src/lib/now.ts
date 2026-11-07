@@ -1,11 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { avg, count, desc, sql } from "drizzle-orm";
 
-import { db } from "~/db/index.ts";
+import { dataVersion, db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
 import { audioUrlFor } from "~/lib/audio.ts";
 import { canHearEveryClip } from "~/lib/clip-access.server.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
+import { shareRead } from "~/lib/shared-read.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import {
 	countVisits,
@@ -80,9 +81,8 @@ type WindowRow = {
 async function buildCurrentBird(
 	latest: WindowRow,
 	windowRows: WindowRow[],
-	generatedAtMs: number,
 	withAudio: boolean,
-): Promise<CurrentBird> {
+): Promise<Omit<CurrentBird, "ageMs">> {
 	const [allTime] = await db
 		.select({
 			allTimeCount: count(),
@@ -101,7 +101,6 @@ async function buildCurrentBird(
 		speciesSlug: comNameToSlug(latest.comName),
 		imageUrl: illustrationUrlFor(latest.sciName, "flight"),
 		detectedAt: latest.detectedAt,
-		ageMs: generatedAtMs - timestampToMillis(latest.detectedAt),
 		confidence: latest.confidence,
 		audioUrl: withAudio
 			? audioUrlFor(latest.date, latest.comName, latest.fileName)
@@ -145,57 +144,84 @@ async function hasAnyDetections(): Promise<boolean> {
 
 function buildRecentVisits(
 	log: Visit<WindowRow>[],
-	generatedAtMs: number,
 	withAudio: boolean,
-): Promise<RecentVisit[]> {
-	return Promise.all(
-		log.slice(0, RECENT_LIMIT).map(async (visit) => {
-			const first = visit.moments[0];
-			const last = visit.moments[visit.moments.length - 1];
-			const best = visit.moments.reduce((top, moment) =>
-				(moment.confidence ?? -1) > (top.confidence ?? -1) ? moment : top,
-			);
-			return {
-				key: `${visit.comName}-${first.detectedAt}`,
-				comName: visit.comName,
-				sciName: last.sciName,
-				speciesSlug: comNameToSlug(visit.comName),
-				imageUrl: illustrationUrlFor(last.sciName, "perched"),
-				firstAt: first.detectedAt,
-				lastAt: last.detectedAt,
-				ageMs: generatedAtMs - timestampToMillis(last.detectedAt),
-				detections: visit.moments.length,
-				confidence: best.confidence,
-				audioUrl: withAudio
-					? audioUrlFor(best.date, best.comName, best.fileName)
-					: null,
-			};
-		}),
+): Omit<RecentVisit, "ageMs">[] {
+	return log.slice(0, RECENT_LIMIT).map((visit) => {
+		const first = visit.moments[0];
+		const last = visit.moments[visit.moments.length - 1];
+		const best = visit.moments.reduce((top, moment) =>
+			(moment.confidence ?? -1) > (top.confidence ?? -1) ? moment : top,
+		);
+		return {
+			key: `${visit.comName}-${first.detectedAt}`,
+			comName: visit.comName,
+			sciName: last.sciName,
+			speciesSlug: comNameToSlug(visit.comName),
+			imageUrl: illustrationUrlFor(last.sciName, "perched"),
+			firstAt: first.detectedAt,
+			lastAt: last.detectedAt,
+			detections: visit.moments.length,
+			confidence: best.confidence,
+			audioUrl: withAudio
+				? audioUrlFor(best.date, best.comName, best.fileName)
+				: null,
+		};
+	});
+}
+
+async function loadNowData(withAudio: boolean) {
+	const rows = await getWindowRows();
+	const latest = rows.at(0);
+	const heroKey = latest && detectionKey(latest);
+	const log = groupVisits(rows).filter(
+		(visit) =>
+			detectionKey(visit.moments[visit.moments.length - 1]) !== heroKey,
 	);
+
+	return {
+		current: latest ? await buildCurrentBird(latest, rows, withAudio) : null,
+		hasAnyDetections: latest ? true : await hasAnyDetections(),
+		summary: { detections: rows.length },
+		recent: buildRecentVisits(log, withAudio),
+	};
+}
+
+const NOW_DATA_MAX_AGE_MS = 60_000;
+
+const nowDataReads = new Map<boolean, () => ReturnType<typeof loadNowData>>();
+
+function readNowData(withAudio: boolean) {
+	let read = nowDataReads.get(withAudio);
+	if (!read) {
+		read = shareRead(() => loadNowData(withAudio), {
+			maxAgeMs: NOW_DATA_MAX_AGE_MS,
+			version: dataVersion,
+		});
+		nowDataReads.set(withAudio, read);
+	}
+	return read();
 }
 
 export const getNowSnapshot = createServerFn({ method: "GET" }).handler(
 	async (): Promise<NowSnapshot> => {
 		const generatedAtDate = new Date();
 		const generatedAtMs = generatedAtDate.getTime();
-
-		const rows = await getWindowRows();
-		const latest = rows.at(0);
-		const withAudio = await canHearEveryClip();
-		const heroKey = latest && detectionKey(latest);
-		const log = groupVisits(rows).filter(
-			(visit) =>
-				detectionKey(visit.moments[visit.moments.length - 1]) !== heroKey,
+		const { current, hasAnyDetections, summary, recent } = await readNowData(
+			await canHearEveryClip(),
 		);
 
 		return {
 			generatedAt: localTimestamp(generatedAtDate),
-			current: latest
-				? await buildCurrentBird(latest, rows, generatedAtMs, withAudio)
-				: null,
-			hasAnyDetections: latest ? true : await hasAnyDetections(),
-			summary: { detections: rows.length },
-			recent: await buildRecentVisits(log, generatedAtMs, withAudio),
+			current: current && {
+				...current,
+				ageMs: generatedAtMs - timestampToMillis(current.detectedAt),
+			},
+			hasAnyDetections,
+			summary,
+			recent: recent.map((visit) => ({
+				...visit,
+				ageMs: generatedAtMs - timestampToMillis(visit.lastAt),
+			})),
 		};
 	},
 );

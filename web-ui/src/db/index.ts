@@ -43,6 +43,13 @@ export function openWritableDetectionsDb(): DatabaseSync {
 
 export const sqlite = openDetectionsDb();
 
+export function dataVersion(): number {
+	const row = sqlite.prepare("PRAGMA data_version").get() as {
+		data_version: number;
+	};
+	return row.data_version;
+}
+
 export const db = drizzle(
 	async (sql, params, method) => {
 		const stmt = sqlite.prepare(sql);

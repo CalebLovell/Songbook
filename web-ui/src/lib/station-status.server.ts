@@ -92,7 +92,6 @@ function queryStationStatus(): Promise<StationStatus> {
 	});
 }
 
-export const readStationStatus = shareRead(
-	queryStationStatus,
-	STATION_STATUS_TTL_MS,
-);
+export const readStationStatus = shareRead(queryStationStatus, {
+	maxAgeMs: STATION_STATUS_TTL_MS,
+});

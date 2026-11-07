@@ -1,22 +1,33 @@
+type SharedReadOptions = {
+	maxAgeMs: number;
+	version?: () => number;
+	now?: () => number;
+};
+
 export function shareRead<T>(
 	read: () => Promise<T>,
-	ttlMs: number,
-	now: () => number = Date.now,
+	{ maxAgeMs, version = () => 0, now = Date.now }: SharedReadOptions,
 ): () => Promise<T> {
-	let inFlight: Promise<T> | null = null;
-	let latest: { value: T; readAt: number } | null = null;
+	let latest: { value: Promise<T>; version: number; readAt: number } | null =
+		null;
 	return () => {
-		if (latest && now() - latest.readAt < ttlMs) {
-			return Promise.resolve(latest.value);
+		const currentVersion = version();
+		if (
+			latest &&
+			latest.version === currentVersion &&
+			now() - latest.readAt < maxAgeMs
+		) {
+			return latest.value;
 		}
-		inFlight ??= read()
-			.then((value) => {
-				latest = { value, readAt: now() };
-				return value;
-			})
-			.finally(() => {
-				inFlight = null;
-			});
-		return inFlight;
+		const started = {
+			value: read(),
+			version: currentVersion,
+			readAt: now(),
+		};
+		latest = started;
+		started.value.catch(() => {
+			if (latest === started) latest = null;
+		});
+		return started.value;
 	};
 }
