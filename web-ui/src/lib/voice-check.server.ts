@@ -24,6 +24,7 @@ const CHECK_INTERVAL_MS = 10 * 60_000;
 const IDLE_SCAN_MAX_AGE_MS = 60 * 60_000;
 
 let running = false;
+let reportedMissingPython = false;
 
 function voiceCheckScript(): string {
 	const beside = path.resolve(
@@ -39,6 +40,23 @@ function pythonPath(): string {
 	return (
 		process.env.BIRDNET_PYTHON ??
 		path.join(homedir(), "BirdNET-Pi/birdnet/bin/python3")
+	);
+}
+
+function isMissingPython(error: unknown): boolean {
+	const { code, syscall } = error as NodeJS.ErrnoException;
+	return code === "ENOENT" && syscall?.startsWith("spawn") === true;
+}
+
+function reportFailedCheck(error: unknown): void {
+	if (!isMissingPython(error)) {
+		console.error("[voice-check] a check failed:", error);
+		return;
+	}
+	if (reportedMissingPython) return;
+	reportedMissingPython = true;
+	console.warn(
+		`[voice-check] skipped, clips stay private: no Python at ${pythonPath()}. Set BIRDNET_PYTHON to run it.`,
 	);
 }
 
@@ -130,7 +148,7 @@ async function checkNewBestClips(): Promise<void> {
 	try {
 		await scanForNewBestClips();
 	} catch (error) {
-		console.error("[voice-check] a check failed:", error);
+		reportFailedCheck(error);
 	} finally {
 		running = false;
 	}
