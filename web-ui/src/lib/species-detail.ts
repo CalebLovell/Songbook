@@ -57,24 +57,30 @@ export type SpeciesDetail = {
 	visitLog: VisitPage;
 };
 
-async function resolveDetectedBird(
-	slug: string,
-): Promise<CatalogSpecies | null> {
-	const rows = await db
-		.selectDistinct({
-			comName: detections.Com_Name,
-			sciName: detections.Sci_Name,
-		})
-		.from(detections);
-	return rows.find((row) => comNameToSlug(row.comName) === slug) ?? null;
+function byComName(comName: string) {
+	return sql`${detections.Com_Name} = ${comName}`;
 }
 
 async function resolveComName(slug: string): Promise<string | null> {
-	return (await resolveDetectedBird(slug))?.comName ?? null;
+	const rows = await db
+		.selectDistinct({ comName: detections.Com_Name })
+		.from(detections);
+	return (
+		rows.find((row) => comNameToSlug(row.comName) === slug)?.comName ?? null
+	);
 }
 
-function byComName(comName: string) {
-	return sql`${detections.Com_Name} = ${comName}`;
+async function resolveDetectedBird(
+	slug: string,
+): Promise<CatalogSpecies | null> {
+	const comName = await resolveComName(slug);
+	if (!comName) return null;
+	const [row] = await db
+		.select({ sciName: detections.Sci_Name })
+		.from(detections)
+		.where(byComName(comName))
+		.limit(1);
+	return row ? { comName, sciName: row.sciName } : null;
 }
 
 function getDayHourCounts(filter: ReturnType<typeof byComName>) {
