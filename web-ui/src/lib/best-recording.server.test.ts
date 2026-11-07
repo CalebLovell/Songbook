@@ -311,3 +311,25 @@ test("voice checks join a station's DATE column", () => {
 	assert.equal(recordings.get("Blue Jay")?.fileName, "jay.wav");
 	assert.deepEqual(unchecked, []);
 });
+
+test("starts from the clips it is given, then scans for more", async () => {
+	const { database, root } = fixture(
+		[
+			["2026-07-01", "06:00:00", "Blue Jay", 0.9, "jay.wav"],
+			["2026-07-01", "06:00:00", "House Finch", 0.8, "finch.wav"],
+		],
+		["jay.wav", "finch.wav"],
+	);
+	const { unchecked } = publicRecordings(database, root, "House Finch");
+	const scored: string[] = [];
+	await checkUncheckedRecordings(
+		database,
+		root,
+		async (clip) => {
+			scored.push(clip.fileName);
+			return 0;
+		},
+		unchecked,
+	);
+	assert.deepEqual(scored, ["finch.wav", "jay.wav"]);
+});

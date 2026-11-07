@@ -222,14 +222,18 @@ export async function checkUncheckedRecordings(
 	database: DatabaseSync,
 	extractedRoot: string,
 	scoreClip: (clip: BestRecording) => Promise<number>,
+	firstUnchecked: BestRecording[] = publicRecordings(
+		database,
+		extractedRoot,
+	).unchecked,
 	now: () => Date = () => new Date(),
 ): Promise<void> {
-	for (;;) {
-		const { unchecked } = publicRecordings(database, extractedRoot);
-		if (unchecked.length === 0) return;
+	let unchecked = firstUnchecked;
+	while (unchecked.length > 0) {
 		for (const clip of unchecked) {
 			const voiceScore = await scoreClip(clip);
 			saveVoiceCheck(database, clip, voiceScore, now().toISOString());
 		}
+		unchecked = publicRecordings(database, extractedRoot).unchecked;
 	}
 }

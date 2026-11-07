@@ -6,7 +6,7 @@ import { homedir, setPriority } from "node:os";
 import path from "node:path";
 import { createInterface } from "node:readline";
 
-import { openWritableDetectionsDb, sqlite } from "~/db/index.ts";
+import { dataVersion, openWritableDetectionsDb, sqlite } from "~/db/index.ts";
 import { extractedDir } from "~/lib/audio.server.ts";
 import {
 	type BestRecording,
@@ -14,10 +14,14 @@ import {
 	publicRecordings,
 } from "~/lib/best-recording.server.ts";
 import { resolveDetectionClipPath } from "~/lib/detection-file-path.server.ts";
+import { shareRead } from "~/lib/shared-read.ts";
 
 const LOWEST_PRIORITY = 19;
 const CLIP_TIMEOUT_MS = 60_000;
 const CHECK_INTERVAL_MS = 10 * 60_000;
+// Clips can leave the disk without a commit, which puts the next-best clip in line,
+// so an idle station still scans. Until then that clip only stays private.
+const IDLE_SCAN_MAX_AGE_MS = 60 * 60_000;
 
 let running = false;
 
@@ -95,24 +99,36 @@ function startScorer(): {
 	};
 }
 
-async function runVoiceChecks(): Promise<void> {
+async function runVoiceChecks(unchecked: BestRecording[]): Promise<void> {
 	const scorer = startScorer();
 	const database = openWritableDetectionsDb();
 	try {
 		database.exec("PRAGMA busy_timeout = 5000");
-		await checkUncheckedRecordings(database, extractedDir(), scorer.scoreClip);
+		await checkUncheckedRecordings(
+			database,
+			extractedDir(),
+			scorer.scoreClip,
+			unchecked,
+		);
 	} finally {
 		scorer.stop();
 		database.close();
 	}
 }
 
+const scanForNewBestClips = shareRead(
+	async () => {
+		const { unchecked } = publicRecordings(sqlite, extractedDir());
+		if (unchecked.length > 0) await runVoiceChecks(unchecked);
+	},
+	{ maxAgeMs: IDLE_SCAN_MAX_AGE_MS, version: dataVersion },
+);
+
 async function checkNewBestClips(): Promise<void> {
 	if (running) return;
 	running = true;
 	try {
-		const { unchecked } = publicRecordings(sqlite, extractedDir());
-		if (unchecked.length > 0) await runVoiceChecks();
+		await scanForNewBestClips();
 	} catch (error) {
 		console.error("[voice-check] a check failed:", error);
 	} finally {
