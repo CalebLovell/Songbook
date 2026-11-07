@@ -1,5 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { getGlobalStartContext } from "@tanstack/react-start";
 import { createQueryClient } from "./lib/query-client.ts";
 import { parseSearch, stringifySearch } from "./lib/search-params.ts";
 import { registerUnlockStatusRouter } from "./lib/unlock-status.ts";
@@ -21,6 +22,7 @@ export function getRouter() {
 		defaultPreloadStaleTime: 0,
 		defaultPendingMs: 0,
 		defaultPendingMinMs: 0,
+		ssr: { nonce: getGlobalStartContext()?.cspNonce },
 	});
 	registerUnlockStatusRouter(router);
 

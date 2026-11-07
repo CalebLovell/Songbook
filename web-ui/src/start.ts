@@ -6,14 +6,23 @@ import {
 } from "@tanstack/react-start";
 
 import { isUnauthorizedError } from "~/lib/auth.ts";
+import {
+	contentSecurityPolicy,
+	PERMISSIONS_POLICY,
+} from "~/lib/content-security-policy.ts";
 import { isStationOrigin } from "~/lib/csrf-origin.ts";
 
 const securityHeaders = createMiddleware({ type: "request" }).server(
 	async ({ request, next }) => {
-		const result = await next();
+		const cspNonce = crypto.randomUUID();
+		const result = await next({ context: { cspNonce } });
 		const headers = new Headers(result.response.headers);
 		headers.set("X-Frame-Options", "DENY");
-		headers.set("Content-Security-Policy", "frame-ancestors 'none'");
+		headers.set(
+			"Content-Security-Policy",
+			contentSecurityPolicy({ nonce: cspNonce, dev: import.meta.env.DEV }),
+		);
+		headers.set("Permissions-Policy", PERMISSIONS_POLICY);
 		headers.set("X-Content-Type-Options", "nosniff");
 		headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 		const https =
