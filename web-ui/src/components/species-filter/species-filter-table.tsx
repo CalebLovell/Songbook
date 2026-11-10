@@ -99,7 +99,8 @@ const COLUMN_VISIBILITY: Record<string, string> = {
 };
 const GRID_ROW = "col-span-full grid grid-cols-subgrid items-center";
 const BODY_ROW_HEIGHT = "min-h-[calc(1.75rem+1rem+1px)]";
-const STATUS_CHIP = "border-0 px-2.5 py-1.5 font-semibold leading-none";
+const STATUS_CHIP =
+	"border-0 px-2.5 py-1.5 font-semibold leading-none ring-1 ring-current/20 ring-inset";
 const COLUMN_GRID = {
 	"--cols-xs": "max-content max-content minmax(max-content, 1fr) max-content",
 	"--cols-sm": "max-content max-content minmax(0, 1fr) max-content",
@@ -122,22 +123,23 @@ const STATUS_PRESENTATION: Record<
 > = {
 	automatic: {
 		label: "Automatic",
-		className: "bg-muted text-muted-foreground",
+		className:
+			"bg-[color-mix(in_oklab,var(--muted-foreground)_16%,var(--paper-raised))] text-muted-foreground",
 	},
 	custom: {
 		label: "Custom",
 		className:
-			"bg-[color-mix(in_oklab,var(--sage)_35%,var(--paper-raised))] text-moss",
+			"bg-[color-mix(in_oklab,var(--moss)_16%,var(--paper-raised))] text-moss",
 	},
 	always: {
 		label: "Always detect",
 		className:
-			"bg-[color-mix(in_oklab,var(--sand)_30%,var(--paper-raised))] text-bark",
+			"bg-[color-mix(in_oklab,var(--sand)_32%,var(--paper-raised))] text-bark",
 	},
 	never: {
 		label: "Never detect",
 		className:
-			"bg-[color-mix(in_oklab,var(--clay)_15%,var(--paper-raised))] text-destructive",
+			"bg-[color-mix(in_oklab,var(--clay)_20%,var(--paper-raised))] text-destructive",
 	},
 };
 
