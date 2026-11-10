@@ -6,23 +6,23 @@ export function formatConfidence(confidence: number | null): string {
 
 export const CONFIDENT_MIN = 0.9;
 
-const RAMP_FLOOR = 0.7;
-const FLOOR_HUE = 48;
-const TOP_HUE = 140;
+const UNSURE_BELOW = 0.8;
+const CONFIDENT_HUE = 150;
+const MIDDLING_HUE = 80;
+const UNSURE_HUE = 35;
 
 export function confidenceHue(confidence: number): number {
-	const share = Math.min(
-		1,
-		Math.max(0, (confidence - RAMP_FLOOR) / (1 - RAMP_FLOOR)),
-	);
-	return FLOOR_HUE + (TOP_HUE - FLOOR_HUE) * share;
+	const shown = Math.round(confidence * 100) / 100;
+	if (shown >= CONFIDENT_MIN) return CONFIDENT_HUE;
+	if (shown >= UNSURE_BELOW) return MIDDLING_HUE;
+	return UNSURE_HUE;
 }
 
 export function confidenceStyle(confidence: number): CSSProperties {
-	const hue = confidenceHue(confidence).toFixed(1);
+	const hue = confidenceHue(confidence);
 	return {
-		backgroundColor: `light-dark(oklch(0.95 0.025 ${hue}), oklch(0.31 0.025 ${hue}))`,
-		color: `light-dark(oklch(0.47 0.06 ${hue}), oklch(0.84 0.045 ${hue}))`,
+		backgroundColor: `light-dark(oklch(0.94 0.035 ${hue}), oklch(0.31 0.045 ${hue}))`,
+		color: `light-dark(oklch(0.45 0.09 ${hue}), oklch(0.85 0.065 ${hue}))`,
 	};
 }
 

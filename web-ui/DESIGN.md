@@ -57,10 +57,12 @@ for a meaning; don't write a new mix inline when one exists:
 | `--row-well` | the slack under a paged list's rows on a short page (`RowWell`) |
 | `--toast-{success,warning,error}-fill/-line` | toast tones; title is moss / bark / clay, neutral toasts stay white |
 
-Confidence pills are a hue ramp (`lib/confidence.ts`): red-orange at 70%, the
-lowest the station keeps, through amber and yellow to green at 100%; anything
-lower clamps to red-orange. Each theme sets its own fill and text lightness
-(`light-dark()`), kept low in chroma so the pills stay quiet; every step clears 5.5:1. Destructive is clay. Single-series charts are moss. Heat
+Confidence pills are three bands, not a ramp (`lib/confidence.ts`): green at
+90% and up (`CONFIDENT_MIN`, the same line review uses), amber from 80%, and
+red-orange below that, judged on the rounded percent the pill shows. A smooth ramp turned every score into the same olive, so
+the bands carry just enough chroma to tell apart at a glance; any more and a
+column of them shouts. Each theme sets its own
+fill and text lightness (`light-dark()`); every band clears 5.5:1. Destructive is clay. Single-series charts are moss. Heat
 shading is a continuous ramp from a pale moss wash to full moss, log-scaled,
 with one scale per chart topped by its busiest cell across every row -- never
 a row's own peak (`lib/heatmap.ts`). The ramp steps over the mixes where neither
