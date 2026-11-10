@@ -57,3 +57,6 @@ whitelist_species_list.txt
 
 # Release bundles built by scripts/package_release.sh
 /dist/
+
+# Per-machine preview launch configs
+/.claude/launch.json

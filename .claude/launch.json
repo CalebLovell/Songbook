@@ -7,6 +7,12 @@
 			"runtimeArgs": ["run", "dev", "--", "--port", "5199", "--strictPort"],
 			"cwd": "web-ui",
 			"port": 5199
+		},
+		{
+			"name": "chorus",
+			"runtimeExecutable": "C:/Users/caleb/Projects/BirdNET-Pi-Chorus/engine/.venv/Scripts/chorus.exe",
+			"runtimeArgs": ["demo", "--live", "--data", "C:/Users/caleb/Projects/BirdNET-Pi-Chorus/.data/demo-latest", "--web", "C:/Users/caleb/Projects/BirdNET-Pi-Chorus/web/build"],
+			"port": 8390
 		}
 	]
 }
