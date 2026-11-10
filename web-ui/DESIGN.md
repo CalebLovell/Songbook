@@ -53,7 +53,6 @@ for a meaning; don't write a new mix inline when one exists:
 | `--shade` | the tint of every shadow and dimming backdrop: ink in light, black in dark (never thin `--ink` for a shadow, it turns into a glow in dark) |
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
-| `--live-fill` | the Live pill |
 | `--row-well` | the slack under a paged list's rows on a short page (`RowWell`) |
 | `--toast-{success,warning,error}-fill/-line` | toast tones; title is moss / bark / clay, neutral toasts stay white |
 
@@ -174,7 +173,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
   `/` to focus), then two nav sections: Explore (Live Feed, Timeline, All Birds, Detections,
   Learn) for everyone, and Station (Review, Species Filter, Settings) right below it only
-  when signed in. Nothing else sits low in the sidebar except the account card pinned at the foot. The Live pill lives in the Live page's hero, not the chrome.
+  when signed in. Nothing else sits low in the sidebar except the station status line and the account card pinned at the foot. The status line sits just above the account card, in the sidebar and the phone drawer alike (the slot under the wordmark belongs to the site name): a moss dot that pings while the station is listening, a still grey dot when offline or unchecked. It is the only place status shows; the Live hero carries none. The drawer and sidebar foot (status, account card, theme switcher) keep a fixed 1rem gap on every width, like the nav rows above it; `--page-gap` halving on phones is for page cards, not the drawer.
 - **Account card**: the sidebar's last item, never a nav row. One line of bold title and
   one muted line beside a 36px round icon well, then a 34px borderless icon action:
   sign out when signed in, a link to `/sign-in?next=` when not, a chevron to `/sign-in` when

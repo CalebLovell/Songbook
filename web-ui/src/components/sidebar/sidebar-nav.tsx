@@ -13,6 +13,7 @@ import {
 import { useId } from "react";
 
 import { AccountCard } from "~/components/sidebar/account-card.tsx";
+import { StationStatusLine } from "~/components/sidebar/station-status-line.tsx";
 import { ThemeSwitcher } from "~/components/sidebar/theme-switcher.tsx";
 import { useSettingsMark } from "~/lib/use-settings-mark.ts";
 
@@ -114,7 +115,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 				</nav>
 			) : null}
 
-			<div className="mt-auto flex flex-col gap-page pt-page">
+			<div className="mt-auto flex flex-col gap-4 pt-4">
+				<StationStatusLine className="px-2.5" />
 				<AccountCard onNavigate={onNavigate} />
 				<ThemeSwitcher />
 			</div>

@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
-import { LivePillSkeleton } from "~/components/now/live-pill.tsx";
+
 import {
-	HERO_ACTIONS_CLASS,
 	HERO_PORTRAIT_SLOT,
 	HeroCardShell,
 	HeroTextShell,
@@ -18,25 +17,18 @@ export function CurrentBirdCard({
 	hasAnyDetections,
 	generatedAt,
 	flash,
-	pill,
 }: {
 	current: CurrentBird | null;
 	hasAnyDetections: boolean;
 	generatedAt: string;
 	flash: boolean;
-	pill: ReactNode;
 }) {
-	const live = pill;
 	const offsetMs = useAgeOffset(generatedAt);
 
 	if (!current && hasAnyDetections) {
 		return (
-			<HeroCardShell
-				label="Last 24 hours"
-				portrait={<NestPortrait />}
-				actions={live}
-			>
-				<StandInBody live={live}>
+			<HeroCardShell label="Last 24 hours" portrait={<NestPortrait />}>
+				<StandInBody>
 					<h1 className="font-bold text-2xl sm:text-3xl">
 						{EMPTY.window.liveQuietTitle}
 					</h1>
@@ -72,19 +64,12 @@ export function CurrentBirdCard({
 			heardAt={formatDateTime(current.detectedAt)}
 			confidence={current.confidence}
 			audioUrl={current.audioUrl}
-			actions={live}
 			className={flash ? "animate-flash-in" : undefined}
 		/>
 	);
 }
 
-function StandInBody({
-	live,
-	children,
-}: {
-	live?: ReactNode;
-	children: ReactNode;
-}) {
+function StandInBody({ children }: { children: ReactNode }) {
 	return (
 		<div className="grid">
 			<div
@@ -92,13 +77,12 @@ function StandInBody({
 				inert
 				className="invisible col-start-1 row-start-1 flex flex-col gap-2.5 max-[400px]:gap-2"
 			>
-				<HeroTextShell actions={<LivePillSkeleton />} />
+				<HeroTextShell />
 			</div>
 			<div className="col-start-1 row-start-1 flex items-start justify-between gap-3 max-[400px]:gap-2">
 				<div className="flex min-w-0 flex-col justify-center gap-2 self-stretch">
 					{children}
 				</div>
-				{live ? <div className={HERO_ACTIONS_CLASS}>{live}</div> : null}
 			</div>
 		</div>
 	);

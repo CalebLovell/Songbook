@@ -1,11 +1,10 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { HighlightsCard } from "~/components/highlights-card.tsx";
 import { CurrentBirdCard } from "~/components/now/current-bird-card.tsx";
 import { LiveAudioCard } from "~/components/now/live-audio-card.tsx";
-import { LivePill, LivePillSkeleton } from "~/components/now/live-pill.tsx";
 import {
 	RecentLogCard,
 	RecentLogCardSkeleton,
@@ -21,11 +20,9 @@ import {
 } from "~/lib/live-highlights.ts";
 import { getNowSnapshot, type NowSnapshot } from "~/lib/now.ts";
 import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
-import { getStationStatus } from "~/lib/station-status.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const POLL_INTERVAL_MS = 10_000;
-const STATUS_INTERVAL_MS = 30_000;
 const FLASH_DURATION_MS = 2_400;
 const NEW_BIRD_ANNOUNCE_GAP_MS = 60_000;
 const HIGHLIGHTS_EMPTY = EMPTY.window.last24Hours;
@@ -47,12 +44,6 @@ const snapshotQuery = queryOptions({
 	refetchInterval: POLL_INTERVAL_MS,
 });
 
-const statusQuery = queryOptions({
-	queryKey: ["station-status"],
-	queryFn: () => getStationStatus(),
-	refetchInterval: STATUS_INTERVAL_MS,
-});
-
 const highlightsQuery = queryOptions({
 	...PAGE_QUERY,
 	queryKey: ["live-highlights"],
@@ -68,7 +59,6 @@ export const Route = createFileRoute("/live")({
 	component: Live,
 	loader: ({ context }) => {
 		prefetchInBrowser(context.queryClient, snapshotQuery);
-		prefetchInBrowser(context.queryClient, statusQuery);
 		prefetchInBrowser(context.queryClient, highlightsQuery);
 		return { unlocked: context.auth.unlocked };
 	},
@@ -99,25 +89,18 @@ function useFreshKeys(keys: string[]): Set<string> {
 function Live() {
 	const { unlocked } = Route.useLoaderData();
 	const snapshot = useSkeletonMinimum(useQuery(snapshotQuery).data);
-	const status = useSkeletonMinimum(useQuery(statusQuery).data);
 	const highlights = useSkeletonMinimum(useQuery(highlightsQuery).data);
-	const pill = status ? <LivePill status={status} /> : <LivePillSkeleton />;
 
-	if (!snapshot) return <LiveShell unlocked={unlocked} pill={pill} />;
+	if (!snapshot) return <LiveShell unlocked={unlocked} />;
 	return (
-		<LiveBody
-			snapshot={snapshot}
-			highlights={highlights}
-			unlocked={unlocked}
-			pill={pill}
-		/>
+		<LiveBody snapshot={snapshot} highlights={highlights} unlocked={unlocked} />
 	);
 }
 
-function LiveShell({ unlocked, pill }: { unlocked: boolean; pill: ReactNode }) {
+function LiveShell({ unlocked }: { unlocked: boolean }) {
 	return (
 		<PageWrap>
-			<SpeciesHeroCardShell label="Last 24 hours" actions={pill} />
+			<SpeciesHeroCardShell label="Last 24 hours" />
 
 			<div className="mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
 				<RecentLogCardSkeleton />
@@ -141,12 +124,10 @@ function LiveBody({
 	snapshot,
 	highlights,
 	unlocked,
-	pill,
 }: {
 	snapshot: NowSnapshot;
 	highlights: LiveHighlights | undefined;
 	unlocked: boolean;
-	pill: ReactNode;
 }) {
 	const freshKeys = useFreshKeys(snapshot.recent.map((row) => row.key));
 
@@ -163,7 +144,6 @@ function LiveBody({
 				hasAnyDetections={snapshot.hasAnyDetections}
 				generatedAt={snapshot.generatedAt}
 				flash={heroIsNew}
-				pill={pill}
 			/>
 
 			<div className="mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">

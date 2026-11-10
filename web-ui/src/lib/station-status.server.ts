@@ -12,7 +12,7 @@ const ANALYZER_SERVICE = "birdnet_analysis.service";
 
 const TIMEOUT_MS = 3_000;
 
-// Shorter than the 30s poll on /live, so a lone viewer still gets a fresh read each time.
+// Shorter than the 30s sidebar status poll, so a lone viewer still gets a fresh read each time.
 const STATION_STATUS_TTL_MS = 25_000;
 
 function runSystemctl(
