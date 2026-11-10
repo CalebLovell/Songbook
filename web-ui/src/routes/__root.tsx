@@ -9,6 +9,7 @@ import { LiveAnnouncer } from "~/components/live-announcer.tsx";
 import { MainFocus } from "~/components/main-focus.tsx";
 import { PullToRefresh } from "~/components/pull-to-refresh.tsx";
 import { RouteError, RouteNotFound } from "~/components/root-status.tsx";
+import { ServiceWorkerRegistration } from "~/components/service-worker.tsx";
 import { MobileNav } from "~/components/sidebar/mobile-nav.tsx";
 import { SiteSidebar } from "~/components/sidebar/site-sidebar.tsx";
 import { ArtworkPreferenceContext } from "~/components/species-image.tsx";
@@ -40,6 +41,7 @@ export const Route = createRootRouteWithContext<{
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
 			},
+			{ name: "theme-color", content: "#fbfdf6" },
 			{
 				title: pageTitle(),
 			},
@@ -120,6 +122,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<MainFocus />
 				<LiveAnnouncer />
 				<Toaster />
+				<ServiceWorkerRegistration />
 				<Scripts />
 			</body>
 		</html>

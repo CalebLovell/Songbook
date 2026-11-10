@@ -18,6 +18,8 @@ const PAPER = "#fbfdf6";
 const MOSS = "#203b14";
 const BARK = "#472f1d";
 const SAND = "#c69a58";
+// Android crops a maskable icon to any shape inside the middle 80% circle.
+const MASKABLE_LOGO_SHARE = 0.56;
 
 const publicUrl = (file: string) =>
 	pathToFileURL(path.join(PUBLIC_DIR, file)).href;
@@ -38,8 +40,8 @@ function previewCard(): string {
 	</body></html>`;
 }
 
-function icon(size: number): string {
-	const logo = Math.round(size * 0.78);
+function icon(size: number, logoShare = 0.78): string {
+	const logo = Math.round(size * logoShare);
 	return `<!doctype html><html><head><meta charset="utf-8"><style>
 		* { margin: 0; }
 		body { width: ${size}px; height: ${size}px; background: ${PAPER};
@@ -53,6 +55,12 @@ const IMAGES = [
 	{ file: "apple-touch-icon.png", width: 180, height: 180, html: icon(180) },
 	{ file: "icon-192.png", width: 192, height: 192, html: icon(192) },
 	{ file: "icon-512.png", width: 512, height: 512, html: icon(512) },
+	{
+		file: "icon-maskable-512.png",
+		width: 512,
+		height: 512,
+		html: icon(512, MASKABLE_LOGO_SHARE),
+	},
 ];
 
 const templateDir = await mkdtemp(path.join(tmpdir(), "songbook-link-images-"));

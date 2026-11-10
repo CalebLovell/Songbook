@@ -321,6 +321,13 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the normal header, and its rows wear the error tones (`--toast-error-fill`, `--toast-error-line`)
   with clay titles and bark text, the one place a whole row goes red.
 
+- **Installable app**: `public/manifest.webmanifest` plus `public/sw.js`, registered
+  only in production builds. The worker caches nothing but `offline.html` and the
+  logo: pages go to the network, and a failed navigation shows the offline page.
+  Station data is never cached, so an installed app never shows stale birds.
+  Icons come from `npm run link-images`; the maskable one keeps the logo inside
+  the middle 80% circle.
+
 ## Data and security
 
 - **`detections` can't grow a column**: BirdNET-Pi's writers INSERT positionally, so
