@@ -1,7 +1,12 @@
-import { and, between, gt, lt, type SQL, sql } from "drizzle-orm";
+import { and, between, gt, gte, lt, or, type SQL, sql } from "drizzle-orm";
 
 import { db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
+import {
+	afterDarkSightings,
+	darkClockBounds,
+	type StationPlace,
+} from "~/lib/after-dark.ts";
 import { dayIdFor } from "~/lib/day.ts";
 import {
 	type HighlightThresholds,
@@ -46,6 +51,7 @@ export type TimelineRow = {
 	isReturned: boolean;
 	away: string | null;
 	vocal: VocalJump | null;
+	afterDark: string | null;
 };
 
 export type TimelineData = {
@@ -107,7 +113,11 @@ export async function loadTimelineData({
 	period,
 	anchor,
 	settings,
-}: TimelineRequest & { settings: HighlightThresholds }): Promise<TimelineData> {
+	place,
+}: TimelineRequest & {
+	settings: HighlightThresholds;
+	place: StationPlace | null;
+}): Promise<TimelineData> {
 	const window = windowFor(period, anchor);
 	const inWindow = window
 		? and(
@@ -127,58 +137,62 @@ export async function loadTimelineData({
 		period === "all" ? [] : precedingWindows(period, anchor, longest);
 	const tallyFrom = beforeWindows.at(-1)?.start ?? window?.start ?? null;
 
-	const [rows, tallyRows, historyRows, streakRows, nav] = await Promise.all([
-		db
-			.select({
-				comName: detections.Com_Name,
-				sciName: detections.Sci_Name,
-				hour: sql<string>`strftime('%H', ${detections.Time})`,
-				count: sql<number>`count(*)`,
-			})
-			.from(detections)
-			.where(inWindow)
-			.groupBy(
-				detections.Com_Name,
-				detections.Sci_Name,
-				sql`strftime('%H', ${detections.Time})`,
-			),
-		db
-			.select({
-				date: detections.Date,
-				comName: detections.Com_Name,
-				count: sql<number>`count(*)`,
-			})
-			.from(detections)
-			.where(
-				window && tallyFrom
-					? and(
-							sql`${detections.Date} >= ${tallyFrom}`,
-							sql`${detections.Date} <= ${window.end}`,
-						)
-					: undefined,
-			)
-			.groupBy(detections.Date, detections.Com_Name),
-		db
-			.select({
-				comName: detections.Com_Name,
-				lifetime: sql<number>`count(*)`,
-				lastBefore: window
-					? sql<
-							string | null
-						>`max(case when ${detections.Date} < ${window.start} then ${detections.Date} end)`
-					: sql<string | null>`null`,
-			})
-			.from(detections)
-			.groupBy(detections.Com_Name),
-		period === "day" && window
-			? db
-					.select({ date: detections.Date, comName: detections.Com_Name })
-					.from(detections)
-					.where(lt(detections.Date, window.start))
-					.groupBy(detections.Date, detections.Com_Name)
-			: Promise.resolve([]),
-		loadTimelineNav(period, window),
-	]);
+	const [rows, tallyRows, historyRows, streakRows, nightRows, nav] =
+		await Promise.all([
+			db
+				.select({
+					comName: detections.Com_Name,
+					sciName: detections.Sci_Name,
+					hour: sql<string>`strftime('%H', ${detections.Time})`,
+					count: sql<number>`count(*)`,
+				})
+				.from(detections)
+				.where(inWindow)
+				.groupBy(
+					detections.Com_Name,
+					detections.Sci_Name,
+					sql`strftime('%H', ${detections.Time})`,
+				),
+			db
+				.select({
+					date: detections.Date,
+					comName: detections.Com_Name,
+					count: sql<number>`count(*)`,
+				})
+				.from(detections)
+				.where(
+					window && tallyFrom
+						? and(
+								sql`${detections.Date} >= ${tallyFrom}`,
+								sql`${detections.Date} <= ${window.end}`,
+							)
+						: undefined,
+				)
+				.groupBy(detections.Date, detections.Com_Name),
+			db
+				.select({
+					comName: detections.Com_Name,
+					lifetime: sql<number>`count(*)`,
+					lastBefore: window
+						? sql<
+								string | null
+							>`max(case when ${detections.Date} < ${window.start} then ${detections.Date} end)`
+						: sql<string | null>`null`,
+				})
+				.from(detections)
+				.groupBy(detections.Com_Name),
+			period === "day" && window
+				? db
+						.select({ date: detections.Date, comName: detections.Com_Name })
+						.from(detections)
+						.where(lt(detections.Date, window.start))
+						.groupBy(detections.Date, detections.Com_Name)
+				: Promise.resolve([]),
+			window && place
+				? readNightRows(window, today, place)
+				: Promise.resolve([]),
+			loadTimelineNav(period, window),
+		]);
 
 	const bySpecies = new Map<
 		string,
@@ -259,6 +273,7 @@ export async function loadTimelineData({
 			heardBefore,
 			awayDays,
 			silentDays,
+			afterDark: place ? afterDarkSightings(nightRows, place) : new Map(),
 		},
 		settings,
 	);
@@ -282,6 +297,7 @@ export async function loadTimelineData({
 			isReturned: flag?.isReturned ?? false,
 			away: flag?.away ?? null,
 			vocal: flag?.vocal ?? null,
+			afterDark: flag?.afterDark ?? null,
 		};
 	});
 
@@ -290,6 +306,37 @@ export async function loadTimelineData({
 		highlights,
 		...nav,
 	};
+}
+
+async function readNightRows(
+	window: TimelineWindow,
+	today: string,
+	place: StationPlace,
+) {
+	const end = window.end < today ? window.end : today;
+	const days: string[] = [];
+	for (let day = window.start; day <= end; day = addDays(day, 1))
+		days.push(day);
+	const bounds = darkClockBounds(days, place);
+	if (!bounds) return [];
+	return db
+		.select({
+			comName: detections.Com_Name,
+			date: detections.Date,
+			time: detections.Time,
+			confidence: detections.Confidence,
+		})
+		.from(detections)
+		.where(
+			and(
+				sql`${detections.Date} >= ${window.start}`,
+				sql`${detections.Date} <= ${window.end}`,
+				or(
+					lt(detections.Time, bounds.before),
+					gte(detections.Time, bounds.from),
+				),
+			),
+		);
 }
 
 function daysHeardBefore(

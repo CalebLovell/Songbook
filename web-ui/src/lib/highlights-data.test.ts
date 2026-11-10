@@ -53,6 +53,7 @@ function evidence(
 		heardBefore: new Set(["Robin"]),
 		awayDays: new Map(),
 		silentDays: new Map(),
+		afterDark: new Map(),
 		...overrides,
 	};
 }
@@ -332,6 +333,7 @@ test("lines read in the card's order", () => {
 	const { highlights } = judge({
 		window: [day({ Robin: 30, Merlin: 1, Hoopoe: 1, Veery: 1 })],
 		before: daysBefore(3, { Robin: 2, Thrush: 1 }),
+		afterDark: new Map([["Veery", { nights: 1, latest: "02:14", best: 0.9 }]]),
 		lifetime: new Map([
 			["Robin", 500],
 			["Merlin", 1],
@@ -350,6 +352,7 @@ test("lines read in the card's order", () => {
 			"vocal",
 			"consistent",
 			"returned",
+			"after-dark",
 			"routine",
 		],
 	);
@@ -389,4 +392,50 @@ test("the vocal note counts in the window's own unit", () => {
 	assert.equal(formatRate(0.4), "under 1");
 	assert.equal(formatRate(9.8), "10");
 	assert.equal(formatRate(1234.4), "1,234");
+});
+
+test("after dark needs one confident call, and skips insect lookalikes", () => {
+	const { flags, highlights } = judge({
+		window: [day({ Robin: 5, Owl: 3, Swan: 1, "Cedar Waxwing": 40 })],
+		lifetime: new Map([
+			["Robin", 500],
+			["Owl", 50],
+			["Swan", 50],
+			["Cedar Waxwing", 900],
+		]),
+		heardBefore: new Set(["Robin", "Owl", "Swan", "Cedar Waxwing"]),
+		afterDark: new Map([
+			["Robin", { nights: 4, latest: "23:10", best: 0.78 }],
+			["Owl", { nights: 3, latest: "03:40", best: 0.86 }],
+			["Swan", { nights: 1, latest: "02:14", best: 0.89 }],
+			["Cedar Waxwing", { nights: 18, latest: "23:50", best: 0.93 }],
+		]),
+	});
+	assert.deepEqual(named(highlights, "after-dark"), ["Owl", "Swan"]);
+	assert.equal(flags.get("Owl")?.afterDark, "at 3:40 AM");
+	assert.equal(flags.get("Swan")?.afterDark, "at 2:14 AM");
+	assert.equal(flags.get("Robin")?.afterDark, null);
+	assert.equal(flags.get("Cedar Waxwing")?.afterDark, null);
+});
+
+test("all time has no after dark line", () => {
+	const { highlights } = judge({
+		period: "all",
+		afterDark: new Map([["Robin", { nights: 2, latest: "01:00", best: 0.95 }]]),
+	});
+	assert.equal(line(highlights, "after-dark"), undefined);
+});
+
+test("a day names its latest call after dark; longer windows count nights", () => {
+	const afterDark = new Map([
+		["Robin", { nights: 2, latest: "17:54", best: 0.86 }],
+	]);
+	assert.equal(
+		judge({ afterDark }).flags.get("Robin")?.afterDark,
+		"at 5:54 PM",
+	);
+	assert.equal(
+		judge({ period: "week", afterDark }).flags.get("Robin")?.afterDark,
+		"2 nights",
+	);
 });

@@ -30,6 +30,7 @@ export type SpeciesGridItem = {
 	isReturned: boolean;
 	away: string | null;
 	vocal: VocalJump | null;
+	afterDark: string | null;
 	hourCounts?: number[];
 };
 
@@ -111,6 +112,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 							regularNote={item.regularNote}
 							away={item.away}
 							vocal={item.vocal}
+							afterDark={item.afterDark}
 							firstHeard={item.firstHeard}
 						/>
 					</div>

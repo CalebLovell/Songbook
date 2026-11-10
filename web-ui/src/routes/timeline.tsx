@@ -426,6 +426,7 @@ function TimelineCards({
 		isReturned: row.isReturned,
 		away: row.away,
 		vocal: row.vocal,
+		afterDark: row.afterDark,
 		hourCounts: row.hourCounts,
 	}));
 

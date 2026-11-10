@@ -4,6 +4,7 @@ import {
 	Gem,
 	House,
 	type LucideIcon,
+	Moon,
 	MoveRight,
 	Sparkles,
 	TrendingDown,
@@ -148,6 +149,7 @@ const SPECIES_NOTES: Record<
 	routine: { icon: VolumeX, lead: () => "gone quiet" },
 	returned: { icon: Undo2, lead: () => "returned" },
 	vocal: { icon: AudioLines, lead: () => "vocal" },
+	"after-dark": { icon: Moon, lead: () => "after dark" },
 };
 
 function guideGlyph(kind: Highlight["kind"]): {

@@ -146,6 +146,11 @@ export function highlightGuide(
 						: `Heard every day ${unit.this}.`,
 		},
 		{
+			kind: "after-dark",
+			name: "After dark",
+			meaning: "Heard at night.",
+		},
+		{
 			kind: "routine",
 			name: "Gone quiet",
 			meaning: "A regular that has stopped singing.",

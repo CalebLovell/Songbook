@@ -60,6 +60,7 @@ export const getTimelinePage = createServerFn({ method: "GET" })
 			period,
 			anchor,
 			settings: thresholds,
+			place: location,
 		});
 		const sun: WindowSun = location
 			? windowSun(

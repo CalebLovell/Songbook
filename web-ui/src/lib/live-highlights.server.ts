@@ -1,11 +1,18 @@
 import "@tanstack/react-start/server-only";
 
-import { count, sql } from "drizzle-orm";
+import { and, count, gte, lt, or, sql } from "drizzle-orm";
 
 import { db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
+import {
+	darkClockBounds,
+	type NightRow,
+	type StationPlace,
+} from "~/lib/after-dark.ts";
+import { dayIdFor } from "~/lib/day.ts";
 import type { DayTally } from "~/lib/highlights-data.ts";
 import { detectedAt, isLast24h } from "~/lib/now.ts";
+import { addDays } from "~/lib/timeline-window.ts";
 
 const isBeforeWindow = sql`${detectedAt} < datetime('now', '-24 hours', 'localtime')`;
 
@@ -110,4 +117,30 @@ export async function readLiveTallies(longest: number): Promise<LiveTallies> {
 		daysBefore,
 		hourCounts,
 	};
+}
+
+export async function readLiveNightRows(
+	place: StationPlace,
+	now: Date = new Date(),
+): Promise<NightRow[]> {
+	const today = dayIdFor(now);
+	const bounds = darkClockBounds([addDays(today, -1), today], place);
+	if (!bounds) return [];
+	return db
+		.select({
+			comName: detections.Com_Name,
+			date: detections.Date,
+			time: detections.Time,
+			confidence: detections.Confidence,
+		})
+		.from(detections)
+		.where(
+			and(
+				isLast24h,
+				or(
+					lt(detections.Time, bounds.before),
+					gte(detections.Time, bounds.from),
+				),
+			),
+		);
 }

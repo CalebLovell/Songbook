@@ -1,9 +1,15 @@
 import {
+	AFTER_DARK_MIN_CONFIDENCE,
+	INSECT_LOOKALIKES,
+	type NightSighting,
+} from "~/lib/after-dark.ts";
+import {
 	type HighlightPeriod,
 	type HighlightThresholds,
 	lookbackFor,
 } from "~/lib/highlight-thresholds.ts";
 import { plural } from "~/lib/number-format.ts";
+import { formatSunClock } from "~/lib/sun-times.ts";
 
 export const MAX_NAMED_BIRDS = 10;
 
@@ -19,7 +25,8 @@ export type SpeciesHighlightKind =
 	| "consistent"
 	| "routine"
 	| "returned"
-	| "vocal";
+	| "vocal"
+	| "after-dark";
 
 export type Highlight =
 	| {
@@ -50,6 +57,7 @@ export type HighlightEvidence = {
 	heardBefore: Set<string>;
 	awayDays: Map<string, number>;
 	silentDays: Map<string, number>;
+	afterDark: Map<string, NightSighting>;
 };
 
 export type VocalJump = {
@@ -67,6 +75,7 @@ type SpeciesFlags = {
 	isReturned: boolean;
 	away: string | null;
 	vocal: VocalJump | null;
+	afterDark: string | null;
 };
 
 export type HighlightJudgement = {
@@ -100,6 +109,16 @@ export function windowPhrase(period: HighlightPeriod): string {
 		: period === "all"
 			? "all time"
 			: `this ${period}`;
+}
+
+export function formatAfterDark(
+	{ nights, latest }: Pick<NightSighting, "nights" | "latest">,
+	period: HighlightPeriod,
+): string {
+	const oneDay = period === "live" || period === "day";
+	if (nights > 1 && !oneDay) return `${nights} nights`;
+	const [hour, minute] = latest.split(":").map(Number);
+	return `at ${formatSunClock(hour * 60 + minute)}`;
 }
 
 export function formatVocal({
@@ -257,6 +276,16 @@ export function judgeHighlights(
 			: null;
 	};
 
+	const afterDarkFor = (name: string) => {
+		const sighting = evidence.afterDark.get(name);
+		return isAll ||
+			!sighting ||
+			sighting.best < AFTER_DARK_MIN_CONFIDENCE ||
+			INSECT_LOOKALIKES.has(name)
+			? null
+			: sighting;
+	};
+
 	const awayFor = (name: string) => {
 		const days = evidence.awayDays.get(name);
 		return isReturned(name) && days != null ? formatAwayIn(days, period) : null;
@@ -265,6 +294,7 @@ export function judgeHighlights(
 	for (const name of heard) {
 		const returned = isReturned(name);
 		const consistent = isConsistent(name);
+		const night = afterDarkFor(name);
 		flags.set(name, {
 			isNew: isNew(name),
 			isRare: isRare(name),
@@ -273,6 +303,7 @@ export function judgeHighlights(
 			isReturned: returned,
 			away: awayFor(name),
 			vocal: vocalJump(name),
+			afterDark: night ? formatAfterDark(night, period) : null,
 		});
 	}
 
@@ -376,6 +407,16 @@ export function judgeHighlights(
 				row.daysAway == null
 					? null
 					: `${formatAwayIn(row.daysAway, period)} missing`,
+		),
+		speciesLine(
+			"after-dark",
+			heard
+				.flatMap((comName) => {
+					const sighting = afterDarkFor(comName);
+					return sighting ? [{ comName, ...sighting }] : [];
+				})
+				.sort((a, b) => b.nights - a.nights || b.best - a.best),
+			(row) => formatAfterDark(row, period),
 		),
 		speciesLine("routine", goneQuiet, (row) =>
 			row.daysSilent == null

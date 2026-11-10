@@ -261,7 +261,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the type, the overlay comes off and the arrows do the work.
 - **Touch type**: fields use 16px under `pointer-coarse`, so iOS doesn't zoom on
   focus. This keys off the pointer, not the viewport width.
-- **Flags** (New, Rare, Vocal, Returned, Regular) stack, render as glyph pills
+- **Flags** (New, Rare, Vocal, After dark, Returned, Regular) stack, render as glyph pills
   with their name in the tooltip, and share a tint with the Highlights line of
   the same name. Their tints never reuse the confidence scale.
 - **Recordings**: a bird call has no words, so clips carry no caption track.
@@ -352,6 +352,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   (`lib/highlights-data.ts`), with thresholds and their guide together in
   `lib/highlight-thresholds.ts`. A day with no recordings means the station was
   down: it is skipped, not held against a bird.
+- **After dark** runs from nautical dusk to nautical dawn at the station's
+  location, and a call before dawn belongs to the night before. Night is when
+  BirdNET misfires most, so a bird needs one call at 85%+ and insect lookalikes
+  (`INSECT_LOOKALIKES`) never count.
 - **Rare** has one meaning, the owner's `rareMax`, for the Rare flag and the quiz
   pools alike. Pools split by familiarity, never by time. Nothing on a question may
   point at its answer, and a loader rerun never swaps the round being played.

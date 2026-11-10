@@ -1,4 +1,4 @@
-import { AudioLines, Gem, House, Sparkles, Undo2 } from "lucide-react";
+import { AudioLines, Gem, House, Moon, Sparkles, Undo2 } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import { Pill } from "~/components/pill.tsx";
 import { formatDate } from "~/lib/date-format.ts";
@@ -55,6 +55,12 @@ function vocalTooltip({
 	);
 }
 
+function afterDarkTooltip(note: string): ReactNode {
+	return withBoldNumbers(
+		`Heard after dark ${note.startsWith("at ") ? note : `on ${note}`}.`,
+	);
+}
+
 function flagTip(name: string, meaning: ReactNode): ReactNode {
 	return (
 		<>
@@ -84,12 +90,15 @@ const CONSISTENT_PILL_STYLE: CSSProperties = hueTint("#2f7d6d", "#1f5248", 20);
 
 const VOCAL_PILL_STYLE: CSSProperties = hueTint("#b07a1f", "#6e4a10", 22);
 
+const AFTER_DARK_PILL_STYLE: CSSProperties = hueTint("#3b4a8a", "#28336a", 22);
+
 export const BADGE_STYLES = {
 	new: NEW_PILL_STYLE,
 	rare: RARE_PILL_STYLE,
 	consistent: CONSISTENT_PILL_STYLE,
 	returned: RETURNED_PILL_STYLE,
 	vocal: VOCAL_PILL_STYLE,
+	"after-dark": AFTER_DARK_PILL_STYLE,
 } satisfies Partial<Record<SpeciesHighlightKind, CSSProperties>>;
 
 export function SpeciesFlagPills({
@@ -101,6 +110,7 @@ export function SpeciesFlagPills({
 	firstHeard,
 	away,
 	vocal,
+	afterDark,
 }: {
 	isNew: boolean;
 	isRare: boolean;
@@ -109,6 +119,7 @@ export function SpeciesFlagPills({
 	isReturned: boolean;
 	away: string | null;
 	vocal: VocalJump | null;
+	afterDark: string | null;
 	firstHeard: string | null;
 }) {
 	return (
@@ -137,6 +148,15 @@ export function SpeciesFlagPills({
 					label="Vocal"
 					style={VOCAL_PILL_STYLE}
 					tooltip={flagTip("Vocal", vocalTooltip(vocal))}
+					iconOnly
+				/>
+			) : null}
+			{afterDark != null ? (
+				<Pill
+					icon={Moon}
+					label="After dark"
+					style={AFTER_DARK_PILL_STYLE}
+					tooltip={flagTip("After dark", afterDarkTooltip(afterDark))}
 					iconOnly
 				/>
 			) : null}

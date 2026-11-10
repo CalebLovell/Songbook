@@ -12,6 +12,7 @@ const SPECIES_LEADS: Record<
 	routine: { emoji: "🤐", name: "Gone quiet" },
 	returned: { emoji: "🔁", name: "Returned" },
 	vocal: { emoji: "📣", name: "Vocal" },
+	"after-dark": { emoji: "🌙", name: "After dark" },
 };
 
 export function formatActivityLines(highlights: Highlight[]): string[] {

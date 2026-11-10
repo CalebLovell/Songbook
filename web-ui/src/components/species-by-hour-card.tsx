@@ -33,6 +33,7 @@ export type SpeciesHourRow = {
 	regularNote: string | null;
 	away: string | null;
 	vocal: VocalJump | null;
+	afterDark: string | null;
 };
 
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
@@ -382,6 +383,7 @@ function SpeciesHourRowView({
 							regularNote={row.regularNote}
 							away={row.away}
 							vocal={row.vocal}
+							afterDark={row.afterDark}
 							firstHeard={row.firstHeard}
 						/>
 					</div>

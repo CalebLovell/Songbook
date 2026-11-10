@@ -1,12 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
-
+import { afterDarkSightings } from "~/lib/after-dark.ts";
 import {
 	type HighlightThresholds,
 	lookbackFor,
 } from "~/lib/highlight-thresholds.ts";
 import { type Highlight, judgeHighlights } from "~/lib/highlights-data.ts";
-import { readLiveTallies } from "~/lib/live-highlights.server.ts";
+import {
+	readLiveNightRows,
+	readLiveTallies,
+} from "~/lib/live-highlights.server.ts";
 import { readHighlightThresholds } from "~/lib/settings-config.server.ts";
+import { readStationLocation } from "~/lib/station-location.server.ts";
 import { timestampToMillis } from "~/lib/visits.ts";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -19,7 +23,10 @@ export type LiveHighlights = {
 
 export const getLiveHighlights = createServerFn({ method: "GET" }).handler(
 	async (): Promise<LiveHighlights> => {
-		const settings = await readHighlightThresholds();
+		const [settings, place] = await Promise.all([
+			readHighlightThresholds(),
+			readStationLocation(),
+		]);
 		const nowMs = Date.now();
 		const longest = Math.max(
 			1,
@@ -28,14 +35,20 @@ export const getLiveHighlights = createServerFn({ method: "GET" }).handler(
 			lookbackFor(settings.vocal, "live"),
 		);
 
-		const {
-			hasAnyDetections,
-			slices,
-			firstInWindow,
-			history,
-			daysBefore,
-			hourCounts,
-		} = await readLiveTallies(longest);
+		const [
+			{
+				hasAnyDetections,
+				slices,
+				firstInWindow,
+				history,
+				daysBefore,
+				hourCounts,
+			},
+			nightRows,
+		] = await Promise.all([
+			readLiveTallies(longest),
+			place ? readLiveNightRows(place) : [],
+		]);
 
 		if (!hasAnyDetections) {
 			return {
@@ -73,6 +86,7 @@ export const getLiveHighlights = createServerFn({ method: "GET" }).handler(
 				heardBefore: new Set(history.keys()),
 				awayDays,
 				silentDays,
+				afterDark: place ? afterDarkSightings(nightRows, place) : new Map(),
 			},
 			settings,
 		);
