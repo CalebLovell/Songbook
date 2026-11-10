@@ -441,7 +441,7 @@ export function ReviewWorkflow({
 						aria-label="Review queue"
 						className={QUEUE_CARD_CLASS}
 					>
-						<div className={QUEUE_HEADER_CLASS}>
+						<div data-slot="card-header" className={QUEUE_HEADER_CLASS}>
 							<Kicker as="h2">In the queue</Kicker>
 							{total === null ? (
 								<ShellText

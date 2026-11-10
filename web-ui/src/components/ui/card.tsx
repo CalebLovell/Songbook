@@ -3,7 +3,7 @@ import type { ComponentProps, ElementType } from "react";
 import { cn } from "~/lib/utils.ts";
 
 export const CARD_CLASS =
-	"rounded-md border bg-[linear-gradient(165deg,var(--surface-strong),var(--surface))] p-page transition-[background-color,color,border-color,transform] duration-180 ease-[ease]";
+	"rounded-md border bg-[linear-gradient(165deg,var(--surface-strong),var(--surface))] p-page transition-[background-color,color,border-color,transform] duration-180 ease-[ease] in-data-settled:*:not-data-[slot=card-header]:transition-opacity in-data-settled:*:not-data-[slot=card-header]:starting:opacity-0";
 
 type CardProps<T extends ElementType> = { as?: T } & ComponentProps<T>;
 

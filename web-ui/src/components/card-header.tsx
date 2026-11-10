@@ -18,7 +18,10 @@ export function CardHeader({
 	className?: string;
 }) {
 	return (
-		<div className={`${CARD_HEADER_CLASS} ${className}`}>
+		<div
+			data-slot="card-header"
+			className={`${CARD_HEADER_CLASS} ${className}`}
+		>
 			<Kicker as={Title} id={titleId} className="m-0 shrink-0">
 				{title}
 			</Kicker>

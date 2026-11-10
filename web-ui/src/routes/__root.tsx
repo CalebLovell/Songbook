@@ -31,6 +31,7 @@ import {
 	useKeepTheme,
 } from "~/lib/theme.ts";
 import { unlockStatusForNavigation } from "~/lib/unlock-status.ts";
+import { useSettledFlag } from "~/lib/use-settled-flag.ts";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRouteWithContext<{
@@ -97,6 +98,7 @@ const SCROLLBAR_PROBE = `(() => {
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const { auth } = Route.useRouteContext();
 	useKeepTheme();
+	useSettledFlag(MAIN_CONTENT_ID);
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>

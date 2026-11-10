@@ -327,6 +327,11 @@
 		translateX(calc(100% + var(--offset-right, 16px)));
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,

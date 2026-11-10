@@ -387,7 +387,7 @@ function VisitLogSkeleton() {
 			className={VISIT_LOG_CLASS}
 		>
 			<Card className={VISIT_LOG_CARD_CLASS}>
-				<div className={VISIT_LOG_HEADER_CLASS}>
+				<div data-slot="card-header" className={VISIT_LOG_HEADER_CLASS}>
 					<Kicker as="h2">Visit log</Kicker>
 				</div>
 				<RowWell as="ul" aria-hidden="true" className={VISIT_LIST_CLASS}>
@@ -895,7 +895,7 @@ function VisitLogCard({
 			<Card
 				className={`${pageCount > 1 ? VISIT_LOG_CARD_CLASS : VISIT_LOG_SHORT_CARD_CLASS} ${visits.length === 0 ? "pb-4!" : ""}`}
 			>
-				<div className={VISIT_LOG_HEADER_CLASS}>
+				<div data-slot="card-header" className={VISIT_LOG_HEADER_CLASS}>
 					<Kicker as="h2">Visit log</Kicker>
 				</div>
 

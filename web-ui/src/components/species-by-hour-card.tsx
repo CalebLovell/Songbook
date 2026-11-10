@@ -86,6 +86,7 @@ export function SpeciesByHourCard({
 				className={`@container/card ${isEmpty ? "" : "pb-1!"} ${className}`}
 			>
 				<div
+					data-slot="card-header"
 					className={`${CARD_HEADER_CLASS} gap-3 py-2 ${isEmpty ? "mb-page" : ""}`}
 				>
 					<HeaderLine
@@ -445,7 +446,10 @@ export function SpeciesByHourCardSkeleton({
 			aria-label="Species by hour"
 			className={`@container/card pb-1! ${className}`}
 		>
-			<div className={`${CARD_HEADER_CLASS} gap-3 py-2`}>
+			<div
+				data-slot="card-header"
+				className={`${CARD_HEADER_CLASS} gap-3 py-2`}
+			>
 				<HeaderLine summary={summary} sunTimes={<HeaderSunTimesSkeleton />} />
 			</div>
 			<div aria-hidden="true" className="-mx-1 px-1">

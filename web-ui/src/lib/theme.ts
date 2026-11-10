@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
+import { flushSync } from "react-dom";
 
 export type Theme = "light" | "dark";
 export type ThemePreference = Theme | "system";
@@ -46,6 +47,7 @@ function applyTheme(theme: Theme) {
 }
 
 const SYSTEM_DARK = "(prefers-color-scheme: dark)";
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 const preferenceListeners = new Set<() => void>();
 
 function readPreference(): ThemePreference {
@@ -66,8 +68,23 @@ export function setThemePreference(preference: ThemePreference) {
 		if (preference === "system") localStorage.removeItem(THEME_STORAGE_KEY);
 		else localStorage.setItem(THEME_STORAGE_KEY, preference);
 	} catch {}
-	applyTheme(resolveTheme(preference));
-	for (const listener of preferenceListeners) listener();
+	const next = resolveTheme(preference);
+	const notify = () => {
+		for (const listener of preferenceListeners) listener();
+	};
+	if (
+		next === readTheme() ||
+		!document.startViewTransition ||
+		matchMedia(REDUCED_MOTION).matches
+	) {
+		applyTheme(next);
+		notify();
+		return;
+	}
+	document.startViewTransition(() => {
+		applyTheme(next);
+		flushSync(notify);
+	});
 }
 
 function subscribePreference(onChange: () => void) {

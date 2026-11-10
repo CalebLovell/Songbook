@@ -109,7 +109,7 @@ export function LearnGameSkeleton() {
 					aria-label="Bird call quiz"
 					className={GAME_CARD_CLASS}
 				>
-					<header className={GAME_HEADER_CLASS}>
+					<header data-slot="card-header" className={GAME_HEADER_CLASS}>
 						<Kicker as="h2">Bird quiz</Kicker>
 						<GameInfo />
 					</header>
@@ -180,7 +180,7 @@ export function LearnGameSkeleton() {
 					aria-label="This round"
 					className={RAIL_CLASS}
 				>
-					<div className={RAIL_HEADER_CLASS}>
+					<div data-slot="card-header" className={RAIL_HEADER_CLASS}>
 						<Kicker as="h2">This round</Kicker>
 					</div>
 					<ol aria-hidden="true" className="-mx-page divide-y">
@@ -214,14 +214,14 @@ export function LearnGameEmpty({ message }: { message: string }) {
 					aria-label="Bird call quiz"
 					className={GAME_CARD_CLASS}
 				>
-					<header className={GAME_HEADER_CLASS}>
+					<header data-slot="card-header" className={GAME_HEADER_CLASS}>
 						<Kicker as="h2">Bird quiz</Kicker>
 					</header>
 					<p className="text-muted-foreground text-sm">{message}</p>
 				</Card>
 
 				<Card as="aside" aria-label="This round" className={RAIL_CLASS}>
-					<div className={RAIL_HEADER_CLASS}>
+					<div data-slot="card-header" className={RAIL_HEADER_CLASS}>
 						<Kicker as="h2">This round</Kicker>
 					</div>
 					<p className="mt-page text-muted-foreground text-sm">{message}</p>
@@ -354,7 +354,7 @@ export function LearnGame({
 					aria-label="Bird call quiz"
 					className={GAME_CARD_CLASS}
 				>
-					<header className={GAME_HEADER_CLASS}>
+					<header data-slot="card-header" className={GAME_HEADER_CLASS}>
 						<Kicker as="h2">Bird quiz</Kicker>
 						<GameInfo rareMax={rareMax} />
 					</header>
@@ -462,7 +462,7 @@ function RoundRail({
 }) {
 	return (
 		<Card as="aside" aria-label="This round" className={RAIL_CLASS}>
-			<div className={RAIL_HEADER_CLASS}>
+			<div data-slot="card-header" className={RAIL_HEADER_CLASS}>
 				<Kicker as="h2">This round</Kicker>
 			</div>
 

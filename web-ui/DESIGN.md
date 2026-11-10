@@ -138,8 +138,15 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   segments are joined.
 - Motion: 180ms ease for color/border/lift; `animate-rise-in` 700ms on mount;
   `animate-flash-in` 2.4s sand highlight for new arrivals; charts 500ms.
-  Only linked cards lift on hover. `prefers-reduced-motion` stops all of it
-  (`styles.css`, `useReducedMotion` for charts).
+  Only linked cards lift on hover, and nothing inside them moves (a painting
+  that grew on hover was tried and dropped). Data that replaces a skeleton fades in over 150ms:
+  a card's children (never its header, marked `data-slot="card-header"`, so a
+  hand-built header needs the attribute too) fade when they arrive after the
+  page settled (`useSettledFlag` on the scroll pane), so cached pages and
+  navigation stay instant. Switching light/dark crossfades over 200ms (view
+  transition). No page transitions, scroll reveals, count-ups or springs.
+  `prefers-reduced-motion` stops all of it (`styles.css`, `useReducedMotion`
+  for charts).
 
 ## Components
 
