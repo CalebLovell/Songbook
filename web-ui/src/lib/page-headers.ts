@@ -1,8 +1,13 @@
 import { createElement, Fragment, type ReactNode } from "react";
 
 export const PAGE_HEADERS = {
+	live: {
+		title: "Live Feed",
+		description: "What the station is hearing right now.",
+	},
 	birds: {
 		title: "All Birds",
+		sectionDescription: "Every species this station has recorded.",
 		description: (
 			detections: ReactNode,
 			species: ReactNode,

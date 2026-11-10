@@ -10,12 +10,14 @@ export function PageStatus({
 	title,
 	heading = "h1",
 	actions,
+	footer,
 	children,
 }: {
 	tone: PageStatusTone;
 	title: string;
 	heading?: "h1" | "h2";
 	actions?: ReactNode;
+	footer?: ReactNode;
 	children: ReactNode;
 }) {
 	return (
@@ -36,9 +38,14 @@ export function PageStatus({
 			{actions ? (
 				<div
 					data-testid="page-status-actions"
-					className="mt-page flex flex-wrap items-center gap-2"
+					className="mt-page flex flex-wrap items-center gap-page"
 				>
 					{actions}
+				</div>
+			) : null}
+			{footer ? (
+				<div className="-mx-page mt-page -mb-page border-t px-page py-3">
+					{footer}
 				</div>
 			) : null}
 		</Card>

@@ -11,6 +11,7 @@ export function StatusPage({
 	tone,
 	title,
 	actions,
+	footer,
 	children,
 }: {
 	icon: ComponentType<{ className?: string }>;
@@ -19,6 +20,7 @@ export function StatusPage({
 	tone: PageStatusTone;
 	title: string;
 	actions?: ReactNode;
+	footer?: ReactNode;
 	children: ReactNode;
 }) {
 	return (
@@ -28,7 +30,13 @@ export function StatusPage({
 				title={section}
 				description={sectionDescription}
 			/>
-			<PageStatus tone={tone} title={title} heading="h2" actions={actions}>
+			<PageStatus
+				tone={tone}
+				title={title}
+				heading="h2"
+				actions={actions}
+				footer={footer}
+			>
 				{children}
 			</PageStatus>
 		</PageWrap>

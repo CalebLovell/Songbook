@@ -13,6 +13,7 @@ import {
 } from "~/components/ui/confirm-dialog.tsx";
 import { ShellLines } from "~/components/ui/shell.tsx";
 import { toast } from "~/components/ui/toaster.tsx";
+import { copyText } from "~/lib/copy-text.ts";
 import { cn } from "~/lib/utils.ts";
 
 const COPIED_FEEDBACK_MS = 2_000;
@@ -27,34 +28,6 @@ const SUMMARY_SHELL_WIDTHS = [
 	"w-3/5",
 	"w-1/2",
 ];
-
-// navigator.clipboard is undefined on a plain-HTTP LAN address, so the deprecated
-// execCommand path is the only one that works there. The field goes inside the dialog
-// because its focus trap would pull focus out of a field anywhere else.
-async function copyText(
-	text: string,
-	container: HTMLElement,
-): Promise<boolean> {
-	if (navigator.clipboard?.writeText) {
-		try {
-			await navigator.clipboard.writeText(text);
-			return true;
-		} catch {}
-	}
-
-	const focused = document.activeElement;
-	const field = document.createElement("textarea");
-	field.value = text;
-	field.setAttribute("readonly", "");
-	field.style.position = "fixed";
-	field.style.opacity = "0";
-	container.append(field);
-	field.select();
-	const copied = document.execCommand("copy");
-	field.remove();
-	if (focused instanceof HTMLElement) focused.focus();
-	return copied;
-}
 
 function hasShareSheet(): boolean {
 	return (

@@ -1,18 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouteContext } from "@tanstack/react-router";
-import {
-	Activity,
-	AudioWaveform,
-	CalendarRange,
-	Feather,
-	Lightbulb,
-	type LucideIcon,
-	Search,
-	SearchCheck,
-	Settings,
-	SlidersHorizontal,
-	X,
-} from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Popover } from "radix-ui";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
@@ -26,38 +14,17 @@ import { Input } from "~/components/ui/input.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import { getSearchSpecies } from "~/lib/search-species.ts";
-import {
-	type SearchPage,
-	type SearchSpecies,
-	searchSite,
-} from "~/lib/site-search.ts";
+import { SITE_PAGES, type SitePage } from "~/lib/site-pages.ts";
+import { type SearchSpecies, searchSite } from "~/lib/site-search.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { cn } from "~/lib/utils.ts";
 
 const SEARCH_INDEX_FRESH_MS = 5 * 60_000;
 
-type PageEntry = SearchPage & { icon: LucideIcon; gated?: boolean };
-
-const PAGES: PageEntry[] = [
-	{ label: "Live Feed", to: "/live", icon: Activity },
-	{ label: "Timeline", to: "/timeline", icon: CalendarRange },
-	{ label: "All Birds", to: "/birds", icon: Feather },
-	{ label: "Detections", to: "/detections", icon: AudioWaveform },
-	{ label: "Learn", to: "/learn", icon: Lightbulb },
-	{ label: "Review", to: "/review", icon: SearchCheck, gated: true },
-	{
-		label: "Species Filter",
-		to: "/species-filter",
-		icon: SlidersHorizontal,
-		gated: true,
-	},
-	{ label: "Settings", to: "/settings", icon: Settings, gated: true },
-];
-
 type Result =
 	| { kind: "species"; species: SearchSpecies }
-	| { kind: "page"; page: PageEntry }
+	| { kind: "page"; page: SitePage }
 	| { kind: "setting"; setting: SettingsIndexEntry; field?: string };
 
 function useSearchSpecies() {
@@ -109,7 +76,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 		const found = searchSite(
 			trimmed,
 			species,
-			auth.unlocked ? PAGES : PAGES.filter((page) => !page.gated),
+			auth.unlocked ? SITE_PAGES : SITE_PAGES.filter((page) => !page.gated),
 			auth.unlocked ? SETTINGS_INDEX : [],
 		);
 		return [

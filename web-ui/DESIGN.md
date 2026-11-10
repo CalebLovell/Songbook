@@ -178,6 +178,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   never name Pi scripts, commands or logs; setup steps live in the README. Public sign-in copy never names Pi
   scripts or logs: setup steps belong in the README. Messages are short and generic
   ("Incorrect password.", "Something went wrong. Try again.").
+- **Status pages** (`StatusPage`): a masthead, then one `PageStatus` card. Card titles
+  stay generic ("Not found", "Error"), the body is one line that names what happened, and
+  the buttons carry the next step, never the text. One primary button, the rest
+  outline. A route error keeps the masthead of the section it happened in
+  (`sitePageFor`); anything specific goes in the collapsed Details footer. A 404 offers
+  the closest page (`closestSitePage`) as its primary button when there is one.
 - **Empty states**: `EmptyNote`. The bird page's Best recording card instead keeps
   its plot: `QuietSpectrogram`, a faint noise floor with a muted icon and the message
   centered, and no controls. It stays generic, never saying why a clip is missing.
