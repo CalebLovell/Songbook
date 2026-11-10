@@ -14,7 +14,7 @@ commit=${GITHUB_SHA:-$(git -C "$root" rev-parse HEAD)}
 rm -rf "$dist"
 mkdir -p "$dist"
 
-(cd "$root/web-ui" && npm run build)
+(cd "$root/web-ui" && VITE_SONGBOOK_VERSION="$version" npm run build)
 echo "$version" > "$root/web-ui/.output/VERSION"
 # A web-UI-only station has no checkout of this repo, so its updater comes
 # with the bundle and replaces itself on each update.

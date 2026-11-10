@@ -14,7 +14,7 @@ export function SidebarBody({
 }) {
 	const { auth } = useRouteContext({ from: "__root__" });
 	return (
-		<div className="flex min-h-full flex-col py-3">
+		<div className="flex min-h-full flex-col pt-3">
 			{withTitle ? (
 				<>
 					<Link
