@@ -14,15 +14,15 @@ import test from "node:test";
 
 import {
 	loadInstalledSpeciesCatalog,
-	loadSpeciesControlPage,
+	loadSpeciesFilterPage,
 	parseSpeciesList,
 	resolveSpeciesListDirectory,
 	resolveSpeciesModelDirectory,
-	saveSpeciesControlLists,
-} from "./species-control.server.ts";
+	saveSpeciesFilterLists,
+} from "./species-filter.server.ts";
 
 async function fixture() {
-	const root = await mkdtemp(path.join(tmpdir(), "birdnet-species-control-"));
+	const root = await mkdtemp(path.join(tmpdir(), "birdnet-species-filter-"));
 	const lists = path.join(root, "lists");
 	const model = path.join(root, "model");
 	await Promise.all([
@@ -147,7 +147,7 @@ test("catalog contains only labels the active classifier can emit", async () => 
 test("page joins policy files with detection history and preserves unresolved lines", async () => {
 	const item = await fixture();
 	try {
-		const page = await loadSpeciesControlPage({
+		const page = await loadSpeciesFilterPage({
 			listDirectory: item.lists,
 			modelDirectory: item.model,
 			database: item.database,
@@ -179,7 +179,7 @@ test("missing list files are treated as empty and recorded as absent", async () 
 		await import("node:fs/promises").then(({ rm }) =>
 			rm(path.join(item.lists, "whitelist_species_list.txt")),
 		);
-		const page = await loadSpeciesControlPage({
+		const page = await loadSpeciesFilterPage({
 			listDirectory: item.lists,
 			modelDirectory: item.model,
 			database: item.database,
@@ -200,12 +200,12 @@ test("save writes canonical sorted lists, preserves unknowns, modes, and revisio
 		const includePath = path.join(item.lists, "include_species_list.txt");
 		await chmod(includePath, 0o640);
 		const beforeMode = (await stat(includePath)).mode & 0o777;
-		const page = await loadSpeciesControlPage({
+		const page = await loadSpeciesFilterPage({
 			listDirectory: item.lists,
 			modelDirectory: item.model,
 			database: item.database,
 		});
-		const result = await saveSpeciesControlLists(
+		const result = await saveSpeciesFilterLists(
 			{
 				revision: page.revision,
 				custom: ["Sciurus carolinensis", "Canis latrans"],
@@ -230,7 +230,7 @@ test("save writes canonical sorted lists, preserves unknowns, modes, and revisio
 		);
 		assert.equal((await stat(includePath)).mode & 0o777, beforeMode);
 		await assert.rejects(
-			saveSpeciesControlLists(
+			saveSpeciesFilterLists(
 				{
 					revision: page.revision,
 					custom: [],
@@ -264,8 +264,8 @@ test("save removes only explicitly named unresolved tokens", async () => {
 			modelDirectory: item.model,
 			database: item.database,
 		};
-		const page = await loadSpeciesControlPage(dependencies);
-		await saveSpeciesControlLists(
+		const page = await loadSpeciesFilterPage(dependencies);
+		await saveSpeciesFilterLists(
 			{
 				revision: page.revision,
 				custom: ["Canis latrans"],
@@ -292,8 +292,8 @@ test("save enforces exclusion precedence and keeps Always species in Custom scop
 			modelDirectory: item.model,
 			database: item.database,
 		};
-		const page = await loadSpeciesControlPage(dependencies);
-		await saveSpeciesControlLists(
+		const page = await loadSpeciesFilterPage(dependencies);
+		await saveSpeciesFilterLists(
 			{
 				revision: page.revision,
 				custom: ["Canis latrans", "Sciurus carolinensis"],

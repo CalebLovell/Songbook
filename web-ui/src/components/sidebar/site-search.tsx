@@ -11,7 +11,6 @@ import {
 	SearchCheck,
 	Settings,
 	SlidersHorizontal,
-	UserRound,
 	X,
 } from "lucide-react";
 import { Popover } from "radix-ui";
@@ -48,13 +47,12 @@ const PAGES: PageEntry[] = [
 	{ label: "Learn", to: "/learn", icon: Lightbulb },
 	{ label: "Review", to: "/review", icon: SearchCheck, gated: true },
 	{
-		label: "Species Control",
-		to: "/species-control",
+		label: "Species Filter",
+		to: "/species-filter",
 		icon: SlidersHorizontal,
 		gated: true,
 	},
 	{ label: "Settings", to: "/settings", icon: Settings, gated: true },
-	{ label: "Account", to: "/account", icon: UserRound },
 ];
 
 type Result =

@@ -14,17 +14,17 @@ import { homedir } from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import type {
-	SpeciesControlPageData,
-	SpeciesControlRow,
-	SpeciesControlSaveInput,
+	SpeciesFilterPageData,
+	SpeciesFilterRow,
+	SpeciesFilterSaveInput,
 	SpeciesHistorySummary,
 	SpeciesListName,
-} from "./species-control-data.ts";
-import { normalizeSpeciesControlSave } from "./species-control-data.ts";
+} from "./species-filter-data.ts";
+import { normalizeSpeciesFilterSave } from "./species-filter-data.ts";
 
 export type InstalledSpecies = { sciName: string; comName: string };
 
-type SpeciesControlDependencies = {
+type SpeciesFilterDependencies = {
 	listDirectory?: string;
 	modelDirectory?: string;
 	database?: DatabaseSync;
@@ -64,7 +64,7 @@ async function readTextIfPresent(filePath: string) {
 }
 
 export async function loadInstalledSpeciesCatalog(
-	dependencies: SpeciesControlDependencies = {},
+	dependencies: SpeciesFilterDependencies = {},
 ): Promise<InstalledSpecies[]> {
 	const modelDirectory =
 		dependencies.modelDirectory ?? resolveSpeciesModelDirectory();
@@ -205,7 +205,7 @@ function historyBySpecies(
 	);
 }
 
-function openHistoryDatabase(dependencies: SpeciesControlDependencies) {
+function openHistoryDatabase(dependencies: SpeciesFilterDependencies) {
 	if (dependencies.database) {
 		return { database: dependencies.database, owned: false };
 	}
@@ -219,9 +219,9 @@ function openHistoryDatabase(dependencies: SpeciesControlDependencies) {
 	};
 }
 
-export async function loadSpeciesControlPage(
-	dependencies: SpeciesControlDependencies = {},
-): Promise<SpeciesControlPageData> {
+export async function loadSpeciesFilterPage(
+	dependencies: SpeciesFilterDependencies = {},
+): Promise<SpeciesFilterPageData> {
 	const listDirectory =
 		dependencies.listDirectory ?? resolveSpeciesListDirectory();
 	const catalog = await loadInstalledSpeciesCatalog(dependencies);
@@ -247,7 +247,7 @@ export async function loadSpeciesControlPage(
 		lastSeen: null,
 		recordings: 0,
 	};
-	const rows: SpeciesControlRow[] = catalog.map((species) => ({
+	const rows: SpeciesFilterRow[] = catalog.map((species) => ({
 		...species,
 		custom: memberships.custom.has(species.sciName),
 		excluded: memberships.excluded.has(species.sciName),
@@ -363,11 +363,11 @@ async function replaceAllLists(
 	}
 }
 
-export async function saveSpeciesControlLists(
-	input: SpeciesControlSaveInput,
-	dependencies: SpeciesControlDependencies = {},
+export async function saveSpeciesFilterLists(
+	input: SpeciesFilterSaveInput,
+	dependencies: SpeciesFilterDependencies = {},
 ): Promise<{ revision: string }> {
-	const parsedInput = normalizeSpeciesControlSave(input);
+	const parsedInput = normalizeSpeciesFilterSave(input);
 	return withSaveLock(async () => {
 		const listDirectory =
 			dependencies.listDirectory ?? resolveSpeciesListDirectory();

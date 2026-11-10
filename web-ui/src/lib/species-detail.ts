@@ -14,7 +14,7 @@ import {
 	type CatalogSpecies,
 	findCatalogSpeciesBySlug,
 } from "~/lib/species-catalog.ts";
-import { loadInstalledSpeciesCatalog } from "~/lib/species-control.server.ts";
+import { loadInstalledSpeciesCatalog } from "~/lib/species-filter.server.ts";
 import { type SpeciesLink, speciesLinkFor } from "~/lib/species-link.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import type { HourActivity } from "~/lib/stats-data.ts";

@@ -28,10 +28,7 @@ import {
 	saveStationSettingsFn,
 	saveStorageSettingsFn,
 } from "./settings.ts";
-import {
-	getSpeciesControlPage,
-	saveSpeciesControl,
-} from "./species-control.ts";
+import { getSpeciesFilterPage, saveSpeciesFilter } from "./species-filter.ts";
 
 function sourceOf(relativePath: string) {
 	return readFileSync(
@@ -53,7 +50,7 @@ function assertGated(source: string, name: string) {
 
 test("every gated server function carries requireUnlocked", () => {
 	void requireUnlocked;
-	void saveSpeciesControl;
+	void saveSpeciesFilter;
 	void resetSettingsFn;
 	void restartStationFn;
 	void saveAudioSettingsFn;
@@ -68,7 +65,7 @@ test("every gated server function carries requireUnlocked", () => {
 	void getReviewPage;
 	void getReviewSpecies;
 	void getSettingsPage;
-	void getSpeciesControlPage;
+	void getSpeciesFilterPage;
 	void getStationHealth;
 	void deleteDetections;
 
@@ -87,9 +84,9 @@ test("every gated server function carries requireUnlocked", () => {
 		assertGated(settingsSource, name);
 	}
 
-	const speciesControlSource = sourceOf("./species-control.ts");
-	for (const name of ["saveSpeciesControl", "getSpeciesControlPage"]) {
-		assertGated(speciesControlSource, name);
+	const speciesFilterSource = sourceOf("./species-filter.ts");
+	for (const name of ["saveSpeciesFilter", "getSpeciesFilterPage"]) {
+		assertGated(speciesFilterSource, name);
 	}
 
 	const reviewSource = sourceOf("./review.ts");

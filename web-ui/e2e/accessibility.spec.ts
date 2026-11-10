@@ -10,10 +10,10 @@ const PUBLIC_PAGES = [
 	"/detections",
 	"/birds",
 	"/learn",
-	"/account",
+	"/sign-in",
 	"/no-such-page",
 ];
-const GATED_PAGES = ["/review", "/settings", "/species-control"];
+const GATED_PAGES = ["/review", "/settings", "/species-filter"];
 
 async function settle(page: Page, path: string) {
 	await page.goto(path);
@@ -21,10 +21,10 @@ async function settle(page: Page, path: string) {
 }
 
 async function signIn(page: Page) {
-	await settle(page, "/account");
-	await page.getByLabel("Station password").fill(PASSWORD);
+	await settle(page, "/sign-in");
+	await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
 	await page.getByRole("button", { name: "Sign in", exact: true }).click();
-	await expect(page.getByLabel("Station password")).toHaveCount(0);
+	await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
 }
 
 async function birdProfilePath(page: Page) {
@@ -256,7 +256,7 @@ test.describe("focus visibility", () => {
 
 	test("narrow sort menu and list tools show the ring", async ({ page }) => {
 		await signIn(page);
-		await settle(page, "/species-control");
+		await settle(page, "/species-filter");
 		await page.keyboard.press("Tab");
 		for (const control of [
 			page.getByRole("combobox", { name: "Sort species by" }),

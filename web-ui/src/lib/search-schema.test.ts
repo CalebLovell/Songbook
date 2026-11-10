@@ -4,12 +4,12 @@ import { test } from "node:test";
 import { detectionWorkspaceSearchSchema } from "./detection-workspace.ts";
 import { reviewSearchSchema } from "./review-data.ts";
 import { parseSearch } from "./search-params.ts";
-import { speciesControlWorkspaceSearchSchema } from "./species-control-workspace.ts";
+import { speciesFilterWorkspaceSearchSchema } from "./species-filter-workspace.ts";
 
 const detections = (url: string) =>
 	detectionWorkspaceSearchSchema.parse(parseSearch(url));
-const speciesControl = (url: string) =>
-	speciesControlWorkspaceSearchSchema.parse(parseSearch(url));
+const speciesFilter = (url: string) =>
+	speciesFilterWorkspaceSearchSchema.parse(parseSearch(url));
 
 test("an empty detections URL gets the default view", () => {
 	const search = detections("");
@@ -56,21 +56,21 @@ test("a detections search is trimmed, and blank means no search", () => {
 	assert.equal(detections("?species=%20%20").species, undefined);
 });
 
-test("species control defaults to ascending species", () => {
-	const search = speciesControl("");
+test("species filter defaults to ascending species", () => {
+	const search = speciesFilter("");
 	assert.equal(search.page, 1);
 	assert.equal(search.sort, "species");
 	assert.equal(search.direction, "asc");
 	assert.equal(search.query, undefined);
 });
 
-test("species control keeps a valid view and rejects a bad one", () => {
-	const kept = speciesControl("?page=3&sort=count&direction=desc&query=wren");
+test("species filter keeps a valid view and rejects a bad one", () => {
+	const kept = speciesFilter("?page=3&sort=count&direction=desc&query=wren");
 	assert.equal(kept.page, 3);
 	assert.equal(kept.sort, "count");
 	assert.equal(kept.direction, "desc");
 	assert.equal(kept.query, "wren");
-	const rejected = speciesControl("?page=0&sort=nope&direction=up");
+	const rejected = speciesFilter("?page=0&sort=nope&direction=up");
 	assert.equal(rejected.page, 1);
 	assert.equal(rejected.sort, "species");
 	assert.equal(rejected.direction, "asc");

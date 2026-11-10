@@ -9,7 +9,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
 import { Hint } from "~/components/ui/hint.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
-import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
+import { ShellBar, ShellFigure, ShellText } from "~/components/ui/shell.tsx";
 import { TooltipProvider } from "~/components/ui/tooltip.tsx";
 import { heatColor, heatInk, heatMaximum } from "~/lib/heatmap.ts";
 import type { VocalJump } from "~/lib/highlights-data.ts";
@@ -87,15 +87,10 @@ export function SpeciesByHourCard({
 				<div
 					className={`${CARD_HEADER_CLASS} gap-3 py-2 ${isEmpty ? "mb-page" : ""}`}
 				>
-					<div className="flex h-6 min-w-0 flex-1 flex-wrap content-start items-center justify-between gap-x-3 gap-y-6 overflow-hidden">
-						<div className="flex h-6 min-w-0 items-center gap-3">
-							<Kicker as="h2" className="shrink-0">
-								Activity
-							</Kicker>
-							{summary}
-						</div>
-						{sun?.available ? <HeaderSunTimes sun={sun} /> : null}
-					</div>
+					<HeaderLine
+						summary={summary}
+						sunTimes={sun?.available ? <HeaderSunTimes sun={sun} /> : null}
+					/>
 				</div>
 
 				{isEmpty ? (
@@ -178,9 +173,31 @@ function HeaderRow() {
 
 type DaylightSun = Extract<WindowSun, { available: true }>;
 
-function SunRow({ sun }: { sun: DaylightSun }) {
+function HeaderLine({
+	summary,
+	sunTimes,
+}: {
+	summary?: ReactNode;
+	sunTimes: ReactNode;
+}) {
 	return (
-		<div className="@min-[56rem]/card:flex hidden items-center pt-2">
+		<div className="flex h-6 min-w-0 flex-1 flex-wrap content-start items-center justify-between gap-x-3 gap-y-6 overflow-hidden">
+			<div className="flex h-6 min-w-0 items-center gap-3">
+				<Kicker as="h2" className="shrink-0">
+					Activity
+				</Kicker>
+				{summary}
+			</div>
+			{sunTimes}
+		</div>
+	);
+}
+
+const SUN_ROW_CLASS = "@min-[56rem]/card:flex hidden items-center pt-2";
+
+function SunRowFrame({ mark }: { mark: (hour: number) => ReactNode }) {
+	return (
+		<div className={SUN_ROW_CLASS}>
 			<div className={`h-4 ${LABEL_LAYOUT}`} />
 			<div className="flex-none">
 				<div
@@ -188,7 +205,9 @@ function SunRow({ sun }: { sun: DaylightSun }) {
 					style={{ gridTemplateColumns: HOUR_GRID_COLUMNS }}
 				>
 					{HOURS.map((hour) => (
-						<SunMark key={`sun-${hour}`} hour={hour} sun={sun} />
+						<div key={`sun-${hour}`} className="flex justify-center">
+							{mark(hour)}
+						</div>
 					))}
 				</div>
 			</div>
@@ -196,19 +215,64 @@ function SunRow({ sun }: { sun: DaylightSun }) {
 	);
 }
 
-function HeaderSunTimes({ sun }: { sun: DaylightSun }) {
+function SunRow({ sun }: { sun: DaylightSun }) {
+	return <SunRowFrame mark={(hour) => <SunMark hour={hour} sun={sun} />} />;
+}
+
+function SunRowSkeleton() {
+	return (
+		<SunRowFrame mark={() => <ShellBar className="size-3 rounded-full" />} />
+	);
+}
+
+function SunTimesFrame({
+	qualifier,
+	sunrise,
+	sunset,
+}: {
+	qualifier?: ReactNode;
+	sunrise: ReactNode;
+	sunset: ReactNode;
+}) {
 	return (
 		<p className="flex h-6 shrink-0 translate-y-[-1.5px] items-center gap-2 whitespace-nowrap text-[13px] text-muted-foreground">
-			{sun.days > 1 ? <span>avg</span> : null}
+			{qualifier}
 			<Sunrise aria-hidden="true" className="size-3.5 shrink-0" />
-			<HeaderSunTime event="Sunrise" minutes={sun.sunriseMinutes} />
+			{sunrise}
 			<span
 				className="size-0.75 shrink-0 rounded-full bg-muted-foreground opacity-60"
 				aria-hidden="true"
 			/>
 			<Sunset aria-hidden="true" className="size-3.5 shrink-0" />
-			<HeaderSunTime event="Sunset" minutes={sun.sunsetMinutes} />
+			{sunset}
 		</p>
+	);
+}
+
+function HeaderSunTimes({ sun }: { sun: DaylightSun }) {
+	return (
+		<SunTimesFrame
+			qualifier={sun.days > 1 ? <span>avg</span> : null}
+			sunrise={<HeaderSunTime event="Sunrise" minutes={sun.sunriseMinutes} />}
+			sunset={<HeaderSunTime event="Sunset" minutes={sun.sunsetMinutes} />}
+		/>
+	);
+}
+
+function HeaderSunTimesSkeleton() {
+	return (
+		<SunTimesFrame
+			sunrise={
+				<span>
+					<ShellFigure placeholder="0:00" /> am
+				</span>
+			}
+			sunset={
+				<span>
+					<ShellFigure placeholder="0:00" /> pm
+				</span>
+			}
+		/>
 	);
 }
 
@@ -246,30 +310,27 @@ function SunMark({ hour, sun }: { hour: number; sun: DaylightSun }) {
 			sun.days,
 		);
 		return (
-			<div className="flex justify-center">
-				<Hint content={label}>
-					<button
-						type="button"
-						aria-label={label}
-						className="flex size-4 cursor-default items-center justify-center"
-					>
-						<Icon aria-hidden="true" className="size-3 text-moss" />
-					</button>
-				</Hint>
-			</div>
+			<Hint content={label}>
+				<button
+					type="button"
+					aria-label={label}
+					className="flex size-4 cursor-default items-center justify-center"
+				>
+					<Icon aria-hidden="true" className="size-3 text-moss" />
+				</button>
+			</Hint>
 		);
 	}
 	const isDay = hour > sun.sunriseHour && hour < sun.sunsetHour;
 	const Icon = isDay ? Sun : Moon;
 	return (
-		<div aria-hidden="true" className="flex justify-center">
-			<Icon
-				className={cn(
-					"size-3",
-					isDay ? "text-moss" : "text-muted-foreground opacity-60",
-				)}
-			/>
-		</div>
+		<Icon
+			aria-hidden="true"
+			className={cn(
+				"size-3",
+				isDay ? "text-moss" : "text-muted-foreground opacity-60",
+			)}
+		/>
 	);
 }
 
@@ -383,14 +444,10 @@ export function SpeciesByHourCardSkeleton({
 			className={`@container/card pb-1! ${className}`}
 		>
 			<div className={`${CARD_HEADER_CLASS} gap-3 py-2`}>
-				<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
-					<Kicker as="h2" className="shrink-0">
-						Activity
-					</Kicker>
-					{summary}
-				</div>
+				<HeaderLine summary={summary} sunTimes={<HeaderSunTimesSkeleton />} />
 			</div>
 			<div aria-hidden="true" className="-mx-1 px-1">
+				<SunRowSkeleton />
 				<HeaderRow />
 				<div className="-mx-page *:px-page">
 					{Array.from({ length: SKELETON_ROWS }, (_, index) => (

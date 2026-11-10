@@ -5,7 +5,7 @@ export function requireUnlocked(
 	location: ParsedLocation,
 ): void {
 	if (auth.unlocked) return;
-	throw redirect({ to: "/account", search: { next: location.href } });
+	throw redirect({ to: "/sign-in", search: { next: location.href } });
 }
 
 export function safeNext(value: unknown): string | undefined {

@@ -23,7 +23,7 @@ The screenshots use generated test data, not a real station.
 - **Live** shows what was just heard. **Timeline** shows any day, week, month or year.
 - **All Birds** has a page per species: history, peak hours and its best recording.
 - **Learn** quizzes you on the calls your own station recorded.
-- **Review** and **Species control** let you correct mistakes, behind a password.
+- **Review** and **Species filter** let you correct mistakes, behind a password.
 
 **Non-commercial use only.** See [License and credits](#license-and-credits).
 
@@ -74,7 +74,7 @@ and reboots. It keeps a log at `~/installation-<date>.txt`. If your Pi is still 
 `raspberrypi`, it gets renamed to `birdnetpi`.
 
 Then open `http://birdnetpi.local` from a device on the same network. Anyone who can reach the
-station can view it. Settings, Review and Species control need the password.
+station can view it. Settings, Review and Species filter need the password.
 
 Next, open **Settings → Station** and check the location. The installer guesses it from your IP
 address using ip-api.com, and that guess decides which species are expected at your station.

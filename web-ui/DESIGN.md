@@ -71,7 +71,7 @@ digit colour reaches 4.5:1.
 One dark theme, a warm neutral charcoal, set by `data-theme="dark"` on
 `<html>`. The choice is Light, Dark or System (`lib/theme.ts`), made in the
 `ThemeSwitcher`: a full-width segmented control (icon and label per segment)
-at the foot of the sidebar and phone drawer.
+directly below the account card, the last thing in the sidebar and phone drawer.
 It is never a nav row and never in the wordmark band or drawer header. Light and
 Dark are saved; System clears the save and follows the device live. A
 `ScriptOnce` in the root sets the attribute before first paint, so pages never
@@ -163,8 +163,19 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Nav rows**: active is marked by fill alone (a step deeper than the meadow
   hover), never bolder text. Gated pages stay listed with a lock icon.
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
-  `/` to focus), then the nav (Explore, Manage, then an Account link to
-  `/account`), with Settings and Species control at the foot. The Live pill lives in the Live page's hero, not the chrome.
+  `/` to focus), then two nav sections: Explore (Live Feed, Timeline, All Birds, Detections,
+  Learn) for everyone, and Station (Review, Species Filter, Settings) right below it only
+  when signed in. Nothing else sits low in the sidebar except the account card pinned at the foot. The Live pill lives in the Live page's hero, not the chrome.
+- **Account card**: the sidebar's last item, never a nav row. One line of bold title and
+  one muted line beside a 36px round icon well, then a 34px borderless icon action:
+  sign out when signed in, a link to `/sign-in?next=` when not, a chevron to `/sign-in` when
+  the Pi has no usable password. Both lines truncate; they never wrap. `/sign-in` is only the
+  form; signing out lives on the card. Nothing in the app is centered on the page.
+- **Error and status copy**: short, generic and clear ("Incorrect password.", "Something went
+  wrong. Try again."), never chatty phrasing like "That password is not right". Public pages
+  never name Pi scripts, commands or logs; setup steps live in the README. Public sign-in copy never names Pi
+  scripts or logs: setup steps belong in the README. Messages are short and generic
+  ("Incorrect password.", "Something went wrong. Try again.").
 - **Empty states**: `EmptyNote`. The bird page's Best recording card instead keeps
   its plot: `QuietSpectrogram`, a faint noise floor with a muted icon and the message
   centered, and no controls. It stays generic, never saying why a clip is missing.
@@ -216,7 +227,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Heat map text**: the timeline's hours are hidden from assistive tech, and a hidden
   table gives every species by hour at any width. A narrow card drops the hours for
   sighted users; that is a known gap against reflow, kept on purpose.
-- **Tables** (Detections, Species Control): one grid with the header, body and
+- **Tables** (Detections, Species Filter): one grid with the header, body and
   rows as subgrids, so only the rows scroll and the columns still align. Header,
   rows and footer stand the same height. Width follows the card: under 36rem one
   sort menu replaces the headings and the binomial stacks under the common name,

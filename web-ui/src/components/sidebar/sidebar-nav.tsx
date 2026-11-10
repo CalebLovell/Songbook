@@ -3,7 +3,6 @@ import {
 	Activity,
 	AudioWaveform,
 	CalendarRange,
-	CircleUserRound,
 	Feather,
 	Lightbulb,
 	type LucideIcon,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react";
 import { useId } from "react";
 
+import { AccountCard } from "~/components/sidebar/account-card.tsx";
 import { ThemeSwitcher } from "~/components/sidebar/theme-switcher.tsx";
 import { useSettingsMark } from "~/lib/use-settings-mark.ts";
 
@@ -61,6 +61,19 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					<NavIcon icon={Feather} />
 					All Birds
 				</Link>
+				<Link
+					to="/detections"
+					search={{
+						page: 1,
+						sort: "recorded",
+						direction: "desc",
+					}}
+					activeOptions={{ includeSearch: false }}
+					{...linkProps}
+				>
+					<NavIcon icon={AudioWaveform} />
+					Detections
+				</Link>
 				<Link to="/learn" {...linkProps}>
 					<NavIcon icon={Lightbulb} />
 					Learn
@@ -70,22 +83,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 			{auth.unlocked ? (
 				<nav
 					className="mt-3 flex flex-col gap-0.5"
-					aria-labelledby={`${id}-manage`}
+					aria-labelledby={`${id}-station`}
 				>
-					<SectionLabel id={`${id}-manage`}>Manage</SectionLabel>
-					<Link
-						to="/detections"
-						search={{
-							page: 1,
-							sort: "recorded",
-							direction: "desc",
-						}}
-						activeOptions={{ includeSearch: false }}
-						{...linkProps}
-					>
-						<NavIcon icon={AudioWaveform} />
-						Detections
-					</Link>
+					<SectionLabel id={`${id}-station`}>Station</SectionLabel>
 					<Link
 						to="/review"
 						search={{ page: 1 }}
@@ -95,41 +95,27 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 						<NavIcon icon={SearchCheck} />
 						Review
 					</Link>
+					<Link
+						to="/species-filter"
+						search={{ page: 1, sort: "species", direction: "asc" }}
+						activeOptions={{ includeSearch: false }}
+						{...linkProps}
+					>
+						<NavIcon icon={SlidersHorizontal} />
+						Species Filter
+					</Link>
+					<Link to="/settings" {...linkProps}>
+						<NavIcon icon={Settings} />
+						Settings
+						{settingsMark ? (
+							<SettingsDot className="ml-auto" label={settingsMark} />
+						) : null}
+					</Link>
 				</nav>
 			) : null}
 
-			<nav
-				className="mt-auto flex flex-col gap-0.5 pt-4"
-				aria-labelledby={`${id}-station`}
-			>
-				<SectionLabel id={`${id}-station`}>Station</SectionLabel>
-				<Link to="/account" {...linkProps}>
-					<NavIcon icon={CircleUserRound} />
-					Account
-				</Link>
-				{auth.unlocked ? (
-					<>
-						<Link
-							to="/species-control"
-							search={{ page: 1, sort: "species", direction: "asc" }}
-							activeOptions={{ includeSearch: false }}
-							{...linkProps}
-						>
-							<NavIcon icon={SlidersHorizontal} />
-							Species Control
-						</Link>
-						<Link to="/settings" {...linkProps}>
-							<NavIcon icon={Settings} />
-							Settings
-							{settingsMark ? (
-								<SettingsDot className="ml-auto" label={settingsMark} />
-							) : null}
-						</Link>
-					</>
-				) : null}
-			</nav>
-
-			<div className="pt-page">
+			<div className="mt-auto flex flex-col gap-page pt-page">
+				<AccountCard onNavigate={onNavigate} />
 				<ThemeSwitcher />
 			</div>
 		</div>

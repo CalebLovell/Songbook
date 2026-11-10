@@ -23,7 +23,7 @@ export const EMPTY = {
 	filter: {
 		birdsSearch: (search: string) => `No birds match “${search}”.`,
 		detectionsFilters: "No detections match these filters.",
-		speciesControlSearch: "No species match that search.",
+		speciesFilterSearch: "No species match that search.",
 		recategorizeSearch: (search: string) => `No species match “${search}”.`,
 		learnPool: "Not enough species with recordings in this selection.",
 	},

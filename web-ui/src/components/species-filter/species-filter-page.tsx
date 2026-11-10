@@ -27,27 +27,27 @@ import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import {
-	type SpeciesControlPageData,
-	type SpeciesControlSaveInput,
+	type SpeciesFilterPageData,
+	type SpeciesFilterSaveInput,
 	type SpeciesStatus,
-	speciesControlInputWithStatus,
-	speciesControlResetInput,
+	speciesFilterInputWithStatus,
+	speciesFilterResetInput,
 	speciesStatusFor,
-} from "~/lib/species-control-data.ts";
+} from "~/lib/species-filter-data.ts";
 import {
-	nextSpeciesControlSort,
-	type SpeciesControlWorkspaceSearch,
-} from "~/lib/species-control-workspace.ts";
+	nextSpeciesFilterSort,
+	type SpeciesFilterWorkspaceSearch,
+} from "~/lib/species-filter-workspace.ts";
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { errorMessage } from "~/lib/utils.ts";
 import {
-	SPECIES_CONTROL_PAGE_SIZE,
-	SpeciesControlTable,
-	type SpeciesControlViewRow,
-	sortSpeciesControlRows,
-} from "./species-control-table.tsx";
-import { SpeciesControlTools } from "./species-control-tools.tsx";
+	SPECIES_FILTER_PAGE_SIZE,
+	SpeciesFilterTable,
+	type SpeciesFilterViewRow,
+	sortSpeciesFilterRows,
+} from "./species-filter-table.tsx";
+import { SpeciesFilterTools } from "./species-filter-tools.tsx";
 
 const TOOLBAR_CLASS =
 	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-page";
@@ -55,29 +55,29 @@ const SEARCH_CLASS = "@min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
 const TABLE_CARD_CLASS =
 	"@container flex min-h-80 flex-col overflow-hidden [--card-edge:min(var(--page-gap),0.75rem)]";
 
-export function SpeciesControlPageSkeleton({
+export function SpeciesFilterPageSkeleton({
 	search,
 }: {
-	search: SpeciesControlWorkspaceSearch;
+	search: SpeciesFilterWorkspaceSearch;
 }) {
 	return (
 		<PageWrap className="flex h-full min-h-fit flex-col gap-page">
 			<div className="@container shrink-0 space-y-page">
 				<PageHeaderCard
 					icon={SlidersHorizontal}
-					title={PAGE_HEADERS.speciesControl.title}
-					description={PAGE_HEADERS.speciesControl.description}
+					title={PAGE_HEADERS.speciesFilter.title}
+					description={PAGE_HEADERS.speciesFilter.description}
 				/>
 				<div inert className={TOOLBAR_CLASS}>
 					<SearchInput
 						aria-label="Search installed species"
 						className={SEARCH_CLASS}
-						placeholder="Search species control..."
+						placeholder="Search species..."
 						value={search.query ?? ""}
 						onChange={() => {}}
 						onClear={() => {}}
 					/>
-					<SpeciesControlTools
+					<SpeciesFilterTools
 						onImport={() => {}}
 						onExport={() => {}}
 						onReset={() => {}}
@@ -90,7 +90,7 @@ export function SpeciesControlPageSkeleton({
 				aria-label="Installed species"
 				className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 			>
-				<SpeciesControlTable
+				<SpeciesFilterTable
 					rows={null}
 					page={search.page}
 					pageCount={130}
@@ -107,26 +107,26 @@ export function SpeciesControlPageSkeleton({
 }
 
 type PageAdapters = {
-	search: SpeciesControlWorkspaceSearch;
-	onSearchChange: (search: SpeciesControlWorkspaceSearch) => void;
-	onSave?: (input: SpeciesControlSaveInput) => Promise<{ revision: string }>;
+	search: SpeciesFilterWorkspaceSearch;
+	onSearchChange: (search: SpeciesFilterWorkspaceSearch) => void;
+	onSave?: (input: SpeciesFilterSaveInput) => Promise<{ revision: string }>;
 	onCommitted?: () => void | Promise<void>;
 };
 
 type ProposedDialog =
 	| {
 			kind: "status";
-			input: SpeciesControlSaveInput;
+			input: SpeciesFilterSaveInput;
 			label: string;
 			count: number;
 	  }
-	| { kind: "import"; input: SpeciesControlSaveInput }
+	| { kind: "import"; input: SpeciesFilterSaveInput }
 	| {
 			kind: "remove-unresolved";
-			input: SpeciesControlSaveInput;
+			input: SpeciesFilterSaveInput;
 			raw: string;
 	  }
-	| { kind: "reset"; input: SpeciesControlSaveInput };
+	| { kind: "reset"; input: SpeciesFilterSaveInput };
 
 type CommitMessages = {
 	success: string;
@@ -281,7 +281,7 @@ export function SpeciesSelectionBar({
 }
 
 function setFrom(
-	data: SpeciesControlPageData,
+	data: SpeciesFilterPageData,
 	key: "custom" | "excluded" | "whitelisted",
 ) {
 	return new Set(
@@ -293,13 +293,13 @@ function setFrom(
 	);
 }
 
-export function SpeciesControlPage({
+export function SpeciesFilterPage({
 	initialData,
 	search,
 	onSearchChange,
 	onSave,
 	onCommitted,
-}: { initialData: SpeciesControlPageData } & PageAdapters) {
+}: { initialData: SpeciesFilterPageData } & PageAdapters) {
 	const [custom, setCustom] = useState(() => setFrom(initialData, "custom"));
 	const [excluded, setExcluded] = useState(() =>
 		setFrom(initialData, "excluded"),
@@ -317,7 +317,7 @@ export function SpeciesControlPage({
 			input,
 		}: {
 			save: NonNullable<typeof onSave>;
-			input: SpeciesControlSaveInput;
+			input: SpeciesFilterSaveInput;
 			messages: CommitMessages;
 			clearSelection: boolean;
 		}) => save(input),
@@ -348,7 +348,7 @@ export function SpeciesControlPage({
 	});
 	const proposed = dialog ? dialogContent(dialog) : null;
 
-	const viewRows = useMemo<SpeciesControlViewRow[]>(
+	const viewRows = useMemo<SpeciesFilterViewRow[]>(
 		() =>
 			initialData.rows.map((row) => {
 				const membership = {
@@ -371,18 +371,18 @@ export function SpeciesControlPage({
 			.map((result) => result.item);
 	}, [search.query, viewRows]);
 	const sorted = useMemo(
-		() => sortSpeciesControlRows(searched, search.sort, search.direction),
+		() => sortSpeciesFilterRows(searched, search.sort, search.direction),
 		[searched, search.sort, search.direction],
 	);
 	const pageCount = Math.max(
 		1,
-		Math.ceil(sorted.length / SPECIES_CONTROL_PAGE_SIZE),
+		Math.ceil(sorted.length / SPECIES_FILTER_PAGE_SIZE),
 	);
 	const safePage = Math.min(search.page, pageCount);
 	useAnnounceChange(`${sorted.length.toLocaleString()} species`);
 	const pagedRows = sorted.slice(
-		(safePage - 1) * SPECIES_CONTROL_PAGE_SIZE,
-		safePage * SPECIES_CONTROL_PAGE_SIZE,
+		(safePage - 1) * SPECIES_FILTER_PAGE_SIZE,
+		safePage * SPECIES_FILTER_PAGE_SIZE,
 	);
 	useEffect(() => {
 		if (search.page !== safePage) {
@@ -395,7 +395,7 @@ export function SpeciesControlPage({
 			0,
 		) - removedUnresolved.size;
 
-	function currentSaveInput(): SpeciesControlSaveInput {
+	function currentSaveInput(): SpeciesFilterSaveInput {
 		return {
 			revision,
 			custom: [...custom],
@@ -410,7 +410,7 @@ export function SpeciesControlPage({
 		if (!action || selected.size === 0) return;
 		setDialog({
 			kind: "status",
-			input: speciesControlInputWithStatus(
+			input: speciesFilterInputWithStatus(
 				currentSaveInput(),
 				[...selected],
 				status,
@@ -495,15 +495,15 @@ export function SpeciesControlPage({
 			<div className="@container shrink-0 space-y-page">
 				<PageHeaderCard
 					icon={SlidersHorizontal}
-					title={PAGE_HEADERS.speciesControl.title}
-					description={PAGE_HEADERS.speciesControl.description}
+					title={PAGE_HEADERS.speciesFilter.title}
+					description={PAGE_HEADERS.speciesFilter.description}
 				/>
 
-				<div data-layout="species-control-toolbar" className={TOOLBAR_CLASS}>
+				<div data-layout="species-filter-toolbar" className={TOOLBAR_CLASS}>
 					<DebouncedSearchInput
 						aria-label="Search installed species"
 						className={SEARCH_CLASS}
-						placeholder="Search species control..."
+						placeholder="Search species..."
 						value={search.query ?? ""}
 						onCommit={(value) =>
 							onSearchChange({
@@ -513,13 +513,13 @@ export function SpeciesControlPage({
 							})
 						}
 					/>
-					<SpeciesControlTools
+					<SpeciesFilterTools
 						onImport={importLists}
 						onExport={exportLists}
 						onReset={() =>
 							setDialog({
 								kind: "reset",
-								input: speciesControlResetInput(revision),
+								input: speciesFilterResetInput(revision),
 							})
 						}
 					/>
@@ -529,7 +529,7 @@ export function SpeciesControlPage({
 			{pagedRows.length === 0 ? (
 				<Card as="section" aria-label="Installed species" className="shrink-0">
 					<CardHeader title="Installed species" />
-					<EmptyNote>{EMPTY.filter.speciesControlSearch}</EmptyNote>
+					<EmptyNote>{EMPTY.filter.speciesFilterSearch}</EmptyNote>
 				</Card>
 			) : (
 				<Card
@@ -537,7 +537,7 @@ export function SpeciesControlPage({
 					aria-label="Installed species"
 					className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 				>
-					<SpeciesControlTable
+					<SpeciesFilterTable
 						rows={pagedRows}
 						page={safePage}
 						pageCount={pageCount}
@@ -546,7 +546,7 @@ export function SpeciesControlPage({
 						direction={search.direction}
 						onSortChange={(sort) => {
 							setSelected(new Set());
-							onSearchChange(nextSpeciesControlSort(search, sort));
+							onSearchChange(nextSpeciesFilterSort(search, sort));
 						}}
 						onSelectedChange={setSelected}
 						onPageChange={(page) => {

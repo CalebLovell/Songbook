@@ -13,7 +13,7 @@ export type SpeciesHistorySummary = {
 	recordings: number;
 };
 
-export type SpeciesControlRow = {
+export type SpeciesFilterRow = {
 	sciName: string;
 	comName: string;
 	custom: boolean;
@@ -24,9 +24,9 @@ export type SpeciesControlRow = {
 
 type UnresolvedSpeciesLists = Record<SpeciesListName, string[]>;
 
-export type SpeciesControlPageData = {
+export type SpeciesFilterPageData = {
 	revision: string;
-	rows: SpeciesControlRow[];
+	rows: SpeciesFilterRow[];
 	unresolved: UnresolvedSpeciesLists;
 	customMode: boolean;
 	listFiles: Record<SpeciesListName, boolean>;
@@ -57,7 +57,7 @@ const unresolvedRemovalSchema = z
 	})
 	.strict();
 
-export const speciesControlSaveSchema = z
+export const speciesFilterSaveSchema = z
 	.object({
 		revision: revisionSchema,
 		custom: knownListSchema,
@@ -69,12 +69,12 @@ export const speciesControlSaveSchema = z
 	})
 	.strict();
 
-export type SpeciesControlSaveInput = z.infer<typeof speciesControlSaveSchema>;
+export type SpeciesFilterSaveInput = z.infer<typeof speciesFilterSaveSchema>;
 
-export function speciesControlResetInput(
+export function speciesFilterResetInput(
 	revision: string,
-): SpeciesControlSaveInput {
-	return speciesControlSaveSchema.parse({
+): SpeciesFilterSaveInput {
+	return speciesFilterSaveSchema.parse({
 		revision,
 		custom: [],
 		excluded: [],
@@ -83,11 +83,11 @@ export function speciesControlResetInput(
 	});
 }
 
-export function speciesControlInputWithStatus(
-	current: SpeciesControlSaveInput,
+export function speciesFilterInputWithStatus(
+	current: SpeciesFilterSaveInput,
 	selected: readonly string[],
 	status: SpeciesStatus,
-): SpeciesControlSaveInput {
+): SpeciesFilterSaveInput {
 	const custom = new Set(current.custom);
 	const excluded = new Set(current.excluded);
 	const whitelisted = new Set(current.whitelisted);
@@ -101,7 +101,7 @@ export function speciesControlInputWithStatus(
 			: whitelisted.delete(sciName);
 	}
 
-	return speciesControlSaveSchema.parse({
+	return speciesFilterSaveSchema.parse({
 		...current,
 		custom: [...custom],
 		excluded: [...excluded],
@@ -153,9 +153,9 @@ function stableUnique(values: unknown): string[] {
 	return result;
 }
 
-export function normalizeSpeciesControlSave(
+export function normalizeSpeciesFilterSave(
 	input: Record<string, unknown>,
-): SpeciesControlSaveInput {
+): SpeciesFilterSaveInput {
 	const removals = Array.isArray(input.removeUnresolved)
 		? input.removeUnresolved
 				.map((entry) => {
@@ -179,7 +179,7 @@ export function normalizeSpeciesControlSave(
 		return true;
 	});
 
-	return speciesControlSaveSchema.parse({
+	return speciesFilterSaveSchema.parse({
 		revision:
 			typeof input.revision === "string"
 				? input.revision.trim()

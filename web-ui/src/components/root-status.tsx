@@ -63,9 +63,9 @@ export function RouteError({ error }: ErrorComponentProps) {
 	useEffect(() => {
 		if (!signedOut) return;
 		const { href: next, pathname } = router.state.location;
-		if (pathname === "/account") return;
+		if (pathname === "/sign-in") return;
 		forgetUnlockStatus();
-		void navigate({ to: "/account", search: { next }, replace: true });
+		void navigate({ to: "/sign-in", search: { next }, replace: true });
 	}, [signedOut, navigate, router]);
 
 	if (signedOut) return null;

@@ -2,44 +2,44 @@ import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
-	SpeciesControlPage,
-	SpeciesControlPageSkeleton,
-} from "~/components/species-control/species-control-page.tsx";
+	SpeciesFilterPage,
+	SpeciesFilterPageSkeleton,
+} from "~/components/species-filter/species-filter-page.tsx";
 import { pageHead } from "~/lib/link-preview.ts";
 import { FORM_QUERY } from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
-	getSpeciesControlPage,
-	saveSpeciesControl,
-} from "~/lib/species-control.ts";
-import { speciesControlWorkspaceSearchSchema } from "~/lib/species-control-workspace.ts";
+	getSpeciesFilterPage,
+	saveSpeciesFilter,
+} from "~/lib/species-filter.ts";
+import { speciesFilterWorkspaceSearchSchema } from "~/lib/species-filter-workspace.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
-const speciesControlQuery = queryOptions({
+const speciesFilterQuery = queryOptions({
 	...FORM_QUERY,
-	queryKey: ["species-control"],
-	queryFn: () => getSpeciesControlPage(),
+	queryKey: ["species-filter"],
+	queryFn: () => getSpeciesFilterPage(),
 });
 
-export const Route = createFileRoute("/species-control")({
-	head: () => pageHead("Species Control"),
-	validateSearch: speciesControlWorkspaceSearchSchema,
+export const Route = createFileRoute("/species-filter")({
+	head: () => pageHead("Species Filter"),
+	validateSearch: speciesFilterWorkspaceSearchSchema,
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
-	component: SpeciesControlRoute,
+	component: SpeciesFilterRoute,
 });
 
-function SpeciesControlRoute() {
-	const page = useSkeletonMinimum(useQuery(speciesControlQuery).data);
+function SpeciesFilterRoute() {
+	const page = useSkeletonMinimum(useQuery(speciesFilterQuery).data);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const save = useServerFn(saveSpeciesControl);
+	const save = useServerFn(saveSpeciesFilter);
 	const queryClient = useQueryClient();
 
-	if (!page) return <SpeciesControlPageSkeleton search={search} />;
+	if (!page) return <SpeciesFilterPageSkeleton search={search} />;
 
 	return (
-		<SpeciesControlPage
+		<SpeciesFilterPage
 			initialData={page}
 			search={search}
 			onSearchChange={(nextSearch) =>

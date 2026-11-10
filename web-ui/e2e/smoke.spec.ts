@@ -10,7 +10,7 @@ import { DEV_PASSWORD } from "../src/lib/dev-password.ts";
  */
 
 const PUBLIC_PAGES = ["/live", "/timeline", "/detections", "/birds", "/learn"];
-const GATED_PAGES = ["/review", "/settings", "/species-control"];
+const GATED_PAGES = ["/review", "/settings", "/species-filter"];
 // The dev server's own password; set SMOKE_PASSWORD to test any other station.
 const PASSWORD = process.env.SMOKE_PASSWORD ?? DEV_PASSWORD;
 
@@ -71,20 +71,20 @@ test("an unknown address gets the not-found card", async ({ page }) => {
 });
 
 test.describe("gated pages", () => {
-	test("redirect to /account while locked", async ({ page }) => {
+	test("redirect to /sign-in while locked", async ({ page }) => {
 		for (const path of GATED_PAGES) {
 			await page.goto(path);
-			await expect(page).toHaveURL(/\/account/);
+			await expect(page).toHaveURL(/\/sign-in/);
 		}
 	});
 
 	test("load once unlocked", async ({ page }) => {
-		await page.goto("/account");
+		await page.goto("/sign-in");
 		// Typing before hydration leaves the form's state empty.
 		await page.waitForLoadState("networkidle");
-		await page.getByLabel("Station password").fill(PASSWORD);
+		await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
 		await page.getByRole("button", { name: "Sign in", exact: true }).click();
-		await expect(page.getByLabel("Station password")).toHaveCount(0);
+		await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
 
 		for (const path of GATED_PAGES) {
 			await expectPageLoads(page, path);

@@ -3,11 +3,11 @@ import { test } from "node:test";
 
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { SpeciesSelectionBar } from "~/components/species-control/species-control-page.tsx";
-import { SpeciesControlTable } from "~/components/species-control/species-control-table.tsx";
+import { SpeciesSelectionBar } from "~/components/species-filter/species-filter-page.tsx";
+import { SpeciesFilterTable } from "~/components/species-filter/species-filter-table.tsx";
 
 const html = renderToStaticMarkup(
-	<SpeciesControlTable
+	<SpeciesFilterTable
 		rows={[]}
 		page={1}
 		pageCount={3}

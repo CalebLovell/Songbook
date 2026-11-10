@@ -35,7 +35,7 @@ import {
 	readSettingsPageValues,
 	resolveSettingsPath,
 } from "./settings-config.server.ts";
-import { resolveSpeciesListDirectory } from "./species-control.server.ts";
+import { resolveSpeciesListDirectory } from "./species-filter.server.ts";
 
 export type DataPaths = {
 	databasePath: string;

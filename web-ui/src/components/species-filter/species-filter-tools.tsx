@@ -10,7 +10,7 @@ const SEGMENT_CLASS =
 	"flex items-center gap-2 @max-[30rem]:px-3 px-3.5 hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent [&+&]:border-input [&+&]:border-l";
 const LISTS_WORD = "@max-[30rem]:hidden";
 
-export function SpeciesControlTools({
+export function SpeciesFilterTools({
 	onImport,
 	onExport,
 	onReset,

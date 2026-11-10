@@ -36,16 +36,16 @@ export const PAGE_HEADERS = {
 		title: "Learn the calls",
 		description: "Test your knowledge of the bird calls from your station.",
 	},
-	speciesControl: {
-		title: "Species Control",
+	speciesFilter: {
+		title: "Species Filter",
 		description: "Decide which installed species BirdNET may detect.",
 	},
 	settings: {
 		title: "Settings",
 		description: "Adjust how your station runs.",
 	},
-	account: {
-		title: "Account",
-		description: "Manage access to your station.",
+	signIn: {
+		title: "Sign in",
+		description: "Sign in to manage your station.",
 	},
 } as const;

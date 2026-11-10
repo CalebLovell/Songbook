@@ -10,13 +10,13 @@ test("requireUnlocked lets an unlocked visitor through", () => {
 	assert.equal(requireUnlocked({ unlocked: true }, location), undefined);
 });
 
-test("requireUnlocked sends a locked visitor to /account with where they were going", () => {
+test("requireUnlocked sends a locked visitor to /sign-in with where they were going", () => {
 	try {
 		requireUnlocked({ unlocked: false }, location);
 		assert.fail("expected a redirect");
 	} catch (thrown) {
 		assert.ok(isRedirect(thrown));
-		assert.equal(thrown.options.to, "/account");
+		assert.equal(thrown.options.to, "/sign-in");
 		assert.deepEqual(thrown.options.search, { next: "/settings#storage" });
 	}
 });

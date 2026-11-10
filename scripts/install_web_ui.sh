@@ -138,7 +138,7 @@ ensure_password() {
     return 0
   fi
   if { : < /dev/tty; } 2>/dev/null; then
-    echo "Choose a password for the web UI's Settings, Review and Species control."
+    echo "Choose a password for the web UI's Settings, Review and Species filter."
     for attempt in 1 2 3; do
       "$my_dir/set_web_ui_password.sh" < /dev/tty && return 0
     done

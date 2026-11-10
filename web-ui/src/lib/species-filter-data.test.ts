@@ -2,15 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
 	applySpeciesStatus,
-	normalizeSpeciesControlSave,
-	speciesControlInputWithStatus,
-	speciesControlResetInput,
-	speciesControlSaveSchema,
+	normalizeSpeciesFilterSave,
+	speciesFilterInputWithStatus,
+	speciesFilterResetInput,
+	speciesFilterSaveSchema,
 	speciesStatusFor,
-} from "./species-control-data.ts";
+} from "./species-filter-data.ts";
 
 test("reset input clears managed lists without removing unresolved entries", () => {
-	assert.deepEqual(speciesControlResetInput("revision-42"), {
+	assert.deepEqual(speciesFilterResetInput("revision-42"), {
 		revision: "revision-42",
 		custom: [],
 		excluded: [],
@@ -28,7 +28,7 @@ test("bulk status input proposes a save without mutating current lists", () => {
 		removeUnresolved: [],
 	};
 	assert.deepEqual(
-		speciesControlInputWithStatus(
+		speciesFilterInputWithStatus(
 			current,
 			["Canis latrans", "Sciurus carolinensis"],
 			"always",
@@ -95,7 +95,7 @@ test("applying a status produces mutually exclusive list memberships", () => {
 
 test("save normalization trims, stably deduplicates, and preserves list order", () => {
 	assert.deepEqual(
-		normalizeSpeciesControlSave({
+		normalizeSpeciesFilterSave({
 			revision: "abc",
 			custom: [" Canis latrans ", "Sciurus carolinensis", "Canis latrans"],
 			excluded: [" Procyon lotor ", "Procyon lotor"],
@@ -123,20 +123,20 @@ test("save schema rejects invalid scientific names, oversized lists, and extra k
 		whitelisted: [],
 		removeUnresolved: [],
 	};
-	assert.equal(speciesControlSaveSchema.safeParse(base).success, true);
+	assert.equal(speciesFilterSaveSchema.safeParse(base).success, true);
 	assert.equal(
-		speciesControlSaveSchema.safeParse({ ...base, custom: ["coyote"] }).success,
+		speciesFilterSaveSchema.safeParse({ ...base, custom: ["coyote"] }).success,
 		false,
 	);
 	assert.equal(
-		speciesControlSaveSchema.safeParse({
+		speciesFilterSaveSchema.safeParse({
 			...base,
 			custom: Array.from({ length: 7_001 }, () => "Canis latrans"),
 		}).success,
 		false,
 	);
 	assert.equal(
-		speciesControlSaveSchema.safeParse({ ...base, filesystemPath: "C:/" })
+		speciesFilterSaveSchema.safeParse({ ...base, filesystemPath: "C:/" })
 			.success,
 		false,
 	);

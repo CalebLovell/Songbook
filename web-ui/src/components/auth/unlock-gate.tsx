@@ -3,7 +3,6 @@ import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, FlaskConical, KeyRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { SIGN_IN_CARD_TITLE } from "~/components/auth/session-card.tsx";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
@@ -13,6 +12,8 @@ import { DEV_PASSWORD } from "~/lib/dev-password.ts";
 import { SITE_NAME } from "~/lib/page-title.ts";
 import { messageForThrown, UNLOCK_MESSAGES } from "~/lib/unlock-messages.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
+
+export const SIGN_IN_CARD_TITLE = "Sign-in";
 
 export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 	const unlock = useServerFn(unlockFn);
@@ -64,36 +65,29 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 			onSubmit={onSubmit}
 		>
 			<CardHeader as="h2" titleId="unlock-title" title={SIGN_IN_CARD_TITLE} />
+			<input
+				type="text"
+				name="username"
+				autoComplete="username"
+				value={SITE_NAME}
+				readOnly
+				tabIndex={-1}
+				aria-hidden="true"
+				className="sr-only"
+			/>
 			<div className="grid gap-4 sm:grid-cols-2">
-				<div className="space-y-1.5 sm:col-start-1">
-					<label
-						htmlFor="station-username"
-						className="block font-medium text-sm"
-					>
-						Username
-					</label>
-					<Input
-						id="station-username"
-						name="username"
-						type="text"
-						autoComplete="username"
-						value={SITE_NAME}
-						readOnly
-						className="bg-meadow text-muted-foreground hover:bg-meadow hover:text-muted-foreground"
-					/>
-				</div>
 				<div className="space-y-1.5 sm:col-start-1">
 					<label
 						htmlFor="station-password"
 						className="block font-medium text-sm"
 					>
-						Station password
+						Password
 					</label>
 					<Input
 						ref={field}
 						id="station-password"
-						aria-describedby="station-password-hint"
 						aria-invalid={error ? true : undefined}
+						aria-describedby="station-password-error"
 						name="password"
 						type="password"
 						autoComplete="current-password"
@@ -101,14 +95,20 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 						onChange={(event) => setPassword(event.target.value)}
 					/>
 					<p
-						id="station-password-hint"
-						className="text-muted-foreground text-xs leading-relaxed"
+						id="station-password-error"
+						aria-live="polite"
+						role="alert"
+						className="m-0 flex min-w-0 items-start gap-1.5 text-destructive text-xs"
 					>
-						Set on the Pi with{" "}
-						<code className="font-sans tabular-nums">
-							scripts/set_web_ui_password.sh
-						</code>
-						.
+						{error ? (
+							<>
+								<AlertTriangle
+									aria-hidden="true"
+									className="mt-px size-3.5 shrink-0"
+								/>
+								<span>{error}</span>
+							</>
+						) : null}
 					</p>
 				</div>
 			</div>
@@ -134,21 +134,6 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 						Dev sign-in
 					</Button>
 				) : null}
-				<p
-					aria-live="polite"
-					role="alert"
-					className="flex min-w-0 items-start gap-2 text-destructive text-xs"
-				>
-					{error ? (
-						<>
-							<AlertTriangle
-								aria-hidden="true"
-								className="mt-px size-3.5 shrink-0"
-							/>
-							<span>{error}</span>
-						</>
-					) : null}
-				</p>
 			</div>
 		</Card>
 	);

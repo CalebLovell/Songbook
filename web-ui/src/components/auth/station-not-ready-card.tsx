@@ -1,21 +1,14 @@
 import { AlertTriangle } from "lucide-react";
-import { SIGN_IN_CARD_TITLE } from "~/components/auth/session-card.tsx";
+import { SIGN_IN_CARD_TITLE } from "~/components/auth/unlock-gate.tsx";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Card } from "~/components/ui/card.tsx";
+import { UNLOCK_MESSAGES } from "~/lib/unlock-messages.ts";
 
-const COPY = {
-	"not-set-up": {
-		title: "No password yet",
-		body: "This station doesn't have a password yet, so nobody can sign in. Set one on the Pi, then reload this page:",
-	},
-	misconfigured: {
-		title: "Sign-in unavailable",
-		body: "The station can't read its password file, so nobody can sign in. Its log says why. Setting the password again on the Pi writes a fresh file:",
-	},
-} as const;
-
-export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
-	const { title, body } = COPY[state];
+export function StationNotReadyCard({
+	state,
+}: {
+	state: "not-set-up" | "misconfigured";
+}) {
 	return (
 		<Card
 			as="section"
@@ -27,26 +20,10 @@ export function StationNotReadyCard({ state }: { state: keyof typeof COPY }) {
 				titleId="station-not-ready"
 				title={SIGN_IN_CARD_TITLE}
 			/>
-			<div role="status" className="flex items-start gap-2 text-bark text-sm">
+			<p role="status" className="m-0 flex items-start gap-2 text-bark text-sm">
 				<AlertTriangle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-				<div className="space-y-2">
-					<p className="font-semibold">{title}</p>
-					<p>{body}</p>
-					<p>
-						<code className="font-sans tabular-nums">
-							sudo scripts/set_web_ui_password.sh
-						</code>
-					</p>
-					{state === "misconfigured" ? (
-						<p>
-							The log:{" "}
-							<code className="font-sans tabular-nums">
-								journalctl -u birdnet_web_ui
-							</code>
-						</p>
-					) : null}
-				</div>
-			</div>
+				<span>{UNLOCK_MESSAGES[state]}</span>
+			</p>
 		</Card>
 	);
 }

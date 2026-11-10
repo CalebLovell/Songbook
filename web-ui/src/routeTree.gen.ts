@@ -8,13 +8,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AccountRouteImport } from './routes/account'
 import { Route as DetectionsRouteImport } from './routes/detections'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SpeciesControlRouteImport } from './routes/species-control'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SpeciesFilterRouteImport } from './routes/species-filter'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as ApiLiveStreamRouteImport } from './routes/api/live-stream'
 import { Route as BirdsIndexRouteImport } from './routes/birds.index'
@@ -27,11 +27,6 @@ import { Route as ApiAudioDateSpeciesAndFileRouteImport } from './routes/api/aud
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DetectionsRoute = DetectionsRouteImport.update({
@@ -59,9 +54,14 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SpeciesControlRoute = SpeciesControlRouteImport.update({
-  id: '/species-control',
-  path: '/species-control',
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeciesFilterRoute = SpeciesFilterRouteImport.update({
+  id: '/species-filter',
+  path: '/species-filter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TimelineRoute = TimelineRouteImport.update({
@@ -108,13 +108,13 @@ const ApiAudioDateSpeciesAndFileRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
   '/detections': typeof DetectionsRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
-  '/species-control': typeof SpeciesControlRoute
+  '/sign-in': typeof SignInRoute
+  '/species-filter': typeof SpeciesFilterRoute
   '/timeline': typeof TimelineRoute
   '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
@@ -126,13 +126,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
   '/detections': typeof DetectionsRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
-  '/species-control': typeof SpeciesControlRoute
+  '/sign-in': typeof SignInRoute
+  '/species-filter': typeof SpeciesFilterRoute
   '/timeline': typeof TimelineRoute
   '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
@@ -145,13 +145,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
   '/detections': typeof DetectionsRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
-  '/species-control': typeof SpeciesControlRoute
+  '/sign-in': typeof SignInRoute
+  '/species-filter': typeof SpeciesFilterRoute
   '/timeline': typeof TimelineRoute
   '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
@@ -165,13 +165,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/account'
     | '/detections'
     | '/learn'
     | '/live'
     | '/review'
     | '/settings'
-    | '/species-control'
+    | '/sign-in'
+    | '/species-filter'
     | '/timeline'
     | '/api/live-stream'
     | '/birds/$comName'
@@ -183,13 +183,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/account'
     | '/detections'
     | '/learn'
     | '/live'
     | '/review'
     | '/settings'
-    | '/species-control'
+    | '/sign-in'
+    | '/species-filter'
     | '/timeline'
     | '/api/live-stream'
     | '/birds/$comName'
@@ -201,13 +201,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/account'
     | '/detections'
     | '/learn'
     | '/live'
     | '/review'
     | '/settings'
-    | '/species-control'
+    | '/sign-in'
+    | '/species-filter'
     | '/timeline'
     | '/api/live-stream'
     | '/birds/$comName'
@@ -220,13 +220,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AccountRoute: typeof AccountRoute
   DetectionsRoute: typeof DetectionsRoute
   LearnRoute: typeof LearnRoute
   LiveRoute: typeof LiveRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
-  SpeciesControlRoute: typeof SpeciesControlRoute
+  SignInRoute: typeof SignInRoute
+  SpeciesFilterRoute: typeof SpeciesFilterRoute
   TimelineRoute: typeof TimelineRoute
   ApiLiveStreamRoute: typeof ApiLiveStreamRoute
   BirdsComNameRoute: typeof BirdsComNameRoute
@@ -244,13 +244,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/detections': {
@@ -288,11 +281,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/species-control': {
-      id: '/species-control'
-      path: '/species-control'
-      fullPath: '/species-control'
-      preLoaderRoute: typeof SpeciesControlRouteImport
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/species-filter': {
+      id: '/species-filter'
+      path: '/species-filter'
+      fullPath: '/species-filter'
+      preLoaderRoute: typeof SpeciesFilterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/timeline': {
@@ -356,13 +356,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AccountRoute: AccountRoute,
   DetectionsRoute: DetectionsRoute,
   LearnRoute: LearnRoute,
   LiveRoute: LiveRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
-  SpeciesControlRoute: SpeciesControlRoute,
+  SignInRoute: SignInRoute,
+  SpeciesFilterRoute: SpeciesFilterRoute,
   TimelineRoute: TimelineRoute,
   ApiLiveStreamRoute: ApiLiveStreamRoute,
   BirdsComNameRoute: BirdsComNameRoute,

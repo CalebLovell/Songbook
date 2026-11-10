@@ -32,26 +32,26 @@ import {
 import { SortButton, SortMenu } from "~/components/ui/table-sort.tsx";
 import { useShiftClickRange } from "~/lib/shift-click-range.ts";
 import type {
-	SpeciesControlRow,
+	SpeciesFilterRow,
 	SpeciesStatus,
-} from "~/lib/species-control-data.ts";
+} from "~/lib/species-filter-data.ts";
 import {
-	SPECIES_CONTROL_DEFAULT_DIRECTION,
-	SPECIES_CONTROL_SORTS,
-	type SpeciesControlSort,
-} from "~/lib/species-control-workspace.ts";
+	SPECIES_FILTER_DEFAULT_DIRECTION,
+	SPECIES_FILTER_SORTS,
+	type SpeciesFilterSort,
+} from "~/lib/species-filter-workspace.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import type { SortDirection } from "~/lib/table-sort.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { cn } from "~/lib/utils.ts";
 
-export type SpeciesControlViewRow = SpeciesControlRow & {
+export type SpeciesFilterViewRow = SpeciesFilterRow & {
 	status: SpeciesStatus;
 };
 
-export type SpeciesSortKey = SpeciesControlSort;
+export type SpeciesSortKey = SpeciesFilterSort;
 
-export const SPECIES_CONTROL_PAGE_SIZE = 100;
+export const SPECIES_FILTER_PAGE_SIZE = 100;
 
 const STATUS_RANK: Record<SpeciesStatus, number> = {
 	automatic: 0,
@@ -60,11 +60,11 @@ const STATUS_RANK: Record<SpeciesStatus, number> = {
 	never: 3,
 };
 
-export function sortSpeciesControlRows(
-	rows: SpeciesControlViewRow[],
+export function sortSpeciesFilterRows(
+	rows: SpeciesFilterViewRow[],
 	sort: SpeciesSortKey,
 	direction: SortDirection,
-): SpeciesControlViewRow[] {
+): SpeciesFilterViewRow[] {
 	const multiplier = direction === "asc" ? 1 : -1;
 	return [...rows].sort((left, right) => {
 		if (sort === "count") {
@@ -141,7 +141,7 @@ const STATUS_PRESENTATION: Record<
 	},
 };
 
-export function SpeciesControlTable({
+export function SpeciesFilterTable({
 	rows,
 	page,
 	pageCount,
@@ -153,7 +153,7 @@ export function SpeciesControlTable({
 	onPageChange,
 	actions,
 }: {
-	rows: SpeciesControlViewRow[] | null;
+	rows: SpeciesFilterViewRow[] | null;
 	page: number;
 	pageCount: number;
 	selected: Set<string>;
@@ -165,9 +165,8 @@ export function SpeciesControlTable({
 	actions?: ReactNode;
 }) {
 	const allSelected = rows?.every((row) => selected.has(row.sciName));
-	const firstIndex = (page - 1) * SPECIES_CONTROL_PAGE_SIZE + 1;
-	const lastIndex =
-		firstIndex + (rows?.length ?? SPECIES_CONTROL_PAGE_SIZE) - 1;
+	const firstIndex = (page - 1) * SPECIES_FILTER_PAGE_SIZE + 1;
+	const lastIndex = firstIndex + (rows?.length ?? SPECIES_FILTER_PAGE_SIZE) - 1;
 
 	const rowsForClick = useShiftClickRange(selected.size > 0);
 	const actionsId = useId();
@@ -278,12 +277,12 @@ export function SpeciesControlTable({
 								<StatusTip />
 								<SortMenu
 									label="Sort species by"
-									sorts={SPECIES_CONTROL_SORTS}
+									sorts={SPECIES_FILTER_SORTS}
 									labels={SORT_LABELS}
 									sort={sort}
 									direction={direction}
 									reversed={
-										direction !== SPECIES_CONTROL_DEFAULT_DIRECTION[sort]
+										direction !== SPECIES_FILTER_DEFAULT_DIRECTION[sort]
 									}
 									onSort={onSortChange}
 									onFlip={() => onSortChange(sort)}
@@ -300,7 +299,7 @@ export function SpeciesControlTable({
 					className="scrollbar-gutter-stable col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
 				>
 					{rows === null
-						? Array.from({ length: SPECIES_CONTROL_PAGE_SIZE }, (_, index) => (
+						? Array.from({ length: SPECIES_FILTER_PAGE_SIZE }, (_, index) => (
 								<SkeletonRow
 									// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 									key={index}
