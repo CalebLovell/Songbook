@@ -63,30 +63,26 @@ function flagTip(name: string, meaning: ReactNode): ReactNode {
 	);
 }
 
-const NEW_PILL_STYLE: CSSProperties = {
-	backgroundColor: "color-mix(in oklab, #3f6ea6 20%, var(--paper-raised))",
-	color: "#2a4d78",
-};
+export function hueTint(
+	hue: string,
+	lightText: string,
+	share: number,
+): CSSProperties {
+	return {
+		backgroundColor: `color-mix(in oklab, ${hue} ${share}%, var(--paper-raised))`,
+		color: `light-dark(${lightText}, color-mix(in oklab, ${hue} 45%, white))`,
+	};
+}
 
-const RETURNED_PILL_STYLE: CSSProperties = {
-	backgroundColor: "color-mix(in oklab, #a8536e 20%, var(--paper-raised))",
-	color: "#733a4e",
-};
+const NEW_PILL_STYLE: CSSProperties = hueTint("#3f6ea6", "#2a4d78", 20);
 
-const RARE_PILL_STYLE: CSSProperties = {
-	backgroundColor: "color-mix(in oklab, #6f5c9c 22%, var(--paper-raised))",
-	color: "#463a73",
-};
+const RETURNED_PILL_STYLE: CSSProperties = hueTint("#a8536e", "#733a4e", 20);
 
-const CONSISTENT_PILL_STYLE: CSSProperties = {
-	backgroundColor: "color-mix(in oklab, #2f7d6d 20%, var(--paper-raised))",
-	color: "#1f5248",
-};
+const RARE_PILL_STYLE: CSSProperties = hueTint("#6f5c9c", "#463a73", 22);
 
-const VOCAL_PILL_STYLE: CSSProperties = {
-	backgroundColor: "color-mix(in oklab, #b07a1f 22%, var(--paper-raised))",
-	color: "#6e4a10",
-};
+const CONSISTENT_PILL_STYLE: CSSProperties = hueTint("#2f7d6d", "#1f5248", 20);
+
+const VOCAL_PILL_STYLE: CSSProperties = hueTint("#b07a1f", "#6e4a10", 22);
 
 export const BADGE_STYLES = {
 	new: NEW_PILL_STYLE,

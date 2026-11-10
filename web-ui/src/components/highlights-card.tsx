@@ -15,7 +15,7 @@ import { type CSSProperties, Fragment, type ReactNode } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { GLYPH_CHIP_SIZE, GlyphChip } from "~/components/glyph-chip.tsx";
-import { BADGE_STYLES } from "~/components/species-flag-pills.tsx";
+import { BADGE_STYLES, hueTint } from "~/components/species-flag-pills.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Count } from "~/components/ui/count.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
@@ -124,27 +124,15 @@ function HighlightsInfo({ guide }: { guide: HighlightGuideEntry[] }) {
 
 type SpeciesLine = Extract<Highlight, { kind: SpeciesHighlightKind }>;
 
-const UP_TINT: CSSProperties = {
-	backgroundColor: "color-mix(in oklab, #6b8a3a 22%, var(--paper-raised))",
-	color: "#3d5220",
-};
-const DOWN_TINT: CSSProperties = {
-	backgroundColor: "color-mix(in oklab, #c4524a 20%, var(--paper-raised))",
-	color: "#7d2a24",
-};
+const UP_TINT: CSSProperties = hueTint("#6b8a3a", "#3d5220", 22);
+const DOWN_TINT: CSSProperties = hueTint("#c4524a", "#7d2a24", 20);
 const LINE_TINTS: Record<
 	Exclude<Highlight["kind"], "activity">,
 	CSSProperties
 > = {
 	...BADGE_STYLES,
-	"busiest-hour": {
-		backgroundColor: "color-mix(in oklab, #c8703c 22%, var(--paper-raised))",
-		color: "#7a3f1c",
-	},
-	routine: {
-		backgroundColor: "color-mix(in oklab, #5f6f82 20%, var(--paper-raised))",
-		color: "#3a4654",
-	},
+	"busiest-hour": hueTint("#c8703c", "#7a3f1c", 22),
+	routine: hueTint("#5f6f82", "#3a4654", 20),
 };
 
 const SPECIES_NOTES: Record<

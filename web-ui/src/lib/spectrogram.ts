@@ -14,3 +14,27 @@ export function rampColor(stops: Rgb[], t: number): Rgb {
 		Math.round(from[2] + (to[2] - from[2]) * frac),
 	];
 }
+
+const FALLBACK_GROUND: Rgb = [251, 253, 246];
+const FALLBACK_INK: Rgb = [32, 59, 20];
+
+export function plotColors(): [Rgb, Rgb] {
+	return [
+		tokenRgb("--paper", FALLBACK_GROUND),
+		tokenRgb("--moss", FALLBACK_INK),
+	];
+}
+
+function tokenRgb(name: string, fallback: Rgb): Rgb {
+	const value = getComputedStyle(document.documentElement)
+		.getPropertyValue(name)
+		.trim();
+	const ctx = document
+		.createElement("canvas")
+		.getContext("2d", { willReadFrequently: true });
+	if (!value || !ctx) return fallback;
+	ctx.fillStyle = value;
+	ctx.fillRect(0, 0, 1, 1);
+	const [red, green, blue] = ctx.getImageData(0, 0, 1, 1).data;
+	return [red, green, blue];
+}

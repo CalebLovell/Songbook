@@ -16,6 +16,7 @@ import type { VocalJump } from "~/lib/highlights-data.ts";
 import { compactCount } from "~/lib/number-format.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
 import { formatSunClock, type WindowSun } from "~/lib/sun-times.ts";
+import { useTheme } from "~/lib/theme.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 import { cn } from "~/lib/utils.ts";
 
@@ -338,6 +339,7 @@ function SpeciesHourRowView({
 }
 
 function HeatRow({ row, heatMax }: { row: SpeciesHourRow; heatMax: number }) {
+	const theme = useTheme();
 	return (
 		<div
 			className="grid items-center"
@@ -351,8 +353,8 @@ function HeatRow({ row, heatMax }: { row: SpeciesHourRow; heatMax: number }) {
 						className="mx-0.5 my-1 flex h-6 items-center justify-center overflow-hidden rounded-[3px] text-[10px] tabular-nums leading-none"
 						style={{
 							backgroundColor:
-								count > 0 ? heatColor(count, heatMax) : EMPTY_CELL_COLOR,
-							color: heatInk(count, heatMax),
+								count > 0 ? heatColor(count, heatMax, theme) : EMPTY_CELL_COLOR,
+							color: heatInk(count, heatMax, theme),
 						}}
 					>
 						{count > 0 ? compactCount(count) : null}

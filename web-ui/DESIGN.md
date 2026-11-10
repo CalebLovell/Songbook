@@ -50,19 +50,60 @@ for a meaning; don't write a new mix inline when one exists:
 | `--hover-line` | border of a linked card on hover |
 | `--focus-ring` | keyboard focus, 2px outline, 2px offset; drawn inset on a segment of a joined control (`JOINED_CONTROL_CLASS`), whose group clips outside it |
 | `--muted-foreground` | secondary text (neutral grey, black 49%) |
+| `--shade` | the tint of every shadow and dimming backdrop: ink in light, black in dark (never thin `--ink` for a shadow, it turns into a glow in dark) |
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
 | `--live-fill` | the Live pill |
 | `--row-well` | the slack under a paged list's rows on a short page (`RowWell`) |
-| `--confidence-high/mid/low` | confidence pills; text is moss / bark / ink |
 | `--toast-{success,warning,error}-fill/-line` | toast tones; title is moss / bark / clay, neutral toasts stay white |
 
-Confidence tiers are fixed at ≥90%, ≥75% and below (`lib/confidence.ts`),
-never a gradient. Destructive is clay. Single-series charts are moss. Heat
+Confidence pills are a hue ramp (`lib/confidence.ts`): red-orange at 70%, the
+lowest the station keeps, through amber and yellow to green at 100%; anything
+lower clamps to red-orange. Each theme sets its own fill and text lightness
+(`light-dark()`), kept low in chroma so the pills stay quiet; every step clears 5.5:1. Destructive is clay. Single-series charts are moss. Heat
 shading is a continuous ramp from a pale moss wash to full moss, log-scaled,
 with one scale per chart topped by its busiest cell across every row -- never
 a row's own peak (`lib/heatmap.ts`). The ramp steps over the mixes where neither
 digit colour reaches 4.5:1.
+
+### Dark theme
+
+One dark theme, a warm neutral charcoal, set by `data-theme="dark"` on
+`<html>`. The choice is Light, Dark or System (`lib/theme.ts`), made in the
+`ThemeSwitcher`: a full-width segmented control (icon and label per segment)
+at the foot of the sidebar and phone drawer.
+It is never a nav row and never in the wordmark band or drawer header. Light and
+Dark are saved; System clears the save and follows the device live. A
+`ScriptOnce` in the root sets the attribute before first paint, so pages never
+flash light.
+
+It overrides only the named colors and the few mixes that assumed a white page
+(`:root[data-theme='dark']` in `styles.css`): `--paper` `#1a1a19`,
+`--paper-raised` `#232321`, `--meadow` `#2c2d29`, `--sage` `#43443e`,
+`--ink` `#ecebe4`, `--moss` `oklch(0.74 0.05 135)`, `--sand` `#d3a964`,
+`--bark` `#e6cfb0`, `--clay` `#e08b74`. Lines and tracks thin `--ink` instead
+of moss; secondary text is ink 60%. Every other token follows from the mixes.
+
+Green splits in two in dark. `--moss` is a soft, low-chroma sage for green
+text, charts and the heat ramp: a saturated light green read as a neon
+terminal. Solid fills (`--primary`) stay the deep forest green,
+`oklch(0.44 0.065 135)`, with ink text on top.
+
+- A solid green fill is `bg-primary text-primary-foreground`, never `bg-moss`
+  with text: in light the two match, in dark moss is too pale for light text.
+- Text on a clay fill is `text-paper-raised`, never `text-white`.
+- Heat-map digits pass the theme to `heatColor`/`heatInk`: dark mode skips a
+  wider band of the ramp (55–72% moss) where neither digit colour reaches 4.5:1.
+- Prefer a token. Reach for Tailwind's `dark:` variant only where a value can't
+  be a token (an SVG data URL, like the row checkbox's check).
+- An inline hue tint uses `hueTint` (`species-flag-pills.tsx`): the same fill
+  mix in both themes, and `light-dark()` text that lightens in dark.
+- Illustrations are transparent cutouts and need no dark variant.
+- A canvas reads its colors from the tokens when it paints (`plotColors` in
+  `lib/spectrogram.ts`) and repaints on a theme switch; never bake RGB values
+  into a canvas.
+- `public/offline.html` can't load the stylesheet, so it carries its own copy
+  of both palettes; change it alongside `styles.css`.
 
 ## Type
 

@@ -1,6 +1,8 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { fftMagnitudes } from "~/lib/fft.ts";
+import { plotColors } from "~/lib/spectrogram.ts";
+import { useTheme } from "~/lib/theme.ts";
 import { fetchAudioBlob } from "~/lib/use-playable-audio.ts";
 
 const FFT_SIZE = 1024;
@@ -8,9 +10,6 @@ const HOP = 256;
 const MAX_HZ = 15000;
 const DB_FLOOR = -95;
 const DB_CEIL = -25;
-
-const PAPER: [number, number, number] = [251, 253, 246];
-const MOSS: [number, number, number] = [32, 59, 20];
 
 const NOISE_WIDTH = 320;
 const NOISE_HEIGHT = 100;
@@ -31,11 +30,14 @@ export function Spectrogram({
 }) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [state, setState] = useState<RenderState>("loading");
+	const bufferRef = useRef<AudioBuffer | null>(null);
 	const onDecodedRef = useRef(onDecoded);
 	onDecodedRef.current = onDecoded;
+	const theme = useTheme();
 
 	useEffect(() => {
 		let cancelled = false;
+		bufferRef.current = null;
 		setState("loading");
 
 		async function draw() {
@@ -56,6 +58,7 @@ export function Spectrogram({
 				const blob = await fetchAudioBlob(audioUrl);
 				const buffer = await context.decodeAudioData(await blob.arrayBuffer());
 				if (cancelled) return;
+				bufferRef.current = buffer;
 				paint(canvas, buffer);
 				setState("ready");
 				onDecodedRef.current?.(buffer.duration);
@@ -71,6 +74,12 @@ export function Spectrogram({
 			cancelled = true;
 		};
 	}, [audioUrl]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: repaint with the new theme's tokens
+	useEffect(() => {
+		if (canvasRef.current && bufferRef.current)
+			paint(canvasRef.current, bufferRef.current);
+	}, [theme]);
 
 	return (
 		<div
@@ -108,10 +117,12 @@ export function QuietSpectrogram({
 	children: ReactNode;
 }) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const theme = useTheme();
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: repaint with the new theme's tokens
 	useEffect(() => {
 		if (canvasRef.current) paintNoiseFloor(canvasRef.current);
-	}, []);
+	}, [theme]);
 
 	return (
 		<div
@@ -133,6 +144,7 @@ function paintNoiseFloor(canvas: HTMLCanvasElement): void {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
 	const image = ctx.createImageData(NOISE_WIDTH, NOISE_HEIGHT);
+	const [ground, ink] = plotColors();
 
 	let seed = NOISE_SEED;
 	const random = () => {
@@ -146,9 +158,9 @@ function paintNoiseFloor(canvas: HTMLCanvasElement): void {
 			const speck = random() > 0.985 ? 0.05 : 0;
 			const level = depth ** 7 * 0.42 * random() + speck;
 			const pixel = (y * NOISE_WIDTH + x) * 4;
-			image.data[pixel] = lerp(PAPER[0], MOSS[0], level);
-			image.data[pixel + 1] = lerp(PAPER[1], MOSS[1], level);
-			image.data[pixel + 2] = lerp(PAPER[2], MOSS[2], level);
+			image.data[pixel] = lerp(ground[0], ink[0], level);
+			image.data[pixel + 1] = lerp(ground[1], ink[1], level);
+			image.data[pixel + 2] = lerp(ground[2], ink[2], level);
 			image.data[pixel + 3] = 255;
 		}
 	}
@@ -179,6 +191,7 @@ function paint(canvas: HTMLCanvasElement, buffer: AudioBuffer): void {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
 	const image = ctx.createImageData(frameCount, maxBin);
+	const [ground, ink] = plotColors();
 
 	const real = new Float32Array(FFT_SIZE);
 	const imag = new Float32Array(FFT_SIZE);
@@ -197,9 +210,9 @@ function paint(canvas: HTMLCanvasElement, buffer: AudioBuffer): void {
 			const level = clamp01((db - DB_FLOOR) / (DB_CEIL - DB_FLOOR));
 			const y = maxBin - 1 - bin;
 			const pixel = (y * frameCount + frame) * 4;
-			image.data[pixel] = lerp(PAPER[0], MOSS[0], level);
-			image.data[pixel + 1] = lerp(PAPER[1], MOSS[1], level);
-			image.data[pixel + 2] = lerp(PAPER[2], MOSS[2], level);
+			image.data[pixel] = lerp(ground[0], ink[0], level);
+			image.data[pixel + 1] = lerp(ground[1], ink[1], level);
+			image.data[pixel + 2] = lerp(ground[2], ink[2], level);
 			image.data[pixel + 3] = 255;
 		}
 	}

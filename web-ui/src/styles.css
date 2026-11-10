@@ -3,6 +3,8 @@
 
 @import 'tw-animate-css';
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 :root {
   /* Named palette -- greens borrowed from adaline.ai's site: a near-white
      paper ground, deep forest-green primary, and a muted sage secondary. */
@@ -30,6 +32,7 @@
 	   instead drains the chroma and the 2px ring just reads black. */
 	--focus-ring: color-mix(in oklch, var(--moss) 50%, oklch(0.3 0.17 145));
   --kicker: var(--moss);
+	--shade: var(--ink);
 
 	/* Named tints. Each is one colour pushed into paper; they live here so a
 	   component asks for a meaning rather than re-deriving a mix inline.
@@ -41,11 +44,6 @@
 	   A warm off-white, picked by eye over cream, grey and the paper ground: a
 	   literal because no mix of the named colours lands on it. */
 	--row-well: #fafaf5;
-	/* The three confidence tiers (see lib/confidence.ts), each paired with a
-	   text colour: moss, bark, ink. */
-	--confidence-high: color-mix(in oklab, var(--moss) 12%, var(--paper-raised));
-	--confidence-mid: color-mix(in oklab, var(--sand) 20%, var(--paper-raised));
-	--confidence-low: color-mix(in oklab, var(--sage) 32%, var(--paper-raised));
 	/* Toast tones (ui/toaster.tsx): a fill and a border per outcome, with the
 	   title in the full colour. Done is moss, done-with-a-catch is sand with
 	   bark text, failed is clay. Neutral news (info, in progress) stays white. */
@@ -115,13 +113,11 @@
   --color-hover-line: var(--hover-line);
   --color-focus-ring: var(--focus-ring);
   --color-kicker: var(--kicker);
+  --color-shade: var(--shade);
   --color-icon-well: var(--icon-well);
   --color-row-selected: var(--row-selected);
   --color-live-fill: var(--live-fill);
   --color-row-well: var(--row-well);
-  --color-confidence-high: var(--confidence-high);
-  --color-confidence-mid: var(--confidence-mid);
-  --color-confidence-low: var(--confidence-low);
   --color-toast-success-fill: var(--toast-success-fill);
   --color-toast-success-line: var(--toast-success-line);
   --color-toast-warning-fill: var(--toast-warning-fill);
@@ -340,4 +336,27 @@
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #1a1a19;
+  --paper-raised: #232321;
+  --ink: #ecebe4;
+  --moss: oklch(0.74 0.05 135);
+  --sage: #43443e;
+  --sand: #d3a964;
+  --bark: #e6cfb0;
+  --clay: #e08b74;
+  --meadow: #2c2d29;
+  --row-well: #1e1e1d;
+  --surface: var(--paper-raised);
+  --line: color-mix(in oklab, var(--ink) 14%, transparent);
+  --track: color-mix(in oklab, var(--ink) 22%, transparent);
+  --hover-line: color-mix(in oklab, var(--moss) 50%, var(--line));
+  --focus-ring: var(--moss);
+  --shade: black;
+  --muted-foreground: color-mix(in oklab, var(--ink) 60%, var(--paper-raised));
+  --primary: oklch(0.44 0.065 135);
+  --primary-foreground: var(--ink);
 }

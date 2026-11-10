@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useId } from "react";
 
+import { ThemeSwitcher } from "~/components/sidebar/theme-switcher.tsx";
 import { useSettingsMark } from "~/lib/use-settings-mark.ts";
 
 const NAV_ROW_CLASS =
@@ -127,6 +128,10 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					</>
 				) : null}
 			</nav>
+
+			<div className="pt-page">
+				<ThemeSwitcher />
+			</div>
 		</div>
 	);
 }

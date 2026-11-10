@@ -16,7 +16,8 @@ import {
 	liveAudioIsPlaying,
 	liveAudioReadout,
 } from "~/lib/live-audio-machine.ts";
-import { type Rgb, rampColor } from "~/lib/spectrogram.ts";
+import { plotColors, rampColor } from "~/lib/spectrogram.ts";
+import { useTheme } from "~/lib/theme.ts";
 import { useLiveAudio } from "~/lib/use-live-audio.ts";
 
 const STREAM_URL = "/api/live-stream";
@@ -146,23 +147,17 @@ function LiveWaterfall({
 	analyser: AnalyserNode | null;
 	active: boolean;
 }) {
+	const theme = useTheme();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: the ramp reads theme tokens, so a theme switch restarts it
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas || !analyser || !active) return;
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
 
-		const styles = getComputedStyle(canvas);
-		const background = readRgb(
-			styles.getPropertyValue("--paper"),
-			[251, 253, 246],
-		);
-		const stops: Rgb[] = [
-			background,
-			readRgb(styles.getPropertyValue("--moss"), [32, 59, 20]),
-		];
+		const stops = plotColors();
 
 		const bins = analyser.frequencyBinCount;
 		const data = new Uint8Array(bins);
@@ -184,7 +179,7 @@ function LiveWaterfall({
 		};
 		raf = requestAnimationFrame(draw);
 		return () => cancelAnimationFrame(raf);
-	}, [analyser, active]);
+	}, [analyser, active, theme]);
 
 	return (
 		// biome-ignore lint/a11y/noAriaHiddenOnFocusable: the spectrogram is a purely decorative live visualization with no accessible content
@@ -196,12 +191,4 @@ function LiveWaterfall({
 			aria-hidden="true"
 		/>
 	);
-}
-
-function readRgb(value: string, fallback: Rgb): Rgb {
-	const hex = value.trim().replace("#", "");
-	if (hex.length !== 6) return fallback;
-	const n = Number.parseInt(hex, 16);
-	if (Number.isNaN(n)) return fallback;
-	return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }

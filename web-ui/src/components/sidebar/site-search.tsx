@@ -237,7 +237,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 					collisionPadding={16}
 					onOpenAutoFocus={(event) => event.preventDefault()}
 					onCloseAutoFocus={(event) => event.preventDefault()}
-					className="z-50 w-88 max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-line bg-paper-raised py-1 shadow-[0_6px_18px_color-mix(in_oklab,var(--ink)_8%,transparent)]"
+					className="z-50 w-88 max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-line bg-paper-raised py-1 shadow-[0_6px_18px_color-mix(in_oklab,var(--shade)_8%,transparent)]"
 				>
 					<div id={listId} role="listbox" aria-label="Search results">
 						{results.map((result, index) => (

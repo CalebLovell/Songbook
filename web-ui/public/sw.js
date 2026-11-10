@@ -1,4 +1,4 @@
-const CACHE = "songbook-offline-v1";
+const CACHE = "songbook-offline-v2";
 const OFFLINE_PAGE = "/offline.html";
 const OFFLINE_FILES = [OFFLINE_PAGE, "/songbook.svg"];
 

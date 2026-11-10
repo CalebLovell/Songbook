@@ -84,7 +84,7 @@ export function MobileNav() {
 					aria-hidden="true"
 					tabIndex={-1}
 					onClick={() => setIsOpen(false)}
-					className={`absolute inset-0 h-full w-full bg-[color-mix(in_oklab,var(--ink)_35%,transparent)] ${
+					className={`absolute inset-0 h-full w-full bg-[color-mix(in_oklab,var(--shade)_35%,transparent)] ${
 						isOpen ? "opacity-100" : "opacity-0"
 					}`}
 				/>

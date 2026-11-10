@@ -18,3 +18,10 @@ test("digits are dark up to the band and pale from its far side", () => {
 	assert.equal(heatInk(countAtMoss(63), 1000), "var(--paper)");
 	assert.equal(heatInk(countAtMoss(80), 1000), "var(--paper)");
 });
+
+test("dark mode steps over its own, wider band", () => {
+	assert.match(heatColorAt(shareAtMoss(64), "dark"), /var\(--moss\) 72\.0%/);
+	assert.match(heatColorAt(shareAtMoss(54), "dark"), /var\(--moss\) 54\.0%/);
+	assert.equal(heatInk(countAtMoss(50), 1000, "dark"), "var(--foreground)");
+	assert.equal(heatInk(countAtMoss(64), 1000, "dark"), "var(--paper)");
+});

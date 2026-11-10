@@ -3,37 +3,75 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="theme-color" content="#fbfdf6" />
+		<meta name="theme-color" content="#fbfdf6" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#1a1a19" media="(prefers-color-scheme: dark)" />
 		<title>Offline · Songbook</title>
+		<script>
+			try {
+				const saved = localStorage.getItem("songbook-theme");
+				if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+			} catch {}
+		</script>
 		<style>
+			:root {
+				--paper: #fbfdf6;
+				--ink: #0a1d08;
+				--heading: #203b14;
+				--muted: color-mix(in oklab, black 49%, #fff);
+				--fill: #203b14;
+				--fill-text: #fff;
+				--ring: #203b14;
+			}
+			@media (prefers-color-scheme: dark) {
+				:root:not([data-theme="light"]) {
+					color-scheme: dark;
+					--paper: #1a1a19;
+					--ink: #ecebe4;
+					--heading: oklch(0.74 0.05 135);
+					--muted: color-mix(in oklab, #ecebe4 60%, #232321);
+					--fill: oklch(0.44 0.065 135);
+					--fill-text: #ecebe4;
+					--ring: oklch(0.74 0.05 135);
+				}
+			}
+			:root[data-theme="dark"] {
+				color-scheme: dark;
+				--paper: #1a1a19;
+				--ink: #ecebe4;
+				--heading: oklch(0.74 0.05 135);
+				--muted: color-mix(in oklab, #ecebe4 60%, #232321);
+				--fill: oklch(0.44 0.065 135);
+				--fill-text: #ecebe4;
+				--ring: oklch(0.74 0.05 135);
+			}
 			* { margin: 0; box-sizing: border-box; }
 			body {
 				min-height: 100dvh;
 				display: grid;
 				place-items: center;
 				padding: 1rem;
-				background: #fbfdf6;
-				color: #0a1d08;
+				background: var(--paper);
+				color: var(--ink);
 				font-family: Georgia, "Times New Roman", serif;
 				text-align: center;
 			}
 			main { display: grid; justify-items: center; gap: 1rem; max-width: 22rem; }
 			img { width: 4.5rem; height: 4.5rem; }
-			h1 { font-size: 1.5rem; font-weight: 600; color: #203b14; }
-			p { line-height: 1.5; color: color-mix(in oklab, black 49%, #fff); }
+			h1 { font-size: 1.5rem; font-weight: 600; color: var(--heading); }
+			p { line-height: 1.5; color: var(--muted); }
 			a {
 				display: inline-flex;
 				align-items: center;
 				height: 2.25rem;
 				padding: 0 1rem;
 				border-radius: 0.375rem;
-				background: #203b14;
-				color: #fff;
+				background: var(--fill);
+				color: var(--fill-text);
 				font: inherit;
 				font-size: 0.875rem;
 				text-decoration: none;
 			}
-			a:focus-visible { outline: 2px solid #203b14; outline-offset: 2px; }
+			a:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 		</style>
 	</head>
 	<body>

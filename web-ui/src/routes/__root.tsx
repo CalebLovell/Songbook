@@ -25,6 +25,11 @@ import { MAIN_CONTENT_ID } from "~/lib/main-content.ts";
 import { pageTitle, SITE_NAME } from "~/lib/page-title.ts";
 import { stationOrigin } from "~/lib/station-origin.ts";
 import { stationTimeZoneScript } from "~/lib/station-time.ts";
+import {
+	LIGHT_BROWSER_BAR_COLOR,
+	themeScript,
+	useKeepTheme,
+} from "~/lib/theme.ts";
 import { unlockStatusForNavigation } from "~/lib/unlock-status.ts";
 import appCss from "../styles.css?url";
 
@@ -41,7 +46,7 @@ export const Route = createRootRouteWithContext<{
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
 			},
-			{ name: "theme-color", content: "#fbfdf6" },
+			{ name: "theme-color", content: LIGHT_BROWSER_BAR_COLOR },
 			{
 				title: pageTitle(),
 			},
@@ -91,10 +96,12 @@ const SCROLLBAR_PROBE = `(() => {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const { auth } = Route.useRouteContext();
+	useKeepTheme();
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<head>
 				<HeadContent />
+				<ScriptOnce>{themeScript()}</ScriptOnce>
 				<ScriptOnce>{SCROLLBAR_PROBE}</ScriptOnce>
 				<ScriptOnce>{stationTimeZoneScript()}</ScriptOnce>
 			</head>

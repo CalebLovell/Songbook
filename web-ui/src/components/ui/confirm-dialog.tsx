@@ -8,7 +8,7 @@ import { useReturnFocus } from "~/lib/use-return-focus.ts";
 import { cn } from "~/lib/utils.ts";
 
 export const MODAL_BACKDROP_CLASS =
-	"fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_oklab,var(--ink)_28%,transparent)] p-page";
+	"fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_oklab,var(--shade)_28%,transparent)] p-page";
 export const MODAL_CARD_CLASS =
 	"flex w-full flex-col gap-page text-left shadow-xl";
 export const MODAL_TITLE_CLASS = "font-semibold text-lg";
