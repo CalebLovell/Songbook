@@ -77,7 +77,7 @@ async function expectShareMatchesPage(page: Page, period: string) {
 	if (species === 0) {
 		expect(summary).toContain("Nothing heard");
 	} else {
-		expect(summary).toContain(`Species · ${species.toLocaleString()}`);
+		expect(summary).toContain(`🐦  ${species.toLocaleString()} species · `);
 		expect(summary).not.toContain("Nothing heard");
 	}
 	return summary;

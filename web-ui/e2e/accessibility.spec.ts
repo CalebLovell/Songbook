@@ -150,6 +150,9 @@ test.describe("mobile menu", () => {
 });
 
 test.describe("Learn quiz", () => {
+	// Guests only hear voice-checked clips, which a machine without BirdNET's Python never has.
+	test.beforeEach(({ page }) => signIn(page));
+
 	const choices = (page: Page) =>
 		page.locator("main fieldset").nth(1).locator("button");
 	const nextControl = (page: Page) =>

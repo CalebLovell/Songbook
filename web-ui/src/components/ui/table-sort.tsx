@@ -40,7 +40,7 @@ export function SortMenu<Sort extends string>({
 		<div
 			className={cn(
 				JOINED_CONTROL_CLASS,
-				"h-8.5 pointer-coarse:h-9 w-fit shrink-0 focus-within:border-focus-ring",
+				"h-8.5 pointer-coarse:h-9 w-fit shrink-0",
 				className,
 			)}
 		>
@@ -51,7 +51,7 @@ export function SortMenu<Sort extends string>({
 					onChange={(event) =>
 						sort !== event.target.value && onSort(event.target.value as Sort)
 					}
-					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 font-medium pointer-coarse:text-base text-sm leading-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none"
+					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 font-medium pointer-coarse:text-base text-sm leading-none transition-colors hover:bg-accent hover:text-accent-foreground"
 				>
 					{sorts.map((option) => (
 						<option key={option} value={option}>
