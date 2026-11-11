@@ -37,7 +37,7 @@ export type SpeciesGridItem = {
 const LIST_CLASS =
 	"grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3";
 const TILE_CLASS =
-	"flex min-h-16 min-w-0 flex-col gap-2 rounded-md bg-meadow px-3 py-2 max-[400px]:px-2";
+	"flex min-h-16 min-w-0 flex-col gap-2 rounded-md border border-line px-3 py-2 max-[400px]:px-2";
 
 export function SpeciesGrid({
 	species,
