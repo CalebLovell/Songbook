@@ -54,18 +54,18 @@ export const SITE_PAGES: readonly SitePage[] = [
 	},
 	{ label: "Learn", to: "/learn", icon: Lightbulb, header: PAGE_HEADERS.learn },
 	{
-		label: "Health",
-		to: "/health",
-		icon: HeartPulse,
-		gated: true,
-		header: PAGE_HEADERS.health,
-	},
-	{
 		label: "Review",
 		to: "/review",
 		icon: SearchCheck,
 		gated: true,
 		header: PAGE_HEADERS.review,
+	},
+	{
+		label: "Health",
+		to: "/health",
+		icon: HeartPulse,
+		gated: true,
+		header: PAGE_HEADERS.health,
 	},
 	{
 		label: "Species Filter",

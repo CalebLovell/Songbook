@@ -89,13 +89,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					aria-labelledby={`${id}-station`}
 				>
 					<SectionLabel id={`${id}-station`}>Station</SectionLabel>
-					<Link to="/health" {...linkProps}>
-						<NavIcon icon={HeartPulse} />
-						Health
-						{healthMark ? (
-							<NavCount className="ml-auto" attention={healthMark} />
-						) : null}
-					</Link>
 					<Link
 						to="/review"
 						search={{ page: 1 }}
@@ -104,6 +97,13 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					>
 						<NavIcon icon={SearchCheck} />
 						Review
+					</Link>
+					<Link to="/health" {...linkProps}>
+						<NavIcon icon={HeartPulse} />
+						Health
+						{healthMark ? (
+							<NavCount className="ml-auto" attention={healthMark} />
+						) : null}
 					</Link>
 					<Link
 						to="/species-filter"
