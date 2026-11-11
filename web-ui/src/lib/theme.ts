@@ -17,9 +17,11 @@ export function themeScript() {
 	return `(() => {
 	let saved = null;
 	try { saved = localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)}); } catch {}
-	const theme = saved === "light" || saved === "dark"
-		? saved
-		: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+	const preference = saved === "light" || saved === "dark" ? saved : "system";
+	const theme = preference === "system"
+		? matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+		: preference;
+	document.documentElement.dataset.themePreference = preference;
 	document.documentElement.dataset.theme = theme;
 	const bar = ${JSON.stringify(BROWSER_BAR_COLOR)}[theme];
 	document.querySelector('meta[name="theme-color"]')?.setAttribute("content", bar);
@@ -39,7 +41,8 @@ function subscribe(onChange: () => void) {
 	return () => observer.disconnect();
 }
 
-function applyTheme(theme: Theme) {
+function applyTheme(theme: Theme, preference: ThemePreference) {
+	document.documentElement.dataset.themePreference = preference;
 	document.documentElement.dataset.theme = theme;
 	document
 		.querySelector('meta[name="theme-color"]')
@@ -77,12 +80,12 @@ export function setThemePreference(preference: ThemePreference) {
 		!document.startViewTransition ||
 		matchMedia(REDUCED_MOTION).matches
 	) {
-		applyTheme(next);
+		applyTheme(next, preference);
 		notify();
 		return;
 	}
 	document.startViewTransition(() => {
-		applyTheme(next);
+		applyTheme(next, preference);
 		flushSync(notify);
 	});
 }
@@ -104,14 +107,17 @@ export function useThemePreference(): ThemePreference {
 	);
 }
 
+function follow() {
+	const preference = readPreference();
+	applyTheme(resolveTheme(preference), preference);
+}
+
 export function useKeepTheme() {
 	useLayoutEffect(() => {
-		if (!document.documentElement.dataset.theme)
-			applyTheme(resolveTheme(readPreference()));
+		if (!document.documentElement.dataset.theme) follow();
 	});
 	useEffect(() => {
 		const system = matchMedia(SYSTEM_DARK);
-		const follow = () => applyTheme(resolveTheme(readPreference()));
 		system.addEventListener("change", follow);
 		window.addEventListener("storage", follow);
 		return () => {

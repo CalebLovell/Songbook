@@ -8,10 +8,33 @@ import {
 } from "~/lib/theme.ts";
 import { cn } from "~/lib/utils.ts";
 
-const OPTIONS: { value: ThemePreference; label: string; icon: LucideIcon }[] = [
-	{ value: "light", label: "Light", icon: Sun },
-	{ value: "dark", label: "Dark", icon: Moon },
-	{ value: "system", label: "System", icon: Monitor },
+const OPTIONS: {
+	value: ThemePreference;
+	label: string;
+	icon: LucideIcon;
+	chosen: string;
+}[] = [
+	{
+		value: "light",
+		label: "Light",
+		icon: Sun,
+		chosen:
+			"in-data-[theme-preference=light]:bg-primary! in-data-[theme-preference=light]:text-primary-foreground!",
+	},
+	{
+		value: "dark",
+		label: "Dark",
+		icon: Moon,
+		chosen:
+			"in-data-[theme-preference=dark]:bg-primary! in-data-[theme-preference=dark]:text-primary-foreground!",
+	},
+	{
+		value: "system",
+		label: "System",
+		icon: Monitor,
+		chosen:
+			"in-data-[theme-preference=system]:bg-primary! in-data-[theme-preference=system]:text-primary-foreground!",
+	},
 ];
 
 export function ThemeSwitcher({ className }: { className?: string }) {
@@ -28,12 +51,15 @@ export function ThemeSwitcher({ className }: { className?: string }) {
 				if (next) setThemePreference(next as ThemePreference);
 			}}
 		>
-			{OPTIONS.map(({ value, label, icon: Icon }) => (
+			{OPTIONS.map(({ value, label, icon: Icon, chosen }) => (
 				<ToggleGroupItem
 					key={value}
 					value={value}
 					aria-label={`${label} theme`}
-					className="pointer-coarse:h-9 flex-1 gap-1.5 text-xs"
+					className={cn(
+						"pointer-coarse:h-9 flex-1 gap-1.5 text-xs data-[state=on]:bg-card data-[state=on]:text-inherit",
+						chosen,
+					)}
 				>
 					<Icon aria-hidden="true" className="size-3.5" />
 					{label}
