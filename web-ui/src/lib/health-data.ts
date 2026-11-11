@@ -1,10 +1,50 @@
-import type { SettingsTab } from "~/components/settings/settings-index.ts";
-
 export type CheckState = "healthy" | "failing" | "unknown";
 
-export type ServiceState = { loadState: string; activeState: string };
+export type ServiceState = {
+	loadState: string;
+	activeState: string;
+	activeEnterMonotonicUs?: number;
+};
 
 export type FullDiskAction = "purge" | "keep";
+
+export type UnderVoltage = { now: boolean; sinceBoot: boolean };
+
+export type PiReadings = {
+	underVoltage: UnderVoltage | null;
+};
+
+export type PowerState = "steady" | "dipped" | "low" | "unknown";
+
+export type StationChecks = {
+	uptimeSeconds: number;
+	audio: {
+		state: CheckState;
+		ageSeconds: number | null;
+		source: "microphone" | "stream";
+	};
+	analyzer: {
+		state: CheckState;
+		runningSeconds: number | null;
+		model: string | null;
+	};
+	name: { state: CheckState; name: string | null };
+	location: {
+		state: CheckState;
+		latitude: number | null;
+		longitude: number | null;
+		timezone: string | null;
+	};
+	power: { state: PowerState };
+	backups: { ageSeconds: number | null };
+	storage: {
+		state: CheckState;
+		usedPercent: number | null;
+		freeBytes: number | null;
+		threshold: number | null;
+		action: FullDiskAction;
+	};
+};
 
 export type StationToDo =
 	| { kind: "audio" }
@@ -21,6 +61,8 @@ export type StationToDo =
 export type StationHealth = {
 	diskUsedPercent: number | null;
 	toDos: StationToDo[];
+	checks: StationChecks;
+	settingUp: boolean;
 };
 
 export type StationReadings = {
@@ -133,6 +175,37 @@ export function checkDisk({
 	return Math.ceil(diskUsedPercent) >= alarmAt ? "failing" : "healthy";
 }
 
+const UNDER_VOLTAGE_NOW = 0x1;
+const UNDER_VOLTAGE_SINCE_BOOT = 0x10000;
+
+export function parseThrottled(output: string): UnderVoltage | null {
+	const match = /throttled=0x([0-9a-f]+)/i.exec(output);
+	if (!match) return null;
+	const bits = Number.parseInt(match[1], 16);
+	return {
+		now: (bits & UNDER_VOLTAGE_NOW) !== 0,
+		sinceBoot: (bits & UNDER_VOLTAGE_SINCE_BOOT) !== 0,
+	};
+}
+
+export function checkPower(underVoltage: UnderVoltage | null): PowerState {
+	if (!underVoltage) return "unknown";
+	if (underVoltage.now) return "low";
+	return underVoltage.sinceBoot ? "dipped" : "steady";
+}
+
+export function formatModelName(model: string | undefined): string | null {
+	const trimmed = model?.trim();
+	if (!trimmed) return null;
+	const version = /_V(\d+(?:\.\d+)*)/i.exec(trimmed)?.[1];
+	if (/^BirdNET_GLOBAL/i.test(trimmed) && version) return `BirdNET ${version}`;
+	return trimmed.replaceAll("_", " ");
+}
+
+export function isSettingUp(checks: Pick<StationChecks, "name" | "location">) {
+	return checks.name.state === "failing" || checks.location.state === "failing";
+}
+
 export function stationToDos(readings: StationReadings): StationToDo[] {
 	const toDos: StationToDo[] = [];
 	if (checkLocation(readings) === "failing") toDos.push({ kind: "location" });
@@ -154,14 +227,9 @@ export function stationToDos(readings: StationReadings): StationToDo[] {
 	return toDos;
 }
 
-export type ToDoAction =
-	| { kind: "restart" }
-	| { kind: "setting"; tab: SettingsTab; label: string };
-
 export type ToDoCopy = {
 	title: string;
 	detail: string;
-	action: ToDoAction;
 };
 
 function diskDetail({
@@ -183,53 +251,29 @@ export function describeToDo(toDo: StationToDo): ToDoCopy {
 				title: "The station's location isn't set",
 				detail:
 					"Latitude and longitude are both 0, so BirdNET can't tell which birds live nearby and will drop most detections. Enter where the station is.",
-				action: { kind: "setting", tab: "station", label: "Set location" },
 			};
 		case "name":
 			return {
 				title: "Give the station a name",
 				detail:
 					"It's still using the name the installer gave it. Choose one that visitors will see.",
-				action: { kind: "setting", tab: "station", label: "Set name" },
 			};
 		case "audio":
 			return {
 				title: "No audio is arriving",
 				detail:
 					"The station hasn't saved a new recording in the last few minutes, so it can't hear any birds. Check that the microphone or stream is connected.",
-				action: {
-					kind: "setting",
-					tab: "audio-input",
-					label: "Check audio input",
-				},
 			};
 		case "analyzer":
 			return {
 				title: "Bird analysis has stopped",
 				detail:
 					"Recordings aren't being checked for birds, so nothing new will appear. Restart BirdNET to bring it back.",
-				action: { kind: "restart" },
 			};
 		case "disk":
 			return {
 				title: "The disk is nearly full",
 				detail: diskDetail(toDo),
-				action: { kind: "setting", tab: "storage", label: "Storage settings" },
 			};
 	}
-}
-
-export function toDosLabel(count: number) {
-	return count === 1 ? "1 thing to do" : `${count} things to do`;
-}
-
-export function settingsMarkLabel(
-	toDoCount: number,
-	offeredUpdate: string | null,
-): string | null {
-	const parts = [
-		toDoCount > 0 ? toDosLabel(toDoCount) : null,
-		offeredUpdate ? `Update to ${offeredUpdate} available` : null,
-	].filter(Boolean);
-	return parts.length > 0 ? parts.join(". ") : null;
 }

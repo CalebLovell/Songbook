@@ -93,6 +93,18 @@ export async function startStationServices(
 	return { attempted: true, skipped: false };
 }
 
+export type PowerAction = "reboot" | "poweroff";
+
+export async function powerStation(
+	action: PowerAction,
+	context: SettingsSystemContext = {},
+	runner: SettingsCommandRunner = defaultRunner,
+) {
+	if (skipRequested(context)) return { attempted: false, skipped: true };
+	await runner("sudo", ["systemctl", "--no-block", action]);
+	return { attempted: true, skipped: false };
+}
+
 export async function runCardSystemActions(
 	kind: SettingsCardKind,
 	context: SettingsSystemContext = {},

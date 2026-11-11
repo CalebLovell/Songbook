@@ -40,6 +40,6 @@ test("a settings tab in the URL selects that tab", () => {
 });
 
 test("a missing or unknown settings tab falls back to Station", () => {
-	assert.equal(validated(SettingsRoute, {}).tab, "station");
-	assert.equal(validated(SettingsRoute, { tab: "nope" }).tab, "station");
+	assert.equal(validated(SettingsRoute, {}).tab, "detection");
+	assert.equal(validated(SettingsRoute, { tab: "nope" }).tab, "detection");
 });

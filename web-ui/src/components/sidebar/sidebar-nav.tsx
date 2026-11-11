@@ -4,6 +4,7 @@ import {
 	AudioWaveform,
 	CalendarRange,
 	Feather,
+	HeartPulse,
 	Lightbulb,
 	type LucideIcon,
 	SearchCheck,
@@ -15,7 +16,8 @@ import { useId } from "react";
 import { AccountCard } from "~/components/sidebar/account-card.tsx";
 import { SidebarStatusBar } from "~/components/sidebar/sidebar-status-bar.tsx";
 import { ThemeSwitcher } from "~/components/sidebar/theme-switcher.tsx";
-import { useSettingsMark } from "~/lib/use-settings-mark.ts";
+import type { HealthAttention } from "~/lib/health-cards.ts";
+import { useHealthMark } from "~/lib/use-health-mark.ts";
 
 const NAV_ROW_CLASS =
 	"group flex min-h-8.5 pointer-coarse:min-h-9 items-center gap-2.5 pointer-coarse:gap-3 rounded-(--radius) px-3 text-[0.875rem] text-[color-mix(in_oklab,var(--ink)_70%,var(--moss)_30%)] pointer-coarse:text-[1rem] no-underline hover:bg-meadow hover:text-ink data-[status=active]:bg-[color-mix(in_oklab,var(--moss)_10%,var(--meadow))] data-[status=active]:text-ink";
@@ -37,7 +39,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
 	const { auth } = useRouteContext({ from: "__root__" });
 	const id = useId();
-	const settingsMark = useSettingsMark(auth.unlocked);
+	const healthMark = useHealthMark(auth.unlocked);
 
 	return (
 		<div className="flex flex-1 flex-col px-3">
@@ -87,6 +89,13 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					aria-labelledby={`${id}-station`}
 				>
 					<SectionLabel id={`${id}-station`}>Station</SectionLabel>
+					<Link to="/health" {...linkProps}>
+						<NavIcon icon={HeartPulse} />
+						Health
+						{healthMark ? (
+							<NavCount className="ml-auto" attention={healthMark} />
+						) : null}
+					</Link>
 					<Link
 						to="/review"
 						search={{ page: 1 }}
@@ -108,9 +117,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 					<Link to="/settings" {...linkProps}>
 						<NavIcon icon={Settings} />
 						Settings
-						{settingsMark ? (
-							<SettingsDot className="ml-auto" label={settingsMark} />
-						) : null}
 					</Link>
 				</nav>
 			) : null}
@@ -124,20 +130,38 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 	);
 }
 
-export function SettingsDot({
-	label,
+export function NavDot({
+	attention,
 	className = "",
 }: {
-	label: string;
+	attention: HealthAttention;
 	className?: string;
 }) {
 	return (
 		<span
 			role="img"
-			aria-label={label}
-			title={label}
-			className={`size-2 shrink-0 rounded-full bg-moss ${className}`}
+			aria-label={attention.label}
+			title={attention.label}
+			className={`size-2 shrink-0 rounded-full ${attention.broken ? "bg-clay" : "bg-sand"} ${className}`}
 		/>
+	);
+}
+
+function NavCount({
+	attention,
+	className = "",
+}: {
+	attention: HealthAttention;
+	className?: string;
+}) {
+	return (
+		<span
+			title={attention.label}
+			className={`inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 font-semibold text-[0.75rem] tabular-nums ${attention.broken ? "bg-clay text-paper-raised" : "bg-toast-warning-fill text-bark"} ${className}`}
+		>
+			<span aria-hidden="true">{attention.count}</span>
+			<span className="sr-only">{attention.label}</span>
+		</span>
 	);
 }
 

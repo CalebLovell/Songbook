@@ -56,12 +56,18 @@ export async function readAnalyzerState(): Promise<ServiceState | null> {
 	const result = await runSystemctl([
 		"show",
 		ANALYZER_SERVICE,
-		"--property=LoadState,ActiveState",
+		"--property=LoadState,ActiveState,ActiveEnterTimestampMonotonic",
 	]);
 	if (result?.code !== 0) return null;
 	const loadState = /^LoadState=(.+)$/m.exec(result.output)?.[1]?.trim();
 	const activeState = /^ActiveState=(.+)$/m.exec(result.output)?.[1]?.trim();
-	return loadState && activeState ? { loadState, activeState } : null;
+	const enteredUs = Number(
+		/^ActiveEnterTimestampMonotonic=(\d+)$/m.exec(result.output)?.[1],
+	);
+	if (!loadState || !activeState) return null;
+	return enteredUs > 0
+		? { loadState, activeState, activeEnterMonotonicUs: enteredUs }
+		: { loadState, activeState };
 }
 
 async function queryStationStatus(): Promise<StationStatus> {

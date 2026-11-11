@@ -53,6 +53,19 @@ test("an old StreamData folder and a zero location are reported", async () => {
 	assert.ok(kinds(health).includes("audio"));
 });
 
+test("a zero location puts the station in setup and keeps its readings", async () => {
+	await writeFile(
+		conf,
+		`LATITUDE=0.0000\nLONGITUDE=0.0000\nSITE_NAME="Backyard"\nRECS_DIR=${root}\n`,
+	);
+	const health = await loadStationHealth({ uptimeSeconds: SETTLED });
+	assert.equal(health.settingUp, true);
+	assert.equal(health.checks.location.state, "failing");
+	assert.equal(health.checks.location.latitude, 0);
+	assert.equal(health.checks.name.name, "Backyard");
+	assert.equal(health.checks.uptimeSeconds, SETTLED);
+});
+
 test("a station still named after its host is reported", async () => {
 	await writeFile(conf, `SITE_NAME="${hostname()}"\n`);
 	const health = await loadStationHealth({ uptimeSeconds: SETTLED });

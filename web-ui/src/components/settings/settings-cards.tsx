@@ -1,16 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
-import { ChevronDown, Download, RefreshCw } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { ChangeEvent, ComponentProps, ReactNode } from "react";
 import { createContext, useContext, useId, useState } from "react";
 
-import { Button } from "~/components/ui/button.tsx";
-import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { Input } from "~/components/ui/input.tsx";
-import { ShellText } from "~/components/ui/shell.tsx";
 import { toast } from "~/components/ui/toaster.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
-import { formatDate } from "~/lib/date-format.ts";
 import {
 	type ArtworkSettings,
 	type AudioSettings,
@@ -22,23 +18,13 @@ import {
 	type SettingsCardKind,
 	type SettingsPageData,
 	type SettingsSaveResult,
-	type StationSettings,
 	type StorageSettings,
 	type UpdateSettings,
 } from "~/lib/settings-data.ts";
-import { formatTimeAgo } from "~/lib/time-ago.ts";
-import { modernTimezone } from "~/lib/timezones.ts";
-import {
-	availableUpdate,
-	type UpdateState,
-	updateBusy,
-} from "~/lib/updates-data.ts";
-import { useClientValue } from "~/lib/use-client-value.ts";
 import { errorMessage } from "~/lib/utils.ts";
 import { RestartButton } from "./restart-button.tsx";
 import { RESET_RESTARTS_DESCRIPTION, SettingsCard } from "./settings-card.tsx";
 import { SETTINGS_TABS, type SettingsTab } from "./settings-index.ts";
-import { StationLocation } from "./station-location.tsx";
 
 const RESET_NO_RESTART_DESCRIPTION =
 	"Every value in this card goes back to what a fresh install writes, and any edits you haven't saved are dropped. Nothing restarts. Other cards are left as they are.";
@@ -47,7 +33,6 @@ type Saver<T> = (values: T) => Promise<SettingsSaveResult<T>>;
 type CardRestarter = () => Promise<{ message: string }>;
 
 export type SettingsSavers = {
-	station?: Saver<StationSettings>;
 	detection?: Saver<DetectionSettings>;
 	audio?: Saver<AudioSettings>;
 	recording?: Saver<RecordingSettings>;
@@ -317,33 +302,17 @@ export function SettingsCards({
 	data,
 	savers,
 	restarter,
-	diskUsedPercent = null,
-	updates = null,
-	onCheckUpdates,
-	onInstallUpdate,
 	dataTab = null,
 }: {
 	tab: SettingsTab;
 	data: SettingsPageData;
 	savers: SettingsSavers;
 	restarter?: SettingsRestarter;
-	diskUsedPercent?: number | null;
-	updates?: UpdateState | null;
-	onCheckUpdates?: () => Promise<UpdateState>;
-	onInstallUpdate?: () => Promise<void>;
 	dataTab?: ReactNode;
 }) {
 	const restartFor = (card: SettingsCardKind): CardRestarter | undefined =>
 		restarter ? () => restarter(card) : undefined;
 	const cards: Record<SettingsTab, ReactNode> = {
-		station: (
-			<StationCard
-				initial={data.station}
-				timezones={data.supportedTimezones}
-				save={savers.station}
-				restart={restartFor("station")}
-			/>
-		),
 		detection: (
 			<DetectionCard
 				initial={data.detection}
@@ -370,17 +339,10 @@ export function SettingsCards({
 				initial={data.storage}
 				save={savers.storage}
 				restart={restartFor("storage")}
-				diskUsedPercent={diskUsedPercent}
 			/>
 		),
 		updates: (
-			<UpdatesSettingsCard
-				initial={data.updates}
-				save={savers.updates}
-				updates={updates}
-				onCheck={onCheckUpdates}
-				onInstall={onInstallUpdate}
-			/>
+			<UpdatesSettingsCard initial={data.updates} save={savers.updates} />
 		),
 		preferences: (
 			<div className="space-y-page">
@@ -406,152 +368,6 @@ export function SettingsCards({
 				</div>
 			))}
 		</>
-	);
-}
-
-function StationCard({
-	initial,
-	timezones,
-	save,
-	restart,
-}: {
-	initial: StationSettings;
-	timezones: string[];
-	save?: Saver<StationSettings>;
-	restart?: CardRestarter;
-}) {
-	const form = useCardSave("Station", initial, save, restart);
-	return (
-		<SettingsCard
-			title="Station"
-			description="Name the station and locate it for geographic species filtering."
-			onSave={() => void form.submit()}
-			restart={restartControl(form)}
-			saveDisabled={form.saveDisabled}
-		>
-			<Field label="Station name" hint="What this station is called.">
-				<FieldInput
-					value={form.values.siteName}
-					maxLength={80}
-					onChange={(event) =>
-						form.setValues({ ...form.values, siteName: event.target.value })
-					}
-				/>
-			</Field>
-			<Field label="Latitude" hint="Decimal degrees, north positive.">
-				<FieldInput
-					type="number"
-					min={-90}
-					max={90}
-					step="any"
-					required
-					unit="°"
-					value={form.values.latitude}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							latitude: numberOr(event, form.values.latitude),
-						})
-					}
-				/>
-			</Field>
-			<Field label="Longitude" hint="Decimal degrees, east positive.">
-				<FieldInput
-					type="number"
-					min={-180}
-					max={180}
-					step="any"
-					required
-					unit="°"
-					value={form.values.longitude}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							longitude: numberOr(event, form.values.longitude),
-						})
-					}
-				/>
-			</Field>
-			<Field
-				label="Your location"
-				readOnly
-				hint="Fill the latitude and longitude from this device's location."
-			>
-				<StationLocation
-					current={{
-						latitude: form.values.latitude,
-						longitude: form.values.longitude,
-					}}
-					onApply={(coordinates) =>
-						form.setValues({ ...form.values, ...coordinates })
-					}
-				/>
-			</Field>
-			<Field
-				label="Timezone"
-				hint={
-					<>
-						<p>
-							Type to search, e.g. “New York”. Also sets the station's
-							operating-system clock.
-						</p>
-						<BrowserTimezoneHint
-							timezone={form.values.timezone}
-							onUse={(timezone) => form.setValues({ ...form.values, timezone })}
-						/>
-					</>
-				}
-			>
-				<FieldInput
-					list="station-timezones"
-					autoComplete="off"
-					spellCheck={false}
-					value={form.values.timezone}
-					onChange={(event) =>
-						form.setValues({ ...form.values, timezone: event.target.value })
-					}
-				/>
-				<datalist id="station-timezones">
-					{timezones.map((timezone) => (
-						<option key={timezone} value={timezone} />
-					))}
-				</datalist>
-			</Field>
-		</SettingsCard>
-	);
-}
-
-function BrowserTimezoneHint({
-	timezone,
-	onUse,
-}: {
-	timezone: string;
-	onUse: (timezone: string) => void;
-}) {
-	const skeleton = useContext(SkeletonContext);
-	const browserTimezone = useClientValue<string | null>(
-		() => modernTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone),
-		null,
-	);
-
-	if (
-		skeleton ||
-		!browserTimezone ||
-		modernTimezone(timezone) === browserTimezone
-	) {
-		return null;
-	}
-	return (
-		<p>
-			This browser is on <span className="font-medium">{browserTimezone}</span>.{" "}
-			<button
-				type="button"
-				onClick={() => onUse(browserTimezone)}
-				className="font-medium text-moss underline underline-offset-2"
-			>
-				Use it
-			</button>
-		</p>
 	);
 }
 
@@ -927,12 +743,10 @@ function StorageCard({
 	initial,
 	save,
 	restart,
-	diskUsedPercent,
 }: {
 	initial: StorageSettings;
 	save?: Saver<StorageSettings>;
 	restart?: CardRestarter;
-	diskUsedPercent: number | null;
 }) {
 	const form = useCardSave(
 		"Storage",
@@ -971,11 +785,7 @@ function StorageCard({
 			</Field>
 			<Field
 				label="Disk-used threshold"
-				hint={
-					diskUsedPercent === null
-						? "How full the disk gets before that action runs."
-						: `How full the disk gets before that action runs. It is ${Math.round(diskUsedPercent)}% full now.`
-				}
+				hint="How full the disk gets before that action runs."
 			>
 				<FieldInput
 					type="number"
@@ -1222,190 +1032,25 @@ function HighlightsSettingsCard({
 	);
 }
 
-function ago(iso: string) {
-	return formatTimeAgo(Date.now() - new Date(iso).getTime());
-}
-
 function UpdatesSettingsCard({
 	initial,
 	save,
-	updates,
-	onCheck,
-	onInstall,
 }: {
 	initial: UpdateSettings;
 	save?: Saver<UpdateSettings>;
-	updates: UpdateState | null;
-	onCheck?: () => Promise<UpdateState>;
-	onInstall?: () => Promise<void>;
 }) {
 	const form = useCardSave("Updates", initial, save);
-	const [confirming, setConfirming] = useState(false);
-	const [loadedVersion, setLoadedVersion] = useState<string | null>(null);
-	const installed = updates?.installed ?? null;
-	if (installed && loadedVersion === null) setLoadedVersion(installed.version);
-	const managed = updates?.managed ?? false;
-	const busy = updates ? updateBusy(updates) : false;
-	const offered = updates ? availableUpdate(updates) : null;
-	const reloadable =
-		loadedVersion !== null &&
-		installed !== null &&
-		installed.version !== loadedVersion;
-
-	const checkMutation = useMutation({
-		mutationFn: (runCheck: () => Promise<UpdateState>) => runCheck(),
-		onSuccess: (result) => {
-			if (result.state === "failed")
-				toast.error(result.message ?? "Couldn't look for updates.", {
-					id: "settings-updates",
-				});
-			else
-				toast.success(
-					result.message ??
-						(availableUpdate(result)
-							? "An update is available."
-							: "Up to date."),
-					{ id: "settings-updates" },
-				);
-		},
-		onError: (error) => {
-			toast.error(errorMessage(error, "Couldn't look for updates."), {
-				id: "settings-updates",
-			});
-		},
-	});
-	const checking = checkMutation.isPending;
-
-	async function run(
-		action: (() => Promise<void>) | undefined,
-		failure: string,
-	) {
-		if (!action) return;
-		try {
-			await action();
-		} catch (error) {
-			toast.error(errorMessage(error, failure), {
-				id: "settings-updates",
-			});
-		}
-	}
-
-	function check() {
-		if (onCheck) checkMutation.mutate(onCheck);
-	}
-
 	return (
 		<SettingsCard
 			title="Updates"
-			description="Keep this station on the newest release of Songbook."
+			description="Choose whether the station updates Songbook by itself. Installing an update now is on Health."
 			confirmDescription="This writes the values in this card to the station's configuration. Nothing restarts."
 			onSave={() => void form.submit()}
 			saveDisabled={form.saveDisabled}
 		>
 			<Field
-				label="This station"
-				readOnly
-				hint={
-					updates === null ? (
-						<ShellText className="text-xs" barClassName="w-40" />
-					) : !managed ? (
-						"Not installed from a release, so the updater leaves it alone."
-					) : reloadable ? (
-						<p>
-							Updated.{" "}
-							<button
-								type="button"
-								onClick={() => window.location.reload()}
-								className="font-medium text-moss underline underline-offset-2"
-							>
-								Reload to use it
-							</button>
-						</p>
-					) : installed?.installedAt ? (
-						`Installed ${formatDate(installed.installedAt)}.`
-					) : null
-				}
-			>
-				{updates === null ? (
-					<ShellText className="text-sm leading-9" barClassName="w-24" />
-				) : (
-					<p className="text-sm leading-9">
-						{!managed ? (
-							"Development copy"
-						) : (
-							<span className="tabular-nums">
-								{installed?.version ?? "Unknown"}
-							</span>
-						)}
-					</p>
-				)}
-			</Field>
-			<Field
-				label="Newest release"
-				readOnly
-				hint={
-					updates === null ? (
-						<ShellText className="text-xs" barClassName="w-48" />
-					) : updates.state === "failed" && updates.message ? (
-						<span className="text-destructive">{updates.message}</span>
-					) : updates.state === "updating" ? (
-						"Recording stops for about a minute while it installs, and this page comes back when the station does."
-					) : updates.checkedAt ? (
-						`Checked ${ago(updates.checkedAt)}.`
-					) : managed ? (
-						"Checked nightly, or when you press Check."
-					) : (
-						"Only an installed station looks for releases."
-					)
-				}
-			>
-				{updates === null ? (
-					<ShellText className="text-sm leading-9" barClassName="w-28" />
-				) : updates.state === "updating" ? (
-					<p className="text-sm leading-9">
-						Installing{" "}
-						<span className="tabular-nums">{updates.target ?? "update"}</span>…
-					</p>
-				) : offered ? (
-					<Button
-						type="button"
-						size="default"
-						icon={Download}
-						disabled={busy || !onInstall}
-						onClick={() => setConfirming(true)}
-					>
-						Update to {offered}
-					</Button>
-				) : (
-					<p className="text-sm leading-9">
-						{updates.latest
-							? "Up to date"
-							: managed
-								? "Not checked yet"
-								: "Not available"}
-					</p>
-				)}
-			</Field>
-			<Field
-				label="Check for updates"
-				readOnly
-				hint="Ask GitHub for the newest release now instead of waiting for tonight's check."
-			>
-				<Button
-					type="button"
-					variant="outline"
-					size="default"
-					icon={RefreshCw}
-					loading={checking || updates?.state === "checking"}
-					disabled={!managed || busy || !onCheck}
-					onClick={() => void check()}
-				>
-					{checking ? "Checking…" : "Check"}
-				</Button>
-			</Field>
-			<Field
 				label="Automatic updates"
-				hint="Installs new releases by itself overnight, between 3 and 5 AM. Off, they wait for you to press Update."
+				hint="Installs new releases by itself overnight, between 3 and 5 AM. Off, they wait for you to press Install on Health."
 			>
 				<FieldChoice
 					value={form.values.automatic ? "on" : "off"}
@@ -1416,20 +1061,6 @@ function UpdatesSettingsCard({
 					onChange={(choice) => form.setValues({ automatic: choice === "on" })}
 				/>
 			</Field>
-
-			{confirming && offered ? (
-				<ConfirmDialog
-					title={`Update to ${offered}?`}
-					description="The station installs the new release and restarts. Recording stops for about a minute, and this page comes back when the station does. If the new version doesn't start, the station goes back to the one it has now."
-					confirmLabel="Update now"
-					confirmIcon={Download}
-					onCancel={() => setConfirming(false)}
-					onConfirm={() => {
-						setConfirming(false);
-						void run(onInstall, "Couldn't start the update.");
-					}}
-				/>
-			) : null}
 		</SettingsCard>
 	);
 }

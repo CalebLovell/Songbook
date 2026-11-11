@@ -16,13 +16,8 @@ import {
 	SettingsPage,
 	SettingsPageSkeleton,
 } from "~/components/settings/settings-page.tsx";
-import { stationHealthQuery } from "~/lib/health.ts";
 import { pageHead } from "~/lib/link-preview.ts";
-import {
-	FORM_QUERY,
-	prefetchInBrowser,
-	refreshAllData,
-} from "~/lib/query-client.ts";
+import { FORM_QUERY, refreshAllData } from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
 	getSettingsPage,
@@ -34,31 +29,11 @@ import {
 	saveHighlightSettingsFn,
 	saveRecordingSettingsFn,
 	saveReviewSettingsFn,
-	saveStationSettingsFn,
 	saveStorageSettingsFn,
 	saveUpdateSettingsFn,
 } from "~/lib/settings.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
-import {
-	checkForUpdatesFn,
-	installUpdateFn,
-	updateStateQuery,
-} from "~/lib/updates.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
-
-const HEALTH_INTERVAL_MS = 30_000;
-
-const UPDATES_INTERVAL_MS = 5_000;
-
-const healthQuery = queryOptions({
-	...stationHealthQuery,
-	refetchInterval: HEALTH_INTERVAL_MS,
-});
-
-const polledUpdateStateQuery = queryOptions({
-	...updateStateQuery,
-	refetchInterval: UPDATES_INTERVAL_MS,
-});
 
 const settingsPageQuery = queryOptions({
 	...FORM_QUERY,
@@ -81,18 +56,12 @@ export const Route = createFileRoute("/settings")({
 	},
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
-	loader: ({ context }) => {
-		prefetchInBrowser(context.queryClient, healthQuery);
-		prefetchInBrowser(context.queryClient, polledUpdateStateQuery);
-	},
 	component: SettingsRoute,
 });
 
 function SettingsRoute() {
 	const page = useSkeletonMinimum(useQuery(settingsPageQuery).data);
 	const queryClient = useQueryClient();
-	const { data: health } = useQuery(healthQuery);
-	const saveStation = useServerFn(saveStationSettingsFn);
 	const saveDetection = useServerFn(saveDetectionSettingsFn);
 	const saveAudio = useServerFn(saveAudioSettingsFn);
 	const saveRecording = useServerFn(saveRecordingSettingsFn);
@@ -101,9 +70,6 @@ function SettingsRoute() {
 	const saveHighlights = useServerFn(saveHighlightSettingsFn);
 	const saveArtwork = useServerFn(saveArtworkSettingsFn);
 	const saveUpdates = useServerFn(saveUpdateSettingsFn);
-	const checkForUpdates = useServerFn(checkForUpdatesFn);
-	const installUpdate = useServerFn(installUpdateFn);
-	const { data: updates } = useQuery(polledUpdateStateQuery);
 	const reset = useServerFn(resetSettingsFn);
 	const restart = useServerFn(restartStationFn);
 	const router = useRouter();
@@ -133,18 +99,8 @@ function SettingsRoute() {
 			tab={tab}
 			onTabChange={showTab}
 			data={page}
-			health={health}
 			dataTab={dataTab}
 			onRestart={(card) => refreshingData(restart({ data: { card } }))}
-			updates={updates ?? null}
-			onCheckUpdates={async () => {
-				const state = await checkForUpdates();
-				const { queryKey } = updateStateQuery;
-				await queryClient.cancelQueries({ queryKey });
-				queryClient.setQueryData(queryKey, state);
-				return state;
-			}}
-			onInstallUpdate={() => installUpdate()}
 			onReset={async () => {
 				const result = await reset({});
 				await refreshAllData(router, queryClient);
@@ -154,7 +110,6 @@ function SettingsRoute() {
 				};
 			}}
 			savers={{
-				station: (values) => refreshingData(saveStation({ data: values })),
 				detection: (values) => refreshingData(saveDetection({ data: values })),
 				audio: (values) => refreshingData(saveAudio({ data: values })),
 				recording: (values) => refreshingData(saveRecording({ data: values })),

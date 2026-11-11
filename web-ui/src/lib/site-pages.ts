@@ -3,6 +3,7 @@ import {
 	AudioWaveform,
 	CalendarRange,
 	Feather,
+	HeartPulse,
 	Lightbulb,
 	type LucideIcon,
 	SearchCheck,
@@ -52,6 +53,13 @@ export const SITE_PAGES: readonly SitePage[] = [
 		header: PAGE_HEADERS.detections,
 	},
 	{ label: "Learn", to: "/learn", icon: Lightbulb, header: PAGE_HEADERS.learn },
+	{
+		label: "Health",
+		to: "/health",
+		icon: HeartPulse,
+		gated: true,
+		header: PAGE_HEADERS.health,
+	},
 	{
 		label: "Review",
 		to: "/review",

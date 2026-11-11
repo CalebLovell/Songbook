@@ -29,6 +29,7 @@ import {
 	saveStorageSettingsFn,
 } from "./settings.ts";
 import { getSpeciesFilterPage, saveSpeciesFilter } from "./species-filter.ts";
+import { powerStationFn } from "./station-power.ts";
 
 function sourceOf(relativePath: string) {
 	return readFileSync(
@@ -101,6 +102,9 @@ test("every gated server function carries requireUnlocked", () => {
 	}
 
 	assertGated(sourceOf("./health.ts"), "getStationHealth");
+
+	void powerStationFn;
+	assertGated(sourceOf("./station-power.ts"), "powerStationFn");
 
 	assertGated(sourceOf("./detections.ts"), "deleteDetections");
 });

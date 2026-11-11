@@ -2,12 +2,10 @@ import type { LucideIcon } from "lucide-react";
 import {
 	Database,
 	Disc3,
-	Download,
 	FileDown,
 	HardDrive,
 	Heart,
 	Image,
-	MapPin,
 	Mic2,
 	RefreshCw,
 	RotateCcw,
@@ -19,7 +17,6 @@ import {
 import type { SearchSetting } from "~/lib/site-search.ts";
 
 export const SETTINGS_TABS = [
-	"station",
 	"detection",
 	"preferences",
 	"updates",
@@ -31,7 +28,7 @@ export const SETTINGS_TABS = [
 
 export type SettingsTab = (typeof SETTINGS_TABS)[number];
 
-export const DEFAULT_SETTINGS_TAB: SettingsTab = "station";
+export const DEFAULT_SETTINGS_TAB: SettingsTab = "detection";
 
 export type SettingsIndexEntry = SearchSetting & {
 	tab: SettingsTab;
@@ -43,13 +40,6 @@ export function settingsCardId(title: string): string {
 }
 
 const CORE_CARDS: SettingsIndexEntry[] = [
-	{
-		title: "Station",
-		tab: "station",
-		icon: MapPin,
-		fields: ["Station name", "Latitude", "Longitude", "Timezone"],
-		keywords: ["location", "coordinates"],
-	},
 	{
 		title: "Detection",
 		tab: "detection",
@@ -100,8 +90,8 @@ const SYSTEM_CARDS: SettingsIndexEntry[] = [
 		title: "Updates",
 		tab: "updates",
 		icon: RefreshCw,
-		fields: ["This station", "Newest release", "Automatic updates"],
-		keywords: ["version", "release", "upgrade"],
+		fields: ["Automatic updates"],
+		keywords: ["version", "release", "upgrade", "automatic"],
 	},
 	{
 		title: "Audio input",
@@ -137,13 +127,6 @@ const SYSTEM_CARDS: SettingsIndexEntry[] = [
 ];
 
 const DATA_CARDS: SettingsIndexEntry[] = [
-	{
-		title: "Backup",
-		tab: "data",
-		icon: Download,
-		fields: ["What to include", "Download backup"],
-		keywords: ["data", "save", "copy", "download"],
-	},
 	{
 		title: "Restore",
 		tab: "data",

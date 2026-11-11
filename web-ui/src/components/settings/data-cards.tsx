@@ -3,7 +3,7 @@ import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
 	Calendar,
-	Download,
+	type Download,
 	FileDown,
 	RotateCcw,
 	Trash2,
@@ -18,7 +18,6 @@ import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
-import { ShellFigure } from "~/components/ui/shell.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
 import {
 	applyRestoreFn,
@@ -28,7 +27,6 @@ import {
 	undoRestoreFn,
 } from "~/lib/data.ts";
 import {
-	backupUrl,
 	type DataSummary,
 	detectionExportUrl,
 	formatBytes,
@@ -41,10 +39,10 @@ import { formatDate, formatDateTime } from "~/lib/date-format.ts";
 import { PAGE_QUERY, refreshAllData } from "~/lib/query-client.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 import { errorMessage } from "~/lib/utils.ts";
-import { Field, FieldChoice, FieldSelect } from "./settings-cards.tsx";
+import { Field, FieldSelect } from "./settings-cards.tsx";
 import { settingsCardId } from "./settings-index.ts";
 
-const DATA_SUMMARY_KEY = ["data-summary"];
+export const DATA_SUMMARY_KEY = ["data-summary"];
 const TOAST_ID = "settings-data";
 const UPLOAD_TOO_BIG =
 	"The upload was cut off. Large backups have to be restored from your home network, so open Songbook there and try again.";
@@ -104,51 +102,6 @@ function DownloadLink({
 				{label}
 			</a>
 		</Button>
-	);
-}
-
-function backupContents(summary: DataSummary, includeClips: boolean) {
-	const records = `${count(summary.detections)} detections, your settings and species lists`;
-	if (!includeClips)
-		return `${records}. About ${formatBytes(summary.databaseBytes)}. The ${count(summary.clipFiles)} clips stay behind.`;
-	return `${records}, and ${count(summary.clipFiles)} clips. About ${formatBytes(summary.databaseBytes + summary.clipBytes)}.`;
-}
-
-function BackupCard({ summary }: { summary: DataSummary | undefined }) {
-	const [contents, setContents] = useState<"clips" | "records">("clips");
-	const includeClips = contents === "clips";
-	return (
-		<DataCard
-			title="Backup"
-			description="Download a copy of this station to keep somewhere safe, or to start a new station from. Recording keeps running while it downloads. Your sign-in password and audio input settings stay out, because they belong to the machine rather than the data."
-			footer={
-				<DownloadLink
-					href={backupUrl(includeClips)}
-					icon={Download}
-					label="Download backup"
-				/>
-			}
-		>
-			<Field
-				label="What to include"
-				hint={
-					summary ? (
-						backupContents(summary, includeClips)
-					) : (
-						<ShellFigure placeholder="000,000 detections and settings" />
-					)
-				}
-			>
-				<FieldChoice
-					value={contents}
-					options={[
-						{ value: "clips", label: "Everything" },
-						{ value: "records", label: "Without clips" },
-					]}
-					onChange={setContents}
-				/>
-			</Field>
-		</DataCard>
 	);
 }
 
@@ -625,7 +578,6 @@ export function DataCards({ active }: { active: boolean }) {
 	const summary = useSkeletonMinimum(data);
 	return (
 		<div className="space-y-page">
-			<BackupCard summary={summary} />
 			<RestoreCard
 				summary={summary}
 				onChanged={async () => {

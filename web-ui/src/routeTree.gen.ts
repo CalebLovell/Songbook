@@ -9,6 +9,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DetectionsRouteImport } from './routes/detections'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ReviewRouteImport } from './routes/review'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const DetectionsRoute = DetectionsRouteImport.update({
   id: '/detections',
   path: '/detections',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnRoute = LearnRouteImport.update({
@@ -109,6 +115,7 @@ const ApiAudioDateSpeciesAndFileRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/detections': typeof DetectionsRoute
+  '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/detections': typeof DetectionsRoute
+  '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/detections': typeof DetectionsRoute
+  '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/detections'
+    | '/health'
     | '/learn'
     | '/live'
     | '/review'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/detections'
+    | '/health'
     | '/learn'
     | '/live'
     | '/review'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/detections'
+    | '/health'
     | '/learn'
     | '/live'
     | '/review'
@@ -221,6 +233,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DetectionsRoute: typeof DetectionsRoute
+  HealthRoute: typeof HealthRoute
   LearnRoute: typeof LearnRoute
   LiveRoute: typeof LiveRoute
   ReviewRoute: typeof ReviewRoute
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/detections'
       fullPath: '/detections'
       preLoaderRoute: typeof DetectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn': {
@@ -357,6 +377,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DetectionsRoute: DetectionsRoute,
+  HealthRoute: HealthRoute,
   LearnRoute: LearnRoute,
   LiveRoute: LiveRoute,
   ReviewRoute: ReviewRoute,

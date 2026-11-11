@@ -9,10 +9,12 @@ import {
 	checkDisk,
 	checkLocation,
 	checkName,
+	checkPower,
 	describeToDo,
 	dfUsedPercent,
+	formatModelName,
+	parseThrottled,
 	type StationReadings,
-	settingsMarkLabel,
 	stationToDos,
 } from "./health-data.ts";
 
@@ -251,32 +253,48 @@ test("every failing check is listed", () => {
 	]);
 });
 
-test("each to-do offers one way forward", () => {
-	assert.deepEqual(describeToDo({ kind: "location" }).action, {
-		kind: "setting",
-		tab: "station",
-		label: "Set location",
-	});
-	assert.equal(describeToDo({ kind: "analyzer" }).action.kind, "restart");
-	const audio = describeToDo({ kind: "audio" }).action;
-	assert.equal(audio.kind === "setting" && audio.tab, "audio-input");
+test("a keeping disk names the line where recording stops", () => {
 	const disk = describeToDo({
 		kind: "disk",
 		usedPercent: 91,
 		threshold: 95,
 		action: "keep",
 	});
-	assert.equal(disk.action.kind === "setting" && disk.action.tab, "storage");
 	assert.match(disk.detail, /91%/);
 	assert.match(disk.detail, /stops recording at 95%/);
 });
 
-test("the settings mark names what it is marking", () => {
-	assert.equal(settingsMarkLabel(0, null), null);
-	assert.equal(settingsMarkLabel(1, null), "1 thing to do");
-	assert.equal(settingsMarkLabel(0, "v1.2"), "Update to v1.2 available");
+test("vcgencmd's throttle bits become power now and since boot", () => {
+	assert.deepEqual(parseThrottled("throttled=0x0\n"), {
+		now: false,
+		sinceBoot: false,
+	});
+	assert.deepEqual(parseThrottled("throttled=0x50005\n"), {
+		now: true,
+		sinceBoot: true,
+	});
+	assert.deepEqual(parseThrottled("throttled=0x50000\n"), {
+		now: false,
+		sinceBoot: true,
+	});
+	assert.equal(parseThrottled("error"), null);
+});
+
+test("power is low now before it dipped earlier", () => {
+	assert.equal(checkPower(null), "unknown");
+	assert.equal(checkPower({ now: false, sinceBoot: false }), "steady");
+	assert.equal(checkPower({ now: false, sinceBoot: true }), "dipped");
+	assert.equal(checkPower({ now: true, sinceBoot: true }), "low");
+});
+
+test("BirdNET-Pi's model file reads as a model name", () => {
 	assert.equal(
-		settingsMarkLabel(2, "v1.2"),
-		"2 things to do. Update to v1.2 available",
+		formatModelName("BirdNET_GLOBAL_6K_V2.4_Model_FP16"),
+		"BirdNET 2.4",
 	);
+	assert.equal(
+		formatModelName("BirdNET_6K_GLOBAL_MODEL"),
+		"BirdNET 6K GLOBAL MODEL",
+	);
+	assert.equal(formatModelName(undefined), null);
 });

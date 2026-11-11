@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link, useRouteContext } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 
 import { ShellSized } from "~/components/ui/shell.tsx";
 import { APP_VERSION, REPO_URL } from "~/lib/app-version.ts";
@@ -19,14 +21,36 @@ const STATUS_HINT: Record<StationStatus, string> = {
 	unknown: "The station's services couldn't be checked from here.",
 };
 
+function HealthLink({
+	className,
+	title,
+	children,
+}: {
+	className: string;
+	title?: string;
+	children: ReactNode;
+}) {
+	return (
+		<Link
+			to="/health"
+			title={title}
+			className={`${className} no-underline hover:underline`}
+		>
+			{children}
+		</Link>
+	);
+}
+
 export function SidebarStatusBar({ className = "" }: { className?: string }) {
 	const status = useQuery(stationStatusQuery).data;
+	const { auth } = useRouteContext({ from: "__root__" });
 	const isLive = status === "live";
+	const StatusTag = auth.unlocked ? HealthLink : "p";
 	return (
 		<div
 			className={`flex items-center gap-1.5 border-line border-t py-2.5 text-xs ${className}`}
 		>
-			<p
+			<StatusTag
 				className="m-0 flex items-center gap-1.5"
 				title={status ? STATUS_HINT[status] : undefined}
 			>
@@ -56,7 +80,7 @@ export function SidebarStatusBar({ className = "" }: { className?: string }) {
 						<span className="font-semibold">{STATUS_LABEL.live}</span>
 					</ShellSized>
 				)}
-			</p>
+			</StatusTag>
 			<a
 				href={REPO_URL}
 				target="_blank"

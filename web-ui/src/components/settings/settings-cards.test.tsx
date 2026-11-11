@@ -56,9 +56,9 @@ function resetButton(card: string) {
 	)?.[0];
 }
 
-test("every card with a default offers its own reset; Station and Updates don't", () => {
+test("every card with a default offers its own reset; Updates doesn't", () => {
 	const markup = renderWithQueryClient(
-		<SettingsCards tab="station" data={DATA} savers={SAVERS} />,
+		<SettingsCards tab="detection" data={DATA} savers={SAVERS} />,
 	);
 	for (const id of [
 		"detection",
@@ -71,7 +71,7 @@ test("every card with a default offers its own reset; Station and Updates don't"
 	]) {
 		assert.ok(resetButton(cardMarkup(markup, id)), id);
 	}
-	for (const id of ["station", "updates"]) {
+	for (const id of ["updates"]) {
 		assert.equal(resetButton(cardMarkup(markup, id)), undefined, id);
 	}
 });

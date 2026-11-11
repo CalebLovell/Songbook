@@ -1,13 +1,11 @@
 import { Settings } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
-import type { StationHealth } from "~/lib/health-data.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import type { SettingsPageData } from "~/lib/settings-data.ts";
-import type { UpdateState } from "~/lib/updates-data.ts";
 import { errorMessage } from "~/lib/utils.ts";
 import { RestartButton } from "./restart-button.tsx";
 import {
@@ -19,7 +17,6 @@ import {
 import type { SettingsTab } from "./settings-index.ts";
 import { SettingsReset } from "./settings-reset.tsx";
 import { SettingsToolbar } from "./settings-toolbar.tsx";
-import { StationToDos } from "./station-to-dos.tsx";
 
 type ResetOutcome = { message: string; needsRestart: boolean };
 
@@ -47,35 +44,18 @@ export function SettingsPage({
 	savers = {},
 	onReset,
 	onRestart,
-	health,
-	updates,
-	onCheckUpdates,
-	onInstallUpdate,
 	dataTab,
 }: {
 	tab: SettingsTab;
 	onTabChange: (next: SettingsTab) => void;
 	data: SettingsPageData;
 	savers?: SettingsSavers;
-	health?: StationHealth;
 	onReset?: () => Promise<ResetOutcome>;
 	onRestart?: SettingsRestarter;
-	updates?: UpdateState | null;
-	onCheckUpdates?: () => Promise<UpdateState>;
-	onInstallUpdate?: () => Promise<void>;
 	dataTab?: ReactNode;
 }) {
 	const [needsRestart, setNeedsRestart] = useState(false);
 	const [factoryResets, setFactoryResets] = useState(0);
-	const [settingToReveal, setSettingToReveal] = useState<SettingsTab | null>(
-		null,
-	);
-
-	useEffect(() => {
-		if (settingToReveal !== tab) return;
-		document.getElementById(settingToReveal)?.scrollIntoView();
-		setSettingToReveal(null);
-	}, [settingToReveal, tab]);
 
 	return (
 		<PageWrap className="space-y-page">
@@ -122,26 +102,12 @@ export function SettingsPage({
 					/>
 				}
 			/>
-			<StationToDos
-				toDos={health?.toDos ?? []}
-				onShowSetting={(next) => {
-					setSettingToReveal(next);
-					onTabChange(next);
-				}}
-				onRestart={async () => {
-					if (onRestart) await restartWithToast(onRestart);
-				}}
-			/>
 			<SettingsCards
 				key={factoryResets}
 				tab={tab}
 				data={data}
 				savers={savers}
 				restarter={onRestart}
-				diskUsedPercent={health?.diskUsedPercent ?? null}
-				updates={updates}
-				onCheckUpdates={onCheckUpdates}
-				onInstallUpdate={onInstallUpdate}
 				dataTab={dataTab}
 			/>
 		</PageWrap>

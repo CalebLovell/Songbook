@@ -172,8 +172,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   hover), never bolder text. Gated pages stay listed with a lock icon.
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
   `/` to focus), then two nav sections: Explore (Live Feed, Timeline, All Birds, Detections,
-  Learn) for everyone, and Station (Review, Species Filter, Settings) right below it only
-  when signed in. Nothing else sits low in the sidebar except the foot: account card, theme switcher, then a full-bleed status bar under a hairline, in the sidebar and the phone drawer alike (the slot under the wordmark belongs to the site name). The bar shows station status on the left (a moss dot that pings while listening, a still grey dot when Offline or Unknown) and `Songbook <version>` on the right, linking to the GitHub repo; the version is the release tag baked in at build time (`VITE_SONGBOOK_VERSION`), so dev builds show just Songbook. It is the only place status shows; the Live hero carries none. The foot keeps a fixed 1rem gap on every width, like the nav rows above it; `--page-gap` halving on phones is for page cards, not the drawer.
+  Learn) for everyone, and Station (Health, Review, Species Filter, Settings) right below it only
+  when signed in. Nothing else sits low in the sidebar except the foot: account card, theme switcher, then a full-bleed status bar under a hairline, in the sidebar and the phone drawer alike (the slot under the wordmark belongs to the site name). The bar shows station status on the left (a moss dot that pings while listening, a still grey dot when Offline or Unknown; signed in, it links to Health) and `Songbook <version>` on the right, linking to the GitHub repo; the version is the release tag baked in at build time (`VITE_SONGBOOK_VERSION`), so dev builds show just Songbook. It is the only place status shows; the Live hero carries none. The foot keeps a fixed 1rem gap on every width, like the nav rows above it; `--page-gap` halving on phones is for page cards, not the drawer.
 - **Account card**: the sidebar's last item, never a nav row. One line of bold title and
   one muted line beside a 36px round icon well, then a 34px borderless icon action:
   sign out when signed in, a link to `/sign-in?next=` when not, a chevron to `/sign-in` when
@@ -370,26 +370,50 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the end.
 - **Settings**: a save writes the config, then restarts the card's services. A
   refused and a declined restart read the same, and the card keeps offering Restart
-  until the values are live. Reset leaves the Station card alone. One tab per card,
+  until the values are live. One tab per card,
   except Preferences, which stacks the cards about taste rather than running the
-  station (Artwork, Highlights, Review), and Data (Backup, Restore, Export detections); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
+  station (Artwork, Highlights, Review), and Data (Restore, Export detections); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
   never drops an unsaved edit. The toolbar's Factory defaults covers every card; a card's own
-  footer reset covers only that card and goes through its normal save, and Station
-  and Updates have no default to offer one. A card's Save and reset show as disabled
+  footer reset covers only that card and goes through its normal save, and Updates
+  has no default to offer one. A card's Save and reset show as disabled
   when there is nothing to do. Artwork picks illustrations or photos for the whole
   station; `SpeciesImage` applies it, so data keeps naming the painting and no page
   has to know.
-- **To do**: Settings lists what's broken or not yet set above its tabs, each with one
-  action, and marks Settings in the sidebar; all of it is signed-in only, and with
-  nothing to do no section shows. Pure checks live in `lib/health-data.ts`. A state
+- **Health or Settings**: Health holds everything the station needs to work, and
+  Settings holds only what someone might tweak to taste. A station left on every Settings
+  default runs fine; one with a Health problem doesn't. So a value with no sensible
+  default (station name, location and its time zone) is set on Health, not in Settings,
+  and Settings never says whether something is working or repeats a Health reading (its
+  Storage card gives no current fullness). The one shared control is Restart BirdNET:
+  Settings offers it only while a saved change waits to take effect. Settings has no Station tab; its
+  first tab is Detection.
+- **Health** (`/health`, signed in) shows no birds and no detection counts. The page has no summary of its own: one
+  standard card per check, in a fixed order (Name, Location, Audio input, Power supply,
+  BirdNET model, Storage, Updates, Backups). Cards carry no status pills: state shows in
+  the card itself. A healthy card is plain, with its reading as the figure and a sentence
+  under it. A broken check is not a separate list: its own card wears the error tones
+  (`--toast-error-fill/-line`, clay title) with the problem and its fix bottom left. A
+  warning wears the warning tones. While the station name or location is unset the station
+  is setting up, and every failing card wears the warning tones instead of red. A reading
+  this computer can't give says "Not known" in muted text. Power supply and Updates only
+  ever warn. Actions live on the card they act on: Restart BirdNET; Change
+  or Set name and location, each in a small dialog; Restart the Pi and Shut down on Power
+  supply; Install (confirmed) and Check for updates; Download a backup, whose dialog
+  offers everything or without clips. Anything that is a preference (audio device, storage rules, automatic updates,
+  restoring a backup) links to its Settings tab. Card logic is pure in
+  `lib/health-cards.ts`. The Health row in the sidebar carries the only mark: the
+  number of cards that need a look (problems, warnings and setup steps, an offered update
+  included), clay when any is broken and sand otherwise, and nothing when all is well. The
+  phone's menu button shows the same as a dot.
+- **Checks**: pure checks live in `lib/health-data.ts`. A state
   that can't be read, or a mid-restart service, is unknown and never listed, and audio
   and the analyzer wait out 5 minutes of uptime. Audio is judged by the `StreamData`
   folder's own mtime, because the analyzer deletes the files. A station name equal to
   the hostname counts as unset, because the installer writes that. A purging disk
   alarms 2 points past `PURGE_THRESHOLD`, since it rests near that line when healthy;
-  a keeping disk warns 5 points before it, since services stop there. The card keeps
-  the normal header, and its rows wear the error tones (`--toast-error-fill`, `--toast-error-line`)
-  with clay titles and bark text, the one place a whole row goes red.
+  a keeping disk warns 5 points before it, since services stop there. Power supply warns
+  after a dip since boot (`vcgencmd get_throttled`). A backup counts when a
+  download finishes (`last-backup.json` in `Songbook-data`); none yet, or one over 30 days old, needs a look.
 
 - **Installable app**: `public/manifest.webmanifest` plus `public/sw.js`, registered
   only in production builds. The worker caches nothing but `offline.html` and the
