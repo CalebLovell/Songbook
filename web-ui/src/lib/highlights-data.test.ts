@@ -290,9 +290,7 @@ test("vocal needs the ratio, the detections and the presence", () => {
 	assert.deepEqual(line(loud.highlights, "vocal"), {
 		kind: "vocal",
 		total: 1,
-		birds: [
-			{ comName: "Robin", note: "30 today, usually 2", shareNote: "15× usual" },
-		],
+		birds: [{ comName: "Robin", note: "30 today, usually 2" }],
 	});
 
 	const few = judge({

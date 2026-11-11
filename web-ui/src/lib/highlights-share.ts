@@ -1,7 +1,5 @@
 import type { Highlight, SpeciesHighlightKind } from "~/lib/highlights-data.ts";
 
-const MAX_SHARED_NAMES = 3;
-
 const SPECIES_LEADS: Record<
 	SpeciesHighlightKind,
 	{ emoji: string; name: string }
@@ -27,21 +25,14 @@ export function formatActivityLines(highlights: Highlight[]): string[] {
 }
 
 export function formatHighlightLines(highlights: Highlight[]): string[] {
-	const blocks = highlights.flatMap((highlight) => {
+	return highlights.flatMap((highlight) => {
 		if (!("birds" in highlight)) return [];
+		const [lead] = highlight.birds;
+		if (!lead) return [];
 		const { emoji, name } = SPECIES_LEADS[highlight.kind];
-		const named = highlight.birds.slice(0, MAX_SHARED_NAMES).map((bird) => {
-			const note = bird.shareNote ?? bird.note;
-			return note ? `${bird.comName} (${note})` : bird.comName;
-		});
-		const rest = highlight.total - named.length;
+		const rest = highlight.total - 1;
 		return [
-			[
-				`${emoji}  ${name} · ${highlight.total.toLocaleString()}`,
-				...named,
-				...(rest > 0 ? [`+${rest} more`] : []),
-			],
+			`${emoji}  ${name} · ${lead.comName}${rest > 0 ? ` +${rest.toLocaleString()}` : ""}`,
 		];
 	});
-	return blocks.flatMap((block, index) => (index > 0 ? ["", ...block] : block));
 }

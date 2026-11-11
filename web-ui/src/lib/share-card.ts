@@ -3,6 +3,7 @@ import {
 	formatActivityLines,
 	formatHighlightLines,
 } from "~/lib/highlights-share.ts";
+import { plural } from "~/lib/number-format.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 
 type ShareWindow = "rolling" | "day";
@@ -34,8 +35,7 @@ export function shareHeader(
 	return [
 		"📖  Songbook",
 		...(stationName ? [`📍  ${stationName}`] : []),
-		`📊  ${period} Summary`,
-		...(date ? [`📅  ${date}`] : []),
+		`📅  ${[`${period} Summary`, ...(date ? [date] : [])].join(" · ")}`,
 	].join("\n");
 }
 
@@ -51,24 +51,17 @@ export function shareTotals({
 	highlights: Highlight[];
 }): string[] {
 	return [
-		`🐦  Species · ${species.toLocaleString()}`,
-		`🎙️  Detections · ${detections.toLocaleString()}`,
+		`🐦  ${species.toLocaleString()} species · ${detections.toLocaleString()} ${plural(detections, "detection")}`,
 		...(peakHour === null ? [] : [`🌅  Peak hour · ${hourLabel(peakHour)}`]),
 		...formatActivityLines(highlights),
 	];
 }
 
-const MEDALS = ["🥇", "🥈", "🥉"] as const;
-
-export function shareLeaderboard(
+export function shareTopBird(
 	ranked: { comName: string; count: number }[],
 ): string[] {
-	return ranked
-		.slice(0, MEDALS.length)
-		.map(
-			({ comName, count }, index) =>
-				`${MEDALS[index]}  ${comName} · ${count.toLocaleString()}`,
-		);
+	const [top] = ranked;
+	return top ? [`🥇  ${top.comName} · ${top.count.toLocaleString()}`] : [];
 }
 
 export function formatShareCard(card: ShareCard): string {
@@ -93,15 +86,13 @@ export function formatShareCard(card: ShareCard): string {
 		highlights: card.highlights ?? [],
 	});
 
-	const leaderboard = shareLeaderboard(card.topSpecies);
-
 	const highlights = formatHighlightLines(card.highlights ?? []);
 
 	return [
 		header,
 		"",
 		...totals,
-		...(leaderboard.length > 0 ? ["", ...leaderboard] : []),
+		...shareTopBird(card.topSpecies),
 		...(highlights.length > 0 ? ["", ...highlights] : []),
 	].join("\n");
 }

@@ -16,7 +16,6 @@ export const MAX_NAMED_BIRDS = 10;
 export type HighlightBird = {
 	comName: string;
 	note: string | null;
-	shareNote?: string;
 };
 
 export type SpeciesHighlightKind =
@@ -159,20 +158,15 @@ function speciesLine<Row extends { comName: string }>(
 	kind: SpeciesHighlightKind,
 	rows: Row[],
 	noteFor: (row: Row) => string | null,
-	shareNoteFor?: (row: Row) => string | undefined,
 ): Highlight | null {
 	if (rows.length === 0) return null;
 	return {
 		kind,
 		total: rows.length,
-		birds: rows.slice(0, MAX_NAMED_BIRDS).map((row) => {
-			const shareNote = shareNoteFor?.(row);
-			return {
-				comName: row.comName,
-				note: noteFor(row),
-				...(shareNote ? { shareNote } : {}),
-			};
-		}),
+		birds: rows.slice(0, MAX_NAMED_BIRDS).map((row) => ({
+			comName: row.comName,
+			note: noteFor(row),
+		})),
 	};
 }
 
@@ -206,7 +200,6 @@ export function judgeHighlights(
 	const windowRecordedDays = window.filter(recorded);
 	const regularShare = new Map<string, number>();
 	const regularNote = new Map<string, string>();
-	const regularShareNote = new Map<string, string>();
 	const streakOf = (name: string) => {
 		let count = 1;
 		for (const species of evidence.daysBefore) {
@@ -224,7 +217,6 @@ export function judgeHighlights(
 				name,
 				`${streak} ${plural(streak, "day", "days")} straight`,
 			);
-			regularShareNote.set(name, `${streak}-day streak`);
 			return streak >= settings.consistent.streakDays;
 		}
 		if (windowRecordedDays.length === 0) return false;
@@ -235,10 +227,6 @@ export function judgeHighlights(
 			regularNote.set(
 				name,
 				`every day${evidence.inProgress ? " so far" : ""} ${windowPhrase(period)}`,
-			);
-			regularShareNote.set(
-				name,
-				`every day${evidence.inProgress ? " so far" : ""}`,
 			);
 			return daysHeard === windowRecordedDays.length;
 		}
@@ -381,7 +369,6 @@ export function judgeHighlights(
 				})
 				.sort((a, b) => b.ratio - a.ratio),
 			formatVocal,
-			(row) => `${Math.round(row.ratio).toLocaleString()}× usual`,
 		),
 		speciesLine(
 			"consistent",
@@ -393,7 +380,6 @@ export function judgeHighlights(
 				)
 				.map((comName) => ({ comName })),
 			(row) => flags.get(row.comName)?.regularNote ?? null,
-			(row) => regularShareNote.get(row.comName),
 		),
 		speciesLine(
 			"returned",

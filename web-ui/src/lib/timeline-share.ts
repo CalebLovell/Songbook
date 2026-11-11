@@ -1,10 +1,6 @@
 import type { Highlight } from "~/lib/highlights-data.ts";
 import { formatHighlightLines } from "~/lib/highlights-share.ts";
-import {
-	shareHeader,
-	shareLeaderboard,
-	shareTotals,
-} from "~/lib/share-card.ts";
+import { shareHeader, shareTopBird, shareTotals } from "~/lib/share-card.ts";
 import type { TimelinePeriod } from "~/lib/timeline-periods.ts";
 
 const HOURS = 24;
@@ -64,7 +60,7 @@ export function formatTimelineShareCard(card: TimelineShareCard): string {
 		highlights: card.highlights,
 	});
 
-	const leaderboard = shareLeaderboard(
+	const topBird = shareTopBird(
 		[...rows]
 			.sort((a, b) => b.totalDetections - a.totalDetections)
 			.map((row) => ({ comName: row.comName, count: row.totalDetections })),
@@ -76,8 +72,7 @@ export function formatTimelineShareCard(card: TimelineShareCard): string {
 		header,
 		"",
 		...totals,
-		"",
-		...leaderboard,
+		...topBird,
 		...(highlights.length > 0 ? ["", ...highlights] : []),
 	].join("\n");
 }
