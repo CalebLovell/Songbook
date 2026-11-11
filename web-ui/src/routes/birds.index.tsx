@@ -166,7 +166,7 @@ function SpeciesControls() {
 		<div className="flex items-center gap-page">
 			<DebouncedSearchInput
 				aria-label="Filter birds"
-				placeholder="Search birds..."
+				placeholder="Search…"
 				value={search}
 				onCommit={(value) =>
 					navigate({

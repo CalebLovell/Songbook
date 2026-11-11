@@ -135,6 +135,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   controls in a toolbar or a row of buttons (search, menus, toggles,
   buttons), side by side or stacked; only a segmented control's own
   segments are joined.
+- Search boxes all read "Search…" (one ellipsis character), never what they
+  search; the specific scope goes in the `aria-label`.
 - Motion: 180ms ease for color/border/lift; `animate-rise-in` 700ms on mount;
   `animate-flash-in` 2.4s sand highlight for new arrivals; charts 500ms.
   Only linked cards lift on hover, and nothing inside them moves (a painting

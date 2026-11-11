@@ -287,7 +287,7 @@ export function DetectionsFilters({
 				<div className="flex w-full min-w-0 flex-1 items-center gap-page">
 					<DebouncedSearchInput
 						aria-label="Search detections"
-						placeholder="Search detections..."
+						placeholder="Search…"
 						value={search.species ?? ""}
 						onCommit={(value) =>
 							updateSearch({ page: 1, species: value || undefined })

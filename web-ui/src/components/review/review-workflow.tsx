@@ -546,7 +546,8 @@ export function ReviewWorkflow({
 							className="pl-9"
 							value={query}
 							onChange={(e) => setQuery(e.target.value)}
-							placeholder="Search any BirdNET species"
+							aria-label="Search any BirdNET species"
+							placeholder="Search…"
 							autoFocus
 						/>
 					</div>

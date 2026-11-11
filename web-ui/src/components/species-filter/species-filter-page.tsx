@@ -74,7 +74,7 @@ export function SpeciesFilterPageSkeleton({
 					<div className={SEARCH_ROW_CLASS}>
 						<SearchInput
 							aria-label="Search installed species"
-							placeholder="Search species..."
+							placeholder="Search…"
 							value={search.query ?? ""}
 							onChange={() => {}}
 							onClear={() => {}}
@@ -511,7 +511,7 @@ export function SpeciesFilterPage({
 					<div className={SEARCH_ROW_CLASS}>
 						<DebouncedSearchInput
 							aria-label="Search installed species"
-							placeholder="Search species..."
+							placeholder="Search…"
 							value={search.query ?? ""}
 							onCommit={(value) =>
 								onSearchChange({
