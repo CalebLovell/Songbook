@@ -20,7 +20,7 @@ import type { HealthAttention } from "~/lib/health-cards.ts";
 import { useHealthMark } from "~/lib/use-health-mark.ts";
 
 const NAV_ROW_CLASS =
-	"group flex min-h-8.5 pointer-coarse:min-h-9 items-center gap-2.5 pointer-coarse:gap-3 rounded-(--radius) px-3 text-[0.875rem] text-[color-mix(in_oklab,var(--ink)_70%,var(--moss)_30%)] pointer-coarse:text-[1rem] no-underline hover:bg-meadow hover:text-ink data-[status=active]:bg-[color-mix(in_oklab,var(--moss)_10%,var(--meadow))] data-[status=active]:text-ink";
+	"group flex min-h-8.5 pointer-coarse:min-h-9.5 items-center gap-2.5 pointer-coarse:gap-3 rounded-(--radius) px-3 text-[0.875rem] text-[color-mix(in_oklab,var(--ink)_70%,var(--moss)_30%)] pointer-coarse:text-[1rem] no-underline hover:bg-meadow hover:text-ink data-[status=active]:bg-[color-mix(in_oklab,var(--moss)_10%,var(--meadow))] data-[status=active]:text-ink";
 
 function NavIcon({ icon: Icon }: { icon: LucideIcon }) {
 	return (
