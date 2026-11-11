@@ -36,7 +36,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table.tsx";
-import { SortButton, SortMenu } from "~/components/ui/table-sort.tsx";
+import {
+	SortButton,
+	SortMenu,
+	TOOLBAR_SORT_CLASS,
+} from "~/components/ui/table-sort.tsx";
 import { audioUrlFor } from "~/lib/audio.ts";
 import { formatDate, formatDateTime, formatTime } from "~/lib/date-format.ts";
 import {
@@ -106,7 +110,6 @@ function gridColumns(canDelete: boolean, canListen: boolean): CSSProperties {
 	const audio = canListen ? " max-content" : "";
 	const fill = "minmax(max-content, 1fr)";
 	return {
-		"--cols-xs": `${lead}${fill} max-content${audio}`,
 		"--cols-sm": `${lead}minmax(0, 1fr) max-content${audio}`,
 		"--cols-md": `${lead}minmax(0, 1fr) ${fill} ${fill}${audio}`,
 		"--cols-lg": `${lead}repeat(4, ${fill})${audio}`,
@@ -281,15 +284,35 @@ export function DetectionsFilters({
 	return (
 		<div className="@container">
 			<div className="flex @min-[38rem]:flex-row flex-col @min-[38rem]:items-center @min-[38rem]:justify-between gap-page">
-				<DebouncedSearchInput
-					aria-label="Search detections"
-					placeholder="Search detections..."
-					value={search.species ?? ""}
-					onCommit={(value) =>
-						updateSearch({ page: 1, species: value || undefined })
-					}
-				/>
-				<div className="@min-[38rem]:w-auto w-full">
+				<div className="flex w-full min-w-0 flex-1 items-center gap-page">
+					<DebouncedSearchInput
+						aria-label="Search detections"
+						placeholder="Search detections..."
+						value={search.species ?? ""}
+						onCommit={(value) =>
+							updateSearch({ page: 1, species: value || undefined })
+						}
+					/>
+					<SortMenu
+						label="Sort detections by"
+						sorts={DETECTION_SORTS}
+						labels={SORT_LABELS}
+						sort={search.sort}
+						direction={search.direction}
+						reversed={
+							search.direction !== DETECTION_DEFAULT_DIRECTION[search.sort]
+						}
+						onSort={(sort) => updateSearch(nextDetectionSort(search, sort))}
+						onFlip={() =>
+							updateSearch({
+								page: 1,
+								direction: search.direction === "asc" ? "desc" : "asc",
+							})
+						}
+						className={TOOLBAR_SORT_CLASS}
+					/>
+				</div>
+				<div className="@max-[38rem]:order-first @min-[38rem]:w-auto w-full">
 					<DateRangeFilter
 						from={search.from}
 						to={search.to}
@@ -400,18 +423,12 @@ export function DetectionsTable({
 }: DetectionsTableProps) {
 	const selectedCount = Object.values(rowSelection).filter(Boolean).length;
 	const actionsId = useId();
+	const selectAllId = useId();
 	const rowsForClick = useShiftClickRange(selectedCount > 0);
 
 	function updateSearch(change: Partial<DetectionWorkspaceSearch>) {
 		onSearchChange({ ...search, ...change });
 		onRowSelectionChange({});
-	}
-
-	function flipSort() {
-		updateSearch({
-			page: 1,
-			direction: search.direction === "asc" ? "desc" : "asc",
-		});
 	}
 
 	function sortBy(sort: DetectionWorkspaceSort) {
@@ -422,6 +439,7 @@ export function DetectionsTable({
 		id: "select",
 		header: ({ table }) => (
 			<RowCheckbox
+				id={selectAllId}
 				aria-label="Select all detections on this page"
 				actionsId={actionsId}
 				checked={table.getIsAllPageRowsSelected()}
@@ -645,13 +663,19 @@ export function DetectionsTable({
 			<Table
 				role="table"
 				aria-label="Detections"
-				className="grid h-full min-w-min @min-[54rem]:grid-cols-(--cols-lg) @xl:grid-cols-(--cols-md) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
+				className={cn(
+					"grid h-full min-w-min @min-[54rem]:grid-cols-(--cols-lg) @xl:grid-cols-(--cols-md) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)]",
+					!canDelete && "@max-xl:grid-rows-[minmax(0,1fr)]",
+				)}
 				style={gridColumns(canDelete, canListen)}
 				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
 				<TableHeader
 					role="rowgroup"
-					className="@xl:scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className={cn(
+						"scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none",
+						!canDelete && "@max-xl:hidden",
+					)}
 				>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} role="row" className={GRID_ROW}>
@@ -680,30 +704,29 @@ export function DetectionsTable({
 											)}
 								</TableHead>
 							))}
-							<TableHead
-								role="columnheader"
-								className={cn(
-									"@xl:hidden",
-									canDelete
-										? "col-[2/-1]"
-										: `col-span-full ${FIRST_COLUMN_CLASSES}`,
-									"pr-page",
-								)}
-							>
-								<SortMenu
-									label="Sort detections by"
-									sorts={DETECTION_SORTS}
-									labels={SORT_LABELS}
-									sort={search.sort}
-									direction={search.direction}
-									reversed={
-										search.direction !==
-										DETECTION_DEFAULT_DIRECTION[search.sort]
-									}
-									onSort={sortBy}
-									onFlip={flipSort}
-								/>
-							</TableHead>
+							{canDelete ? (
+								<TableHead
+									role="columnheader"
+									className={cn(
+										"col-[2/-1] flex @xl:hidden items-center justify-between gap-page font-normal",
+										CELL_GAP,
+										AUDIO_EDGE,
+									)}
+								>
+									<label
+										htmlFor={selectAllId}
+										className="cursor-pointer text-muted-foreground"
+									>
+										Select all
+									</label>
+									{page ? (
+										<span className="text-muted-foreground tabular-nums">
+											{page.total.toLocaleString()}{" "}
+											{plural(page.total, "detection")}
+										</span>
+									) : null}
+								</TableHead>
+							) : null}
 						</TableRow>
 					))}
 				</TableHeader>
@@ -712,7 +735,7 @@ export function DetectionsTable({
 					role="rowgroup"
 					aria-busy={skeleton || undefined}
 					data-scroll-reset=""
-					className="scrollbar-gutter-stable col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
+					className="scrollbar-gutter-stable col-span-full grid min-h-0 auto-rows-max grid-cols-subgrid content-start overflow-y-auto"
 				>
 					{table.getRowModel().rows.map((row) => (
 						<TableRow

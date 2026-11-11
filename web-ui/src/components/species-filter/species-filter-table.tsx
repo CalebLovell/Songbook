@@ -29,7 +29,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table.tsx";
-import { SortButton, SortMenu } from "~/components/ui/table-sort.tsx";
+import {
+	SortButton,
+	SortMenu,
+	TOOLBAR_SORT_CLASS,
+} from "~/components/ui/table-sort.tsx";
 import { useShiftClickRange } from "~/lib/shift-click-range.ts";
 import type {
 	SpeciesFilterRow,
@@ -102,7 +106,6 @@ const BODY_ROW_HEIGHT = "min-h-[calc(1.75rem+1rem+1px)]";
 const STATUS_CHIP =
 	"border-0 px-2.5 py-1.5 font-semibold leading-none ring-1 ring-current/20 ring-inset";
 const COLUMN_GRID = {
-	"--cols-xs": "max-content max-content minmax(max-content, 1fr) max-content",
 	"--cols-sm": "max-content max-content minmax(0, 1fr) max-content",
 	"--cols-md":
 		"max-content max-content minmax(0, 1fr) minmax(max-content, 1fr) max-content",
@@ -116,6 +119,30 @@ const SORT_LABELS: Record<SpeciesSortKey, string> = {
 	count: "Count",
 	status: "Status",
 };
+
+export function SpeciesFilterSortMenu({
+	sort,
+	direction,
+	onSortChange,
+}: {
+	sort: SpeciesSortKey;
+	direction: SortDirection;
+	onSortChange: (key: SpeciesSortKey) => void;
+}) {
+	return (
+		<SortMenu
+			label="Sort species by"
+			sorts={SPECIES_FILTER_SORTS}
+			labels={SORT_LABELS}
+			sort={sort}
+			direction={direction}
+			reversed={direction !== SPECIES_FILTER_DEFAULT_DIRECTION[sort]}
+			onSort={onSortChange}
+			onFlip={() => onSortChange(sort)}
+			className={TOOLBAR_SORT_CLASS}
+		/>
+	);
+}
 
 const STATUS_PRESENTATION: Record<
 	SpeciesStatus,
@@ -172,6 +199,7 @@ export function SpeciesFilterTable({
 
 	const rowsForClick = useShiftClickRange(selected.size > 0);
 	const actionsId = useId();
+	const selectAllId = useId();
 	useAnnounceChange(
 		selected.size > 0
 			? `${selected.size} selected. Press Enter to reach the actions.`
@@ -222,13 +250,13 @@ export function SpeciesFilterTable({
 			<Table
 				role="table"
 				aria-label="Installed species"
-				className="grid h-full min-w-min @min-[54rem]:grid-cols-(--cols-lg) @xl:grid-cols-(--cols-md) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)] max-[400px]:min-w-0 max-[400px]:grid-cols-[minmax(0,1fr)]"
+				className="grid h-full min-w-min @min-[54rem]:grid-cols-(--cols-lg) @xl:grid-cols-(--cols-md) grid-cols-(--cols-sm) grid-rows-[auto_minmax(0,1fr)]"
 				style={COLUMN_GRID}
 				containerClassName="-ml-page -mr-card-edge -mt-page min-h-0 flex-1 overflow-x-auto overflow-y-hidden pr-0 pl-0"
 			>
 				<TableHeader
 					role="rowgroup"
-					className="@xl:scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong max-[400px]:grid-cols-[max-content_minmax(0,1fr)] [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
+					className="scrollbar-gutter-stable col-span-full grid grid-cols-subgrid overflow-hidden border-b bg-surface-strong [&_th]:h-auto [&_th]:py-0 [&_th]:leading-none [&_th_button]:leading-none [&_tr]:h-11 [&_tr]:border-none"
 				>
 					<TableRow role="row" className={GRID_ROW}>
 						<TableHead
@@ -241,6 +269,7 @@ export function SpeciesFilterTable({
 							)}
 						>
 							<RowCheckbox
+								id={selectAllId}
 								aria-label="Select all species on this page"
 								actionsId={actionsId}
 								checked={allSelected}
@@ -273,23 +302,19 @@ export function SpeciesFilterTable({
 						)}
 						<TableHead
 							role="columnheader"
-							className="col-[2/-1] @xl:hidden pr-page"
+							className={cn(
+								"col-[2/-1] flex @xl:hidden items-center justify-between gap-page font-normal",
+								CELL_GAP,
+								STATUS_EDGE,
+							)}
 						>
-							<div className="flex items-center gap-2">
-								<StatusTip />
-								<SortMenu
-									label="Sort species by"
-									sorts={SPECIES_FILTER_SORTS}
-									labels={SORT_LABELS}
-									sort={sort}
-									direction={direction}
-									reversed={
-										direction !== SPECIES_FILTER_DEFAULT_DIRECTION[sort]
-									}
-									onSort={onSortChange}
-									onFlip={() => onSortChange(sort)}
-								/>
-							</div>
+							<label
+								htmlFor={selectAllId}
+								className="cursor-pointer text-muted-foreground"
+							>
+								Select all
+							</label>
+							<StatusTip />
 						</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -298,7 +323,7 @@ export function SpeciesFilterTable({
 					role="rowgroup"
 					aria-busy={rows === null || undefined}
 					data-scroll-reset=""
-					className="scrollbar-gutter-stable col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto max-[400px]:grid-cols-(--cols-xs) max-[400px]:overflow-x-auto"
+					className="scrollbar-gutter-stable col-span-full grid min-h-0 grid-cols-subgrid content-start overflow-y-auto"
 				>
 					{rows === null
 						? Array.from({ length: SPECIES_FILTER_PAGE_SIZE }, (_, index) => (

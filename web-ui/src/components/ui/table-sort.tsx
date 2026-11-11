@@ -10,6 +10,10 @@ import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
 import type { SortDirection } from "~/lib/table-sort.ts";
 import { cn } from "~/lib/utils.ts";
 
+// A table's own @container is 30px narrower than the toolbar above it (card padding
+// and border), so this matches the table's 36rem switch to column headings.
+export const TOOLBAR_SORT_CLASS = "@min-[37.875rem]:hidden";
+
 export function SortMenu<Sort extends string>({
 	label,
 	sorts,
@@ -19,6 +23,7 @@ export function SortMenu<Sort extends string>({
 	reversed,
 	onSort,
 	onFlip,
+	className,
 }: {
 	label: string;
 	sorts: readonly Sort[];
@@ -28,13 +33,15 @@ export function SortMenu<Sort extends string>({
 	reversed: boolean;
 	onSort: (sort: Sort) => void;
 	onFlip: () => void;
+	className?: string;
 }) {
 	const DirectionIcon = reversed ? ArrowUpNarrowWide : ArrowDownWideNarrow;
 	return (
 		<div
 			className={cn(
 				JOINED_CONTROL_CLASS,
-				"ml-auto h-7 pointer-coarse:h-9 w-fit font-normal pointer-coarse:text-base text-sm",
+				"h-8.5 pointer-coarse:h-9 w-fit shrink-0 focus-within:border-focus-ring",
+				className,
 			)}
 		>
 			<div className="relative flex">
@@ -44,7 +51,7 @@ export function SortMenu<Sort extends string>({
 					onChange={(event) =>
 						sort !== event.target.value && onSort(event.target.value as Sort)
 					}
-					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 leading-none transition-colors hover:bg-accent hover:text-accent-foreground"
+					className="h-full cursor-pointer appearance-none bg-transparent pr-7 pl-2.5 font-medium pointer-coarse:text-base text-sm leading-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none"
 				>
 					{sorts.map((option) => (
 						<option key={option} value={option}>
@@ -53,7 +60,7 @@ export function SortMenu<Sort extends string>({
 					))}
 				</select>
 				<ChevronDown
-					className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-muted-foreground"
+					className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground"
 					aria-hidden="true"
 				/>
 			</div>
@@ -63,9 +70,9 @@ export function SortMenu<Sort extends string>({
 				aria-pressed={reversed}
 				title={direction === "asc" ? "Ascending" : "Descending"}
 				onClick={onFlip}
-				className="flex pointer-coarse:w-9 w-7 shrink-0 items-center justify-center border-input border-l text-muted-foreground hover:bg-accent hover:text-accent-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
+				className="flex pointer-coarse:w-9 w-8.5 shrink-0 items-center justify-center border-input border-l hover:bg-accent hover:text-accent-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
 			>
-				<DirectionIcon className="size-3.5" aria-hidden="true" />
+				<DirectionIcon className="size-4" aria-hidden="true" />
 			</button>
 		</div>
 	);

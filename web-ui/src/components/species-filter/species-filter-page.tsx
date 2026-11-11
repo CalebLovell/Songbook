@@ -43,6 +43,7 @@ import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { errorMessage } from "~/lib/utils.ts";
 import {
 	SPECIES_FILTER_PAGE_SIZE,
+	SpeciesFilterSortMenu,
 	SpeciesFilterTable,
 	type SpeciesFilterViewRow,
 	sortSpeciesFilterRows,
@@ -51,7 +52,8 @@ import { SpeciesFilterTools } from "./species-filter-tools.tsx";
 
 const TOOLBAR_CLASS =
 	"flex @min-[38rem]:flex-row flex-col @min-[38rem]:flex-wrap @min-[38rem]:items-center gap-page";
-const SEARCH_CLASS = "@min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
+const SEARCH_ROW_CLASS =
+	"flex min-w-0 items-center gap-page @min-[38rem]:min-w-64 @min-[38rem]:flex-[1_1_20rem]";
 const TABLE_CARD_CLASS =
 	"@container flex min-h-80 flex-col overflow-hidden [--card-edge:min(var(--page-gap),0.75rem)]";
 
@@ -69,14 +71,20 @@ export function SpeciesFilterPageSkeleton({
 					description={PAGE_HEADERS.speciesFilter.description}
 				/>
 				<div inert className={TOOLBAR_CLASS}>
-					<SearchInput
-						aria-label="Search installed species"
-						className={SEARCH_CLASS}
-						placeholder="Search species..."
-						value={search.query ?? ""}
-						onChange={() => {}}
-						onClear={() => {}}
-					/>
+					<div className={SEARCH_ROW_CLASS}>
+						<SearchInput
+							aria-label="Search installed species"
+							placeholder="Search species..."
+							value={search.query ?? ""}
+							onChange={() => {}}
+							onClear={() => {}}
+						/>
+						<SpeciesFilterSortMenu
+							sort={search.sort}
+							direction={search.direction}
+							onSortChange={() => {}}
+						/>
+					</div>
 					<SpeciesFilterTools
 						onImport={() => {}}
 						onExport={() => {}}
@@ -500,19 +508,28 @@ export function SpeciesFilterPage({
 				/>
 
 				<div data-layout="species-filter-toolbar" className={TOOLBAR_CLASS}>
-					<DebouncedSearchInput
-						aria-label="Search installed species"
-						className={SEARCH_CLASS}
-						placeholder="Search species..."
-						value={search.query ?? ""}
-						onCommit={(value) =>
-							onSearchChange({
-								...search,
-								page: 1,
-								query: value.trim() || undefined,
-							})
-						}
-					/>
+					<div className={SEARCH_ROW_CLASS}>
+						<DebouncedSearchInput
+							aria-label="Search installed species"
+							placeholder="Search species..."
+							value={search.query ?? ""}
+							onCommit={(value) =>
+								onSearchChange({
+									...search,
+									page: 1,
+									query: value.trim() || undefined,
+								})
+							}
+						/>
+						<SpeciesFilterSortMenu
+							sort={search.sort}
+							direction={search.direction}
+							onSortChange={(sort) => {
+								setSelected(new Set());
+								onSearchChange(nextSpeciesFilterSort(search, sort));
+							}}
+						/>
+					</div>
 					<SpeciesFilterTools
 						onImport={importLists}
 						onExport={exportLists}

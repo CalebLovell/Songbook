@@ -5,9 +5,9 @@ import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
 import { cn } from "~/lib/utils.ts";
 
 const GROUP_CLASS =
-	"h-8.5 pointer-coarse:h-9 w-fit shrink-0 pointer-coarse:text-base text-sm @min-[38rem]:self-auto self-start lg:ml-auto";
+	"@max-[38rem]:order-first h-8.5 pointer-coarse:h-9 @min-[38rem]:w-fit w-full shrink-0 pointer-coarse:text-base text-sm lg:ml-auto";
 const SEGMENT_CLASS =
-	"flex items-center gap-2 @max-[30rem]:px-3 px-3.5 hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent [&+&]:border-input [&+&]:border-l";
+	"flex @min-[38rem]:flex-none flex-1 items-center justify-center gap-2 @max-[30rem]:px-3 px-3.5 hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent [&+&]:border-input [&+&]:border-l";
 const LISTS_WORD = "@max-[30rem]:hidden";
 
 export function SpeciesFilterTools({

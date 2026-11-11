@@ -243,10 +243,15 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   sighted users; that is a known gap against reflow, kept on purpose.
 - **Tables** (Detections, Species Filter): one grid with the header, body and
   rows as subgrids, so only the rows scroll and the columns still align. Header,
-  rows and footer stand the same height. Width follows the card: under 36rem one
-  sort menu replaces the headings and the binomial stacks under the common name,
-  36rem and 54rem each bring columns back. On the narrowest screens (400px) the
-  body scrolls sideways on its own, so the sort menu never leaves the screen. Only
+  rows and footer stand the same height. Width follows the card: under 36rem the
+  headings give way to one sort menu beside the search box (as on All Birds), and
+  once the toolbar stacks, that search row sits directly on the table with any
+  other rows (date range, list tools stretched full width) above it. The
+  binomial stacks under the common name, and the header strip holds only "Select
+  all" and, on the right, the total or the status tip, so signed-out visitors get
+  no strip at all. 36rem and 54rem each
+  bring columns back. Rows never scroll sideways: names truncate so the last
+  column always sits inside the card. Only
   the selection column (2.5rem) and the last column are pinned; the rest share
   the width. Row numbers count on across pages (`IndexDot`). The footer is one
   line that keeps its height whatever is ticked: range on the left, stepper on the
