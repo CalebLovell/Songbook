@@ -7,7 +7,6 @@ import {
 	Heart,
 	Image,
 	Mic2,
-	RefreshCw,
 	RotateCcw,
 	SearchCheck,
 	SlidersHorizontal,
@@ -19,7 +18,6 @@ import type { SearchSetting } from "~/lib/site-search.ts";
 export const SETTINGS_TABS = [
 	"detection",
 	"preferences",
-	"updates",
 	"audio-input",
 	"recording",
 	"storage",
@@ -86,13 +84,6 @@ const PREFERENCE_CARDS: SettingsIndexEntry[] = [
 ];
 
 const SYSTEM_CARDS: SettingsIndexEntry[] = [
-	{
-		title: "Updates",
-		tab: "updates",
-		icon: RefreshCw,
-		fields: ["Automatic updates"],
-		keywords: ["version", "release", "upgrade", "automatic"],
-	},
 	{
 		title: "Audio input",
 		tab: "audio-input",

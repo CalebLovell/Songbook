@@ -237,3 +237,13 @@ test("name and location are changed on Health itself", () => {
 		{ kind: "download-backup" },
 	]);
 });
+
+test("only a release install offers the automatic-updates choice", () => {
+	const managed = cardsOf(health({})).find((each) => each.id === "updates");
+	assert.equal(managed?.automaticUpdates, true);
+	const development = healthCards(health({}), {
+		...UP_TO_DATE,
+		managed: false,
+	}).find((each) => each.id === "updates");
+	assert.equal(development?.automaticUpdates, undefined);
+});

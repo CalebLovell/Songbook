@@ -1,6 +1,7 @@
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	createFileRoute,
+	redirect,
 	stripSearchParams,
 	useRouter,
 } from "@tanstack/react-router";
@@ -30,7 +31,6 @@ import {
 	saveRecordingSettingsFn,
 	saveReviewSettingsFn,
 	saveStorageSettingsFn,
-	saveUpdateSettingsFn,
 } from "~/lib/settings.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
@@ -41,9 +41,11 @@ const settingsPageQuery = queryOptions({
 	queryFn: () => getSettingsPage(),
 });
 
+const MOVED_TO_HEALTH = "updates";
+
 const settingsSearchSchema = z.object({
 	tab: z
-		.enum(SETTINGS_TABS)
+		.enum([...SETTINGS_TABS, MOVED_TO_HEALTH])
 		.default(DEFAULT_SETTINGS_TAB)
 		.catch(DEFAULT_SETTINGS_TAB),
 });
@@ -54,8 +56,11 @@ export const Route = createFileRoute("/settings")({
 	search: {
 		middlewares: [stripSearchParams({ tab: DEFAULT_SETTINGS_TAB })],
 	},
-	beforeLoad: ({ context, location }) =>
-		requireUnlocked(context.auth, location),
+	beforeLoad: ({ context, location, search }) => {
+		requireUnlocked(context.auth, location);
+		if (search.tab === MOVED_TO_HEALTH)
+			throw redirect({ to: "/health", replace: true });
+	},
 	component: SettingsRoute,
 });
 
@@ -69,11 +74,11 @@ function SettingsRoute() {
 	const saveReview = useServerFn(saveReviewSettingsFn);
 	const saveHighlights = useServerFn(saveHighlightSettingsFn);
 	const saveArtwork = useServerFn(saveArtworkSettingsFn);
-	const saveUpdates = useServerFn(saveUpdateSettingsFn);
 	const reset = useServerFn(resetSettingsFn);
 	const restart = useServerFn(restartStationFn);
 	const router = useRouter();
-	const { tab } = Route.useSearch();
+	const { tab: requested } = Route.useSearch();
+	const tab = requested === MOVED_TO_HEALTH ? DEFAULT_SETTINGS_TAB : requested;
 	const navigate = Route.useNavigate();
 	const showTab = (next: SettingsTab) =>
 		navigate({
@@ -123,7 +128,6 @@ function SettingsRoute() {
 					await refreshAllData(router, queryClient);
 					return result;
 				},
-				updates: (values) => refreshingData(saveUpdates({ data: values })),
 			}}
 		/>
 	);

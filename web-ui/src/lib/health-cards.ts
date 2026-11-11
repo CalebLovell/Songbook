@@ -46,6 +46,7 @@ export type HealthCardView = {
 	problem: { title: string; detail: string } | null;
 	meter: { usedPercent: number; threshold: number | null } | null;
 	actions: HealthAction[];
+	automaticUpdates?: true;
 };
 
 export type HealthAttention = { count: number; broken: boolean; label: string };
@@ -363,9 +364,10 @@ function updatesCard(
 			problem: null,
 			actions: [],
 		};
+	const managed = { ...base, automaticUpdates: true as const };
 	if (updates.state === "updating")
 		return {
-			...base,
+			...managed,
 			tone: "warning",
 			figure: `Installing ${updates.target ?? "an update"}…`,
 			details: [
@@ -376,7 +378,7 @@ function updatesCard(
 		};
 	if (updates.state === "failed")
 		return {
-			...base,
+			...managed,
 			tone: "warning",
 			figure: installed ? `Songbook ${installed}` : null,
 			details: [],
@@ -390,7 +392,7 @@ function updatesCard(
 	const offered = availableUpdate(updates);
 	if (offered)
 		return {
-			...base,
+			...managed,
 			tone: "warning",
 			figure: installed ? `Songbook ${installed}` : null,
 			details: [],
@@ -405,7 +407,7 @@ function updatesCard(
 		? Date.parse(updates.checkedAt)
 		: Number.NaN;
 	return {
-		...base,
+		...managed,
 		tone: "ok",
 		figure: installed ? `Songbook ${installed}` : "Up to date",
 		details: [

@@ -18,6 +18,7 @@ export type SitePage = {
 	to: string;
 	icon: LucideIcon;
 	gated?: boolean;
+	keywords?: string[];
 	header: { title: string; description: string };
 };
 
@@ -65,6 +66,7 @@ export const SITE_PAGES: readonly SitePage[] = [
 		to: "/health",
 		icon: HeartPulse,
 		gated: true,
+		keywords: ["updates", "automatic updates", "version", "release", "upgrade"],
 		header: PAGE_HEADERS.health,
 	},
 	{

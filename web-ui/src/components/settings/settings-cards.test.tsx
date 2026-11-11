@@ -71,9 +71,6 @@ test("every card with a default offers its own reset; Updates doesn't", () => {
 	]) {
 		assert.ok(resetButton(cardMarkup(markup, id)), id);
 	}
-	for (const id of ["updates"]) {
-		assert.equal(resetButton(cardMarkup(markup, id)), undefined, id);
-	}
 });
 
 test("a card's reset does nothing while it already holds the defaults", () => {

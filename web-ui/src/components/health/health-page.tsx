@@ -21,6 +21,7 @@ import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import {
 	type HealthAction,
 	type HealthCardView,
@@ -46,6 +47,12 @@ export type HealthHandlers = {
 	onCheckUpdates: () => Promise<UpdateState>;
 	onInstallUpdate: () => Promise<void>;
 	station: StationEditing | null;
+	automaticUpdates: AutomaticUpdates | null;
+};
+
+export type AutomaticUpdates = {
+	automatic: boolean;
+	save: (automatic: boolean) => Promise<unknown>;
 };
 
 const GRID_CLASS =
@@ -188,6 +195,9 @@ function HealthCard({
 							</p>
 						))}
 			</div>
+			{card.automaticUpdates ? (
+				<AutomaticUpdatesChoice setting={handlers.automaticUpdates} />
+			) : null}
 			{card.actions.length ? (
 				<div className="mt-auto flex flex-wrap gap-page">
 					{card.actions.map((action) => (
@@ -200,6 +210,57 @@ function HealthCard({
 				</div>
 			) : null}
 		</Card>
+	);
+}
+
+function AutomaticUpdatesChoice({
+	setting,
+}: {
+	setting: AutomaticUpdates | null;
+}) {
+	const labelId = "health-automatic-updates";
+	const mutation = useMutation({
+		mutationFn: (automatic: boolean) =>
+			setting ? setting.save(automatic) : Promise.resolve(),
+		onSuccess: (_, automatic) =>
+			toast.success(
+				automatic
+					? "Updates now install by themselves overnight."
+					: "Updates now wait for you to press Install.",
+				{ id: "health-automatic-updates" },
+			),
+		onError: (error) =>
+			toast.error(errorMessage(error, "Couldn't change automatic updates."), {
+				id: "health-automatic-updates",
+			}),
+	});
+	const automatic = mutation.isPending
+		? mutation.variables
+		: (setting?.automatic ?? true);
+	return (
+		<div className="flex flex-wrap items-center justify-between gap-page">
+			<div>
+				<p id={labelId} className="m-0 font-semibold text-base">
+					Install automatically
+				</p>
+				<p className="m-0 text-muted-foreground text-sm leading-relaxed">
+					Overnight, between 3 and 5 AM. Off, updates wait for Install.
+				</p>
+			</div>
+			<ToggleGroup
+				type="single"
+				variant="outline"
+				aria-labelledby={labelId}
+				disabled={!setting || mutation.isPending}
+				value={automatic ? "on" : "off"}
+				onValueChange={(next) => {
+					if (next) mutation.mutate(next === "on");
+				}}
+			>
+				<ToggleGroupItem value="on">On</ToggleGroupItem>
+				<ToggleGroupItem value="off">Off</ToggleGroupItem>
+			</ToggleGroup>
+		</div>
 	);
 }
 

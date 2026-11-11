@@ -382,8 +382,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   except Preferences, which stacks the cards about taste rather than running the
   station (Artwork, Highlights, Review), and Data (Restore, Export detections); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
   never drops an unsaved edit. The toolbar's Factory defaults covers every card; a card's own
-  footer reset covers only that card and goes through its normal save, and Updates
-  has no default to offer one. A card's Save and reset show as disabled
+  footer reset covers only that card and goes through its normal save. A card's Save and reset show as disabled
   when there is nothing to do. Artwork picks illustrations or photos for the whole
   station; `SpeciesImage` applies it, so data keeps naming the painting and no page
   has to know.
@@ -406,8 +405,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   this computer can't give says "Not known" in muted text. Power supply and Updates only
   ever warn. Actions live on the card they act on: Restart BirdNET; Change
   or Set name and location, each in a small dialog; Restart the Pi and Shut down on Power
-  supply; Install (confirmed) and Check for updates; Download a backup, whose dialog
-  offers everything or without clips. Anything that is a preference (audio device, storage rules, automatic updates,
+  supply; Install (confirmed), Check for updates and the Install automatically On/Off, which saves on click (Updates lives only on Health; old `?tab=updates` links redirect there); Download a backup, whose dialog
+  offers everything or without clips. Anything else that is a preference (audio device, storage rules,
   restoring a backup) links to its Settings tab. Card logic is pure in
   `lib/health-cards.ts`. The Health row in the sidebar carries the only mark: the
   number of cards that need a look (problems, warnings and setup steps, an offered update

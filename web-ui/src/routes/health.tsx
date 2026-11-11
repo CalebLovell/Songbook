@@ -18,6 +18,7 @@ import {
 	getSettingsPage,
 	restartStationFn,
 	saveStationSettingsFn,
+	saveUpdateSettingsFn,
 } from "~/lib/settings.ts";
 import { powerStationFn } from "~/lib/station-power.ts";
 import {
@@ -46,7 +47,11 @@ const stationSettingsQuery = queryOptions({
 	queryKey: ["health-station-settings"],
 	queryFn: async () => {
 		const page = await getSettingsPage();
-		return { values: page.station, timezones: page.supportedTimezones };
+		return {
+			values: page.station,
+			timezones: page.supportedTimezones,
+			automaticUpdates: page.updates.automatic,
+		};
 	},
 });
 
@@ -71,6 +76,7 @@ function HealthRoute() {
 	const restart = useServerFn(restartStationFn);
 	const power = useServerFn(powerStationFn);
 	const saveStation = useServerFn(saveStationSettingsFn);
+	const saveUpdates = useServerFn(saveUpdateSettingsFn);
 	const checkForUpdates = useServerFn(checkForUpdatesFn);
 	const installUpdate = useServerFn(installUpdateFn);
 
@@ -97,9 +103,22 @@ function HealthRoute() {
 					return state;
 				},
 				onInstallUpdate: () => installUpdate(),
+				automaticUpdates: station
+					? {
+							automatic: station.automaticUpdates,
+							save: async (automatic) => {
+								const result = await saveUpdates({ data: { automatic } });
+								await queryClient.invalidateQueries({
+									queryKey: stationSettingsQuery.queryKey,
+								});
+								return result;
+							},
+						}
+					: null,
 				station: station
 					? {
-							...station,
+							values: station.values,
+							timezones: station.timezones,
 							save: async (values) => {
 								const result = await saveStation({ data: values });
 								await refreshAllData(router, queryClient);

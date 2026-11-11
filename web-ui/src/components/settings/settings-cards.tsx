@@ -19,7 +19,6 @@ import {
 	type SettingsPageData,
 	type SettingsSaveResult,
 	type StorageSettings,
-	type UpdateSettings,
 } from "~/lib/settings-data.ts";
 import { errorMessage } from "~/lib/utils.ts";
 import { RestartButton } from "./restart-button.tsx";
@@ -40,7 +39,6 @@ export type SettingsSavers = {
 	review?: Saver<ReviewSettings>;
 	highlights?: Saver<HighlightSettings>;
 	artwork?: Saver<ArtworkSettings>;
-	updates?: Saver<UpdateSettings>;
 };
 
 export type SettingsRestarter = (
@@ -340,9 +338,6 @@ export function SettingsCards({
 				save={savers.storage}
 				restart={restartFor("storage")}
 			/>
-		),
-		updates: (
-			<UpdatesSettingsCard initial={data.updates} save={savers.updates} />
 		),
 		preferences: (
 			<div className="space-y-page">
@@ -1026,39 +1021,6 @@ function HighlightsSettingsCard({
 					unit="×"
 					value={form.values.vocalRatio}
 					onChange={number("vocalRatio")}
-				/>
-			</Field>
-		</SettingsCard>
-	);
-}
-
-function UpdatesSettingsCard({
-	initial,
-	save,
-}: {
-	initial: UpdateSettings;
-	save?: Saver<UpdateSettings>;
-}) {
-	const form = useCardSave("Updates", initial, save);
-	return (
-		<SettingsCard
-			title="Updates"
-			description="Choose whether the station updates Songbook by itself. Installing an update now is on Health."
-			confirmDescription="This writes the values in this card to the station's configuration. Nothing restarts."
-			onSave={() => void form.submit()}
-			saveDisabled={form.saveDisabled}
-		>
-			<Field
-				label="Automatic updates"
-				hint="Installs new releases by itself overnight, between 3 and 5 AM. Off, they wait for you to press Install on Health."
-			>
-				<FieldChoice
-					value={form.values.automatic ? "on" : "off"}
-					options={[
-						{ value: "on", label: "On" },
-						{ value: "off", label: "Off" },
-					]}
-					onChange={(choice) => form.setValues({ automatic: choice === "on" })}
 				/>
 			</Field>
 		</SettingsCard>

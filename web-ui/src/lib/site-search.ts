@@ -2,7 +2,7 @@ import { speciesFuse } from "~/lib/species-fuse.ts";
 
 export type SearchSpecies = { comName: string; sciName: string; count: number };
 
-export type SearchPage = { label: string; to: string };
+export type SearchPage = { label: string; to: string; keywords?: string[] };
 
 export type SearchSetting = {
 	title: string;
@@ -63,7 +63,11 @@ export function searchSite<P extends SearchPage, S extends SearchSetting>(
 		species: fuse
 			.search(needle, { limit: MAX_SPECIES })
 			.map((result) => result.item),
-		pages: pages.filter((page) => matchesWords(page.label, needles)),
+		pages: pages.filter(
+			(page) =>
+				matchesWords(page.label, needles) ||
+				page.keywords?.some((keyword) => matchesWords(keyword, needles)),
+		),
 		settings: settingMatches.slice(0, MAX_SETTINGS),
 	};
 }
