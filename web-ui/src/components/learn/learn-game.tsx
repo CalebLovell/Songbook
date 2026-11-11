@@ -576,8 +576,8 @@ function RailDot({
 		attempts === null
 			? "bg-muted text-muted-foreground"
 			: attempts === 1
-				? "bg-[color-mix(in_oklab,var(--moss)_12%,var(--paper-raised))] font-semibold text-moss"
-				: "bg-[color-mix(in_oklab,var(--clay)_10%,var(--paper-raised))] font-semibold text-clay";
+				? "bg-toast-success-fill font-semibold text-moss"
+				: "bg-toast-error-fill font-semibold text-clay";
 	const label = String(position + 1);
 
 	return (
@@ -635,10 +635,8 @@ type ChoiceState = "open" | "correct" | "wrong" | "muted";
 
 const CHOICE_STYLES: Record<ChoiceState, string> = {
 	open: "border-line bg-paper-raised hover:border-hover-line hover:bg-meadow",
-	correct:
-		"cursor-default border-moss bg-[color-mix(in_oklab,var(--moss)_12%,var(--paper-raised))]",
-	wrong:
-		"cursor-default border-clay bg-[color-mix(in_oklab,var(--clay)_10%,var(--paper-raised))] opacity-80",
+	correct: "cursor-default border-moss bg-toast-success-fill",
+	wrong: "cursor-default border-clay bg-toast-error-fill opacity-80",
 	muted: "cursor-default border-line bg-paper-raised opacity-50",
 };
 

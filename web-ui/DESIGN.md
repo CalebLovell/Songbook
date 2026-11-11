@@ -54,7 +54,7 @@ for a meaning; don't write a new mix inline when one exists:
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
 | `--row-well` | the slack under a paged list's rows on a short page (`RowWell`) |
-| `--toast-{success,warning,error}-fill/-line` | toast tones; title is moss / bark / clay, neutral toasts stay white |
+| `--toast-{success,warning,error}-fill/-line` | outcome tones: toasts, Health cards, quiz answers, warning wells; title is moss / bark / clay, neutral toasts stay white |
 
 Confidence pills are three bands, not a ramp (`lib/confidence.ts`): green at
 90% and up (`CONFIDENT_MIN`, the same line review uses), amber from 80%, and
@@ -134,7 +134,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   page gutter -- `--page-gap`, 8px under 400px. The same gap separates the
   controls in a toolbar or a row of buttons (search, menus, toggles,
   buttons), side by side or stacked; only a segmented control's own
-  segments are joined.
+  segments are joined. The one other exception is the recording player's
+  strip under its spectrogram (play, time, date, confidence): a fixed 8px
+  (`gap-2`) at every width, because the wider gap looked worse there.
 - Search boxes all read "Search…" (one ellipsis character), never what they
   search; the specific scope goes in the `aria-label`.
 - Motion: 180ms ease for color/border/lift; `animate-rise-in` 700ms on mount;
@@ -168,7 +170,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   buttons and pagers, stands 32px at most. On a touch screen (`pointer-coarse:`) the
   full-height controls step up to 36px for an easier tap, and the sidebar's nav
   rows to 38px, the one exception, since the drawer is a list of taps.
-- **Toggle group**: on = moss fill, white text; segments share borders.
+- **Toggle group**: on = `bg-primary text-primary-foreground`; segments share borders.
 - **Input**: focus is shown by a `--focus-ring` border, not the outline. Fields and checkboxes keep the
   site's light borders even though they fall short of 3:1 (WCAG 1.4.11): a darker line was tried and looked wrong.
 - **Nav rows**: active is marked by fill alone (a step deeper than the meadow
@@ -184,9 +186,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   form; signing out lives on the card. Nothing in the app is centered on the page.
 - **Error and status copy**: short, generic and clear ("Incorrect password.", "Something went
   wrong. Try again."), never chatty phrasing like "That password is not right". Public pages
-  never name Pi scripts, commands or logs; setup steps live in the README. Public sign-in copy never names Pi
-  scripts or logs: setup steps belong in the README. Messages are short and generic
-  ("Incorrect password.", "Something went wrong. Try again.").
+  never name Pi scripts, commands or logs; setup steps live in the README.
 - **Status pages** (`StatusPage`): a masthead, then one `PageStatus` card. Card titles
   stay generic ("Not found", "Error"), the body is one line that names what happened, and
   the buttons carry the next step, never the text. One primary button, the rest

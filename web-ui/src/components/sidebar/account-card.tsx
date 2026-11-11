@@ -115,7 +115,7 @@ function SignedInCard() {
 const TONES = {
 	moss: { well: "bg-icon-well text-moss", title: "text-ink" },
 	warning: {
-		well: "bg-[color-mix(in_oklab,var(--bark)_10%,var(--paper-raised))] text-bark",
+		well: "bg-toast-warning-fill text-bark",
 		title: "text-bark",
 	},
 } as const;
