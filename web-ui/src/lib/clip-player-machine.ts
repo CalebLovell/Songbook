@@ -1,6 +1,7 @@
 export type ClipStatus =
 	| "idle"
 	| "loading"
+	| "starting"
 	| "paused"
 	| "playing"
 	| "scrubbing"
@@ -11,6 +12,7 @@ export type ClipState = {
 	status: ClipStatus;
 	afterLoad: "play" | "pause" | "scrub";
 	resumeAfterScrub: boolean;
+	heard: boolean;
 };
 
 export type ClipEvent =
@@ -27,6 +29,7 @@ export const INITIAL_CLIP_STATE: ClipState = {
 	status: "idle",
 	afterLoad: "pause",
 	resumeAfterScrub: false,
+	heard: false,
 };
 
 export function clipTransition(state: ClipState, event: ClipEvent): ClipState {
@@ -60,10 +63,27 @@ export function clipTransition(state: ClipState, event: ClipEvent): ClipState {
 						? to("loading", { afterLoad: "pause" })
 						: state;
 				case "loaded":
-					if (state.afterLoad === "play") return to("playing");
+					if (state.afterLoad === "play") return to("starting");
 					if (state.afterLoad === "scrub")
 						return to("scrubbing", { resumeAfterScrub: false });
 					return to("paused");
+				case "loadFailed":
+					return to("error");
+				default:
+					return state;
+			}
+
+		case "starting":
+			switch (event.type) {
+				case "mediaPlaying":
+					return to("playing", { heard: true });
+				case "toggle":
+				case "mediaPaused":
+					return to("paused");
+				case "scrubStart":
+					return to("scrubbing", { resumeAfterScrub: true });
+				case "mediaEnded":
+					return to("ended");
 				case "loadFailed":
 					return to("error");
 				default:
@@ -87,8 +107,9 @@ export function clipTransition(state: ClipState, event: ClipEvent): ClipState {
 		case "ended":
 			switch (event.type) {
 				case "toggle":
+					return to("starting");
 				case "mediaPlaying":
-					return to("playing");
+					return to("playing", { heard: true });
 				case "scrubStart":
 					return to("scrubbing", { resumeAfterScrub: false });
 				default:
@@ -97,13 +118,20 @@ export function clipTransition(state: ClipState, event: ClipEvent): ClipState {
 
 		case "scrubbing":
 			if (event.type === "scrubEnd")
-				return to(state.resumeAfterScrub ? "playing" : "paused");
+				return to(state.resumeAfterScrub ? "starting" : "paused");
 			return state;
 	}
 }
 
 export function clipShouldPlay(state: ClipState): boolean {
-	return state.status === "playing";
+	return state.status === "starting" || state.status === "playing";
+}
+
+export function clipAwaitsFirstSound(state: ClipState): boolean {
+	return (
+		(state.status === "loading" && state.afterLoad === "play") ||
+		(state.status === "starting" && !state.heard)
+	);
 }
 
 export function clipNeedsLoad(state: ClipState): boolean {
@@ -112,6 +140,7 @@ export function clipNeedsLoad(state: ClipState): boolean {
 
 export function clipShowsPlayhead(state: ClipState): boolean {
 	return (
+		state.status === "starting" ||
 		state.status === "playing" ||
 		state.status === "paused" ||
 		state.status === "scrubbing" ||

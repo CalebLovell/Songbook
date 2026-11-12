@@ -4,6 +4,7 @@ import test from "node:test";
 import {
 	type ClipEvent,
 	type ClipStatus,
+	clipAwaitsFirstSound,
 	clipShowsPlayhead,
 	clipTransition,
 	INITIAL_CLIP_STATE,
@@ -17,8 +18,36 @@ function walk(...types: ClipEvent["type"][]): ClipStatus[] {
 	});
 }
 
-test("pressing play loads the clip, then plays it", () => {
-	assert.deepEqual(walk("toggle", "loaded"), ["loading", "playing"]);
+test("pressing play loads the clip, then waits for sound before playing", () => {
+	assert.deepEqual(walk("toggle", "loaded", "mediaPlaying"), [
+		"loading",
+		"starting",
+		"playing",
+	]);
+});
+
+test("pressing pause before the first sound stops it starting", () => {
+	assert.deepEqual(walk("toggle", "loaded", "toggle"), [
+		"loading",
+		"starting",
+		"paused",
+	]);
+});
+
+test("the button waits only for the clip's first sound", () => {
+	let state = INITIAL_CLIP_STATE;
+	const steps: ClipEvent["type"][] = [
+		"toggle",
+		"loaded",
+		"mediaPlaying",
+		"toggle",
+		"toggle",
+	];
+	const waits = steps.map((type) => {
+		state = clipTransition(state, { type } as ClipEvent);
+		return clipAwaitsFirstSound(state);
+	});
+	assert.deepEqual(waits, [true, true, false, false, false]);
 });
 
 test("a second press while loading means don't play after all", () => {
@@ -30,25 +59,37 @@ test("a second press while loading means don't play after all", () => {
 });
 
 test("play, pause, play", () => {
-	assert.deepEqual(walk("toggle", "loaded", "toggle", "toggle"), [
-		"loading",
-		"playing",
-		"paused",
-		"playing",
-	]);
+	assert.deepEqual(
+		walk(
+			"toggle",
+			"loaded",
+			"mediaPlaying",
+			"toggle",
+			"toggle",
+			"mediaPlaying",
+		),
+		["loading", "starting", "playing", "paused", "starting", "playing"],
+	);
 });
 
 test("dragging while playing pauses for the drag and resumes on release", () => {
 	assert.deepEqual(
-		walk("toggle", "loaded", "scrubStart", "mediaPaused", "scrubEnd"),
-		["loading", "playing", "scrubbing", "scrubbing", "playing"],
+		walk(
+			"toggle",
+			"loaded",
+			"mediaPlaying",
+			"scrubStart",
+			"mediaPaused",
+			"scrubEnd",
+		),
+		["loading", "starting", "playing", "scrubbing", "scrubbing", "starting"],
 	);
 });
 
 test("dragging while paused stays paused on release", () => {
 	assert.deepEqual(
 		walk("toggle", "loaded", "toggle", "scrubStart", "scrubEnd", "toggle"),
-		["loading", "playing", "paused", "scrubbing", "paused", "playing"],
+		["loading", "starting", "paused", "scrubbing", "paused", "starting"],
 	);
 });
 
@@ -68,22 +109,21 @@ test("dragging before anything has loaded loads, then lands paused", () => {
 test("dragging to the end mid-drag doesn't end the clip", () => {
 	assert.deepEqual(
 		walk("toggle", "loaded", "scrubStart", "mediaEnded", "scrubEnd"),
-		["loading", "playing", "scrubbing", "scrubbing", "playing"],
+		["loading", "starting", "scrubbing", "scrubbing", "starting"],
 	);
 });
 
 test("a clip that runs out ends, and play starts it again", () => {
-	assert.deepEqual(walk("toggle", "loaded", "mediaEnded", "toggle"), [
-		"loading",
-		"playing",
-		"ended",
-		"playing",
-	]);
+	assert.deepEqual(
+		walk("toggle", "loaded", "mediaPlaying", "mediaEnded", "toggle"),
+		["loading", "starting", "playing", "ended", "starting"],
+	);
 });
 
 test("another clip starting elsewhere pauses this one", () => {
-	assert.deepEqual(walk("toggle", "loaded", "mediaPaused"), [
+	assert.deepEqual(walk("toggle", "loaded", "mediaPlaying", "mediaPaused"), [
 		"loading",
+		"starting",
 		"playing",
 		"paused",
 	]);
@@ -94,7 +134,7 @@ test("a failed load can be retried", () => {
 		"loading",
 		"error",
 		"loading",
-		"playing",
+		"starting",
 	]);
 });
 

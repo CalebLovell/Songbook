@@ -16,6 +16,7 @@ import { clamp01, Spectrogram } from "~/components/spectrogram.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
+	clipAwaitsFirstSound,
 	clipNeedsLoad,
 	clipShouldPlay,
 	clipShowsPlayhead,
@@ -38,7 +39,14 @@ const TIME_CLASS = "tabular-nums text-muted-foreground text-xs";
 const META_DATE_CLASS =
 	"tabular-nums text-muted-foreground text-sm @max-[22rem]/controls:text-xs";
 
-const RESYNC_SECONDS = 0.15;
+const RESYNC_SECONDS = 0.25;
+
+type PlayheadClock = {
+	media: number;
+	wall: number;
+	lastRaw: number;
+	shown: number;
+};
 
 export function SpectrogramPlayer({
 	audioUrl,
@@ -64,6 +72,7 @@ export function SpectrogramPlayer({
 	const objectUrlRef = useRef<string | null>(null);
 	const pendingRef = useRef<number | null>(null);
 	const dragRef = useRef<number | null>(null);
+	const clockRef = useRef<PlayheadClock | null>(null);
 	const durationRef = useRef<number | null>(null);
 	durationRef.current = duration;
 
@@ -144,19 +153,27 @@ export function SpectrogramPlayer({
 	useEffect(() => {
 		const audio = audioRef.current;
 		if (!audio || state.status !== "playing") return;
-		let anchor = { media: audio.currentTime, wall: performance.now() };
-		let lastRaw = audio.currentTime;
+		clockRef.current = null;
 		let frame = requestAnimationFrame(function tick(now) {
 			const raw = audio.currentTime;
-			let at = anchor.media + ((now - anchor.wall) / 1000) * audio.playbackRate;
+			const clock = clockRef.current ?? {
+				media: raw,
+				wall: now,
+				lastRaw: raw,
+				shown: raw,
+			};
+			let at = clock.media + ((now - clock.wall) / 1000) * audio.playbackRate;
 			if (Math.abs(raw - at) > RESYNC_SECONDS) {
-				anchor = { media: raw, wall: now };
+				clock.media = raw;
+				clock.wall = now;
 				at = raw;
-			} else if (raw !== lastRaw) {
-				anchor.media += (raw - at) * 0.1;
+			} else if (raw !== clock.lastRaw) {
+				clock.media += (raw - at) * 0.1;
 			}
-			lastRaw = raw;
-			if (audio.duration > 0) paint(at / audio.duration);
+			clock.lastRaw = raw;
+			clock.shown = Math.max(clock.shown, at);
+			clockRef.current = clock;
+			if (audio.duration > 0) paint(clock.shown / audio.duration);
 			frame = requestAnimationFrame(tick);
 		});
 		return () => cancelAnimationFrame(frame);
@@ -173,6 +190,7 @@ export function SpectrogramPlayer({
 	function seekTo(fraction: number) {
 		const clamped = clamp01(fraction);
 		const audio = audioRef.current;
+		clockRef.current = null;
 		if (audio && audio.duration > 0)
 			audio.currentTime = clamped * audio.duration;
 		else pendingRef.current = clamped;
@@ -237,8 +255,8 @@ export function SpectrogramPlayer({
 		}
 	}
 
-	const isPlaying = state.status === "playing";
-	const isLoading = state.status === "loading" && state.afterLoad === "play";
+	const isPlaying = clipShouldPlay(state);
+	const isLoading = clipAwaitsFirstSound(state);
 	const total = formatClock(duration ?? 0);
 
 	return (
