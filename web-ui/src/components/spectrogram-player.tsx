@@ -1,4 +1,4 @@
-import { Pause, Play } from "lucide-react";
+import { Pause, Play, Repeat } from "lucide-react";
 import {
 	type KeyboardEvent,
 	type PointerEvent,
@@ -24,6 +24,11 @@ import {
 	INITIAL_CLIP_STATE,
 } from "~/lib/clip-player-machine.ts";
 import {
+	type PlayheadClock,
+	startPlayheadClock,
+	tickPlayheadClock,
+} from "~/lib/playhead-clock.ts";
+import {
 	claimPlayback,
 	fetchAudioBlob,
 	primeForPlayback,
@@ -39,14 +44,8 @@ const TIME_CLASS = "tabular-nums text-muted-foreground text-xs";
 const META_DATE_CLASS =
 	"tabular-nums text-muted-foreground text-sm @max-[22rem]/controls:text-xs";
 
-const RESYNC_SECONDS = 0.25;
-
-type PlayheadClock = {
-	media: number;
-	wall: number;
-	lastRaw: number;
-	shown: number;
-};
+const LOOP_CLASS =
+	"aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground";
 
 export function SpectrogramPlayer({
 	audioUrl,
@@ -65,6 +64,7 @@ export function SpectrogramPlayer({
 }) {
 	const [state, dispatch] = useReducer(clipTransition, INITIAL_CLIP_STATE);
 	const [duration, setDuration] = useState<number | null>(null);
+	const [looping, setLooping] = useState(false);
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const playheadRef = useRef<HTMLDivElement>(null);
 	const timeRef = useRef<HTMLSpanElement>(null);
@@ -72,7 +72,6 @@ export function SpectrogramPlayer({
 	const objectUrlRef = useRef<string | null>(null);
 	const pendingRef = useRef<number | null>(null);
 	const dragRef = useRef<number | null>(null);
-	const clockRef = useRef<PlayheadClock | null>(null);
 	const durationRef = useRef<number | null>(null);
 	durationRef.current = duration;
 
@@ -141,7 +140,10 @@ export function SpectrogramPlayer({
 		if (!audio || !objectUrlRef.current) return;
 		if (clipShouldPlay(state)) {
 			if (audio.paused)
-				audio.play().catch(() => dispatch({ type: "mediaPaused" }));
+				audio.play().then(
+					() => dispatch({ type: "mediaPlaying" }),
+					() => dispatch({ type: "mediaPaused" }),
+				);
 		} else if (!audio.paused) {
 			audio.pause();
 		}
@@ -153,26 +155,12 @@ export function SpectrogramPlayer({
 	useEffect(() => {
 		const audio = audioRef.current;
 		if (!audio || state.status !== "playing") return;
-		clockRef.current = null;
+		let clock: PlayheadClock | null = null;
 		let frame = requestAnimationFrame(function tick(now) {
 			const raw = audio.currentTime;
-			const clock = clockRef.current ?? {
-				media: raw,
-				wall: now,
-				lastRaw: raw,
-				shown: raw,
-			};
-			let at = clock.media + ((now - clock.wall) / 1000) * audio.playbackRate;
-			if (Math.abs(raw - at) > RESYNC_SECONDS) {
-				clock.media = raw;
-				clock.wall = now;
-				at = raw;
-			} else if (raw !== clock.lastRaw) {
-				clock.media += (raw - at) * 0.1;
-			}
-			clock.lastRaw = raw;
-			clock.shown = Math.max(clock.shown, at);
-			clockRef.current = clock;
+			clock = clock
+				? tickPlayheadClock(clock, raw, now, audio.playbackRate)
+				: startPlayheadClock(raw, now);
 			if (audio.duration > 0) paint(clock.shown / audio.duration);
 			frame = requestAnimationFrame(tick);
 		});
@@ -190,7 +178,6 @@ export function SpectrogramPlayer({
 	function seekTo(fraction: number) {
 		const clamped = clamp01(fraction);
 		const audio = audioRef.current;
-		clockRef.current = null;
 		if (audio && audio.duration > 0)
 			audio.currentTime = clamped * audio.duration;
 		else pendingRef.current = clamped;
@@ -307,6 +294,17 @@ export function SpectrogramPlayer({
 					onClick={toggle}
 					aria-label={recordingActionLabel(isPlaying, speciesName)}
 				/>
+				<Button
+					type="button"
+					variant="outline"
+					size="icon-sm"
+					icon={Repeat}
+					aria-pressed={looping}
+					onClick={() => setLooping((on) => !on)}
+					aria-label={speciesName ? `Loop ${speciesName} call` : "Loop call"}
+					title={looping ? "Looping" : "Loop"}
+					className={LOOP_CLASS}
+				/>
 				<span className={TIME_CLASS}>
 					<span ref={timeRef}>0:00.0</span>
 					<span className={TOTAL_CLASS}> / {total}</span>
@@ -322,6 +320,7 @@ export function SpectrogramPlayer({
 			<audio
 				ref={audioRef}
 				preload="none"
+				loop={looping}
 				onPlay={() => claimPlayback(audioRef.current)}
 				onPlaying={() => dispatch({ type: "mediaPlaying" })}
 				onPause={() => {
@@ -355,6 +354,15 @@ export function SpectrogramPlayerSkeleton({
 			<div className={CONTROLS_CLASS}>
 				<ShellSized className="rounded-md">
 					<Button type="button" size="icon-sm" icon={Play} disabled />
+				</ShellSized>
+				<ShellSized className="rounded-md">
+					<Button
+						type="button"
+						variant="outline"
+						size="icon-sm"
+						icon={Repeat}
+						disabled
+					/>
 				</ShellSized>
 				<ShellText
 					className={`@max-[22rem]/controls:w-10 w-24 ${TIME_CLASS}`}
