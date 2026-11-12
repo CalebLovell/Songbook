@@ -325,9 +325,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   words come from `lib/page-headers.ts`.
 - The Live hero and the bird page's profile share one geometry (a 120px portrait
   centred in a 9.5rem column), so a bird keeps its size and place between them.
-- The bird page's visit log shows 100 rows a page and scrolls inside its card: 10
-  rows tall when stacked, and exactly the charts' height beside them, which it never
-  stretches.
+- The bird page's visit log shows 10 rows a page and never scrolls. Its full page
+  sets the row's height; the hour and month charts beside it stretch to match it,
+  never the other way round.
 - Empty wording comes from `lib/empty-messages.ts`: name what's missing and stop.
   A card keeps its title whether full or empty.
 

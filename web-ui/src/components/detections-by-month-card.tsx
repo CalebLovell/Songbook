@@ -61,7 +61,7 @@ export function DetectionsByMonthCard({
 					<ResponsiveContainer
 						width="100%"
 						height="100%"
-						minHeight={220}
+						minHeight={200}
 						onResize={(width) => setInitials(width < INITIALS_BELOW_PX)}
 					>
 						<BarChart

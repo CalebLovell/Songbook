@@ -78,7 +78,7 @@ export function DetectionsByHourCard({
 			</CardHeader>
 
 			<div className="mt-page min-h-0 flex-1">
-				<ResponsiveContainer width="100%" height="100%" minHeight={220}>
+				<ResponsiveContainer width="100%" height="100%" minHeight={200}>
 					<AreaChart
 						data={activity}
 						margin={CHART_MARGIN}

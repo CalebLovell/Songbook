@@ -92,7 +92,7 @@ function getDayHourCounts(filter: ReturnType<typeof byComName>) {
 		.groupBy(detections.Date, hour);
 }
 
-export const VISITS_PAGE_SIZE = 100;
+export const VISITS_PAGE_SIZE = 10;
 
 async function getVisitPage(
 	comName: string,

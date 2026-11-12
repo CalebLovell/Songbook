@@ -675,15 +675,11 @@ const PROFILE_TEXT_CLASS =
 	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-39 sm:justify-between sm:pl-0";
 const COLUMNS_CLASS =
 	"mt-page grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-page";
-const VISIT_LOG_BESIDE_CHARTS_CLASS =
-	"@min-[80rem]/bird:h-0 @min-[80rem]/bird:min-h-full";
-const VISIT_LOG_CLASS = `flex min-h-105 min-w-0 flex-col ${VISIT_LOG_BESIDE_CHARTS_CLASS}`;
-const VISIT_LOG_SHORT_CLASS = `flex min-w-0 flex-col ${VISIT_LOG_BESIDE_CHARTS_CLASS}`;
+const VISIT_LOG_CLASS = "flex min-w-0 flex-col";
 const VISIT_LOG_CARD_CLASS = "@container flex min-h-0 flex-1 flex-col pb-0!";
 const VISIT_LOG_SHORT_CARD_CLASS =
 	"@container flex min-h-0 flex-initial flex-col pb-0!";
-const VISIT_LIST_CLASS =
-	"-mx-page max-h-127.5 grow divide-y overflow-y-auto @min-[80rem]/bird:max-h-none @min-[80rem]/bird:min-h-0";
+const VISIT_LIST_CLASS = "-mx-page grow divide-y";
 const VISIT_LOG_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-11.25 flex-wrap items-center justify-between gap-2 border-b px-page";
 const VISIT_ROW_CLASS =
@@ -888,10 +884,7 @@ function VisitLogCard({
 	const lastIndex = firstIndex + visits.length - 1;
 
 	return (
-		<section
-			aria-label="Visit log"
-			className={pageCount > 1 ? VISIT_LOG_CLASS : VISIT_LOG_SHORT_CLASS}
-		>
+		<section aria-label="Visit log" className={VISIT_LOG_CLASS}>
 			<Card
 				className={`${pageCount > 1 ? VISIT_LOG_CARD_CLASS : VISIT_LOG_SHORT_CARD_CLASS} ${visits.length === 0 ? "pb-4!" : ""}`}
 			>

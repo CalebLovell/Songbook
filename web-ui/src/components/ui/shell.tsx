@@ -105,7 +105,7 @@ export function ShellChartCard({
 			className={cn("flex min-h-72 flex-col", className)}
 		>
 			<CardHeader title={title}>{action}</CardHeader>
-			<ShellBar className="mt-page min-h-55 w-full flex-1 rounded-md" />
+			<ShellBar className="mt-page min-h-50 w-full flex-1 rounded-md" />
 		</Card>
 	);
 }
