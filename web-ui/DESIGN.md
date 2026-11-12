@@ -212,8 +212,16 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   Page queries spread `PAGE_QUERY`, or `FORM_QUERY` when a form seeds from the
   data once (no cached copy, so never an old revision). Neither refetches on
   focus. Data refreshes on navigation, after a change (`invalidateQueries`), and
-  on pull to refresh or sign-in changes (`refreshAllData`). Loaders still `await`
+  on sign-in changes (`refreshAllData`). Pull to refresh clears the cache
+  instead (`reloadAllData`), so every card shows its skeleton while it
+  reloads, even when nothing changed. Loaders still `await`
   what `head` or `notFound` needs.
+  New code arrives by a full reload, never a data refresh. Every page checks
+  the station's release every 5 minutes and on focus (`useFollowRelease`). A
+  page left on an old release reloads itself once it is hidden, or after 5
+  minutes untouched, but never while audio plays or a field has focus. Pull to
+  refresh reloads the whole page when a newer release is out, and the Health
+  page reloads as soon as an install it is watching finishes.
   Anything that doesn't depend on the data (titles, labels, controls driven
   by the URL) renders as itself at once. Every card that fetches has a
   `…Skeleton` beside it, built from the card's own markup and shared class

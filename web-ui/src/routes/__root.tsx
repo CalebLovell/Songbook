@@ -31,6 +31,7 @@ import {
 	useKeepTheme,
 } from "~/lib/theme.ts";
 import { unlockStatusForNavigation } from "~/lib/unlock-status.ts";
+import { useFollowRelease } from "~/lib/use-follow-release.ts";
 import { useSettledFlag } from "~/lib/use-settled-flag.ts";
 import appCss from "../styles.css?url";
 
@@ -99,6 +100,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	const { auth } = Route.useRouteContext();
 	useKeepTheme();
 	useSettledFlag(MAIN_CONTENT_ID);
+	useFollowRelease();
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>

@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
 	availableUpdate,
+	installedNewerBuild,
 	parseUpdateState,
 	updateBusy,
 } from "./updates-data.ts";
@@ -94,4 +95,22 @@ test("garbage and unknown states read as unknown, never as a crash", () => {
 	assert.equal(state.installed, null);
 	assert.equal(state.state, "idle");
 	assert.equal(parseUpdateState("[]", "null").installed, null);
+});
+
+test("a page from an older build learns the station moved on", () => {
+	const state = parseUpdateState(
+		installed,
+		JSON.stringify({ state: "updated" }),
+	);
+	assert.equal(installedNewerBuild(state, "v1.1.0"), "v1.2.0");
+	assert.equal(installedNewerBuild(state, "v1.2.0"), null);
+	assert.equal(installedNewerBuild(state, null), null);
+});
+
+test("a page waits for the update to finish before reloading", () => {
+	const state = parseUpdateState(
+		installed,
+		JSON.stringify({ state: "updating", target: "v1.3.0" }),
+	);
+	assert.equal(installedNewerBuild(state, "v1.1.0"), null);
 });

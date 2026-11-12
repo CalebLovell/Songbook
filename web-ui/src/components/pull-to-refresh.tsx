@@ -9,7 +9,8 @@ import {
 	type PullEvent,
 	pullTransition,
 } from "~/lib/pull-refresh-machine.ts";
-import { refreshAllData } from "~/lib/query-client.ts";
+import { reloadAllData } from "~/lib/query-client.ts";
+import { newerStationRelease } from "~/lib/release.ts";
 import { cn } from "~/lib/utils.ts";
 
 const MIN_SPIN_MS = 600;
@@ -78,8 +79,9 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
 		if (phase !== "refreshing") return;
 		let cancelled = false;
 		const spun = new Promise((resolve) => setTimeout(resolve, MIN_SPIN_MS));
-		Promise.allSettled([refreshAllData(router, queryClient), spun]).then(() => {
-			if (!cancelled) sendRef.current({ type: "refreshDone" });
+		Promise.allSettled([reloadAllData(router, queryClient), spun]).then(() => {
+			if (newerStationRelease(queryClient)) window.location.reload();
+			else if (!cancelled) sendRef.current({ type: "refreshDone" });
 		});
 		return () => {
 			cancelled = true;

@@ -26,6 +26,7 @@ import {
 	installUpdateFn,
 	updateStateQuery,
 } from "~/lib/updates.ts";
+import { useReloadOnUpdate } from "~/lib/use-reload-on-update.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const HEALTH_INTERVAL_MS = 30_000;
@@ -70,6 +71,7 @@ export const Route = createFileRoute("/health")({
 function HealthRoute() {
 	const health = useSkeletonMinimum(useQuery(healthQuery).data);
 	const { data: updates } = useQuery(polledUpdateStateQuery);
+	useReloadOnUpdate(updates);
 	const { data: station } = useQuery(stationSettingsQuery);
 	const queryClient = useQueryClient();
 	const router = useRouter();

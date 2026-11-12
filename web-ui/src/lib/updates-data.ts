@@ -1,3 +1,5 @@
+import { newerRelease } from "./release-data.ts";
+
 type UpdateRunState = "idle" | "checking" | "updating" | "failed" | "updated";
 
 export type UpdateState = {
@@ -103,4 +105,12 @@ export function availableUpdate(state: UpdateState): string | null {
 	return state.latest.version === state.installed?.version
 		? null
 		: state.latest.version;
+}
+
+export function installedNewerBuild(
+	state: UpdateState,
+	runningVersion: string | null,
+): string | null {
+	if (updateBusy(state)) return null;
+	return newerRelease(runningVersion, state.installed?.version ?? null);
 }

@@ -35,6 +35,10 @@ export function refreshAllData(router: AnyRouter, queryClient: QueryClient) {
 	return Promise.all([router.invalidate(), queryClient.invalidateQueries()]);
 }
 
+export function reloadAllData(router: AnyRouter, queryClient: QueryClient) {
+	return Promise.all([router.invalidate(), queryClient.resetQueries()]);
+}
+
 // Browser only: useQuery doesn't fetch during SSR, so the first paint is the
 // same shell on server and client and hydration can't race the data.
 export function prefetchInBrowser<T, Key extends QueryKey>(
