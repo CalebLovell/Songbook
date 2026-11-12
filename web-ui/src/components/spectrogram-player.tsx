@@ -110,11 +110,12 @@ export function SpectrogramPlayer({
 							audio.currentTime = pendingRef.current * audio.duration;
 							pendingRef.current = null;
 						}
-						if (!cancelled) dispatch({ type: "loaded" });
 					},
 					{ once: true },
 				);
 				audio.src = objectUrlRef.current;
+				// Safari loads nothing under preload="none" until play(), so waiting for metadata would hang.
+				dispatch({ type: "loaded" });
 			},
 			() => {
 				if (!cancelled) dispatch({ type: "loadFailed" });
