@@ -171,6 +171,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   full-height controls step up to 36px for an easier tap, and the sidebar's nav
   rows to 38px, the one exception, since the drawer is a list of taps.
 - **Toggle group**: on = `bg-primary text-primary-foreground`; segments share borders.
+- **Player controls**: play is the primary action and stays filled, showing its state by
+  icon (play/pause). Options beside it, such as loop, are outline toggles that fill only
+  while on (`aria-pressed`). Making play an outline toggle to match was considered and declined.
 - **Input**: focus is shown by a `--focus-ring` border, not the outline. Fields and checkboxes keep the
   site's light borders even though they fall short of 3:1 (WCAG 1.4.11): a darker line was tried and looked wrong.
 - **Nav rows**: active is marked by fill alone (a step deeper than the meadow
