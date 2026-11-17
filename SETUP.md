@@ -64,8 +64,8 @@ Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) on your compute
 2. **Operating system:** Raspberry Pi OS (other) → **Raspberry Pi OS Lite (64-bit)**.
 3. **Storage:** the microSD card. Everything on it is erased.
 4. **Customisation:** set all of these before writing.
-   - **Hostname:** the station's network name. It becomes `http://<hostname>.local`, so each Pi
-     needs its own. If you leave it as `raspberrypi`, the installer renames it `birdnetpi`.
+   - **Hostname:** `songbook`. The installer names the station `songbook` whatever you enter, or
+     `songbook-2` if another station on your network already has that name.
    - **Username and password**, or an SSH public key. The installer needs the user to have
      passwordless sudo, which is the Imager's default.
    - **Wi-Fi name, password and country**, unless you use Ethernet. A Pi 3B+ can only join a
@@ -77,7 +77,7 @@ Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) on your compute
 **You should see:** after 2–4 minutes, the Pi answers on your network:
 
 ```bash
-ssh <user>@<hostname>.local
+ssh <user>@songbook.local
 ```
 
 Before installing, check the OS, sudo and the mic:
@@ -105,7 +105,8 @@ It installs the newest release and everything it needs. This took about 10 minut
 
 1. **Near the end it asks you to choose a password** for the web UI's Settings, Review and Species
    filter. The prompt shows nothing as you type, so check Caps Lock, then type it twice.
-2. **Then it reboots,** which ends your SSH session. That is expected.
+2. **Then it shows the station's address and reboots,** which ends your SSH session. That is
+   expected.
 
 It keeps a log at `~/installation-<date>.txt`. It also guesses the station's location from your
 IP address using ip-api.com, which decides which species are expected there. If you left the
@@ -113,8 +114,9 @@ Imager's time zone at its default, it takes the time zone from the same guess.
 
 ## 4. Open the web UI
 
-From a computer or phone on the same network, open `http://<hostname>.local`, for example
-`http://birdnetpi.local`. Type the `http://`, or browsers may search for it instead.
+From a computer or phone on the same network, open `http://songbook.local`, or the address the
+installer showed if it chose `songbook-2`. Type the `http://`, or browsers may search for it
+instead. The name keeps working when your router gives the Pi a new IP address.
 
 If it doesn't load, use the Pi's IP address instead, from your router or `hostname -I` on the Pi.
 See [Can't reach the station](#cant-reach-the-station).
@@ -183,8 +185,10 @@ hears nothing, check **Settings → Audio input**: the recording device should b
 ### Can't reach the station
 
 - **Type the `http://`.** Without it, browsers often search for the name instead.
-- **Use the IP address.** Names ending in `.local` don't work on every device or network. Android
-  often can't use them.
+- **Try `http://songbook`.** Many routers know the station by its name without `.local`, which
+  helps on Android, where `.local` names often don't work.
+- **Use the IP address.** It's on your router's list of devices, or run `hostname -I` on the Pi.
+  If it keeps changing, reserve it for the Pi in your router's DHCP settings.
 - **Chrome says `DNS_PROBE_FINISHED_NXDOMAIN`:** Chrome's **Use secure DNS** (`chrome://settings/security`)
   sends every lookup to an internet DNS provider, which doesn't know `.local` names. Use the IP
   address, or set that option to your current service provider.

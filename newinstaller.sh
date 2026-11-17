@@ -69,6 +69,11 @@ if [ ${PIPESTATUS[0]} -eq 0 ];then
     echo
     sleep 10
   fi
+  echo
+  echo "After the reboot, open http://$(hostname).local"
+  echo "If that doesn't load, use http://$(hostname -I | awk '{print $1}')"
+  echo
+  sleep 5
   sudo reboot
 else
   echo "The installation exited unsuccessfully."

@@ -13,6 +13,14 @@ sudo -u "$USER" "$HOME/BirdNET-Pi/birdnet/bin/pip3" install -q -r "$HOME/BirdNET
 # Scripts deleted from the repository leave dangling links behind.
 find /usr/local/bin -maxdepth 1 -xtype l -lname "$HOME/BirdNET-Pi/scripts/*" -delete
 
+# The old mDNS alias pinned the address the station had at boot; avahi already
+# publishes the hostname and follows the address.
+if [ -e /usr/lib/systemd/system/avahi-alias@.service ]; then
+  systemctl stop 'avahi-alias@*.service'
+  rm -f /etc/systemd/system/multi-user.target.wants/avahi-alias@*.service \
+    /usr/lib/systemd/system/avahi-alias@.service "$HOME/BirdNET-Pi/templates/avahi-alias@.service"
+fi
+
 sed -i '/birdnet/,+1d' /etc/crontab
 sed "s/\$USER/$USER/g" "$HOME/BirdNET-Pi/templates/cleanup.cron" >> /etc/crontab
 

@@ -31,8 +31,8 @@ On the Pi, run:
 curl -s https://raw.githubusercontent.com/CalebLovell/Songbook/main/newinstaller.sh | bash
 ```
 
-It asks you to choose a password, then reboots. Open `http://birdnetpi.local` (or
-`http://<your Pi's name>.local`) from a device on the same network, sign in, and check **Health**.
+It asks you to choose a password, then reboots. Open `http://songbook.local` from a
+device on the same network, sign in, and check **Health**.
 
 New to this? The [setup guide](SETUP.md) goes from a blank memory card to a listening
 station, step by step.

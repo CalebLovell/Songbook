@@ -15,20 +15,37 @@ install_depends() {
   apt -qqq update && apt -qqy upgrade
   echo "icecast2 icecast2/icecast-setup boolean false" | debconf-set-selections
   apt install --no-install-recommends -qqy sqlite3 icecast2 \
-    pulseaudio avahi-utils sox libsox-fmt-mp3 alsa-utils ffmpeg \
+    pulseaudio avahi-daemon avahi-utils sox libsox-fmt-mp3 alsa-utils ffmpeg \
     wget curl unzip bc jq openssh-client xz-utils \
     python3-pip python3-venv lsof net-tools inotify-tools
 }
 
+# Every station answers at songbook.local. If another device on the network
+# already does, this one takes songbook-2, and so on, so the name never moves
+# between Pis. avahi follows the address as DHCP changes it.
 set_hostname() {
-  if [ "$(hostname)" == "raspberrypi" ];then
-    hostnamectl set-hostname birdnetpi
-    sed -i 's/raspberrypi/birdnetpi/g' /etc/hosts
+  local name=songbook n=1 found own
+  own=" $(hostname -I) "
+  systemctl enable --now avahi-daemon.service
+  while true; do
+    found=$(timeout 5 avahi-resolve -4 -n "$name.local" 2>/dev/null | awk '{print $2}')
+    if [ -z "$found" ] || [[ "$own" == *" $found "* ]]; then
+      break
+    fi
+    n=$((n + 1))
+    name=songbook-$n
+  done
+  hostnamectl set-hostname "$name"
+  if grep -q '^127\.0\.1\.1' /etc/hosts; then
+    sed -i "s/^127\.0\.1\.1[[:space:]].*/127.0.1.1\t$name/" /etc/hosts
+  else
+    printf '127.0.1.1\t%s\n' "$name" >> /etc/hosts
   fi
-}
-
-update_etc_hosts() {
-  sed -ie s/'$(hostname).local'/"$(hostname).local ${BIRDNETPI_URL//https:\/\/}"/g /etc/hosts
+  # cloud-init rewrites the hostname and /etc/hosts from this file on boot.
+  if [ -f /boot/firmware/user-data ]; then
+    sed -i "s/^hostname:.*/hostname: $name/" /boot/firmware/user-data
+  fi
+  systemctl restart avahi-daemon.service
 }
 
 install_scripts() {
@@ -130,25 +147,6 @@ EOF
   ln -sf $HOME/BirdNET-Pi/templates/custom_recording.service /usr/lib/systemd/system
 }
 
-install_avahi_aliases() {
-  cat << 'EOF' > $HOME/BirdNET-Pi/templates/avahi-alias@.service
-[Unit]
-Description=Publish %I as alias for %H.local via mdns
-After=network.target network-online.target
-Requires=network-online.target
-[Service]
-Restart=always
-RestartSec=3
-Type=simple
-ExecStart=/bin/bash -c "/usr/bin/avahi-publish -a -R %I $(hostname -I |cut -d' ' -f1)"
-[Install]
-WantedBy=multi-user.target
-EOF
-  ln -sf $HOME/BirdNET-Pi/templates/avahi-alias@.service /usr/lib/systemd/system
-  systemctl enable avahi-alias@"$(hostname)".local.service
-  systemctl restart avahi-daemon.service
-}
-
 config_icecast() {
   if [ -f /etc/icecast2/icecast.xml ];then
     cp /etc/icecast2/icecast.xml{,.prebirdnetpi}
@@ -191,14 +189,12 @@ chown_things() {
 }
 
 install_services() {
-  set_hostname
-  update_etc_hosts
   set_login
   install_tmp_mount
 
   install_depends
+  set_hostname
   install_scripts
-  install_avahi_aliases
   install_birdnet_analysis
   install_recording_service
   install_custom_recording_service # But does not enable
