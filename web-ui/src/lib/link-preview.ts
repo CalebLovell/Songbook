@@ -1,4 +1,10 @@
-import { illustrationUrlFor, isPhotoUrl } from "~/lib/illustrations.ts";
+import { APP_VERSION } from "~/lib/app-version.ts";
+import {
+	illustrationUrlFor,
+	isPhotoUrl,
+	paintingStem,
+	releaseQuery,
+} from "~/lib/illustrations.ts";
 import { pageTitle } from "~/lib/page-title.ts";
 
 export const STATION_DESCRIPTION =
@@ -33,7 +39,7 @@ export function speciesPreviewImage(
 	if (!url) return null;
 	if (isPhotoUrl(url)) return { url, alt: comName, card: "summary" };
 	return {
-		url: `${origin}${url.replace(/^(\/illustrations\/)(.+)\.webp$/, "$1previews/$2.jpg")}`,
+		url: `${origin}/illustrations/previews/${paintingStem(url)}.jpg${releaseQuery(APP_VERSION)}`,
 		alt: comName,
 		card: "summary",
 		width: PREVIEW_SIZE,

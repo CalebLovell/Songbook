@@ -463,6 +463,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   only in production builds. The worker caches nothing but `offline.html` and the
   logo: pages go to the network, and a failed navigation shows the offline page.
   Station data is never cached, so an installed app never shows stale birds.
+  Paintings are cached for a week under a fixed file name, so their URLs carry
+  the release (`illustrationUrlFor` adds `?v=<version>`): a repaint shows on the
+  next release instead of up to a month later.
   Icons come from `npm run link-images`; the maskable one keeps the logo inside
   the middle 80% circle.
 

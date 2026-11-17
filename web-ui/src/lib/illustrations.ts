@@ -1,3 +1,4 @@
+import { APP_VERSION } from "~/lib/app-version.ts";
 import {
 	PAINTED_BOUNDS,
 	PAINTED_FLIGHT_SLUGS,
@@ -21,11 +22,23 @@ export function illustrationUrlFor(
 	sciName: string,
 	pose: IllustrationPose = "perched",
 	photos: Record<string, string> = REFERENCE_PHOTOS,
+	version: string | null = APP_VERSION,
 ): string | null {
 	const slug = slugify(sciName);
 	if (!PAINTED_SLUGS.has(slug)) return photos[slug] ?? null;
 	const flight = pose === "flight" && PAINTED_FLIGHT_SLUGS.has(slug);
-	return `/illustrations/${slug}${flight ? "-2" : ""}.webp`;
+	return `/illustrations/${slug}${flight ? "-2" : ""}.webp${releaseQuery(version)}`;
+}
+
+export function releaseQuery(version: string | null): string {
+	return version ? `?v=${encodeURIComponent(version)}` : "";
+}
+
+export function paintingStem(imageUrl: string): string | null {
+	return (
+		imageUrl.match(/^\/illustrations\/([a-z0-9-]+)\.webp(?:\?[^#]*)?$/)?.[1] ??
+		null
+	);
 }
 
 export function isPhotoUrl(url: string): boolean {
@@ -36,15 +49,13 @@ export function photoInPlaceOfPainting(
 	imageUrl: string,
 	photos: Record<string, string> = REFERENCE_PHOTOS,
 ): string {
-	const slug = imageUrl.match(
-		/^\/illustrations\/([a-z0-9-]+?)(?:-2)?\.webp$/,
-	)?.[1];
+	const slug = paintingStem(imageUrl)?.replace(/-2$/, "");
 	if (!slug) return imageUrl;
 	if (PAINTED_SPECIES_PHOTOS.has(slug)) return `/photos/${slug}.webp`;
 	return photos[slug] ?? imageUrl;
 }
 
 export function paintedBoundsFor(imageUrl: string): PaintedBounds | null {
-	const stem = imageUrl.match(/^\/illustrations\/([a-z0-9-]+)\.webp$/)?.[1];
+	const stem = paintingStem(imageUrl);
 	return (stem && PAINTED_BOUNDS[stem]) || null;
 }
