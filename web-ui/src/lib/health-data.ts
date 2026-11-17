@@ -2,6 +2,8 @@ export type CheckState = "healthy" | "failing" | "unknown";
 
 export type NameState = CheckState | "default";
 
+export type LocationState = CheckState | "guessed";
+
 export const DEFAULT_SITE_NAME = "Backyard Station";
 
 export type ServiceState = {
@@ -47,10 +49,12 @@ export type StationChecks = {
 	};
 	name: { state: NameState; name: string | null };
 	location: {
-		state: CheckState;
+		state: LocationState;
 		latitude: number | null;
 		longitude: number | null;
 		timezone: string | null;
+		place: string | null;
+		timezoneFits: boolean | null;
 	};
 	power: { state: PowerState };
 	backups: { ageSeconds: number | null; historyDays: number | null };
@@ -67,6 +71,12 @@ export type StationToDo =
 	| { kind: "audio"; problem: AudioProblem }
 	| { kind: "analyzer" }
 	| { kind: "location" }
+	| {
+			kind: "location-guessed";
+			place: string | null;
+			timezone: string | null;
+	  }
+	| { kind: "timezone"; timezone: string }
 	| { kind: "name" }
 	| {
 			kind: "disk";
@@ -94,6 +104,7 @@ export type StationReadings = {
 	analyzer: ServiceState | null;
 	latitude: string | undefined;
 	longitude: string | undefined;
+	locationSource?: string;
 	siteName: string | undefined;
 	hostname: string;
 	diskUsedPercent: number | null;
@@ -205,12 +216,52 @@ export function checkAnalyzer({
 export function checkLocation({
 	latitude,
 	longitude,
-}: Pick<StationReadings, "latitude" | "longitude">): CheckState {
+	locationSource,
+}: Pick<
+	StationReadings,
+	"latitude" | "longitude" | "locationSource"
+>): LocationState {
 	if (latitude === undefined || longitude === undefined) return "unknown";
 	const lat = Number(latitude);
 	const lon = Number(longitude);
 	if (!Number.isFinite(lat) || !Number.isFinite(lon)) return "unknown";
-	return lat === 0 && lon === 0 ? "failing" : "healthy";
+	if (lat === 0 && lon === 0) return "failing";
+	return locationSource?.trim() === "ip" ? "guessed" : "healthy";
+}
+
+const HOURS_PER_DEGREE = 1 / 15;
+const TIMEZONE_FIT_HOURS = 3.5;
+
+export function timezoneOffsetHours(
+	timezone: string,
+	atMs: number,
+): number | null {
+	try {
+		const name = new Intl.DateTimeFormat("en-US", {
+			timeZone: timezone,
+			timeZoneName: "longOffset",
+		})
+			.formatToParts(atMs)
+			.find((part) => part.type === "timeZoneName")?.value;
+		const match = name ? /^GMT(?:([+-])(\d{2}):(\d{2}))?$/.exec(name) : null;
+		if (!match) return null;
+		if (!match[1]) return 0;
+		const hours = Number(match[2]) + Number(match[3]) / 60;
+		return match[1] === "-" ? -hours : hours;
+	} catch {
+		return null;
+	}
+}
+
+export function timezoneFitsLongitude(
+	timezone: string,
+	longitude: number,
+	atMs: number,
+): boolean | null {
+	const offset = timezoneOffsetHours(timezone, atMs);
+	if (offset === null || !Number.isFinite(longitude)) return null;
+	const gap = Math.abs(offset - longitude * HOURS_PER_DEGREE) % 24;
+	return Math.min(gap, 24 - gap) <= TIMEZONE_FIT_HOURS;
 }
 
 export function checkName({
@@ -284,7 +335,11 @@ export function formatModelName(model: string | undefined): string | null {
 }
 
 export function isSettingUp(checks: Pick<StationChecks, "name" | "location">) {
-	return checks.name.state === "failing" || checks.location.state === "failing";
+	return (
+		checks.name.state === "failing" ||
+		checks.location.state === "failing" ||
+		checks.location.state === "guessed"
+	);
 }
 
 export function stationToDos(readings: StationReadings): StationToDo[] {
@@ -367,6 +422,16 @@ export function describeToDo(toDo: StationToDo): ToDoCopy {
 				title: "The station's location isn't set",
 				detail:
 					"Latitude and longitude are both 0, so BirdNET can't tell which birds live nearby and will drop most detections. Enter where the station is.",
+			};
+		case "location-guessed":
+			return {
+				title: "Check the station's location",
+				detail: `The location${toDo.place ? `, near ${toDo.place},` : ""} and the time zone${toDo.timezone ? `, ${toDo.timezone.replaceAll("_", " ")},` : ""} were guessed from your internet connection, which can be miles off. BirdNET uses the location to decide which birds live nearby.`,
+			};
+		case "timezone":
+			return {
+				title: "The time zone doesn't fit the location",
+				detail: `The station is on ${toDo.timezone.replaceAll("_", " ")}, which is hours away from the local time at its coordinates, so detection times are probably off. Pick the time zone where the station is.`,
 			};
 		case "name":
 			return {

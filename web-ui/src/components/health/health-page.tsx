@@ -322,6 +322,7 @@ function HealthActionButton({
 			<StationEditButton
 				kind={action.kind}
 				primary={action.primary}
+				check={action.kind === "edit-location" && action.check === true}
 				editing={handlers.station}
 			/>
 		);
@@ -348,15 +349,18 @@ function HealthActionButton({
 function StationEditButton({
 	kind,
 	primary,
+	check,
 	editing,
 }: {
 	kind: "edit-name" | "edit-location";
 	primary: boolean;
+	check: boolean;
 	editing: StationEditing | null;
 }) {
 	const [open, setOpen] = useState(false);
 	const name = kind === "edit-name";
-	const label = `${primary ? "Set" : "Change"} ${name ? "name" : "location"}`;
+	const verb = check ? "Check" : primary ? "Set" : "Change";
+	const label = `${verb} ${name ? "name" : "location"}`;
 	return (
 		<>
 			<Button

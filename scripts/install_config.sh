@@ -9,11 +9,24 @@ birdnet_conf=$my_dir/birdnet.conf
 
 # Retrieve latitude and longitude from web
 json=$(curl -s4 http://ip-api.com/json || true)
+LOCATION_SOURCE=ip
+LOCATION_PLACE=
 if [ -n "$json" ] && [ "$(echo "$json" | jq -r .status)" = "success" ]; then
-  LATITUDE=$(echo "$json" | jq .lat)
-  LONGITUDE=$(echo "$json" | jq .lon)
+  LATITUDE=$(echo "$json" | jq '.lat * 10000 | round / 10000')
+  LONGITUDE=$(echo "$json" | jq '.lon * 10000 | round / 10000')
+  LOCATION_PLACE=$(echo "$json" | jq -r '[.city, .regionName, .country] | map(select(. != null and . != "")) | reduce .[] as $part ([]; if any(.[]; . == $part) then . else . + [$part] end) | join(", ")' | tr -d '"$`\\')
+  GUESSED_TIMEZONE=$(echo "$json" | jq -r '.timezone // empty')
+  CURRENT_TIMEZONE=$(timedatectl show --value --property=Timezone 2>/dev/null || true)
+  case "$CURRENT_TIMEZONE" in
+    ""|UTC|Etc/UTC|Europe/London)
+      if [ -n "$GUESSED_TIMEZONE" ] && [ "$GUESSED_TIMEZONE" != "$CURRENT_TIMEZONE" ] \
+        && [ -e "/usr/share/zoneinfo/$GUESSED_TIMEZONE" ]; then
+        sudo timedatectl set-timezone "$GUESSED_TIMEZONE" || true
+      fi
+      ;;
+  esac
 else
-  echo -e "\033[33mCouldn't set latitude and longitude automatically, you will need to set them in the web UI's Settings.\033[0m"
+  echo -e "\033[33mCouldn't set latitude and longitude automatically, you will need to set them on the web UI's Health page.\033[0m"
   LATITUDE=0.0000
   LONGITUDE=0.0000
 fi
@@ -37,6 +50,10 @@ SITE_NAME="Backyard Station"
 
 LATITUDE=$LATITUDE
 LONGITUDE=$LONGITUDE
+
+## "ip" until the location is confirmed on the web UI's Health page, then "user".
+LOCATION_SOURCE=$LOCATION_SOURCE
+LOCATION_PLACE="$LOCATION_PLACE"
 
 #--------------------------------- Model --------------------------------------#
 #_______The variable below sets how common a species must be near you_________#

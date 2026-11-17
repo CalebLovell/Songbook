@@ -15,9 +15,12 @@ import {
 	describeToDo,
 	dfUsedPercent,
 	formatModelName,
+	isSettingUp,
 	parseThrottled,
 	type StationReadings,
 	stationToDos,
+	timezoneFitsLongitude,
+	timezoneOffsetHours,
 } from "./health-data.ts";
 
 const NOW = 1_800_000_000_000;
@@ -224,6 +227,56 @@ test("location fails when both coordinates are zero, however written", () => {
 		checkLocation({ latitude: "0.0000", longitude: "0.0000" }),
 		"failing",
 	);
+});
+
+test("an install-time guess is guessed until someone confirms it", () => {
+	const guess = { latitude: "45.5231", longitude: "-122.6765" };
+	assert.equal(checkLocation({ ...guess, locationSource: "ip" }), "guessed");
+	assert.equal(checkLocation({ ...guess, locationSource: "user" }), "healthy");
+	assert.equal(checkLocation(guess), "healthy");
+	assert.equal(
+		checkLocation({ latitude: "0", longitude: "0", locationSource: "ip" }),
+		"failing",
+	);
+});
+
+test("a guessed location puts the station in setup", () => {
+	const location = {
+		latitude: 45.5,
+		longitude: -122.7,
+		timezone: "UTC",
+		place: null,
+		timezoneFits: null,
+	};
+	const name = { state: "healthy" as const, name: "Creek" };
+	assert.equal(
+		isSettingUp({ name, location: { ...location, state: "guessed" } }),
+		true,
+	);
+	assert.equal(
+		isSettingUp({ name, location: { ...location, state: "healthy" } }),
+		false,
+	);
+});
+
+test("time zone offsets follow daylight saving", () => {
+	const july = Date.parse("2026-07-01T12:00:00Z");
+	const january = Date.parse("2026-01-01T12:00:00Z");
+	assert.equal(timezoneOffsetHours("UTC", july), 0);
+	assert.equal(timezoneOffsetHours("America/Los_Angeles", july), -7);
+	assert.equal(timezoneOffsetHours("America/Los_Angeles", january), -8);
+	assert.equal(timezoneOffsetHours("Asia/Kolkata", july), 5.5);
+	assert.equal(timezoneOffsetHours("Not/AZone", july), null);
+});
+
+test("a time zone fits a longitude within a few hours of local solar time", () => {
+	assert.equal(timezoneFitsLongitude("UTC", -122.7, NOW), false);
+	assert.equal(timezoneFitsLongitude("Europe/London", -87.6, NOW), false);
+	assert.equal(timezoneFitsLongitude("America/Los_Angeles", -122.7, NOW), true);
+	assert.equal(timezoneFitsLongitude("Asia/Shanghai", 76, NOW), true);
+	assert.equal(timezoneFitsLongitude("Europe/Madrid", -8.5, NOW), true);
+	assert.equal(timezoneFitsLongitude("Pacific/Kiritimati", -157.4, NOW), true);
+	assert.equal(timezoneFitsLongitude("Not/AZone", 0, NOW), null);
 });
 
 test("location is unknown when the config doesn't say", () => {

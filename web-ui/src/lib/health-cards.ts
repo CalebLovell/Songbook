@@ -30,7 +30,7 @@ export type HealthAction =
 	| { kind: "setting"; tab: SettingsTab; label: string; primary: boolean }
 	| { kind: "restart-birdnet"; primary: boolean }
 	| { kind: "edit-name"; primary: boolean }
-	| { kind: "edit-location"; primary: boolean }
+	| { kind: "edit-location"; primary: boolean; check?: true }
 	| { kind: "download-backup" }
 	| { kind: "install-update"; version: string }
 	| { kind: "check-updates"; busy: boolean }
@@ -224,11 +224,32 @@ function nameCard(health: StationHealth): HealthCardView {
 	};
 }
 
+function locationProblem(location: StationHealth["checks"]["location"]) {
+	if (location.state === "failing") return copyFor({ kind: "location" });
+	if (location.state === "guessed")
+		return copyFor({
+			kind: "location-guessed",
+			place: location.place,
+			timezone: location.timezone,
+		});
+	if (location.timezoneFits === false && location.timezone)
+		return copyFor({ kind: "timezone", timezone: location.timezone });
+	return null;
+}
+
+function locationTone(health: StationHealth): HealthTone {
+	const { location } = health.checks;
+	if (location.state === "guessed") return "setup";
+	if (location.state === "healthy" && location.timezoneFits === false)
+		return "warning";
+	return toneFor(location.state, health.settingUp);
+}
+
 function locationCard(health: StationHealth): HealthCardView {
 	const { location } = health.checks;
-	const failing = location.state === "failing";
+	const guessed = location.state === "guessed";
 	const known =
-		location.state === "healthy" &&
+		(location.state === "healthy" || guessed) &&
 		location.latitude !== null &&
 		location.longitude !== null;
 	const details = known
@@ -238,19 +259,26 @@ function locationCard(health: StationHealth): HealthCardView {
 		: location.state === "unknown"
 			? ["The settings file couldn't be read."]
 			: [];
+	const problem = locationProblem(location);
 	return {
 		id: "location",
 		title: "Location",
-		tone: toneFor(location.state, health.settingUp),
+		tone: locationTone(health),
 		figure: known
 			? `${coordinate(location.latitude as number)}, ${coordinate(location.longitude as number)}`
 			: location.state === "unknown"
 				? NOT_KNOWN
 				: null,
 		details,
-		problem: failing ? copyFor({ kind: "location" }) : null,
+		problem,
 		meter: null,
-		actions: [{ kind: "edit-location", primary: failing }],
+		actions: [
+			location.state === "failing"
+				? { kind: "edit-location", primary: true }
+				: problem
+					? { kind: "edit-location", primary: true, check: true }
+					: { kind: "edit-location", primary: false },
+		],
 	};
 }
 

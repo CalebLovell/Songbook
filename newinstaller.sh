@@ -57,7 +57,15 @@ if [ ${PIPESTATUS[0]} -eq 0 ];then
     echo
     echo "*** The station's location could not be set. ***"
     echo "Until it is, BirdNET will drop most detections."
-    echo "After the reboot, sign in to the web UI and set it in Settings -> Station."
+    echo "After the reboot, sign in to the web UI and set it on the Health page."
+    echo
+    sleep 10
+  elif grep -q '^LOCATION_SOURCE=ip' /etc/birdnet/birdnet.conf; then
+    place=$(sed -n 's/^LOCATION_PLACE="\(.*\)"$/\1/p' /etc/birdnet/birdnet.conf)
+    echo
+    echo "The station's location was guessed from your internet connection${place:+, near $place},"
+    echo "with the time zone $(timedatectl show --value --property=Timezone)."
+    echo "After the reboot, sign in to the web UI and confirm both on the Health page."
     echo
     sleep 10
   fi

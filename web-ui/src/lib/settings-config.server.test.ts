@@ -89,6 +89,45 @@ test("updates only Station assignments and preserves the document", async () => 
 	assert.deepEqual(await readdir(path.dirname(file)), ["birdnet.conf"]);
 });
 
+test("a guessed location stays guessed until the location itself is saved", async () => {
+	const file = await fixtureConfig(
+		[
+			'SITE_NAME="Backyard Station"',
+			"LATITUDE=45.5231",
+			"LONGITUDE=-122.6765",
+			"LOCATION_SOURCE=ip",
+			'LOCATION_PLACE="Portland, Oregon, United States"',
+			"",
+		].join("\n"),
+	);
+	const guessed = (await readSettingsPageValues(file, "UTC")).station;
+	assert.equal(guessed.locationConfirmed, false);
+
+	await writeSettingsCard("station", { ...guessed, siteName: "Creek" }, file);
+	let after = await readFile(file, "utf8");
+	assert.match(after, /^LOCATION_SOURCE=ip$/m);
+	assert.match(after, /^LOCATION_PLACE="Portland, Oregon, United States"$/m);
+
+	await writeSettingsCard(
+		"station",
+		{ ...guessed, latitude: 45.6, locationConfirmed: true },
+		file,
+	);
+	after = await readFile(file, "utf8");
+	assert.match(after, /^LOCATION_SOURCE=user$/m);
+	assert.match(after, /^LOCATION_PLACE=""$/m);
+	assert.equal(
+		(await readSettingsPageValues(file, "UTC")).station.locationConfirmed,
+		true,
+	);
+});
+
+test("a station without a location source counts as confirmed", async () => {
+	const file = await fixtureConfig("LATITUDE=41.25\nLONGITUDE=-93\n");
+	const { station } = await readSettingsPageValues(file, "UTC");
+	assert.equal(station.locationConfirmed, true);
+});
+
 const SHELL_ACTIVE_NAMES = [
 	"x$(echo RAN)",
 	"x`echo RAN`",
@@ -136,7 +175,7 @@ test("replacement patterns in a value don't rewrite the rest of the file", async
 	const file = await fixtureConfig('BEFORE=1\nSITE_NAME="Backyard"\nAFTER=2\n');
 	await saveSiteName("a$&b$'c$`d", file);
 	const after = await readFile(file, "utf8");
-	assert.equal(after.split("\n").length, 6);
+	assert.equal(after.split("\n").length, 8);
 	assert.equal(parseBirdnetConfig(after).SITE_NAME, "a$&b$'c$`d");
 	assert.equal(parseBirdnetConfig(after).AFTER, "2");
 });

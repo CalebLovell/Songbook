@@ -416,7 +416,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   under it. A broken check is not a separate list: its own card wears the error tones
   (`--toast-error-fill/-line`, clay title) with the problem and its fix bottom left. A
   warning wears the warning tones. While the station name is empty or the location is unset
-  the station is setting up, and every failing card wears the warning tones instead of red.
+  or still the installer's guess, the station is setting up, and every failing card wears the
+  warning tones instead of red. A guessed location (`LOCATION_SOURCE=ip`) shows the guessed
+  place and asks to Check location, and only saving the Location dialog confirms it; renaming
+  the station doesn't. A missing `LOCATION_SOURCE` counts as confirmed. A confirmed location
+  whose time zone is more than 3.5 hours from its longitude's solar time warns only on the
+  Location card.
   A station still on the default name only warns on its Name card, never puts the station in
   setup, so a station that keeps it still shows real problems in red. A reading
   this computer can't give says "Not known" in muted text. Power supply and Updates only

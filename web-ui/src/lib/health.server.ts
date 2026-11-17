@@ -29,6 +29,7 @@ import {
 	type StationHealth,
 	type StationReadings,
 	stationToDos,
+	timezoneFitsLongitude,
 } from "~/lib/health-data.ts";
 import { readPiReadings } from "~/lib/pi-readings.server.ts";
 import { currentTimezone } from "~/lib/settings.server.ts";
@@ -178,6 +179,7 @@ export async function loadStationHealth({
 		analyzer,
 		latitude: config?.LATITUDE,
 		longitude: config?.LONGITUDE,
+		locationSource: config?.LOCATION_SOURCE,
 		siteName: config?.SITE_NAME,
 		hostname: hostname(),
 		diskUsedPercent: disk.usedPercent,
@@ -216,6 +218,14 @@ export async function loadStationHealth({
 			latitude,
 			longitude,
 			timezone,
+			place:
+				locationState === "guessed"
+					? config?.LOCATION_PLACE?.trim() || null
+					: null,
+			timezoneFits:
+				timezone && longitude !== null && locationState !== "failing"
+					? timezoneFitsLongitude(timezone, longitude, nowMs)
+					: null,
 		},
 		power: { state: checkPower(pi.underVoltage) },
 		backups: { ageSeconds: secondsSince(nowMs, backupMs), historyDays },

@@ -90,6 +90,7 @@ export async function readSettingsPageValues(
 			latitude: numberValue(values, "LATITUDE", 0),
 			longitude: numberValue(values, "LONGITUDE", 0),
 			timezone,
+			locationConfirmed: values.LOCATION_SOURCE?.trim() !== "ip",
 		}),
 		detection: parseSettingsCard("detection", {
 			speciesFrequencyThreshold: numberValue(
@@ -211,6 +212,9 @@ function assignmentsFor<K extends SettingsCardKind>(
 				SITE_NAME: quoteShellValue(station.siteName),
 				LATITUDE: String(station.latitude),
 				LONGITUDE: String(station.longitude),
+				...(station.locationConfirmed === false
+					? { LOCATION_SOURCE: "ip" }
+					: { LOCATION_SOURCE: "user", LOCATION_PLACE: '""' }),
 			};
 		}
 		case "detection": {

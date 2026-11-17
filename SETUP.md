@@ -108,7 +108,8 @@ It installs the newest release and everything it needs. This took about 10 minut
 2. **Then it reboots,** which ends your SSH session. That is expected.
 
 It keeps a log at `~/installation-<date>.txt`. It also guesses the station's location from your
-IP address using ip-api.com, which decides which species are expected there.
+IP address using ip-api.com, which decides which species are expected there. If you left the
+Imager's time zone at its default, it takes the time zone from the same guess.
 
 ## 4. Open the web UI
 
@@ -129,8 +130,10 @@ fixing turns yellow or red with what to do.
 - **Audio input** names your microphone and shows how loud it is hearing, for example
   "Hearing sound, peaking at −42 dB". If no mic is plugged in, or it records silence, the card
   turns red. Fix it at the Pi, then press **Check again**.
-- **Location:** check it's right. A VPN can make the installer's guess wrong, and species filtered
-  out by a wrong location can't be recovered afterwards.
+- **Location** stays yellow, showing roughly where the installer's guess points and the time
+  zone, until you press **Check location** and save. A VPN can make the guess wrong, and species
+  filtered out by a wrong location can't be recovered afterwards. Later, the card warns if the
+  time zone is hours away from the location.
 - **Name:** new stations are called "Backyard Station". Visitors see the name, so change it to one
   of your own if you like, but don't use your address.
 

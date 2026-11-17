@@ -29,6 +29,7 @@ export const stationSettingsSchema = z.object({
 		.string()
 		.trim()
 		.refine(isKnownTimezone, "Pick a timezone from the list"),
+	locationConfirmed: z.boolean().optional(),
 });
 
 export const detectionSettingsSchema = z.object({

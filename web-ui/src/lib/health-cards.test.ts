@@ -47,6 +47,8 @@ const HEALTHY_CHECKS: StationChecks = {
 		latitude: 41.881,
 		longitude: -87.627,
 		timezone: "America/Chicago",
+		place: null,
+		timezoneFits: true,
 	},
 	power: { state: "steady" },
 	backups: { ageSeconds: 13 * 86_400, historyDays: 200 },
@@ -239,6 +241,8 @@ test("a new station shows set-up cards, not problems", () => {
 				latitude: 0,
 				longitude: 0,
 				timezone: "America/Chicago",
+				place: null,
+				timezoneFits: null,
 			},
 			backups: { ageSeconds: null, historyDays: 200 },
 		},
@@ -334,6 +338,8 @@ test("name and location are changed on Health itself", () => {
 					latitude: 0,
 					longitude: 0,
 					timezone: null,
+					place: null,
+					timezoneFits: null,
 				},
 			}),
 			"location",
@@ -353,4 +359,50 @@ test("only a release install offers the automatic-updates choice", () => {
 		managed: false,
 	}).find((each) => each.id === "updates");
 	assert.equal(development?.automaticUpdates, undefined);
+});
+
+test("an install-time guess asks to be checked, in setup tones", () => {
+	const view = health(
+		{
+			location: {
+				...HEALTHY_CHECKS.location,
+				state: "guessed",
+				place: "Portland, Oregon, United States",
+				timezoneFits: false,
+			},
+		},
+		{ settingUp: true },
+	);
+	const location = card(view, "location");
+	assert.equal(location.tone, "setup");
+	assert.equal(location.figure, "41.8810, −87.6270");
+	assert.equal(location.problem?.title, "Check the station's location");
+	assert.match(location.problem?.detail ?? "", /near Portland, Oregon/);
+	assert.match(location.problem?.detail ?? "", /time zone, America\/Chicago,/);
+	assert.deepEqual(location.actions, [
+		{ kind: "edit-location", primary: true, check: true },
+	]);
+});
+
+test("a confirmed location whose time zone doesn't fit warns", () => {
+	const view = health({
+		location: {
+			...HEALTHY_CHECKS.location,
+			timezone: "Europe/London",
+			timezoneFits: false,
+		},
+	});
+	const location = card(view, "location");
+	assert.equal(location.tone, "warning");
+	assert.equal(
+		location.problem?.title,
+		"The time zone doesn't fit the location",
+	);
+	assert.deepEqual(location.actions, [
+		{ kind: "edit-location", primary: true, check: true },
+	]);
+	const fine = card(health({}), "location");
+	assert.equal(fine.tone, "ok");
+	assert.equal(fine.problem, null);
+	assert.deepEqual(fine.details, ["Time zone America/Chicago."]);
 });

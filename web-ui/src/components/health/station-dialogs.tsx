@@ -179,13 +179,17 @@ export function LocationDialog({
 	const save = useStationSave(editing.save, onClose);
 	function submit(event: SyntheticEvent) {
 		event.preventDefault();
-		save.mutate(values);
+		save.mutate({ ...values, locationConfirmed: true });
 	}
+	const guessed = editing.values.locationConfirmed === false;
 	return (
 		<ModalDialog title="Location" className="max-w-lg" onClose={onClose}>
 			<form onSubmit={submit} className="flex flex-col gap-page">
 				<p className="m-0 text-muted-foreground text-sm leading-relaxed">
 					BirdNET uses where the station is to decide which birds live nearby.
+					{guessed
+						? " These were guessed from your internet connection when the station was installed. Use your location or enter it by hand, then save to confirm."
+						: null}
 				</p>
 				<div className="grid grid-cols-2 gap-page">
 					<Field id={`${id}-lat`} label="Latitude">
