@@ -16,12 +16,25 @@ export type PiReadings = {
 
 export type PowerState = "steady" | "dipped" | "low" | "unknown";
 
+export type AudioSource = "microphone" | "stream";
+
+export type Microphone = { card: number; id: string; name: string };
+
+export type AudioProblem =
+	| { kind: "no-microphone" }
+	| { kind: "device-missing"; device: string }
+	| { kind: "stopped" }
+	| { kind: "silent"; source: AudioSource };
+
 export type StationChecks = {
 	uptimeSeconds: number;
 	audio: {
 		state: CheckState;
 		ageSeconds: number | null;
-		source: "microphone" | "stream";
+		source: AudioSource;
+		microphones: Microphone[] | null;
+		peakDb: number | null;
+		problem: AudioProblem | null;
 	};
 	analyzer: {
 		state: CheckState;
@@ -47,7 +60,7 @@ export type StationChecks = {
 };
 
 export type StationToDo =
-	| { kind: "audio" }
+	| { kind: "audio"; problem: AudioProblem }
 	| { kind: "analyzer" }
 	| { kind: "location" }
 	| { kind: "name" }
@@ -70,6 +83,10 @@ export type StationReadings = {
 	uptimeSeconds: number;
 	audioChangedMs: number | null;
 	recordingLengthSeconds: number;
+	audioSource: AudioSource;
+	recordingDevice: string;
+	microphones: Microphone[] | null;
+	soundPeak: number | null;
 	analyzer: ServiceState | null;
 	latitude: string | undefined;
 	longitude: string | undefined;
@@ -93,7 +110,7 @@ export function audioStaleAfterSeconds(recordingLengthSeconds: number) {
 	);
 }
 
-export function checkAudio({
+export function checkRecordingFlow({
 	nowMs,
 	uptimeSeconds,
 	audioChangedMs,
@@ -108,6 +125,64 @@ export function checkAudio({
 	return ageSeconds > audioStaleAfterSeconds(recordingLengthSeconds)
 		? "failing"
 		: "healthy";
+}
+
+const SILENT_PEAK = 2 / 32_768;
+const SYSTEM_DEVICES = new Set(["", "default", "pulse", "sysdefault"]);
+
+export function namedCard(device: string): string | null {
+	const trimmed = device.trim();
+	if (SYSTEM_DEVICES.has(trimmed)) return null;
+	const match = /^[a-z_]+:(?:CARD=)?([^,]+)/i.exec(trimmed);
+	return match ? match[1] : null;
+}
+
+function deviceConnected(card: string, microphones: Microphone[]) {
+	return microphones.some((each) =>
+		/^\d+$/.test(card) ? each.card === Number(card) : each.id === card,
+	);
+}
+
+export function audioProblem(
+	readings: Pick<
+		StationReadings,
+		| "nowMs"
+		| "uptimeSeconds"
+		| "audioChangedMs"
+		| "recordingLengthSeconds"
+		| "audioSource"
+		| "recordingDevice"
+		| "microphones"
+		| "soundPeak"
+	>,
+): AudioProblem | null {
+	const { audioSource, microphones, recordingDevice, soundPeak } = readings;
+	if (audioSource === "microphone" && microphones !== null) {
+		if (microphones.length === 0) return { kind: "no-microphone" };
+		const card = namedCard(recordingDevice);
+		if (card !== null && !deviceConnected(card, microphones))
+			return { kind: "device-missing", device: recordingDevice.trim() };
+	}
+	if (checkRecordingFlow(readings) === "failing") return { kind: "stopped" };
+	if (soundPeak !== null && soundPeak < SILENT_PEAK)
+		return { kind: "silent", source: audioSource };
+	return null;
+}
+
+export function checkAudio(
+	readings: Parameters<typeof audioProblem>[0],
+): CheckState {
+	if (audioProblem(readings)) return "failing";
+	const flowing =
+		readings.soundPeak !== null || checkRecordingFlow(readings) === "healthy";
+	const heard =
+		readings.audioSource === "stream" ||
+		(readings.microphones?.length ?? 0) > 0;
+	return flowing && heard ? "healthy" : "unknown";
+}
+
+export function peakDb(peak: number | null): number | null {
+	return peak === null || peak <= 0 ? null : 20 * Math.log10(peak);
 }
 
 export function checkAnalyzer({
@@ -209,7 +284,8 @@ export function isSettingUp(checks: Pick<StationChecks, "name" | "location">) {
 export function stationToDos(readings: StationReadings): StationToDo[] {
 	const toDos: StationToDo[] = [];
 	if (checkLocation(readings) === "failing") toDos.push({ kind: "location" });
-	if (checkAudio(readings) === "failing") toDos.push({ kind: "audio" });
+	const audio = audioProblem(readings);
+	if (audio) toDos.push({ kind: "audio", problem: audio });
 	if (checkAnalyzer(readings) === "failing") toDos.push({ kind: "analyzer" });
 	if (
 		checkDisk(readings) === "failing" &&
@@ -244,6 +320,40 @@ function diskDetail({
 		: `The disk is ${usedPercent}% full, and the station stops recording at ${threshold}%. Free some space on the station or change what happens when it fills.`;
 }
 
+export function describeAudioProblem(problem: AudioProblem): ToDoCopy {
+	switch (problem.kind) {
+		case "no-microphone":
+			return {
+				title: "No microphone is plugged in",
+				detail:
+					"Plug a USB microphone into any USB port on the Pi. Until then the station records silence and can't hear any birds.",
+			};
+		case "device-missing":
+			return {
+				title: "The recording device isn't connected",
+				detail: `Audio input is set to record from ${problem.device}, which isn't plugged in. Plug it back in, or choose another device in Audio input settings.`,
+			};
+		case "stopped":
+			return {
+				title: "No audio is arriving",
+				detail:
+					"The station hasn't saved a new recording in the last few minutes, so it can't hear any birds. Check that the microphone or stream is connected, then restart BirdNET.",
+			};
+		case "silent":
+			return problem.source === "stream"
+				? {
+						title: "The stream is silent",
+						detail:
+							"Recordings from the network stream contain no sound at all. Check that the stream's source is running and sending audio.",
+					}
+				: {
+						title: "The microphone isn't picking up any sound",
+						detail:
+							"It's plugged in, but its recordings are completely silent. Unplug it and plug it back in, or try another USB port or another microphone.",
+					};
+	}
+}
+
 export function describeToDo(toDo: StationToDo): ToDoCopy {
 	switch (toDo.kind) {
 		case "location":
@@ -259,11 +369,7 @@ export function describeToDo(toDo: StationToDo): ToDoCopy {
 					"It's still using the name the installer gave it. Choose one that visitors will see.",
 			};
 		case "audio":
-			return {
-				title: "No audio is arriving",
-				detail:
-					"The station hasn't saved a new recording in the last few minutes, so it can't hear any birds. Check that the microphone or stream is connected.",
-			};
+			return describeAudioProblem(toDo.problem);
 		case "analyzer":
 			return {
 				title: "Bird analysis has stopped",

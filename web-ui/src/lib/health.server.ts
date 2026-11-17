@@ -5,9 +5,11 @@ import { hostname, uptime } from "node:os";
 import path from "node:path";
 
 import { extractedDir } from "~/lib/audio.server.ts";
+import { readMicrophones, readSoundPeak } from "~/lib/audio-input.server.ts";
 import { readLastBackupMs } from "~/lib/backup-log.server.ts";
 import { stationDataPaths } from "~/lib/data-backup.server.ts";
 import {
+	audioProblem,
 	checkAnalyzer,
 	checkAudio,
 	checkDisk,
@@ -17,6 +19,7 @@ import {
 	dfUsedPercent,
 	formatModelName,
 	isSettingUp,
+	peakDb,
 	type ServiceState,
 	type StationChecks,
 	type StationHealth,
@@ -119,15 +122,25 @@ export async function loadStationHealth({
 	nowMs?: number;
 } = {}): Promise<StationHealth> {
 	const config = await readConfig();
-	const [disk, audioChangedMs, analyzer, pi, backupMs, timezone] =
-		await Promise.all([
-			readDisk(),
-			streamDataChangedMs(config?.RECS_DIR),
-			readAnalyzerState(),
-			readPiReadings(),
-			lastBackupMs(),
-			readTimezone(),
-		]);
+	const [
+		disk,
+		audioChangedMs,
+		microphones,
+		soundPeak,
+		analyzer,
+		pi,
+		backupMs,
+		timezone,
+	] = await Promise.all([
+		readDisk(),
+		streamDataChangedMs(config?.RECS_DIR),
+		readMicrophones(),
+		readSoundPeak(config?.RECS_DIR),
+		readAnalyzerState(),
+		readPiReadings(),
+		lastBackupMs(),
+		readTimezone(),
+	]);
 	const readings: StationReadings = {
 		nowMs,
 		uptimeSeconds,
@@ -136,6 +149,11 @@ export async function loadStationHealth({
 			config?.RECORDING_LENGTH,
 			SETTINGS_DEFAULTS.recording.recordingLength,
 		),
+		audioSource: config?.RTSP_STREAM?.trim() ? "stream" : "microphone",
+		recordingDevice:
+			config?.REC_CARD ?? SETTINGS_DEFAULTS.audio.recordingDevice,
+		microphones,
+		soundPeak,
 		analyzer,
 		latitude: config?.LATITUDE,
 		longitude: config?.LONGITUDE,
@@ -158,7 +176,10 @@ export async function loadStationHealth({
 		audio: {
 			state: checkAudio(readings),
 			ageSeconds: secondsSince(nowMs, audioChangedMs),
-			source: config?.RTSP_STREAM?.trim() ? "stream" : "microphone",
+			source: readings.audioSource,
+			microphones,
+			peakDb: peakDb(soundPeak),
+			problem: audioProblem(readings),
 		},
 		analyzer: {
 			state: checkAnalyzer(readings),

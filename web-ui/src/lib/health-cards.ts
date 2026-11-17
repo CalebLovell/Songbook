@@ -34,6 +34,7 @@ export type HealthAction =
 	| { kind: "download-backup" }
 	| { kind: "install-update"; version: string }
 	| { kind: "check-updates"; busy: boolean }
+	| { kind: "check-audio" }
 	| { kind: "reboot" }
 	| { kind: "poweroff" };
 
@@ -113,27 +114,51 @@ function waitingDetail(health: StationHealth, otherwise: string) {
 		: otherwise;
 }
 
+function decibels(value: number) {
+	return `${Math.round(value)} dB`.replace("-", "−");
+}
+
+function audioFigure(audio: StationHealth["checks"]["audio"]) {
+	if (audio.source === "stream") return "Network stream";
+	const microphones = audio.microphones ?? [];
+	if (microphones.length === 1) return microphones[0].name;
+	return microphones.length > 1 ? `${microphones.length} microphones` : null;
+}
+
+function audioDetails(audio: StationHealth["checks"]["audio"]) {
+	const details: string[] = [];
+	const microphones = audio.microphones ?? [];
+	if (audio.source === "microphone" && microphones.length > 1)
+		details.push(
+			`Plugged in: ${microphones.map((each) => each.name).join(", ")}.`,
+		);
+	if (audio.peakDb !== null && audio.problem?.kind !== "silent")
+		details.push(`Hearing sound, peaking at ${decibels(audio.peakDb)}.`);
+	if (audio.ageSeconds !== null && audio.problem?.kind !== "stopped")
+		details.push(`Last recording ${formatAge(audio.ageSeconds)}.`);
+	return details;
+}
+
 function audioCard(health: StationHealth): HealthCardView {
 	const { audio } = health.checks;
-	const failing = audio.state === "failing";
-	const source = audio.source === "stream" ? "network stream" : "microphone";
+	const { problem } = audio;
+	const details = audioDetails(audio);
 	return {
 		id: "audio",
 		title: "Audio input",
 		tone: toneFor(audio.state, health.settingUp),
 		figure:
-			audio.state === "unknown"
-				? NOT_KNOWN
-				: audio.state === "healthy" && audio.ageSeconds !== null
-					? `Last recording ${formatAge(audio.ageSeconds)}`
-					: null,
+			problem?.kind === "no-microphone"
+				? null
+				: (audioFigure(audio) ??
+					(audio.state === "unknown" ? NOT_KNOWN : null)),
 		details:
-			audio.state === "unknown"
+			audio.state === "unknown" && details.length === 0
 				? [waitingDetail(health, "The recordings folder couldn't be read.")]
-				: [`Recording from the ${source}.`],
-		problem: failing ? copyFor({ kind: "audio" }) : null,
+				: details,
+		problem: problem ? copyFor({ kind: "audio", problem }) : null,
 		meter: null,
-		actions: failing ? [setting("audio-input", "Check audio input", true)] : [],
+		actions: problem ? [{ kind: "check-audio" }] : [],
 	};
 }
 

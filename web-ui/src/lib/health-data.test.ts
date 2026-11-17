@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+	audioProblem,
 	audioStaleAfterSeconds,
 	BOOT_GRACE_SECONDS,
 	checkAnalyzer,
@@ -10,6 +11,7 @@ import {
 	checkLocation,
 	checkName,
 	checkPower,
+	checkRecordingFlow,
 	describeToDo,
 	dfUsedPercent,
 	formatModelName,
@@ -26,6 +28,12 @@ const HEALTHY: StationReadings = {
 	uptimeSeconds: SETTLED,
 	audioChangedMs: NOW - 10_000,
 	recordingLengthSeconds: 15,
+	audioSource: "microphone",
+	recordingDevice: "default",
+	microphones: [
+		{ card: 1, id: "Microphone", name: "KTMicro UAC 1.0 Microphone" },
+	],
+	soundPeak: 0.05,
 	analyzer: { loadState: "loaded", activeState: "active" },
 	latitude: "45.5",
 	longitude: "-75.1",
@@ -68,19 +76,80 @@ test("a long recording length earns a longer wait before audio fails", () => {
 	);
 });
 
-test("audio is unknown with no folder to read", () => {
-	assert.equal(checkAudio({ ...HEALTHY, audioChangedMs: null }), "unknown");
+test("recording flow is unknown with no folder to read", () => {
+	assert.equal(
+		checkRecordingFlow({ ...HEALTHY, audioChangedMs: null }),
+		"unknown",
+	);
 });
 
-test("audio is unknown during the boot grace period", () => {
+test("recording flow is unknown during the boot grace period", () => {
 	assert.equal(
-		checkAudio({
+		checkRecordingFlow({
 			...HEALTHY,
 			audioChangedMs: NOW - 3_600_000,
 			uptimeSeconds: BOOT_GRACE_SECONDS - 1,
 		}),
 		"unknown",
 	);
+});
+
+test("audio is unknown with nothing to read", () => {
+	assert.equal(
+		checkAudio({
+			...HEALTHY,
+			audioChangedMs: null,
+			microphones: null,
+			soundPeak: null,
+		}),
+		"unknown",
+	);
+});
+
+test("no microphone plugged in fails at once, even while booting", () => {
+	const readings = {
+		...HEALTHY,
+		uptimeSeconds: 30,
+		microphones: [],
+		soundPeak: 0,
+	};
+	assert.deepEqual(audioProblem(readings), { kind: "no-microphone" });
+	assert.equal(checkAudio(readings), "failing");
+});
+
+test("a stream doesn't need a microphone", () => {
+	assert.equal(
+		audioProblem({ ...HEALTHY, audioSource: "stream", microphones: [] }),
+		null,
+	);
+});
+
+test("a recording device naming a card that isn't plugged in fails", () => {
+	for (const device of ["plughw:2,0", "hw:CARD=Boya,DEV=0", "dsnoop:Boya"]) {
+		assert.deepEqual(audioProblem({ ...HEALTHY, recordingDevice: device }), {
+			kind: "device-missing",
+			device,
+		});
+	}
+	for (const device of ["plughw:1,0", "hw:CARD=Microphone,DEV=0", "pulse"]) {
+		assert.equal(audioProblem({ ...HEALTHY, recordingDevice: device }), null);
+	}
+});
+
+test("digital silence fails, a quiet room doesn't", () => {
+	assert.deepEqual(audioProblem({ ...HEALTHY, soundPeak: 0 }), {
+		kind: "silent",
+		source: "microphone",
+	});
+	assert.equal(audioProblem({ ...HEALTHY, soundPeak: 0.008 }), null);
+});
+
+test("silence is checked before boot grace ends", () => {
+	assert.equal(
+		checkAudio({ ...HEALTHY, uptimeSeconds: 30, soundPeak: 0 }),
+		"failing",
+	);
+	assert.equal(checkAudio({ ...HEALTHY, uptimeSeconds: 30 }), "healthy");
 });
 
 test("a folder dated ahead of the clock counts as healthy", () => {
@@ -246,7 +315,7 @@ test("every failing check is listed", () => {
 	});
 	assert.deepEqual(toDos, [
 		{ kind: "location" },
-		{ kind: "audio" },
+		{ kind: "audio", problem: { kind: "stopped" } },
 		{ kind: "analyzer" },
 		{ kind: "disk", usedPercent: 99, threshold: 95, action: "purge" },
 		{ kind: "name" },

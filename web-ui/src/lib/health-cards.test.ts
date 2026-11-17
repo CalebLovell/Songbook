@@ -26,7 +26,16 @@ function cardsOf(
 
 const HEALTHY_CHECKS: StationChecks = {
 	uptimeSeconds: 6 * 86_400,
-	audio: { state: "healthy", ageSeconds: 14, source: "microphone" },
+	audio: {
+		state: "healthy",
+		ageSeconds: 14,
+		source: "microphone",
+		microphones: [
+			{ card: 1, id: "Microphone", name: "KTMicro UAC 1.0 Microphone" },
+		],
+		peakDb: -41.6,
+		problem: null,
+	},
 	analyzer: {
 		state: "healthy",
 		runningSeconds: 3 * 86_400 + 4 * 3_600,
@@ -94,6 +103,74 @@ test("a healthy station keeps every card green and says so", () => {
 	);
 });
 
+test("a healthy audio card names the microphone and what it hears", () => {
+	const audio = card(health({}), "audio");
+	assert.equal(audio.figure, "KTMicro UAC 1.0 Microphone");
+	assert.deepEqual(audio.details, [
+		"Hearing sound, peaking at −42 dB.",
+		"Last recording 14 seconds ago.",
+	]);
+});
+
+test("an unplugged microphone says to plug one in, then check again", () => {
+	const audio = card(
+		health({
+			audio: {
+				...HEALTHY_CHECKS.audio,
+				state: "failing",
+				microphones: [],
+				peakDb: null,
+				problem: { kind: "no-microphone" },
+			},
+		}),
+		"audio",
+	);
+	assert.equal(audio.tone, "problem");
+	assert.equal(audio.figure, null);
+	assert.equal(audio.problem?.title, "No microphone is plugged in");
+	assert.deepEqual(audio.actions, [{ kind: "check-audio" }]);
+});
+
+test("a silent microphone keeps its name and drops the level", () => {
+	const audio = card(
+		health({
+			audio: {
+				...HEALTHY_CHECKS.audio,
+				state: "failing",
+				peakDb: null,
+				problem: { kind: "silent", source: "microphone" },
+			},
+		}),
+		"audio",
+	);
+	assert.equal(audio.figure, "KTMicro UAC 1.0 Microphone");
+	assert.equal(
+		audio.problem?.title,
+		"The microphone isn't picking up any sound",
+	);
+	assert.deepEqual(audio.details, ["Last recording 14 seconds ago."]);
+});
+
+test("two microphones are both named", () => {
+	const audio = card(
+		health({
+			audio: {
+				...HEALTHY_CHECKS.audio,
+				microphones: [
+					{ card: 1, id: "Microphone", name: "KTMicro UAC 1.0 Microphone" },
+					{ card: 3, id: "Boya", name: "BOYA BY-LM40" },
+				],
+			},
+		}),
+		"audio",
+	);
+	assert.equal(audio.figure, "2 microphones");
+	assert.equal(
+		audio.details[0],
+		"Plugged in: KTMicro UAC 1.0 Microphone, BOYA BY-LM40.",
+	);
+});
+
 test("the location card gives its time zone", () => {
 	const location = card(health({}), "location");
 	assert.equal(location.figure, "41.8810, −87.6270");
@@ -103,12 +180,17 @@ test("the location card gives its time zone", () => {
 test("a broken check carries its own problem and fix", () => {
 	const view = health(
 		{
-			audio: { state: "failing", ageSeconds: 1_080, source: "microphone" },
+			audio: {
+				...HEALTHY_CHECKS.audio,
+				state: "failing",
+				ageSeconds: 1_080,
+				problem: { kind: "stopped" },
+			},
 			storage: { ...HEALTHY_CHECKS.storage, state: "failing", usedPercent: 88 },
 		},
 		{
 			toDos: [
-				{ kind: "audio" },
+				{ kind: "audio", problem: { kind: "stopped" } },
 				{ kind: "disk", usedPercent: 88, threshold: 85, action: "purge" },
 			],
 		},
@@ -116,14 +198,7 @@ test("a broken check carries its own problem and fix", () => {
 	const audio = card(view, "audio");
 	assert.equal(audio.tone, "problem");
 	assert.equal(audio.problem?.title, "No audio is arriving");
-	assert.deepEqual(audio.actions, [
-		{
-			kind: "setting",
-			tab: "audio-input",
-			label: "Check audio input",
-			primary: true,
-		},
-	]);
+	assert.deepEqual(audio.actions, [{ kind: "check-audio" }]);
 	assert.equal(card(view, "storage").problem?.title, "The disk is nearly full");
 	assert.deepEqual(healthAttention(cardsOf(view)), {
 		count: 2,

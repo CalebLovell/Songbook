@@ -28,7 +28,7 @@ import {
 	type HealthTone,
 	healthCards,
 } from "~/lib/health-cards.ts";
-import type { StationHealth } from "~/lib/health-data.ts";
+import { describeAudioProblem, type StationHealth } from "~/lib/health-data.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import type { UpdateState } from "~/lib/updates-data.ts";
 import { errorMessage } from "~/lib/utils.ts";
@@ -45,6 +45,7 @@ export type HealthHandlers = {
 	onRestartBirdnet: () => Promise<{ message: string }>;
 	onPower: (action: PowerAction) => Promise<{ message: string }>;
 	onCheckUpdates: () => Promise<UpdateState>;
+	onCheckAudio: () => Promise<StationHealth>;
 	onInstallUpdate: () => Promise<void>;
 	station: StationEditing | null;
 	automaticUpdates: AutomaticUpdates | null;
@@ -332,6 +333,8 @@ function HealthActionButton({
 				onCheck={handlers.onCheckUpdates}
 			/>
 		);
+	if (action.kind === "check-audio")
+		return <CheckAudioButton onCheck={handlers.onCheckAudio} />;
 	if (action.kind === "install-update")
 		return (
 			<InstallUpdateButton
@@ -374,6 +377,40 @@ function StationEditButton({
 				)
 			) : null}
 		</>
+	);
+}
+
+function CheckAudioButton({
+	onCheck,
+}: {
+	onCheck: HealthHandlers["onCheckAudio"];
+}) {
+	const check = useMutation({
+		mutationFn: onCheck,
+		onSuccess: (health) => {
+			const { problem } = health.checks.audio;
+			if (problem)
+				toast.error(describeAudioProblem(problem).title, {
+					id: "health-audio",
+				});
+			else toast.success("Audio input is working.", { id: "health-audio" });
+		},
+		onError: (error) =>
+			toast.error(errorMessage(error, "Couldn't check the audio input."), {
+				id: "health-audio",
+			}),
+	});
+	return (
+		<Button
+			type="button"
+			variant="default"
+			size="default"
+			icon={RefreshCw}
+			loading={check.isPending}
+			onClick={() => check.mutate()}
+		>
+			Check again
+		</Button>
 	);
 }
 

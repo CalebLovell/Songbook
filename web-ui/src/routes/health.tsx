@@ -104,6 +104,8 @@ function HealthRoute() {
 					queryClient.setQueryData(queryKey, state);
 					return state;
 				},
+				onCheckAudio: () =>
+					queryClient.fetchQuery({ ...healthQuery, staleTime: 0 }),
 				onInstallUpdate: () => installUpdate(),
 				automaticUpdates: station
 					? {

@@ -417,16 +417,22 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   ever warn. Actions live on the card they act on: Restart BirdNET; Change
   or Set name and location, each in a small dialog; Restart the Pi and Shut down on Power
   supply; Install (confirmed), Check for updates and the Install automatically On/Off, which saves on click (Updates lives only on Health; old `?tab=updates` links redirect there); Download a backup, whose dialog
-  offers everything or without clips. Anything else that is a preference (audio device, storage rules,
-  restoring a backup) links to its Settings tab. Card logic is pure in
+  offers everything or without clips. A failing Audio input offers only Check again, which
+  re-reads the station and toasts whether audio now works, since its fixes happen at the Pi.
+  Anything else that is a preference (storage rules, restoring a backup) links to its Settings tab. Card logic is pure in
   `lib/health-cards.ts`. The Health row in the sidebar carries the only mark: the
   number of cards that need a look (problems, warnings and setup steps, an offered update
   included), clay when any is broken and sand otherwise, and nothing when all is well. The
   phone's menu button shows the same as a dot.
 - **Checks**: pure checks live in `lib/health-data.ts`. A state
   that can't be read, or a mid-restart service, is unknown and never listed, and audio
-  and the analyzer wait out 5 minutes of uptime. Audio is judged by the `StreamData`
-  folder's own mtime, because the analyzer deletes the files. A station name equal to
+  and the analyzer wait out 5 minutes of uptime. Audio input names the microphone and fails
+  on the first of: no capture device in `/proc/asound` (checked at once, because with none
+  PulseAudio falls back to a silent monitor and recording carries on); a `REC_CARD` naming a
+  card that isn't connected; no new recording; digital silence (peak under 2 LSB) in the last
+  3 seconds of the newest recording. Silence is judged by digital zero, never loudness, so a
+  quiet yard passes. Recording is judged by the `StreamData` folder's own mtime, because the
+  analyzer deletes the files. A station name equal to
   the hostname counts as unset, because the installer writes that. A purging disk
   alarms 2 points past `PURGE_THRESHOLD`, since it rests near that line when healthy;
   a keeping disk warns 5 points before it, since services stop there. Power supply warns
