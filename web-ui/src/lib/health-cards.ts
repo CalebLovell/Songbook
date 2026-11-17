@@ -191,21 +191,33 @@ function modelCard(health: StationHealth): HealthCardView {
 function nameCard(health: StationHealth): HealthCardView {
 	const { name } = health.checks;
 	const failing = name.state === "failing";
+	const isDefault = name.state === "default";
 	return {
 		id: "name",
 		title: "Name",
-		tone: toneFor(name.state, health.settingUp),
+		tone:
+			name.state === "default"
+				? "warning"
+				: toneFor(name.state, health.settingUp),
 		figure:
 			name.state === "unknown"
 				? NOT_KNOWN
-				: name.state === "healthy"
+				: name.state === "healthy" || isDefault
 					? name.name
 					: null,
 		details:
 			name.state === "unknown"
 				? ["The settings file couldn't be read."]
 				: ["Shown to visitors at the top of every page."],
-		problem: failing ? copyFor({ kind: "name" }) : null,
+		problem: failing
+			? copyFor({ kind: "name" })
+			: isDefault
+				? {
+						title: "The station has the default name",
+						detail:
+							"Every new station starts with this name. Change it to one of your own if you like.",
+					}
+				: null,
 		meter: null,
 		actions: [{ kind: "edit-name", primary: failing }],
 	};

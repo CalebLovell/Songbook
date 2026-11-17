@@ -411,8 +411,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the card itself. A healthy card is plain, with its reading as the figure and a sentence
   under it. A broken check is not a separate list: its own card wears the error tones
   (`--toast-error-fill/-line`, clay title) with the problem and its fix bottom left. A
-  warning wears the warning tones. While the station name or location is unset the station
-  is setting up, and every failing card wears the warning tones instead of red. A reading
+  warning wears the warning tones. While the station name is empty or the location is unset
+  the station is setting up, and every failing card wears the warning tones instead of red.
+  A station still on the default name only warns on its Name card, never puts the station in
+  setup, so a station that keeps it still shows real problems in red. A reading
   this computer can't give says "Not known" in muted text. Power supply and Updates only
   ever warn. Actions live on the card they act on: Restart BirdNET; Change
   or Set name and location, each in a small dialog; Restart the Pi and Shut down on Power
@@ -432,8 +434,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   card that isn't connected; no new recording; digital silence (peak under 2 LSB) in the last
   3 seconds of the newest recording. Silence is judged by digital zero, never loudness, so a
   quiet yard passes. Recording is judged by the `StreamData` folder's own mtime, because the
-  analyzer deletes the files. A station name equal to
-  the hostname counts as unset, because the installer writes that. A purging disk
+  analyzer deletes the files. The installer names every station
+  "Backyard Station" (`DEFAULT_SITE_NAME`); that name, or one equal to the hostname (what older
+  installers wrote), counts as the default. A purging disk
   alarms 2 points past `PURGE_THRESHOLD`, since it rests near that line when healthy;
   a keeping disk warns 5 points before it, since services stop there. Power supply warns
   after a dip since boot (`vcgencmd get_throttled`). A backup counts when a

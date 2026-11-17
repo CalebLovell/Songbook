@@ -37,7 +37,7 @@ const HEALTHY: StationReadings = {
 	analyzer: { loadState: "loaded", activeState: "active" },
 	latitude: "45.5",
 	longitude: "-75.1",
-	siteName: "Backyard Station",
+	siteName: "Maple Street Feeders",
 	hostname: "birdnetpi",
 	diskUsedPercent: 45,
 	purgeThreshold: 95,
@@ -238,10 +238,14 @@ test("the name is healthy once it differs from the hostname", () => {
 	assert.equal(checkName(HEALTHY), "healthy");
 });
 
-test("the name is still to do when empty or the installer's hostname", () => {
+test("an empty name is to do, and the default or hostname is flagged", () => {
 	assert.equal(checkName({ ...HEALTHY, siteName: "  " }), "failing");
-	assert.equal(checkName({ ...HEALTHY, siteName: "birdnetpi" }), "failing");
-	assert.equal(checkName({ ...HEALTHY, siteName: "BirdNetPi " }), "failing");
+	assert.equal(checkName({ ...HEALTHY, siteName: "birdnetpi" }), "default");
+	assert.equal(checkName({ ...HEALTHY, siteName: "BirdNetPi " }), "default");
+	assert.equal(
+		checkName({ ...HEALTHY, siteName: "backyard station" }),
+		"default",
+	);
 });
 
 test("the name is unknown when the config doesn't say", () => {

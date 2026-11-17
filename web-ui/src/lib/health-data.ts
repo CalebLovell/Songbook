@@ -1,5 +1,9 @@
 export type CheckState = "healthy" | "failing" | "unknown";
 
+export type NameState = CheckState | "default";
+
+export const DEFAULT_SITE_NAME = "Backyard Station";
+
 export type ServiceState = {
 	loadState: string;
 	activeState: string;
@@ -41,7 +45,7 @@ export type StationChecks = {
 		runningSeconds: number | null;
 		model: string | null;
 	};
-	name: { state: CheckState; name: string | null };
+	name: { state: NameState; name: string | null };
 	location: {
 		state: CheckState;
 		latitude: number | null;
@@ -212,11 +216,13 @@ export function checkLocation({
 export function checkName({
 	siteName,
 	hostname,
-}: Pick<StationReadings, "siteName" | "hostname">): CheckState {
+}: Pick<StationReadings, "siteName" | "hostname">): NameState {
 	if (siteName === undefined) return "unknown";
 	const name = siteName.trim().toLowerCase();
-	return name === "" || name === hostname.trim().toLowerCase()
-		? "failing"
+	if (name === "") return "failing";
+	return name === DEFAULT_SITE_NAME.toLowerCase() ||
+		name === hostname.trim().toLowerCase()
+		? "default"
 		: "healthy";
 }
 
@@ -365,8 +371,7 @@ export function describeToDo(toDo: StationToDo): ToDoCopy {
 		case "name":
 			return {
 				title: "Give the station a name",
-				detail:
-					"It's still using the name the installer gave it. Choose one that visitors will see.",
+				detail: "The station has no name. Choose one that visitors will see.",
 			};
 		case "audio":
 			return describeAudioProblem(toDo.problem);

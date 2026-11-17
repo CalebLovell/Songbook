@@ -26,7 +26,7 @@ install_config() {
 
 # Optional: Site Title for banner
 
-SITE_NAME="$HOSTNAME"
+SITE_NAME="Backyard Station"
 
 #--------------------- Required: Latitude, and Longitude ----------------------#
 

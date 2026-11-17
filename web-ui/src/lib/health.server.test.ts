@@ -66,10 +66,15 @@ test("a zero location puts the station in setup and keeps its readings", async (
 	assert.equal(health.checks.uptimeSeconds, SETTLED);
 });
 
-test("a station still named after its host is reported", async () => {
-	await writeFile(conf, `SITE_NAME="${hostname()}"\n`);
+test("a station named after its host is flagged without blocking setup", async () => {
+	await writeFile(
+		conf,
+		`SITE_NAME="${hostname()}"\nLATITUDE=45.5\nLONGITUDE=-75.1\n`,
+	);
 	const health = await loadStationHealth({ uptimeSeconds: SETTLED });
-	assert.ok(kinds(health).includes("name"));
+	assert.equal(health.checks.name.state, "default");
+	assert.equal(health.settingUp, false);
+	assert.ok(!kinds(health).includes("name"));
 });
 
 test("a just-booted station doesn't report stale audio", async () => {

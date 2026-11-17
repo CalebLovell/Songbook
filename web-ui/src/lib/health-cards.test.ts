@@ -41,7 +41,7 @@ const HEALTHY_CHECKS: StationChecks = {
 		runningSeconds: 3 * 86_400 + 4 * 3_600,
 		model: "BirdNET 2.4",
 	},
-	name: { state: "healthy", name: "Backyard Station" },
+	name: { state: "healthy", name: "Maple Street Feeders" },
 	location: {
 		state: "healthy",
 		latitude: 41.881,
@@ -169,6 +169,17 @@ test("two microphones are both named", () => {
 		audio.details[0],
 		"Plugged in: KTMicro UAC 1.0 Microphone, BOYA BY-LM40.",
 	);
+});
+
+test("the default name warns in yellow and keeps the name showing", () => {
+	const name = card(
+		health({ name: { state: "default", name: "Backyard Station" } }),
+		"name",
+	);
+	assert.equal(name.tone, "warning");
+	assert.equal(name.figure, "Backyard Station");
+	assert.equal(name.problem?.title, "The station has the default name");
+	assert.deepEqual(name.actions, [{ kind: "edit-name", primary: false }]);
 });
 
 test("the location card gives its time zone", () => {
