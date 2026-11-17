@@ -230,6 +230,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   control for its exact box, `ShellFigure` (a small rectangle) for a figure
   in running text, and one plain rectangle for a chart. Loading and loaded
   must measure the same; only row counts that depend on the data may differ.
+  Text whose wrapping depends on the data (a bird's name, a date beside
+  controls) uses its real string as the `ShellText` strut: the last data
+  shown when there is some (`useLastDefined`, so a pull to refresh keeps its
+  shape), else a typical sample.
   No animation between the two: shells show from the first frame and content
   replaces them in place.
 - **Keyboard**: every page opens with a skip link, and a page change moves focus to

@@ -149,12 +149,24 @@ export function SpeciesHeroCard({
 	);
 }
 
+export type HeroShellBird = {
+	comName: string;
+	sciName: string;
+	relativeTime: string;
+	heardAt: string;
+	confidence: number | null;
+};
+
+const SAMPLE_HEARD_AT = "last heard Nov 17, 2026, 10:45 AM";
+
 export function SpeciesHeroCardShell({
 	label,
 	actions,
+	bird,
 }: {
 	label: string;
 	actions?: ReactNode;
+	bird?: HeroShellBird;
 }) {
 	return (
 		<HeroCardShell
@@ -166,33 +178,79 @@ export function SpeciesHeroCardShell({
 				</div>
 			}
 		>
-			<HeroTextShell actions={actions} />
+			<HeroTextShell actions={actions} bird={bird} />
 		</HeroCardShell>
 	);
 }
 
-export function HeroTextShell({ actions }: { actions?: ReactNode }) {
+function TextStrut({
+	text,
+	className = "",
+}: {
+	text: string;
+	className?: string;
+}) {
+	return (
+		<ShellText
+			className={`w-fit max-w-full ${className}`}
+			barClassName="right-0"
+			strut={<span className="invisible">{text}</span>}
+		/>
+	);
+}
+
+export function HeroTextShell({
+	actions,
+	bird,
+}: {
+	actions?: ReactNode;
+	bird?: HeroShellBird;
+}) {
 	const canListen = useCanListen();
+	const confidence = bird ? bird.confidence : 0.9;
 	return (
 		<>
 			<div className="flex flex-wrap items-start justify-between gap-3 max-[400px]:gap-2">
 				<div className="min-w-0 flex-1">
-					<ShellText
-						className="font-bold text-2xl sm:text-3xl"
-						barClassName="w-60 max-w-full"
-					/>
-					<ShellText className="text-xs" barClassName="w-32" />
+					{bird ? (
+						<>
+							<TextStrut
+								text={bird.comName}
+								className="font-bold text-2xl sm:text-3xl"
+							/>
+							<TextStrut text={bird.sciName} className="text-xs italic" />
+						</>
+					) : (
+						<>
+							<ShellText
+								className="font-bold text-2xl sm:text-3xl"
+								barClassName="w-60 max-w-full"
+							/>
+							<ShellText className="text-xs" barClassName="w-32" />
+						</>
+					)}
 				</div>
 				{actions ? <div className={HERO_ACTIONS_CLASS}>{actions}</div> : null}
 			</div>
 
 			<div>
-				<ShellText className="font-semibold text-lg" barClassName="w-32" />
+				{bird ? (
+					<TextStrut
+						text={bird.relativeTime}
+						className="font-semibold text-lg"
+					/>
+				) : (
+					<ShellText className="font-semibold text-lg" barClassName="w-32" />
+				)}
 				<div className="mt-1 flex flex-wrap items-center gap-2 text-sm tabular-nums">
-					<ShellText className="w-40 sm:w-52" barClassName="w-full" />
-					<ShellSized className="rounded-full">
-						<ConfidencePill confidence={0.9} />
-					</ShellSized>
+					<TextStrut
+						text={bird ? `last heard ${bird.heardAt}` : SAMPLE_HEARD_AT}
+					/>
+					{confidence != null ? (
+						<ShellSized className="rounded-full">
+							<ConfidencePill confidence={confidence} />
+						</ShellSized>
+					) : null}
 					{canListen ? (
 						<ShellSized className="rounded-md">
 							<RecordingButton audioUrl={null} size="sm" />

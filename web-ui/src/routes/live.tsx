@@ -9,17 +9,27 @@ import {
 	RecentLogCard,
 	RecentLogCardSkeleton,
 } from "~/components/now/recent-log-card.tsx";
-import { SpeciesHeroCardShell } from "~/components/species-hero-card.tsx";
+import {
+	type HeroShellBird,
+	SpeciesHeroCardShell,
+} from "~/components/species-hero-card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { announce } from "~/lib/announce.ts";
+import { formatDateTime } from "~/lib/date-format.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import {
 	getLiveHighlights,
 	type LiveHighlights,
 } from "~/lib/live-highlights.ts";
-import { getNowSnapshot, type NowSnapshot } from "~/lib/now.ts";
+import {
+	type CurrentBird,
+	getNowSnapshot,
+	type NowSnapshot,
+} from "~/lib/now.ts";
 import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
+import { formatTimeAgo } from "~/lib/time-ago.ts";
+import { useLastDefined } from "~/lib/use-last-defined.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const POLL_INTERVAL_MS = 10_000;
@@ -90,17 +100,39 @@ function Live() {
 	const { unlocked } = Route.useLoaderData();
 	const snapshot = useSkeletonMinimum(useQuery(snapshotQuery).data);
 	const highlights = useSkeletonMinimum(useQuery(highlightsQuery).data);
+	const lastSnapshot = useLastDefined(snapshot);
 
-	if (!snapshot) return <LiveShell unlocked={unlocked} />;
+	if (!snapshot) {
+		return (
+			<LiveShell unlocked={unlocked} bird={shellBird(lastSnapshot?.current)} />
+		);
+	}
 	return (
 		<LiveBody snapshot={snapshot} highlights={highlights} unlocked={unlocked} />
 	);
 }
 
-function LiveShell({ unlocked }: { unlocked: boolean }) {
+function shellBird(current: CurrentBird | null | undefined) {
+	if (!current) return undefined;
+	return {
+		comName: current.comName,
+		sciName: current.sciName,
+		relativeTime: formatTimeAgo(current.ageMs),
+		heardAt: formatDateTime(current.detectedAt),
+		confidence: current.confidence,
+	} satisfies HeroShellBird;
+}
+
+function LiveShell({
+	unlocked,
+	bird,
+}: {
+	unlocked: boolean;
+	bird: HeroShellBird | undefined;
+}) {
 	return (
 		<PageWrap>
-			<SpeciesHeroCardShell label="Last 24 hours" />
+			<SpeciesHeroCardShell label="Last 24 hours" bird={bird} />
 
 			<div className="mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
 				<RecentLogCardSkeleton />
