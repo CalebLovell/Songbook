@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { applyClipBoost, useBoostQuietRecordings } from "~/lib/clip-boost.ts";
 import { createClipLoader } from "~/lib/clip-loader.ts";
 
 const CACHE_SIZE = 12;
@@ -49,6 +50,7 @@ export function claimPlayback(audio: HTMLAudioElement | null) {
 
 export function usePlayableAudio(audioUrl: string | null) {
 	const audioRef = useRef<HTMLAudioElement>(null);
+	const boost = useBoostQuietRecordings();
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [loader] = useState(() =>
@@ -75,6 +77,7 @@ export function usePlayableAudio(audioUrl: string | null) {
 			audio.pause();
 			return;
 		}
+		applyClipBoost(audio, boost);
 		primeForPlayback(audio);
 		if (!(await loader.load(audio, audioUrl))) return;
 		audio.play().catch(() => setIsPlaying(false));

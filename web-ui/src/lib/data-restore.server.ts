@@ -454,6 +454,7 @@ async function applySettings(sourceDir: string, paths: DataPaths) {
 		paths.settingsPath,
 	);
 	await writeSettingsCard("artwork", settings.artwork, paths.settingsPath);
+	await writeSettingsCard("playback", settings.playback, paths.settingsPath);
 	return settings;
 }
 

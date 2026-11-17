@@ -4,8 +4,10 @@ import {
 	artworkSettingsSchema,
 	detectionSettingsSchema,
 	highlightSettingsSchema,
+	playbackSettingsSchema,
 	recordingSettingsSchema,
 	reviewSettingsSchema,
+	SETTINGS_DEFAULTS,
 	stationSettingsSchema,
 	storageSettingsSchema,
 } from "./settings-data.ts";
@@ -53,6 +55,7 @@ export const backupSettingsSchema = z.object({
 	review: reviewSettingsSchema,
 	highlights: highlightSettingsSchema,
 	artwork: artworkSettingsSchema,
+	playback: playbackSettingsSchema.default(SETTINGS_DEFAULTS.playback),
 });
 export type BackupSettings = z.infer<typeof backupSettingsSchema>;
 

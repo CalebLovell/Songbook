@@ -15,6 +15,7 @@ import {
 	type AudioSettings,
 	type DetectionSettings,
 	type HighlightSettings,
+	type PlaybackSettings,
 	parseSettingsCard,
 	RESETTABLE_CARDS,
 	type RecordingSettings,
@@ -189,6 +190,13 @@ export function saveArtworkSettings(
 	dependencies: SettingsServerDependencies = {},
 ) {
 	return saveSettings("artwork", input, dependencies);
+}
+
+export function savePlaybackSettings(
+	input: PlaybackSettings,
+	dependencies: SettingsServerDependencies = {},
+) {
+	return saveSettings("playback", input, dependencies);
 }
 
 export type SettingsResetResult = {

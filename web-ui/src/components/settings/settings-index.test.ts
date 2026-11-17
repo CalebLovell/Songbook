@@ -26,5 +26,5 @@ test("search finds Preferences' cards by their own names", () => {
 	const titles = SETTINGS_INDEX.filter(
 		(entry) => entry.tab === "preferences",
 	).map((entry) => entry.title);
-	assert.deepEqual(titles, ["Artwork", "Highlights", "Review"]);
+	assert.deepEqual(titles, ["Artwork", "Playback", "Highlights", "Review"]);
 });

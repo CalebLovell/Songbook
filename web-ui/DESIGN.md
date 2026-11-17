@@ -395,12 +395,15 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   refused and a declined restart read the same, and the card keeps offering Restart
   until the values are live. One tab per card,
   except Preferences, which stacks the cards about taste rather than running the
-  station (Artwork, Highlights, Review), and Data (Restore, Export detections); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
+  station (Artwork, Playback, Highlights, Review), and Data (Restore, Export detections); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
   never drops an unsaved edit. The toolbar's Factory defaults covers every card; a card's own
   footer reset covers only that card and goes through its normal save. A card's Save and reset show as disabled
   when there is nothing to do. Artwork picks illustrations or photos for the whole
   station; `SpeciesImage` applies it, so data keeps naming the painting and no page
   has to know.
+  Playback's boost (on by default) works the same way: `applyClipBoost` routes every
+  clip player through a shared gain and limiter during the tap, since iOS Safari only
+  starts audio from a gesture. Live audio keeps its own gain and compression popover.
 - **Health or Settings**: Health holds everything the station needs to work, and
   Settings holds only what someone might tweak to taste. A station left on every Settings
   default runs fine; one with a Health problem doesn't. So a value with no sensible

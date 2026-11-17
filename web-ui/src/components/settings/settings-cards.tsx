@@ -12,6 +12,7 @@ import {
 	type AudioSettings,
 	type DetectionSettings,
 	type HighlightSettings,
+	type PlaybackSettings,
 	type RecordingSettings,
 	type ReviewSettings,
 	SETTINGS_DEFAULTS,
@@ -39,6 +40,7 @@ export type SettingsSavers = {
 	review?: Saver<ReviewSettings>;
 	highlights?: Saver<HighlightSettings>;
 	artwork?: Saver<ArtworkSettings>;
+	playback?: Saver<PlaybackSettings>;
 };
 
 export type SettingsRestarter = (
@@ -346,6 +348,7 @@ export function SettingsCards({
 					initial={data.artwork}
 					save={savers.artwork}
 				/>
+				<PlaybackSettingsCard initial={data.playback} save={savers.playback} />
 				<HighlightsSettingsCard
 					initial={data.highlights}
 					save={savers.highlights}
@@ -917,6 +920,48 @@ function ArtworkSettingsCard({
 						{ value: "photos", label: "Photos" },
 					]}
 					onChange={(preference) => form.setValues({ preference })}
+				/>
+			</Field>
+		</SettingsCard>
+	);
+}
+
+function PlaybackSettingsCard({
+	initial,
+	save,
+}: {
+	initial: PlaybackSettings;
+	save?: Saver<PlaybackSettings>;
+}) {
+	const form = useCardSave(
+		"Playback",
+		initial,
+		save,
+		undefined,
+		SETTINGS_DEFAULTS.playback,
+	);
+	return (
+		<SettingsCard
+			title="Playback"
+			description="Choose how recordings sound when played on any page, for you and anyone visiting."
+			confirmDescription="This writes the value in this card to the station's configuration. Nothing restarts: the next recording played uses it."
+			onSave={() => void form.submit()}
+			reset={resetControl(form, RESET_NO_RESTART_DESCRIPTION)}
+			saveDisabled={form.saveDisabled}
+		>
+			<Field
+				label="Boost quiet recordings"
+				hint="Makes faint, far-off calls louder, and keeps loud ones from distorting. Live audio has its own controls."
+			>
+				<FieldChoice
+					value={form.values.boostQuietRecordings ? "on" : "off"}
+					options={[
+						{ value: "on", label: "On" },
+						{ value: "off", label: "Off" },
+					]}
+					onChange={(choice) =>
+						form.setValues({ boostQuietRecordings: choice === "on" })
+					}
 				/>
 			</Field>
 		</SettingsCard>

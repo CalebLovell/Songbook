@@ -68,6 +68,7 @@ test("every card with a default offers its own reset; Updates doesn't", () => {
 		"review",
 		"highlights",
 		"artwork",
+		"playback",
 	]) {
 		assert.ok(resetButton(cardMarkup(markup, id)), id);
 	}

@@ -139,6 +139,10 @@ export const artworkSettingsSchema = z.object({
 	preference: z.enum(ARTWORK_PREFERENCES),
 });
 
+export const playbackSettingsSchema = z.object({
+	boostQuietRecordings: z.boolean(),
+});
+
 export const updateSettingsSchema = z.object({ automatic: z.boolean() });
 
 export type StationSettings = z.infer<typeof stationSettingsSchema>;
@@ -149,6 +153,7 @@ export type StorageSettings = z.infer<typeof storageSettingsSchema>;
 export type ReviewSettings = z.infer<typeof reviewSettingsSchema>;
 export type HighlightSettings = z.infer<typeof highlightSettingsSchema>;
 export type ArtworkSettings = z.infer<typeof artworkSettingsSchema>;
+export type PlaybackSettings = z.infer<typeof playbackSettingsSchema>;
 export type UpdateSettings = z.infer<typeof updateSettingsSchema>;
 
 export type SettingsCardKind =
@@ -160,6 +165,7 @@ export type SettingsCardKind =
 	| "review"
 	| "highlights"
 	| "artwork"
+	| "playback"
 	| "updates";
 
 export type SettingsByKind = {
@@ -171,6 +177,7 @@ export type SettingsByKind = {
 	review: ReviewSettings;
 	highlights: HighlightSettings;
 	artwork: ArtworkSettings;
+	playback: PlaybackSettings;
 	updates: UpdateSettings;
 };
 
@@ -213,6 +220,7 @@ export const SETTINGS_DEFAULTS = {
 		vocalRatio: HIGHLIGHT_THRESHOLDS.vocal.ratio,
 	},
 	artwork: { preference: DEFAULT_ARTWORK_PREFERENCE },
+	playback: { boostQuietRecordings: true },
 } satisfies Omit<SettingsByKind, "station" | "updates">;
 
 export const RESETTABLE_CARDS = [
@@ -223,6 +231,7 @@ export const RESETTABLE_CARDS = [
 	"review",
 	"highlights",
 	"artwork",
+	"playback",
 ] as const satisfies readonly Exclude<
 	SettingsCardKind,
 	"station" | "updates"
@@ -243,6 +252,7 @@ const schemas = {
 	review: reviewSettingsSchema,
 	highlights: highlightSettingsSchema,
 	artwork: artworkSettingsSchema,
+	playback: playbackSettingsSchema,
 	updates: updateSettingsSchema,
 } as const;
 

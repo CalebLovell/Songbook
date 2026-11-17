@@ -27,6 +27,7 @@ const SERVICES = {
 	review: [],
 	highlights: [],
 	artwork: [],
+	playback: [],
 	updates: [],
 } as const satisfies Record<SettingsCardKind, readonly string[]>;
 

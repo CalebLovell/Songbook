@@ -28,6 +28,7 @@ import {
 	saveAudioSettingsFn,
 	saveDetectionSettingsFn,
 	saveHighlightSettingsFn,
+	savePlaybackSettingsFn,
 	saveRecordingSettingsFn,
 	saveReviewSettingsFn,
 	saveStorageSettingsFn,
@@ -74,6 +75,7 @@ function SettingsRoute() {
 	const saveReview = useServerFn(saveReviewSettingsFn);
 	const saveHighlights = useServerFn(saveHighlightSettingsFn);
 	const saveArtwork = useServerFn(saveArtworkSettingsFn);
+	const savePlayback = useServerFn(savePlaybackSettingsFn);
 	const reset = useServerFn(resetSettingsFn);
 	const restart = useServerFn(restartStationFn);
 	const router = useRouter();
@@ -124,6 +126,12 @@ function SettingsRoute() {
 					refreshingData(saveHighlights({ data: values })),
 				artwork: async (values) => {
 					const result = await saveArtwork({ data: values });
+					forgetUnlockStatus();
+					await refreshAllData(router, queryClient);
+					return result;
+				},
+				playback: async (values) => {
+					const result = await savePlayback({ data: values });
 					forgetUnlockStatus();
 					await refreshAllData(router, queryClient);
 					return result;

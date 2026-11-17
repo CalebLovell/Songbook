@@ -15,6 +15,7 @@ import { SiteSidebar } from "~/components/sidebar/site-sidebar.tsx";
 import { ArtworkPreferenceContext } from "~/components/species-image.tsx";
 import { SkipLink } from "~/components/ui/skip-link.tsx";
 import { Toaster } from "~/components/ui/toaster.tsx";
+import { BoostQuietRecordingsContext } from "~/lib/clip-boost.ts";
 import {
 	defaultPreviewImage,
 	previewImageMeta,
@@ -114,21 +115,25 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					Skip to main content
 				</SkipLink>
 				<ArtworkPreferenceContext.Provider value={auth.artwork}>
-					<div className="fixed inset-0 flex overflow-hidden">
-						<SiteSidebar />
-						<div className="flex min-h-0 min-w-0 flex-1 flex-col">
-							<MobileNav />
-							<PullToRefresh>
-								<main
-									id={MAIN_CONTENT_ID}
-									tabIndex={-1}
-									className="scrollbar-gutter-stable min-h-0 flex-1 overflow-y-auto overscroll-y-contain outline-none focus-visible:outline-none"
-								>
-									{children}
-								</main>
-							</PullToRefresh>
+					<BoostQuietRecordingsContext.Provider
+						value={auth.boostQuietRecordings}
+					>
+						<div className="fixed inset-0 flex overflow-hidden">
+							<SiteSidebar />
+							<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+								<MobileNav />
+								<PullToRefresh>
+									<main
+										id={MAIN_CONTENT_ID}
+										tabIndex={-1}
+										className="scrollbar-gutter-stable min-h-0 flex-1 overflow-y-auto overscroll-y-contain outline-none focus-visible:outline-none"
+									>
+										{children}
+									</main>
+								</PullToRefresh>
+							</div>
 						</div>
-					</div>
+					</BoostQuietRecordingsContext.Provider>
 				</ArtworkPreferenceContext.Provider>
 				<MainFocus />
 				<LiveAnnouncer />

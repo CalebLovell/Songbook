@@ -73,6 +73,13 @@ function artworkPreferenceFrom(values: Record<string, string>) {
 	);
 }
 
+function boostQuietRecordingsFrom(values: Record<string, string>) {
+	const saved = values.BOOST_QUIET_RECORDINGS?.trim();
+	return saved === undefined || saved === ""
+		? SETTINGS_DEFAULTS.playback.boostQuietRecordings
+		: saved !== "0";
+}
+
 export async function readSettingsPageValues(
 	settingsPath = resolveSettingsPath(),
 	timezone = Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -183,6 +190,7 @@ export async function readSettingsPageValues(
 			),
 		}),
 		artwork: { preference: artworkPreferenceFrom(values) },
+		playback: { boostQuietRecordings: boostQuietRecordingsFrom(values) },
 		updates: parseSettingsCard("updates", {
 			automatic: values.AUTOMATIC_UPDATE?.trim() === "1",
 		}),
@@ -267,6 +275,12 @@ function assignmentsFor<K extends SettingsCardKind>(
 		case "artwork": {
 			const artwork = value as SettingsByKind["artwork"];
 			return { BIRD_ARTWORK: artwork.preference };
+		}
+		case "playback": {
+			const playback = value as SettingsByKind["playback"];
+			return {
+				BOOST_QUIET_RECORDINGS: playback.boostQuietRecordings ? "1" : "0",
+			};
 		}
 		case "updates": {
 			const updates = value as SettingsByKind["updates"];
@@ -385,6 +399,18 @@ export async function readArtworkPreference(
 		);
 	} catch {
 		return SETTINGS_DEFAULTS.artwork.preference;
+	}
+}
+
+export async function readBoostQuietRecordings(
+	settingsPath = resolveSettingsPath(),
+) {
+	try {
+		return boostQuietRecordingsFrom(
+			parseBirdnetConfig(await readFile(settingsPath, "utf8")),
+		);
+	} catch {
+		return SETTINGS_DEFAULTS.playback.boostQuietRecordings;
 	}
 }
 

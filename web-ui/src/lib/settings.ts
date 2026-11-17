@@ -9,6 +9,7 @@ import {
 	saveAudioSettings,
 	saveDetectionSettings,
 	saveHighlightSettings,
+	savePlaybackSettings,
 	saveRecordingSettings,
 	saveReviewSettings,
 	saveStationSettings,
@@ -20,6 +21,7 @@ import {
 	audioSettingsSchema,
 	detectionSettingsSchema,
 	highlightSettingsSchema,
+	playbackSettingsSchema,
 	recordingSettingsSchema,
 	reviewSettingsSchema,
 	stationSettingsSchema,
@@ -71,6 +73,11 @@ export const saveArtworkSettingsFn = createServerFn({ method: "POST" })
 	.validator(artworkSettingsSchema)
 	.handler(({ data }) => saveArtworkSettings(data));
 
+export const savePlaybackSettingsFn = createServerFn({ method: "POST" })
+	.middleware([requireUnlocked])
+	.validator(playbackSettingsSchema)
+	.handler(({ data }) => savePlaybackSettings(data));
+
 export const saveUpdateSettingsFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
 	.validator(updateSettingsSchema)
@@ -94,6 +101,7 @@ export const restartStationFn = createServerFn({ method: "POST" })
 					"review",
 					"highlights",
 					"artwork",
+					"playback",
 					"updates",
 				])
 				.optional(),

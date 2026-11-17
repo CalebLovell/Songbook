@@ -11,6 +11,7 @@ import {
 	SearchCheck,
 	SlidersHorizontal,
 	Sparkles,
+	Volume2,
 } from "lucide-react";
 
 import type { SearchSetting } from "~/lib/site-search.ts";
@@ -65,6 +66,21 @@ const PREFERENCE_CARDS: SettingsIndexEntry[] = [
 			"paintings",
 			"photos",
 			"pictures",
+		],
+	},
+	{
+		title: "Playback",
+		tab: "preferences",
+		icon: Volume2,
+		fields: ["Boost quiet recordings"],
+		keywords: [
+			"preferences",
+			"volume",
+			"loud",
+			"louder",
+			"gain",
+			"compression",
+			"audio",
 		],
 	},
 	{

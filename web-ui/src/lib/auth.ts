@@ -9,6 +9,7 @@ import {
 } from "./auth.server.ts";
 import {
 	readArtworkPreference,
+	readBoostQuietRecordings,
 	readSiteName,
 } from "./settings-config.server.ts";
 
@@ -51,6 +52,7 @@ export const getUnlockStatusFn = createServerFn({ method: "GET" }).handler(
 			...status,
 			siteName: await readSiteName(),
 			artwork: await readArtworkPreference(),
+			boostQuietRecordings: await readBoostQuietRecordings(),
 		};
 	},
 );

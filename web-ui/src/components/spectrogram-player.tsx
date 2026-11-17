@@ -15,6 +15,7 @@ import { recordingActionLabel } from "~/components/recording-button.tsx";
 import { clamp01, Spectrogram } from "~/components/spectrogram.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
+import { applyClipBoost, useBoostQuietRecordings } from "~/lib/clip-boost.ts";
 import {
 	clipAwaitsFirstSound,
 	clipNeedsLoad,
@@ -66,6 +67,7 @@ export function SpectrogramPlayer({
 	const [duration, setDuration] = useState<number | null>(null);
 	const [looping, setLooping] = useState(false);
 	const audioRef = useRef<HTMLAudioElement>(null);
+	const boost = useBoostQuietRecordings();
 	const playheadRef = useRef<HTMLDivElement>(null);
 	const timeRef = useRef<HTMLSpanElement>(null);
 	const sliderRef = useRef<HTMLDivElement>(null);
@@ -185,6 +187,7 @@ export function SpectrogramPlayer({
 	}
 
 	function toggle() {
+		applyClipBoost(audioRef.current, boost);
 		primeForPlayback(audioRef.current);
 		dispatch({ type: "toggle" });
 	}
