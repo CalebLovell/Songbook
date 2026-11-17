@@ -49,7 +49,7 @@ const HEALTHY_CHECKS: StationChecks = {
 		timezone: "America/Chicago",
 	},
 	power: { state: "steady" },
-	backups: { ageSeconds: 13 * 86_400 },
+	backups: { ageSeconds: 13 * 86_400, historyDays: 200 },
 	storage: {
 		state: "healthy",
 		usedPercent: 61.2,
@@ -240,7 +240,7 @@ test("a new station shows set-up cards, not problems", () => {
 				longitude: 0,
 				timezone: "America/Chicago",
 			},
-			backups: { ageSeconds: null },
+			backups: { ageSeconds: null, historyDays: 200 },
 		},
 		{ settingUp: true, toDos: [{ kind: "location" }, { kind: "name" }] },
 	);
@@ -269,11 +269,32 @@ test("a power dip warns without counting as a problem", () => {
 test("unreadable checks and a missing backup are counted apart", () => {
 	const view = health({
 		power: { state: "unknown" },
-		backups: { ageSeconds: null },
+		backups: { ageSeconds: null, historyDays: 200 },
 	});
 	assert.equal(card(view, "power").figure, "Not known");
 	assert.equal(card(view, "backups").figure, "No backup yet");
 	assert.equal(healthAttention(cardsOf(view))?.count, 1);
+});
+
+test("a missing backup waits for a month of detections", () => {
+	const young = card(
+		health({ backups: { ageSeconds: null, historyDays: 29 } }),
+		"backups",
+	);
+	assert.equal(young.tone, "ok");
+	assert.equal(young.figure, "No backup yet");
+	assert.equal(
+		card(
+			health({ backups: { ageSeconds: null, historyDays: null } }),
+			"backups",
+		).tone,
+		"ok",
+	);
+	assert.equal(
+		card(health({ backups: { ageSeconds: null, historyDays: 30 } }), "backups")
+			.tone,
+		"warning",
+	);
 });
 
 test("spans read naturally", () => {

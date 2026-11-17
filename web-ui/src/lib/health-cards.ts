@@ -56,6 +56,7 @@ const MINUTE = 60;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 const STALE_BACKUP_SECONDS = 30 * DAY;
+const BACKUP_WORTHY_HISTORY_DAYS = 30;
 const NOT_KNOWN = "Not known";
 
 function unit(value: number, name: string) {
@@ -296,7 +297,7 @@ function powerCard(health: StationHealth): HealthCardView {
 }
 
 function backupsCard(health: StationHealth): HealthCardView {
-	const { ageSeconds } = health.checks.backups;
+	const { ageSeconds, historyDays } = health.checks.backups;
 	const base = { id: "backups" as const, title: "Backups", meter: null };
 	if (health.settingUp)
 		return {
@@ -310,6 +311,19 @@ function backupsCard(health: StationHealth): HealthCardView {
 					"Restore a backup from your old station to keep every detection, review and setting.",
 			},
 			actions: [setting("data", "Restore a backup", false)],
+		};
+	if (ageSeconds === null && (historyDays ?? 0) < BACKUP_WORTHY_HISTORY_DAYS)
+		return {
+			...base,
+			tone: "ok",
+			figure: "No backup yet",
+			details: [
+				historyDays === null
+					? "Nothing to back up until your station hears its first bird."
+					: "Worth downloading one once your station has a month of detections.",
+			],
+			problem: null,
+			actions: [{ kind: "download-backup" }],
 		};
 	if (ageSeconds === null)
 		return {

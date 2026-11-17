@@ -53,7 +53,7 @@ export type StationChecks = {
 		timezone: string | null;
 	};
 	power: { state: PowerState };
-	backups: { ageSeconds: number | null };
+	backups: { ageSeconds: number | null; historyDays: number | null };
 	storage: {
 		state: CheckState;
 		usedPercent: number | null;

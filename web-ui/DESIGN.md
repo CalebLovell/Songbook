@@ -440,7 +440,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   alarms 2 points past `PURGE_THRESHOLD`, since it rests near that line when healthy;
   a keeping disk warns 5 points before it, since services stop there. Power supply warns
   after a dip since boot (`vcgencmd get_throttled`). A backup counts when a
-  download finishes (`last-backup.json` in `Songbook-data`); none yet, or one over 30 days old, needs a look.
+  download finishes (`last-backup.json` in `Songbook-data`); one over 30 days old needs a look,
+  and so does none yet once the first detection is 30 days old (a new station has little to lose).
 
 - **Installable app**: `public/manifest.webmanifest` plus `public/sw.js`, registered
   only in production builds. The worker caches nothing but `offline.html` and the

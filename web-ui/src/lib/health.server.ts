@@ -4,6 +4,10 @@ import { readFile, stat, statfs } from "node:fs/promises";
 import { hostname, uptime } from "node:os";
 import path from "node:path";
 
+import { min, sql } from "drizzle-orm";
+
+import { db } from "~/db/index.ts";
+import { detections } from "~/db/schema.ts";
 import { extractedDir } from "~/lib/audio.server.ts";
 import { readMicrophones, readSoundPeak } from "~/lib/audio-input.server.ts";
 import { readLastBackupMs } from "~/lib/backup-log.server.ts";
@@ -76,6 +80,21 @@ async function lastBackupMs(): Promise<number | null> {
 	}
 }
 
+async function detectionHistoryDays(): Promise<number | null> {
+	try {
+		const [row] = await db
+			.select({
+				days: sql<
+					number | null
+				>`cast(julianday('now', 'localtime') - julianday(${min(detections.Date)}) as integer)`,
+			})
+			.from(detections);
+		return row?.days ?? null;
+	} catch {
+		return null;
+	}
+}
+
 function positiveNumber(value: string | undefined, fallback: number) {
 	const parsed = Number(value);
 	return value && Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
@@ -130,6 +149,7 @@ export async function loadStationHealth({
 		analyzer,
 		pi,
 		backupMs,
+		historyDays,
 		timezone,
 	] = await Promise.all([
 		readDisk(),
@@ -139,6 +159,7 @@ export async function loadStationHealth({
 		readAnalyzerState(),
 		readPiReadings(),
 		lastBackupMs(),
+		detectionHistoryDays(),
 		readTimezone(),
 	]);
 	const readings: StationReadings = {
@@ -197,7 +218,7 @@ export async function loadStationHealth({
 			timezone,
 		},
 		power: { state: checkPower(pi.underVoltage) },
-		backups: { ageSeconds: secondsSince(nowMs, backupMs) },
+		backups: { ageSeconds: secondsSince(nowMs, backupMs), historyDays },
 		storage: {
 			state: checkDisk(readings),
 			usedPercent: disk.usedPercent,
