@@ -5,7 +5,6 @@ import {
 	detectionSettingsSchema,
 	highlightSettingsSchema,
 	playbackSettingsSchema,
-	recordingSettingsSchema,
 	reviewSettingsSchema,
 	SETTINGS_DEFAULTS,
 	stationSettingsSchema,
@@ -50,7 +49,6 @@ export type BackupChecksums = z.infer<typeof backupChecksumsSchema>;
 export const backupSettingsSchema = z.object({
 	station: stationSettingsSchema,
 	detection: detectionSettingsSchema,
-	recording: recordingSettingsSchema,
 	storage: storageSettingsSchema,
 	review: reviewSettingsSchema,
 	highlights: highlightSettingsSchema,

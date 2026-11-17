@@ -40,77 +40,6 @@ export const detectionSettingsSchema = z.object({
 	privacyThreshold: z.number().finite().min(0).max(3),
 });
 
-const rtspStreamSchema = z
-	.string()
-	.trim()
-	.url()
-	.refine((value) => {
-		const protocol = new URL(value).protocol;
-		return protocol === "rtsp:" || protocol === "rtsps:";
-	}, "Use an rtsp:// or rtsps:// URL");
-
-const rtspStreamsSchema = z.preprocess((value) => {
-	const lines = typeof value === "string" ? value.split(/\r?\n/) : value;
-	if (!Array.isArray(lines)) return value;
-	return lines
-		.map((line) => (typeof line === "string" ? line.trim() : line))
-		.filter((line) => line !== "");
-}, z.array(rtspStreamSchema));
-
-export const audioSettingsSchema = z
-	.object({
-		mode: z.enum(["microphone", "rtsp"]),
-		recordingDevice: safeText(200),
-		channels: z.number().int().min(1).max(32),
-		rtspStreams: rtspStreamsSchema,
-		livestreamIndex: z.number().int().min(0),
-	})
-	.superRefine((value, context) => {
-		if (value.mode === "microphone" && value.recordingDevice.length === 0) {
-			context.addIssue({
-				code: "custom",
-				path: ["recordingDevice"],
-				message: "A recording device is required in microphone mode",
-			});
-		}
-		if (value.mode === "rtsp" && value.rtspStreams.length === 0) {
-			context.addIssue({
-				code: "custom",
-				path: ["rtspStreams"],
-				message: "Add at least one RTSP stream",
-			});
-		}
-		if (
-			value.mode === "rtsp" &&
-			value.livestreamIndex >= value.rtspStreams.length
-		) {
-			context.addIssue({
-				code: "custom",
-				path: ["livestreamIndex"],
-				message: "Select a configured live stream",
-			});
-		}
-	});
-
-export const recordingSettingsSchema = z
-	.object({
-		recordingLength: z.number().int().min(3).max(60),
-		extractionLength: z.number().int().min(3).max(60).nullable(),
-		audioFormat: z.enum(["mp3", "wav", "flac", "ogg"]),
-	})
-	.superRefine((value, context) => {
-		if (
-			value.extractionLength !== null &&
-			value.extractionLength > value.recordingLength
-		) {
-			context.addIssue({
-				code: "custom",
-				path: ["extractionLength"],
-				message: "Extraction length cannot exceed recording length",
-			});
-		}
-	});
-
 export const storageSettingsSchema = z.object({
 	fullDiskAction: z.enum(["purge", "keep"]),
 	purgeThreshold: z.number().int().min(20).max(99),
@@ -147,8 +76,6 @@ export const updateSettingsSchema = z.object({ automatic: z.boolean() });
 
 export type StationSettings = z.infer<typeof stationSettingsSchema>;
 export type DetectionSettings = z.infer<typeof detectionSettingsSchema>;
-export type AudioSettings = z.infer<typeof audioSettingsSchema>;
-export type RecordingSettings = z.infer<typeof recordingSettingsSchema>;
 export type StorageSettings = z.infer<typeof storageSettingsSchema>;
 export type ReviewSettings = z.infer<typeof reviewSettingsSchema>;
 export type HighlightSettings = z.infer<typeof highlightSettingsSchema>;
@@ -159,8 +86,6 @@ export type UpdateSettings = z.infer<typeof updateSettingsSchema>;
 export type SettingsCardKind =
 	| "station"
 	| "detection"
-	| "audio"
-	| "recording"
 	| "storage"
 	| "review"
 	| "highlights"
@@ -171,8 +96,6 @@ export type SettingsCardKind =
 export type SettingsByKind = {
 	station: StationSettings;
 	detection: DetectionSettings;
-	audio: AudioSettings;
-	recording: RecordingSettings;
 	storage: StorageSettings;
 	review: ReviewSettings;
 	highlights: HighlightSettings;
@@ -192,18 +115,6 @@ export const SETTINGS_DEFAULTS = {
 		sensitivity: 1.25,
 		overlap: 0,
 		privacyThreshold: 0,
-	},
-	audio: {
-		mode: "microphone",
-		recordingDevice: "default",
-		channels: 2,
-		rtspStreams: [],
-		livestreamIndex: 0,
-	},
-	recording: {
-		recordingLength: 15,
-		extractionLength: null,
-		audioFormat: "mp3",
 	},
 	storage: {
 		fullDiskAction: "purge",
@@ -225,8 +136,6 @@ export const SETTINGS_DEFAULTS = {
 
 export const RESETTABLE_CARDS = [
 	"detection",
-	"audio",
-	"recording",
 	"storage",
 	"review",
 	"highlights",
@@ -246,8 +155,6 @@ export type SettingsSaveResult<T> = {
 const schemas = {
 	station: stationSettingsSchema,
 	detection: detectionSettingsSchema,
-	audio: audioSettingsSchema,
-	recording: recordingSettingsSchema,
 	storage: storageSettingsSchema,
 	review: reviewSettingsSchema,
 	highlights: highlightSettingsSchema,

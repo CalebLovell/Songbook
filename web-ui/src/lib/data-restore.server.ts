@@ -445,7 +445,6 @@ async function applySettings(sourceDir: string, paths: DataPaths) {
 	);
 	await writeSettingsCard("station", settings.station, paths.settingsPath);
 	await writeSettingsCard("detection", settings.detection, paths.settingsPath);
-	await writeSettingsCard("recording", settings.recording, paths.settingsPath);
 	await writeSettingsCard("storage", settings.storage, paths.settingsPath);
 	await writeSettingsCard("review", settings.review, paths.settingsPath);
 	await writeSettingsCard(

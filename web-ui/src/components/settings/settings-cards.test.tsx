@@ -27,8 +27,6 @@ const saved = async <T,>(values: T) => ({
 const SAVERS = {
 	station: saved,
 	detection: saved,
-	audio: saved,
-	recording: saved,
 	storage: saved,
 	review: saved,
 	highlights: saved,
@@ -62,8 +60,6 @@ test("every card with a default offers its own reset; Updates doesn't", () => {
 	);
 	for (const id of [
 		"detection",
-		"audio-input",
-		"recording",
 		"storage",
 		"review",
 		"highlights",

@@ -21,9 +21,7 @@ import {
 	getSettingsPage,
 	resetSettingsFn,
 	restartStationFn,
-	saveAudioSettingsFn,
 	saveDetectionSettingsFn,
-	saveRecordingSettingsFn,
 	saveReviewSettingsFn,
 	saveStationSettingsFn,
 	saveStorageSettingsFn,
@@ -54,9 +52,7 @@ test("every gated server function carries requireUnlocked", () => {
 	void saveSpeciesFilter;
 	void resetSettingsFn;
 	void restartStationFn;
-	void saveAudioSettingsFn;
 	void saveDetectionSettingsFn;
-	void saveRecordingSettingsFn;
 	void saveReviewSettingsFn;
 	void saveStationSettingsFn;
 	void saveStorageSettingsFn;
@@ -74,8 +70,6 @@ test("every gated server function carries requireUnlocked", () => {
 	for (const name of [
 		"saveStationSettingsFn",
 		"saveDetectionSettingsFn",
-		"saveAudioSettingsFn",
-		"saveRecordingSettingsFn",
 		"saveStorageSettingsFn",
 		"saveReviewSettingsFn",
 		"resetSettingsFn",

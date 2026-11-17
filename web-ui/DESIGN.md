@@ -411,7 +411,11 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   and Settings never says whether something is working or repeats a Health reading (its
   Storage card gives no current fullness). The one shared control is Restart BirdNET:
   Settings offers it only while a saved change waits to take effect. Settings has no Station tab; its
-  first tab is Detection.
+  first tab is Detection. Settings has no Audio input or Recording card either: they are
+  technical knobs, not taste, and the install defaults are right (one USB mic on `default`;
+  15 s recordings, 6 s mp3 clips). `REC_CARD`, `CHANNELS`, `RTSP_STREAM`, `RECORDING_LENGTH`,
+  `EXTRACTION_LENGTH` and `AUDIOFMT` live only in the config file; no save, Factory defaults
+  or restore touches them.
 - **Health** (`/health`, signed in) shows no birds and no detection counts. The page has no summary of its own: one
   standard card per check, in a fixed order (Name, Location, Audio input, Power supply,
   BirdNET model, Storage, Updates, Backups). Cards carry no status pills: state shows in
@@ -483,8 +487,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the CLI reads stdin and never argv, and an unreadable file is an error, not "unset".
 - **Backups** carry the database, the settings cards that describe the data, species
   lists and optionally clips, as a tar whose last entry holds every file's checksum,
-  so a cut-off download fails the check. Passwords and the Audio input and Updates
-  cards never travel: they belong to the machine. Add to `backupSettingsSchema` only
+  so a cut-off download fails the check. Passwords, the Updates card and the config-only audio
+  and recording values never travel: they belong to the machine or stay at install defaults. Add to `backupSettingsSchema` only
   what a new station should inherit.
 - **Restores** never touch live data until a backup has passed every check and the
   owner has seen what's in it. The database is replaced inside one transaction on the

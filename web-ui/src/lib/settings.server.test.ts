@@ -160,18 +160,6 @@ test("reset returns every card but Station to its defaults", async () => {
 		overlap: 0,
 		privacyThreshold: 0,
 	});
-	assert.deepEqual(page.audio, {
-		mode: "microphone",
-		recordingDevice: "default",
-		channels: 2,
-		rtspStreams: [],
-		livestreamIndex: 0,
-	});
-	assert.deepEqual(page.recording, {
-		recordingLength: 15,
-		extractionLength: null,
-		audioFormat: "mp3",
-	});
 	assert.deepEqual(page.storage, {
 		fullDiskAction: "purge",
 		purgeThreshold: 95,
@@ -183,10 +171,14 @@ test("reset returns every card but Station to its defaults", async () => {
 	assert.equal(page.station.siteName, "Backyard");
 	assert.equal(page.station.latitude, 41.1);
 	assert.equal(page.station.longitude, -93.2);
-	assert.match(
-		await readFile(file, "utf8"),
-		/^BIRDWEATHER_ID=secret-that-must-survive$/m,
-	);
+	const after = await readFile(file, "utf8");
+	assert.match(after, /^BIRDWEATHER_ID=secret-that-must-survive$/m);
+	assert.match(after, /^REC_CARD=hw:1,0$/m);
+	assert.match(after, /^CHANNELS=1$/m);
+	assert.match(after, /^RTSP_STREAM="rtsp:\/\/camera\/live"$/m);
+	assert.match(after, /^RECORDING_LENGTH=30$/m);
+	assert.match(after, /^EXTRACTION_LENGTH=9$/m);
+	assert.match(after, /^AUDIOFMT=flac$/m);
 });
 
 test("a config still naming removed models loads and saves", async () => {
@@ -221,7 +213,6 @@ test("reset restarts each affected service once", async () => {
 	const services = commands[0].slice(3);
 	assert.deepEqual(services, [...new Set(services)]);
 	assert.ok(services.includes("birdnet_analysis.service"));
-	assert.ok(services.includes("birdnet_recording.service"));
 });
 
 test("a failed restart still reports the reset that landed", async () => {
@@ -278,20 +269,14 @@ test("a card with nothing to restart just saves", async () => {
 
 test("restart bounces exactly the named card's services", async () => {
 	const commands: string[][] = [];
-	const result = await restartStation("audio", {
+	const result = await restartStation("detection", {
 		runner: async (executable, args) => {
 			commands.push([executable, ...args]);
 		},
 	});
 	assert.equal(result.status, "restarted");
 	assert.deepEqual(commands, [
-		[
-			"sudo",
-			"systemctl",
-			"restart",
-			"birdnet_recording.service",
-			"livestream.service",
-		],
+		["sudo", "systemctl", "restart", "birdnet_analysis.service"],
 	]);
 });
 

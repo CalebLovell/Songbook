@@ -179,8 +179,7 @@ Health says "No microphone is plugged in". List what the Pi can see:
 arecord -l
 ```
 
-If the mic is missing, try another USB port or a powered hub. If it's listed but Health says it
-hears nothing, check **Settings → Audio input**: the recording device should be `default`.
+If the mic is missing, try another USB port or a powered hub.
 
 ### Can't reach the station
 

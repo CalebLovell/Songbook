@@ -1,12 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import {
 	Database,
-	Disc3,
 	FileDown,
 	HardDrive,
 	Heart,
 	Image,
-	Mic2,
 	RotateCcw,
 	SearchCheck,
 	SlidersHorizontal,
@@ -19,8 +17,6 @@ import type { SearchSetting } from "~/lib/site-search.ts";
 export const SETTINGS_TABS = [
 	"detection",
 	"preferences",
-	"audio-input",
-	"recording",
 	"storage",
 	"data",
 ] as const;
@@ -100,26 +96,6 @@ const PREFERENCE_CARDS: SettingsIndexEntry[] = [
 ];
 
 const SYSTEM_CARDS: SettingsIndexEntry[] = [
-	{
-		title: "Audio input",
-		tab: "audio-input",
-		icon: Mic2,
-		fields: [
-			"Input",
-			"Recording device",
-			"Channels",
-			"RTSP streams",
-			"Live-player stream",
-		],
-		keywords: ["microphone", "stream"],
-	},
-	{
-		title: "Recording",
-		tab: "recording",
-		icon: Disc3,
-		fields: ["Recording length", "Extraction length", "Audio format"],
-		keywords: ["clip"],
-	},
 	{
 		title: "Storage",
 		tab: "storage",

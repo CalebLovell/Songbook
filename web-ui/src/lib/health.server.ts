@@ -40,6 +40,8 @@ import {
 import { SETTINGS_DEFAULTS } from "~/lib/settings-data.ts";
 import { readAnalyzerState } from "~/lib/station-status.server.ts";
 
+const DEFAULT_RECORDING_LENGTH_SECONDS = 15;
+
 type DiskReading = { usedPercent: number | null; freeBytes: number | null };
 
 async function readDisk(): Promise<DiskReading> {
@@ -169,11 +171,10 @@ export async function loadStationHealth({
 		audioChangedMs,
 		recordingLengthSeconds: positiveNumber(
 			config?.RECORDING_LENGTH,
-			SETTINGS_DEFAULTS.recording.recordingLength,
+			DEFAULT_RECORDING_LENGTH_SECONDS,
 		),
 		audioSource: config?.RTSP_STREAM?.trim() ? "stream" : "microphone",
-		recordingDevice:
-			config?.REC_CARD ?? SETTINGS_DEFAULTS.audio.recordingDevice,
+		recordingDevice: config?.REC_CARD ?? "default",
 		microphones,
 		soundPeak,
 		analyzer,

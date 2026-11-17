@@ -9,11 +9,9 @@ import { toast } from "~/components/ui/toaster.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import {
 	type ArtworkSettings,
-	type AudioSettings,
 	type DetectionSettings,
 	type HighlightSettings,
 	type PlaybackSettings,
-	type RecordingSettings,
 	type ReviewSettings,
 	SETTINGS_DEFAULTS,
 	type SettingsCardKind,
@@ -34,8 +32,6 @@ type CardRestarter = () => Promise<{ message: string }>;
 
 export type SettingsSavers = {
 	detection?: Saver<DetectionSettings>;
-	audio?: Saver<AudioSettings>;
-	recording?: Saver<RecordingSettings>;
 	storage?: Saver<StorageSettings>;
 	review?: Saver<ReviewSettings>;
 	highlights?: Saver<HighlightSettings>;
@@ -320,20 +316,6 @@ export function SettingsCards({
 				restart={restartFor("detection")}
 			/>
 		),
-		"audio-input": (
-			<AudioCard
-				initial={data.audio}
-				save={savers.audio}
-				restart={restartFor("audio")}
-			/>
-		),
-		recording: (
-			<RecordingCard
-				initial={data.recording}
-				save={savers.recording}
-				restart={restartFor("recording")}
-			/>
-		),
 		storage: (
 			<StorageCard
 				initial={data.storage}
@@ -511,227 +493,6 @@ function DetectionCard({
 						})
 					}
 				/>
-			</Field>
-		</SettingsCard>
-	);
-}
-
-function AudioCard({
-	initial,
-	save,
-	restart,
-}: {
-	initial: AudioSettings;
-	save?: Saver<AudioSettings>;
-	restart?: CardRestarter;
-}) {
-	const form = useCardSave(
-		"Audio input",
-		initial,
-		save,
-		restart,
-		SETTINGS_DEFAULTS.audio as AudioSettings,
-	);
-	const streams = form.values.rtspStreams.filter(Boolean);
-	return (
-		<SettingsCard
-			title="Audio input"
-			description="Choose a local microphone or one or more network audio streams."
-			onSave={() => void form.submit()}
-			reset={resetControl(
-				form,
-				`${RESET_RESTARTS_DESCRIPTION} Any RTSP streams you have configured are cleared and the station returns to microphone input.`,
-			)}
-			restart={restartControl(form)}
-			saveDisabled={form.saveDisabled}
-		>
-			<Field label="Input" hint="Where the station listens from.">
-				<FieldChoice
-					value={form.values.mode}
-					options={[
-						{ value: "microphone", label: "Microphone" },
-						{ value: "rtsp", label: "RTSP stream" },
-					]}
-					onChange={(mode) => form.setValues({ ...form.values, mode })}
-				/>
-			</Field>
-			{form.values.mode === "microphone" ? (
-				<>
-					<Field
-						label="Recording device"
-						hint="ALSA or PulseAudio device identifier."
-					>
-						<FieldInput
-							required
-							className="font-mono"
-							value={form.values.recordingDevice}
-							placeholder="default"
-							onChange={(event) =>
-								form.setValues({
-									...form.values,
-									recordingDevice: event.target.value,
-								})
-							}
-						/>
-					</Field>
-					<Field label="Channels" hint="Channels captured from the device.">
-						<FieldInput
-							type="number"
-							min={1}
-							max={32}
-							required
-							value={form.values.channels}
-							onChange={(event) =>
-								form.setValues({
-									...form.values,
-									channels: numberOr(event, form.values.channels),
-								})
-							}
-						/>
-					</Field>
-				</>
-			) : (
-				<>
-					<Field
-						label="RTSP streams"
-						hint="One rtsp:// or rtsps:// URL per line. Credentials stay in the station configuration."
-					>
-						<FieldTextarea
-							required
-							value={form.values.rtspStreams.join("\n")}
-							onChange={(event) => {
-								const rtspStreams = event.target.value.split(/\r?\n/);
-								form.setValues({
-									...form.values,
-									rtspStreams,
-									livestreamIndex: Math.min(
-										form.values.livestreamIndex,
-										Math.max(0, rtspStreams.filter(Boolean).length - 1),
-									),
-								});
-							}}
-						/>
-					</Field>
-					{streams.length > 1 ? (
-						<Field
-							label="Live-player stream"
-							hint="The stream the live player plays."
-						>
-							<FieldSelect
-								value={form.values.livestreamIndex}
-								onChange={(event) =>
-									form.setValues({
-										...form.values,
-										livestreamIndex: Number(event.target.value),
-									})
-								}
-							>
-								{streams.map((stream, index) => (
-									<option key={stream} value={index}>
-										Stream {index + 1}
-									</option>
-								))}
-							</FieldSelect>
-						</Field>
-					) : null}
-				</>
-			)}
-		</SettingsCard>
-	);
-}
-
-function FieldTextarea(props: ComponentProps<"textarea">) {
-	const { id, hintId } = useContext(FieldContext);
-	return (
-		<textarea
-			id={id}
-			aria-describedby={hintId}
-			className="block min-h-28 w-full rounded-md border border-input bg-card px-3 py-2 font-mono text-xs transition-colors placeholder:text-muted-foreground focus-visible:border-focus-ring focus-visible:outline-none"
-			{...props}
-		/>
-	);
-}
-
-function RecordingCard({
-	initial,
-	save,
-	restart,
-}: {
-	initial: RecordingSettings;
-	save?: Saver<RecordingSettings>;
-	restart?: CardRestarter;
-}) {
-	const form = useCardSave(
-		"Recording",
-		initial,
-		save,
-		restart,
-		SETTINGS_DEFAULTS.recording as RecordingSettings,
-	);
-	return (
-		<SettingsCard
-			title="Recording"
-			description="Control capture duration and the files retained for playback."
-			onSave={() => void form.submit()}
-			reset={resetControl(form)}
-			restart={restartControl(form)}
-			saveDisabled={form.saveDisabled}
-		>
-			<Field
-				label="Recording length"
-				hint="Audio captured per analyzed recording."
-			>
-				<FieldInput
-					type="number"
-					min={3}
-					max={60}
-					required
-					unit="s"
-					value={form.values.recordingLength}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							recordingLength: numberOr(event, form.values.recordingLength),
-						})
-					}
-				/>
-			</Field>
-			<Field
-				label="Extraction length"
-				hint="Length of each saved clip. Leave blank for the backend default."
-			>
-				<FieldInput
-					type="number"
-					min={3}
-					max={form.values.recordingLength}
-					unit="s"
-					value={form.values.extractionLength ?? ""}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							extractionLength: Number.isNaN(event.target.valueAsNumber)
-								? null
-								: event.target.valueAsNumber,
-						})
-					}
-				/>
-			</Field>
-			<Field label="Audio format" hint="File type for saved clips.">
-				<FieldSelect
-					value={form.values.audioFormat}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							audioFormat: event.target
-								.value as RecordingSettings["audioFormat"],
-						})
-					}
-				>
-					<option value="mp3">MP3</option>
-					<option value="wav">WAV</option>
-					<option value="flac">FLAC</option>
-					<option value="ogg">Ogg Vorbis</option>
-				</FieldSelect>
 			</Field>
 		</SettingsCard>
 	);

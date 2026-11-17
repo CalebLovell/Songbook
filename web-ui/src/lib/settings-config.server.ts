@@ -86,11 +86,6 @@ export async function readSettingsPageValues(
 ): Promise<SettingsByKind> {
 	const values = parseBirdnetConfig(await readFile(settingsPath, "utf8"));
 	const defaults = SETTINGS_DEFAULTS;
-	const streams = (values.RTSP_STREAM ?? "")
-		.split(",")
-		.map((stream) => stream.trim())
-		.filter(Boolean);
-	const extraction = values.EXTRACTION_LENGTH?.trim();
 	return {
 		station: parseSettingsCard("station", {
 			siteName: values.SITE_NAME ?? "",
@@ -121,28 +116,6 @@ export async function readSettingsPageValues(
 				"PRIVACY_THRESHOLD",
 				defaults.detection.privacyThreshold,
 			),
-		}),
-		audio: parseSettingsCard("audio", {
-			mode: streams.length > 0 ? "rtsp" : "microphone",
-			recordingDevice: values.REC_CARD ?? defaults.audio.recordingDevice,
-			channels: integerValue(values, "CHANNELS", defaults.audio.channels),
-			rtspStreams: streams,
-			livestreamIndex: integerValue(
-				values,
-				"RTSP_STREAM_TO_LIVESTREAM",
-				defaults.audio.livestreamIndex,
-			),
-		}),
-		recording: parseSettingsCard("recording", {
-			recordingLength: integerValue(
-				values,
-				"RECORDING_LENGTH",
-				defaults.recording.recordingLength,
-			),
-			extractionLength: extraction
-				? integerValue(values, "EXTRACTION_LENGTH", 6)
-				: null,
-			audioFormat: values.AUDIOFMT ?? defaults.recording.audioFormat,
 		}),
 		storage: parseSettingsCard("storage", {
 			fullDiskAction: values.FULL_DISK ?? defaults.storage.fullDiskAction,
@@ -233,30 +206,6 @@ function assignmentsFor<K extends SettingsCardKind>(
 				SENSITIVITY: String(detection.sensitivity),
 				OVERLAP: String(detection.overlap),
 				PRIVACY_THRESHOLD: String(detection.privacyThreshold),
-			};
-		}
-		case "audio": {
-			const audio = value as SettingsByKind["audio"];
-			return {
-				REC_CARD: quoteShellValue(audio.recordingDevice),
-				CHANNELS: String(audio.channels),
-				RTSP_STREAM: quoteShellValue(
-					audio.mode === "rtsp" ? audio.rtspStreams.join(",") : "",
-				),
-				RTSP_STREAM_TO_LIVESTREAM: String(
-					audio.mode === "rtsp" ? audio.livestreamIndex : 0,
-				),
-			};
-		}
-		case "recording": {
-			const recording = value as SettingsByKind["recording"];
-			return {
-				RECORDING_LENGTH: String(recording.recordingLength),
-				EXTRACTION_LENGTH:
-					recording.extractionLength === null
-						? ""
-						: String(recording.extractionLength),
-				AUDIOFMT: recording.audioFormat,
 			};
 		}
 		case "storage": {

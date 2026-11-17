@@ -12,13 +12,11 @@ import {
 } from "./settings-config.server.ts";
 import {
 	type ArtworkSettings,
-	type AudioSettings,
 	type DetectionSettings,
 	type HighlightSettings,
 	type PlaybackSettings,
 	parseSettingsCard,
 	RESETTABLE_CARDS,
-	type RecordingSettings,
 	type ReviewSettings,
 	SETTINGS_DEFAULTS,
 	type SettingsByKind,
@@ -141,20 +139,6 @@ export function saveDetectionSettings(
 	dependencies: SettingsServerDependencies = {},
 ) {
 	return saveSettings("detection", input, dependencies);
-}
-
-export function saveAudioSettings(
-	input: AudioSettings,
-	dependencies: SettingsServerDependencies = {},
-) {
-	return saveSettings("audio", input, dependencies);
-}
-
-export function saveRecordingSettings(
-	input: RecordingSettings,
-	dependencies: SettingsServerDependencies = {},
-) {
-	return saveSettings("recording", input, dependencies);
 }
 
 export function saveStorageSettings(

@@ -12,34 +12,10 @@ function recordingRunner(calls: unknown[]): SettingsCommandRunner {
 	};
 }
 
-test("audio restarts only its three fixed services", async () => {
-	const calls: unknown[] = [];
-	const result = await runCardSystemActions(
-		"audio",
-		{},
-		recordingRunner(calls),
-	);
-	assert.deepEqual(calls, [
-		{
-			executable: "sudo",
-			args: [
-				"systemctl",
-				"restart",
-				"birdnet_recording.service",
-				"livestream.service",
-			],
-			stdin: undefined,
-		},
-	]);
-	assert.deepEqual(result, { attempted: true, skipped: false });
-});
-
 test("each card can invoke only its allowlisted services", async () => {
 	const expected = {
 		station: ["birdnet_analysis.service"],
 		detection: ["birdnet_analysis.service"],
-		audio: ["birdnet_recording.service", "livestream.service"],
-		recording: ["birdnet_recording.service", "birdnet_analysis.service"],
 		storage: [],
 		review: [],
 	} as const;
@@ -113,7 +89,7 @@ test("Station skips timezone commands when it did not change", async () => {
 test("development can skip fixed system actions explicitly", async () => {
 	const calls: unknown[] = [];
 	const result = await runCardSystemActions(
-		"recording",
+		"detection",
 		{ skipSystemActions: true },
 		recordingRunner(calls),
 	);

@@ -25,11 +25,9 @@ import {
 	resetSettingsFn,
 	restartStationFn,
 	saveArtworkSettingsFn,
-	saveAudioSettingsFn,
 	saveDetectionSettingsFn,
 	saveHighlightSettingsFn,
 	savePlaybackSettingsFn,
-	saveRecordingSettingsFn,
 	saveReviewSettingsFn,
 	saveStorageSettingsFn,
 } from "~/lib/settings.ts";
@@ -69,8 +67,6 @@ function SettingsRoute() {
 	const page = useSkeletonMinimum(useQuery(settingsPageQuery).data);
 	const queryClient = useQueryClient();
 	const saveDetection = useServerFn(saveDetectionSettingsFn);
-	const saveAudio = useServerFn(saveAudioSettingsFn);
-	const saveRecording = useServerFn(saveRecordingSettingsFn);
 	const saveStorage = useServerFn(saveStorageSettingsFn);
 	const saveReview = useServerFn(saveReviewSettingsFn);
 	const saveHighlights = useServerFn(saveHighlightSettingsFn);
@@ -118,8 +114,6 @@ function SettingsRoute() {
 			}}
 			savers={{
 				detection: (values) => refreshingData(saveDetection({ data: values })),
-				audio: (values) => refreshingData(saveAudio({ data: values })),
-				recording: (values) => refreshingData(saveRecording({ data: values })),
 				storage: (values) => refreshingData(saveStorage({ data: values })),
 				review: (values) => refreshingData(saveReview({ data: values })),
 				highlights: (values) =>

@@ -392,7 +392,7 @@ export function describeAudioProblem(problem: AudioProblem): ToDoCopy {
 		case "device-missing":
 			return {
 				title: "The recording device isn't connected",
-				detail: `Audio input is set to record from ${problem.device}, which isn't plugged in. Plug it back in, or choose another device in Audio input settings.`,
+				detail: `Audio input is set to record from ${problem.device}, which isn't plugged in. Plug it back in, or change REC_CARD in the station configuration.`,
 			};
 		case "stopped":
 			return {

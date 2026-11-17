@@ -232,37 +232,37 @@ test("appends any key an older config never carried", async () => {
 	assert.match(text, /^PURGE_KEEP_PER_SPECIES=3$/m);
 });
 
-test("round-trips RTSP streams and blank extraction length", async () => {
+test("saving a card leaves the config-only audio and recording values alone", async () => {
 	const file = await fixtureConfig(
 		[
-			"REC_CARD=default",
-			"CHANNELS=2",
-			"RTSP_STREAM=",
-			"RTSP_STREAM_TO_LIVESTREAM=0",
+			"REC_CARD=hw:1,0",
+			"CHANNELS=1",
+			'RTSP_STREAM="rtsp://one/live,rtsps://two/live"',
+			"RTSP_STREAM_TO_LIVESTREAM=1",
 			"RECORDING_LENGTH=15",
 			"EXTRACTION_LENGTH=",
 			"AUDIOFMT=mp3",
 		].join("\n"),
 	);
 	await writeSettingsCard(
-		"audio",
+		"detection",
 		{
-			mode: "rtsp",
-			recordingDevice: "default",
-			channels: 2,
-			rtspStreams: ["rtsp://one/live", "rtsps://two/live"],
-			livestreamIndex: 1,
+			speciesFrequencyThreshold: 0.03,
+			confidence: 0.8,
+			sensitivity: 1.25,
+			overlap: 0,
+			privacyThreshold: 0,
 		},
 		file,
 	);
-	const settings = await readSettingsPageValues(file, "America/Chicago");
-	assert.equal(settings.audio.mode, "rtsp");
-	assert.deepEqual(settings.audio.rtspStreams, [
-		"rtsp://one/live",
-		"rtsps://two/live",
-	]);
-	assert.equal(settings.audio.livestreamIndex, 1);
-	assert.equal(settings.recording.extractionLength, null);
+	const text = await readFile(file, "utf8");
+	assert.match(text, /^REC_CARD=hw:1,0$/m);
+	assert.match(text, /^CHANNELS=1$/m);
+	assert.match(text, /^RTSP_STREAM="rtsp:\/\/one\/live,rtsps:\/\/two\/live"$/m);
+	assert.match(text, /^RTSP_STREAM_TO_LIVESTREAM=1$/m);
+	assert.match(text, /^RECORDING_LENGTH=15$/m);
+	assert.match(text, /^EXTRACTION_LENGTH=$/m);
+	assert.match(text, /^AUDIOFMT=mp3$/m);
 });
 
 test("rejects newlines before writing configuration strings", async () => {
