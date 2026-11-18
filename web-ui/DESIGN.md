@@ -386,7 +386,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   BirdNET misfires most, so a bird needs one call at 85%+ and insect lookalikes
   (`INSECT_LOOKALIKES`) never count.
 - **Rare** has one meaning, the owner's `rareMax`, for the Rare flag and the quiz
-  pools alike. Pools split by familiarity, never by time. Nothing on a question may
+  pools alike. Pools split by familiarity, never by time. Common is ranked, not a
+  fixed count: the most-heard third of species past rare, with a floor
+  (`COMMON_FLOOR`) so a young station's first loud hour doesn't fill it; Uncommon is
+  what lies between. While the station has under `SETTLING_DAYS` days of detections
+  the page opens on All and says the groups will shift. A pool too small to deal a
+  round is disabled, never offered only to come up empty. Nothing on a question may
   point at its answer, and a loader rerun never swaps the round being played.
   A guess is spoken and leaves its choice focusable (`aria-disabled`); focus then
   follows the round: Next after a right answer, the clip after Next, the results at

@@ -15,7 +15,7 @@ export function IconSelect<Value extends string>({
 	icon: ComponentType<{ className?: string; "aria-hidden"?: "true" }>;
 	label: string;
 	value: Value;
-	options: readonly { value: Value; label: string }[];
+	options: readonly { value: Value; label: string; disabled?: boolean }[];
 	onChange: (value: Value) => void;
 	iconHiddenWhenNarrow?: boolean;
 	className?: string;
@@ -39,7 +39,11 @@ export function IconSelect<Value extends string>({
 				)}
 			>
 				{options.map((option) => (
-					<option key={option.value} value={option.value}>
+					<option
+						key={option.value}
+						value={option.value}
+						disabled={option.disabled}
+					>
 						{option.label}
 					</option>
 				))}

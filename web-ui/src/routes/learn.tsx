@@ -3,7 +3,7 @@ import {
 	queryOptions,
 	useQuery,
 } from "@tanstack/react-query";
-import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Lightbulb, RotateCcw } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { z } from "zod";
@@ -28,17 +28,15 @@ import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
 import { useHeldRound } from "~/lib/use-held-round.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
-const DEFAULT_POOL: LearnPool = "common";
-
 const learnSearchSchema = z.object({
-	pool: z.enum(LEARN_POOLS).default(DEFAULT_POOL).catch(DEFAULT_POOL),
+	pool: z.enum(LEARN_POOLS).optional().catch(undefined),
 });
 
-const learnRoundQuery = (pool: LearnPool) =>
+const learnRoundQuery = (pool: LearnPool | undefined) =>
 	queryOptions({
 		...PAGE_QUERY,
-		queryKey: ["learn-round", pool],
-		queryFn: () => getLearnRound({ data: pool }),
+		queryKey: ["learn-round", pool ?? "default"],
+		queryFn: () => getLearnRound({ data: pool ?? null }),
 	});
 
 export const Route = createFileRoute("/learn")({
@@ -48,9 +46,6 @@ export const Route = createFileRoute("/learn")({
 			"Learn the birds at this station by ear, using their own recordings.",
 		),
 	validateSearch: learnSearchSchema,
-	search: {
-		middlewares: [stripSearchParams({ pool: DEFAULT_POOL })],
-	},
 	loaderDeps: ({ search }) => ({ pool: search.pool }),
 	loader: ({ context, deps }) => {
 		prefetchInBrowser(context.queryClient, learnRoundQuery(deps.pool));
@@ -61,13 +56,14 @@ export const Route = createFileRoute("/learn")({
 type LoadedRound = Awaited<ReturnType<typeof getLearnRound>>;
 
 function Learn() {
-	const { pool } = Route.useSearch();
+	const { pool: chosenPool } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
 	const roundQuery = useQuery({
-		...learnRoundQuery(pool),
+		...learnRoundQuery(chosenPool),
 		placeholderData: keepPreviousData,
 	});
+	const pool = chosenPool ?? roundQuery.data?.pool;
 	const forPool = useSkeletonMinimum(
 		roundQuery.isPlaceholderData ? undefined : roundQuery.data,
 	);
@@ -99,13 +95,19 @@ function Learn() {
 						: undefined
 				}
 			/>
+			{roundQuery.data?.isSettling ? (
+				<p className="mt-page text-muted-foreground text-sm">
+					This station is new, so Common, Uncommon and Rare will shift as more
+					birds are heard.
+				</p>
+			) : null}
 
 			<div className="mt-page w-full">
 				{forPool ? (
 					<LearnRoundView
-						key={pool}
+						key={forPool.pool}
 						loaded={forPool}
-						pool={pool}
+						pool={forPool.pool}
 						isLoadingNextRound={roundQuery.isFetching}
 						dealNextRound={dealNextRound}
 						isConfirmingNewRound={isConfirmingNewRound}
@@ -168,7 +170,7 @@ function LearnRoundView({
 			<LearnGame
 				key={round.id}
 				round={round}
-				rareMax={loaded.rareMax}
+				thresholds={loaded.thresholds}
 				initialProgress={
 					saved?.round.id === round.id ? saved.progress : undefined
 				}

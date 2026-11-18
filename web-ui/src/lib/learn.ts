@@ -5,9 +5,12 @@ import { sqlite } from "~/db/index.ts";
 import { hearableRecordings } from "~/lib/clip-access.server.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import {
+	commonMinimum,
 	familiarityPool,
 	LEARN_POOLS,
 	type LearnPool,
+	type PoolThresholds,
+	SETTLING_DAYS,
 } from "~/lib/learn-pools.ts";
 import {
 	buildRound,
@@ -28,15 +31,22 @@ function allTimeDetections(): Map<string, number> {
 	return new Map(rows.map((row) => [row.comName, row.detections]));
 }
 
+function daysWithDetections(): number {
+	const row = sqlite
+		.prepare("SELECT COUNT(DISTINCT Date) AS days FROM detections")
+		.get() as { days: number } | undefined;
+	return row?.days ?? 0;
+}
+
 function inPool(
 	pool: LearnPool,
 	species: PoolSpecies,
 	detections: Map<string, number>,
-	rareMax: number,
+	thresholds: PoolThresholds,
 ): boolean {
 	if (pool === "all") return true;
 	return (
-		familiarityPool(detections.get(species.comName) ?? 0, rareMax) === pool
+		familiarityPool(detections.get(species.comName) ?? 0, thresholds) === pool
 	);
 }
 
@@ -97,23 +107,31 @@ function addSpeciesStats(round: LearnRound): LearnRound {
 }
 
 export type LearnRoundData = {
+	pool: LearnPool;
 	round: LearnRound;
 	hasAnyDetections: boolean;
+	isSettling: boolean;
 	poolCounts: Record<LearnPool, number>;
-	rareMax: number;
+	thresholds: PoolThresholds;
 };
 
 export const getLearnRound = createServerFn({ method: "GET" })
-	.validator(z.enum(LEARN_POOLS))
-	.handler(async ({ data: pool }): Promise<LearnRoundData> => {
+	.validator(z.enum(LEARN_POOLS).nullable())
+	.handler(async ({ data: chosenPool }): Promise<LearnRoundData> => {
 		const playable = await playableSpecies();
 		const detections = allTimeDetections();
 		const { rareMax } = await readHighlightThresholds();
+		const thresholds: PoolThresholds = {
+			rareMax,
+			commonMin: commonMinimum(detections.values(), rareMax),
+		};
+		const isSettling = daysWithDetections() < SETTLING_DAYS;
+		const pool = chosenPool ?? (isSettling ? "all" : "common");
 		const poolCounts = Object.fromEntries(
 			LEARN_POOLS.map((option) => [
 				option,
 				playable.filter((species) =>
-					inPool(option, species, detections, rareMax),
+					inPool(option, species, detections, thresholds),
 				).length,
 			]),
 		) as Record<LearnPool, number>;
@@ -121,15 +139,17 @@ export const getLearnRound = createServerFn({ method: "GET" })
 		const round = addSpeciesStats(
 			buildRound(
 				playable.filter((species) =>
-					inPool(pool, species, detections, rareMax),
+					inPool(pool, species, detections, thresholds),
 				),
 			),
 		);
 
 		return {
+			pool,
 			round,
 			hasAnyDetections: detections.size > 0,
+			isSettling,
 			poolCounts,
-			rareMax,
+			thresholds,
 		};
 	});

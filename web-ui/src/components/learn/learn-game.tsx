@@ -17,11 +17,11 @@ import { Kicker } from "~/components/ui/kicker.tsx";
 import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
 import { announce } from "~/lib/announce.ts";
 import { formatDateTime } from "~/lib/date-format.ts";
-import { HIGHLIGHT_THRESHOLDS } from "~/lib/highlight-thresholds.ts";
 import {
 	LEARN_POOL_LABELS,
 	LEARN_POOLS,
 	learnPoolMeanings,
+	type PoolThresholds,
 } from "~/lib/learn-pools.ts";
 import {
 	FRESH_PROGRESS,
@@ -64,11 +64,11 @@ const CONTROL_SELECTOR = `a[href], button, [role='slider'], ${TEXT_ENTRY_SELECTO
 const DIALOG_SELECTOR = "[role='dialog'], [role='alertdialog']";
 
 function GameInfo({
-	rareMax = HIGHLIGHT_THRESHOLDS.rareMax,
+	thresholds = null,
 }: {
-	rareMax?: number;
+	thresholds?: PoolThresholds | null;
 }) {
-	const meanings = learnPoolMeanings(rareMax);
+	const meanings = learnPoolMeanings(thresholds);
 	return (
 		<InfoTip label="Bird quiz" size="default">
 			<p>
@@ -233,7 +233,7 @@ export function LearnGameEmpty({ message }: { message: string }) {
 
 export function LearnGame({
 	round,
-	rareMax,
+	thresholds,
 	initialProgress = FRESH_PROGRESS,
 	onProgressChange,
 	onPlayAgain,
@@ -242,7 +242,7 @@ export function LearnGame({
 	focusClipOnStart = false,
 }: {
 	round: LearnRound;
-	rareMax: number;
+	thresholds: PoolThresholds;
 	initialProgress?: GameProgress;
 	onProgressChange?: (progress: GameProgress) => void;
 	onPlayAgain: () => void;
@@ -356,7 +356,7 @@ export function LearnGame({
 				>
 					<header data-slot="card-header" className={GAME_HEADER_CLASS}>
 						<Kicker as="h2">Bird quiz</Kicker>
-						<GameInfo rareMax={rareMax} />
+						<GameInfo thresholds={thresholds} />
 					</header>
 
 					<div className="flex @3xl/quiz:hidden flex-col gap-2">

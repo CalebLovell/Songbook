@@ -17,6 +17,7 @@ import {
 	LEARN_POOLS,
 	type LearnPool,
 } from "~/lib/learn-pools.ts";
+import { CHOICES_PER_QUESTION } from "~/lib/learn-round.ts";
 
 const LEARN_POOL_ICONS: Record<
 	LearnPool,
@@ -30,13 +31,25 @@ const LEARN_POOL_ICONS: Record<
 
 type PoolCounts = Record<LearnPool, number> | null;
 
+function isTooSmall(
+	option: LearnPool,
+	pool: LearnPool | undefined,
+	poolCounts: PoolCounts,
+): boolean {
+	return (
+		option !== pool &&
+		poolCounts !== null &&
+		poolCounts[option] < CHOICES_PER_QUESTION
+	);
+}
+
 export function LearnPoolSelector({
 	pool,
 	poolCounts,
 	onPoolChange,
 	onNewRound,
 }: {
-	pool: LearnPool;
+	pool: LearnPool | undefined;
 	poolCounts: PoolCounts;
 	onPoolChange: (pool: LearnPool) => void;
 	onNewRound?: () => void;
@@ -53,7 +66,7 @@ export function LearnPoolSelector({
 					type="single"
 					variant="outline"
 					aria-label="Which birds"
-					value={pool}
+					value={pool ?? ""}
 					onValueChange={(value) => {
 						if (value) onPoolChange(value as LearnPool);
 					}}
@@ -61,7 +74,11 @@ export function LearnPoolSelector({
 					{LEARN_POOLS.map((option) => {
 						const Icon = LEARN_POOL_ICONS[option];
 						return (
-							<ToggleGroupItem key={option} value={option}>
+							<ToggleGroupItem
+								key={option}
+								value={option}
+								disabled={isTooSmall(option, pool, poolCounts)}
+							>
 								<Icon className="size-4" />
 								{LEARN_POOL_LABELS[option]}
 								<PoolCount count={poolCounts?.[option]} />
@@ -98,19 +115,21 @@ function PoolSelect({
 	poolCounts,
 	onPoolChange,
 }: {
-	pool: LearnPool;
+	pool: LearnPool | undefined;
 	poolCounts: PoolCounts;
 	onPoolChange: (pool: LearnPool) => void;
 }) {
+	const shown = pool ?? "all";
 	return (
 		<IconSelect
-			icon={LEARN_POOL_ICONS[pool]}
+			icon={LEARN_POOL_ICONS[shown]}
 			label="Which birds"
-			value={pool}
+			value={shown}
 			onChange={onPoolChange}
 			className="sm:hidden"
 			options={LEARN_POOLS.map((option) => ({
 				value: option,
+				disabled: isTooSmall(option, pool, poolCounts),
 				label: poolCounts
 					? `${LEARN_POOL_LABELS[option]} (${poolCounts[option]})`
 					: LEARN_POOL_LABELS[option],
