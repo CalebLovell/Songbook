@@ -5,8 +5,6 @@ import {
 	buildRound,
 	CHOICES_PER_QUESTION,
 	type PoolSpecies,
-	pointsForAttempt,
-	QUESTIONS_PER_ROUND,
 	scoreRound,
 } from "./learn-round.ts";
 
@@ -33,11 +31,19 @@ function poolOf(count: number): PoolSpecies[] {
 
 const alwaysZero = () => 0;
 
-test("builds a full round of questions from a large enough pool", () => {
-	const round = buildRound(poolOf(10), alwaysZero);
+test("asks every bird in the pool once", () => {
+	const round = buildRound(poolOf(23), alwaysZero);
+	const answers = round.questions.map((question) => question.answerSciName);
 
-	assert.equal(round.questions.length, QUESTIONS_PER_ROUND);
-	assert.equal(round.speciesInPool, 10);
+	assert.equal(round.questions.length, 23);
+	assert.equal(new Set(answers).size, 23);
+	assert.equal(round.speciesInPool, 23);
+});
+
+test("a pool smaller than ten still makes a round of its own size", () => {
+	const round = buildRound(poolOf(CHOICES_PER_QUESTION));
+
+	assert.equal(round.questions.length, CHOICES_PER_QUESTION);
 });
 
 test("gives every question the right number of distinct choices", () => {
@@ -75,55 +81,17 @@ test("ignores species that have no playable clips", () => {
 	}
 });
 
-test("spreads questions across the pool before repeating a species", () => {
-	const round = buildRound(poolOf(QUESTIONS_PER_ROUND));
-	const answers = round.questions.map((question) => question.answerSciName);
-
-	assert.equal(new Set(answers).size, QUESTIONS_PER_ROUND);
-});
-
-test("repeats species when the pool is smaller than the round", () => {
-	const round = buildRound(poolOf(4));
-
-	assert.equal(round.questions.length, QUESTIONS_PER_ROUND);
-});
-
-test("points fall off with each extra guess", () => {
-	assert.equal(pointsForAttempt(1), 3);
-	assert.equal(pointsForAttempt(2), 1);
-	assert.equal(pointsForAttempt(3), 0);
-	assert.equal(pointsForAttempt(9), 0);
-});
-
-test("scores a round of clean answers at full marks", () => {
-	const score = scoreRound([{ attempts: 1 }, { attempts: 1 }]);
-
-	assert.equal(score.score, 6);
-	assert.equal(score.maxScore, 6);
-	assert.equal(score.firstTry, 2);
-	assert.equal(score.bestStreak, 2);
-});
-
-test("tracks the longest first-try streak, not the last one", () => {
+test("scores one point per bird named on the first try", () => {
 	const score = scoreRound([
 		{ attempts: 1 },
+		{ attempts: 2 },
 		{ attempts: 1 },
-		{ attempts: 1 },
-		{ attempts: 3 },
-		{ attempts: 1 },
+		{ attempts: 4 },
 	]);
 
-	assert.equal(score.bestStreak, 3);
-	assert.equal(score.firstTry, 4);
-	assert.equal(score.score, 12);
+	assert.deepEqual(score, { firstTry: 2, answered: 4 });
 });
 
 test("scores an empty round at zero", () => {
-	assert.deepEqual(scoreRound([]), {
-		score: 0,
-		maxScore: 0,
-		firstTry: 0,
-		answered: 0,
-		bestStreak: 0,
-	});
+	assert.deepEqual(scoreRound([]), { firstTry: 0, answered: 0 });
 });

@@ -34,9 +34,6 @@ import {
 	type LearnChoice,
 	type LearnQuestion,
 	type LearnRound,
-	POINTS_BY_ATTEMPT,
-	pointsForAttempt,
-	QUESTIONS_PER_ROUND,
 	type QuestionResult,
 	scoreRound,
 } from "~/lib/learn-round.ts";
@@ -53,6 +50,8 @@ const CHOICE_CLASS =
 const CHOICE_TEXT_CLASS =
 	"flex min-h-[calc(2*1.375rem+1rem)] min-w-0 flex-1 flex-col justify-center @max-[20rem]/choice:min-h-[calc(2*1.203125rem+1rem)]";
 const RAIL_CLASS = "@3xl/quiz:flex hidden flex-col";
+const SKELETON_ROWS = 10;
+const DENSE_TRACK_OVER = 24;
 const RAIL_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-11.25 items-center justify-between gap-2 border-b px-page";
 const RAIL_ROW_CLASS = "flex min-h-13.75 items-center gap-3 px-page py-1.75";
@@ -72,16 +71,12 @@ function GameInfo({
 	return (
 		<InfoTip label="Bird quiz" size="default">
 			<p>
-				Each round has {QUESTIONS_PER_ROUND} bird detections. Play each clip,
-				then pick which bird corresponds to that audio recording.
+				Each round plays one recording of every bird in your selection, in a
+				random order. Play each clip, then pick the bird you heard.
 			</p>
 			<p>
-				Points are gained depending on the number of guesses. The first guess
-				awards {POINTS_BY_ATTEMPT[0]} points, while the second only gives{" "}
-				{POINTS_BY_ATTEMPT[1]} point, and no points are gained after that.
-			</p>
-			<p>
-				Then repeat for all {QUESTIONS_PER_ROUND} birds for your final score!
+				Keep picking until you find the right bird. Naming it on the first try
+				scores a point; any later guess scores nothing.
 			</p>
 			<p>
 				On a keyboard, keys 1 to {CHOICES_PER_QUESTION} pick a bird and Enter
@@ -123,7 +118,7 @@ export function LearnGameSkeleton() {
 							<ShellText className="w-10 text-xs" barClassName="w-full" />
 						</div>
 						<div className="flex gap-1">
-							{Array.from({ length: QUESTIONS_PER_ROUND }, (_, pip) => (
+							{Array.from({ length: SKELETON_ROWS }, (_, pip) => (
 								<ShellBar
 									// biome-ignore lint/suspicious/noArrayIndexKey: one pip per bird
 									key={pip}
@@ -184,7 +179,7 @@ export function LearnGameSkeleton() {
 						<Kicker as="h2">This round</Kicker>
 					</div>
 					<ol aria-hidden="true" className="-mx-page divide-y">
-						{Array.from({ length: QUESTIONS_PER_ROUND }, (_, position) => (
+						{Array.from({ length: SKELETON_ROWS }, (_, position) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: one row per bird
 							<li key={position} className={RAIL_ROW_CLASS}>
 								<ShellBar className="size-5 shrink-0 rounded-full" />
@@ -286,9 +281,10 @@ export function LearnGame({
 			if (next === progress) return;
 
 			if (next.phase === "solved") {
-				const points = pointsForAttempt(progress.wrongGuesses.length + 1);
 				announce(
-					`Correct: ${choice.comName}. ${points} ${points === 1 ? "point" : "points"}.`,
+					progress.wrongGuesses.length === 0
+						? `Correct: ${choice.comName}, first try. One point.`
+						: `Correct: ${choice.comName}.`,
 				);
 				focusAfterRender.current = "next";
 			} else {
@@ -364,7 +360,7 @@ export function LearnGame({
 							<span>
 								Bird {index + 1} of {round.questions.length}
 							</span>
-							<span>{runningScore.score} pts</span>
+							<span>{runningScore.firstTry} right</span>
 						</div>
 						<ProgressTrack
 							total={round.questions.length}
@@ -439,8 +435,7 @@ export function LearnGame({
 					questions={round.questions}
 					results={results}
 					current={index}
-					score={runningScore.score}
-					maxScore={round.questions.length * POINTS_BY_ATTEMPT[0]}
+					score={runningScore.firstTry}
 				/>
 			</div>
 		</div>
@@ -452,70 +447,89 @@ function RoundRail({
 	results,
 	current,
 	score,
-	maxScore,
 }: {
 	questions: LearnQuestion[];
 	results: QuestionResult[];
 	current: number;
 	score: number;
-	maxScore: number;
 }) {
+	const list = useRef<HTMLOListElement>(null);
+	useEffect(() => {
+		const row = list.current?.children[current];
+		if (!list.current || !(row instanceof HTMLElement)) return;
+		const { scrollTop, clientHeight } = list.current;
+		if (row.offsetTop < scrollTop) {
+			list.current.scrollTop = row.offsetTop;
+		} else if (row.offsetTop + row.offsetHeight > scrollTop + clientHeight) {
+			list.current.scrollTop = row.offsetTop + row.offsetHeight - clientHeight;
+		}
+	}, [current]);
+
 	return (
-		<Card as="aside" aria-label="This round" className={RAIL_CLASS}>
-			<div data-slot="card-header" className={RAIL_HEADER_CLASS}>
-				<Kicker as="h2">This round</Kicker>
-			</div>
+		<Card
+			as="aside"
+			aria-label="This round"
+			className={`${RAIL_CLASS} relative self-stretch`}
+		>
+			<div className="absolute inset-0 flex flex-col p-page">
+				<div data-slot="card-header" className={RAIL_HEADER_CLASS}>
+					<Kicker as="h2">This round</Kicker>
+				</div>
 
-			<ol className="-mx-page divide-y">
-				{questions.map((question, position) => {
-					const result = results[position];
-					const answer = question.choices.find(
-						(choice) => choice.sciName === question.answerSciName,
-					);
-					const isCurrent = position === current && !result;
+				<ol
+					ref={list}
+					className="relative -mx-page min-h-0 flex-1 divide-y overflow-y-auto"
+				>
+					{questions.map((question, position) => {
+						const result = results[position];
+						const answer = question.choices.find(
+							(choice) => choice.sciName === question.answerSciName,
+						);
+						const isCurrent = position === current && !result;
 
-					return (
-						<li
-							key={question.id}
-							aria-current={isCurrent ? "step" : undefined}
-							className={`${RAIL_ROW_CLASS} ${isCurrent ? "bg-row-selected" : ""}`}
-						>
-							<RailDot
-								position={position}
-								attempts={result?.attempts ?? null}
-							/>
-							{result && answer ? (
-								<AnsweredRailRow
-									answer={answer}
-									attempts={result.attempts}
-									question={question}
+						return (
+							<li
+								key={question.id}
+								aria-current={isCurrent ? "step" : undefined}
+								className={`${RAIL_ROW_CLASS} ${isCurrent ? "bg-row-selected" : ""}`}
+							>
+								<RailDot
+									position={position}
+									attempts={result?.attempts ?? null}
 								/>
-							) : isCurrent ? (
-								<>
-									<span
-										aria-hidden="true"
-										className={`flex shrink-0 items-center justify-center rounded-md border border-line border-dashed text-muted-foreground text-sm ${THUMBNAIL_SIZES.md}`}
-									>
-										?
-									</span>
-									<span className="text-sm italic">Mystery bird</span>
-								</>
-							) : (
-								<span className="text-muted-foreground text-sm">—</span>
-							)}
-						</li>
-					);
-				})}
-			</ol>
+								{result && answer ? (
+									<AnsweredRailRow
+										answer={answer}
+										attempts={result.attempts}
+										question={question}
+									/>
+								) : isCurrent ? (
+									<>
+										<span
+											aria-hidden="true"
+											className={`flex shrink-0 items-center justify-center rounded-md border border-line border-dashed text-muted-foreground text-sm ${THUMBNAIL_SIZES.md}`}
+										>
+											?
+										</span>
+										<span className="text-sm italic">Mystery bird</span>
+									</>
+								) : (
+									<span className="text-muted-foreground text-sm">—</span>
+								)}
+							</li>
+						);
+					})}
+				</ol>
 
-			<div className={RAIL_FOOTER_CLASS}>
-				<span className="text-muted-foreground text-sm">Score</span>
-				<span className="font-semibold text-xl tabular-nums leading-none">
-					{score}
-					<span className="ml-1 font-normal text-muted-foreground text-sm">
-						of {maxScore} pts
+				<div className={RAIL_FOOTER_CLASS}>
+					<span className="text-muted-foreground text-sm">Score</span>
+					<span className="font-semibold text-xl tabular-nums leading-none">
+						{score}
+						<span className="ml-1 font-normal text-muted-foreground text-sm">
+							of {questions.length}
+						</span>
 					</span>
-				</span>
+				</div>
 			</div>
 		</Card>
 	);
@@ -547,13 +561,8 @@ function AnsweredRailRow({
 				</div>
 			</div>
 
-			<div className="shrink-0 text-right">
-				<div className="text-sm tabular-nums">
-					+{pointsForAttempt(attempts)}
-				</div>
-				<div className="text-muted-foreground text-xs tabular-nums">
-					{attemptLabel(attempts)}
-				</div>
+			<div className="shrink-0 text-muted-foreground text-xs tabular-nums">
+				{attemptLabel(attempts)}
 			</div>
 
 			<RecordingButton
@@ -606,8 +615,9 @@ function ProgressTrack({
 	results: QuestionResult[];
 	current: number;
 }) {
+	const isDense = total > DENSE_TRACK_OVER;
 	return (
-		<div className="flex gap-1">
+		<div className={`flex ${isDense ? "gap-px" : "gap-1"}`}>
 			{Array.from({ length: total }, (_, position) => {
 				const result = results[position];
 				const background = result
@@ -616,13 +626,15 @@ function ProgressTrack({
 						: "var(--sand)"
 					: position === current
 						? "var(--track)"
-						: "transparent";
+						: isDense
+							? "var(--line)"
+							: "transparent";
 
 				return (
 					<div
 						// biome-ignore lint/suspicious/noArrayIndexKey: pips are positional
 						key={position}
-						className="h-1.5 flex-1 rounded-full border border-line"
+						className={`h-1.5 min-w-px flex-1 ${isDense ? "first:rounded-l-full last:rounded-r-full" : "rounded-full border border-line"}`}
 						style={{ background }}
 					/>
 				);
@@ -755,8 +767,8 @@ function RoundSummary({
 		>
 			<CardHeader title="Round complete">
 				<span className="text-sm tabular-nums">
-					<strong className="font-semibold">{score.score}</strong> of{" "}
-					<strong className="font-semibold">{score.maxScore}</strong> pts
+					<strong className="font-semibold">{score.firstTry}</strong> of{" "}
+					<strong className="font-semibold">{score.answered}</strong> right
 				</span>
 			</CardHeader>
 
@@ -787,9 +799,14 @@ function RoundSummary({
 									{formatDateTime(question.detectedAt)}
 								</div>
 							</div>
-							<span className="shrink-0 text-sm tabular-nums">
-								+{pointsForAttempt(result.attempts)}
-							</span>
+							{result.attempts === 1 ? (
+								<Check
+									aria-label="Right first try"
+									className="size-4 shrink-0 text-moss"
+								/>
+							) : (
+								<X aria-label="Missed" className="size-4 shrink-0 text-clay" />
+							)}
 							<RecordingButton
 								audioUrl={question.audioUrl}
 								speciesName={answer.comName}

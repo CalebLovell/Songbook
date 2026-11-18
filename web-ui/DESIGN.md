@@ -391,7 +391,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   (`COMMON_FLOOR`) so a young station's first loud hour doesn't fill it; Uncommon is
   what lies between. While the station has under `SETTLING_DAYS` days of detections
   the page opens on All and says the groups will shift. A pool too small to deal a
-  round is disabled, never offered only to come up empty. Nothing on a question may
+  round is disabled, never offered only to come up empty. A round asks every bird in
+  its pool once, in shuffled order, so it is as long as the pool; the rail scrolls
+  inside the game card's height. Scoring is pass or fail: a point for a bird named
+  on the first try, nothing after. Nothing on a question may
   point at its answer, and a loader rerun never swaps the round being played.
   A guess is spoken and leaves its choice focusable (`aria-disabled`); focus then
   follows the round: Next after a right answer, the clip after Next, the results at

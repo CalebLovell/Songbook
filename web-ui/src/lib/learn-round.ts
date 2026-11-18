@@ -1,9 +1,6 @@
 import { audioUrlFor } from "~/lib/audio.ts";
 
-export const QUESTIONS_PER_ROUND = 10;
 export const CHOICES_PER_QUESTION = 4;
-
-export const POINTS_BY_ATTEMPT = [3, 1] as const;
 
 type PoolClip = {
 	date: string;
@@ -70,20 +67,6 @@ function toChoice(species: PoolSpecies): LearnChoice {
 	};
 }
 
-function drawAnswers(
-	species: PoolSpecies[],
-	questionCount: number,
-	random: () => number,
-): PoolSpecies[] {
-	const answers: PoolSpecies[] = [];
-	while (answers.length < questionCount) {
-		answers.push(
-			...shuffle(species, random).slice(0, questionCount - answers.length),
-		);
-	}
-	return answers;
-}
-
 export function buildRound(
 	species: PoolSpecies[],
 	random: () => number = Math.random,
@@ -93,24 +76,22 @@ export function buildRound(
 		return { id: "empty", questions: [], speciesInPool: playable.length };
 	}
 
-	const questions = drawAnswers(playable, QUESTIONS_PER_ROUND, random).map(
-		(answer, index) => {
-			const clip = pick(answer.clips, random);
-			const distractors = shuffle(
-				playable.filter((entry) => entry.sciName !== answer.sciName),
-				random,
-			).slice(0, CHOICES_PER_QUESTION - 1);
+	const questions = shuffle(playable, random).map((answer, index) => {
+		const clip = pick(answer.clips, random);
+		const distractors = shuffle(
+			playable.filter((entry) => entry.sciName !== answer.sciName),
+			random,
+		).slice(0, CHOICES_PER_QUESTION - 1);
 
-			return {
-				id: `${index}-${clip.date}-${clip.fileName}`,
-				audioUrl: audioUrlFor(clip.date, answer.comName, clip.fileName),
-				detectedAt: clip.detectedAt,
-				confidence: clip.confidence,
-				answerSciName: answer.sciName,
-				choices: shuffle([answer, ...distractors], random).map(toChoice),
-			};
-		},
-	);
+		return {
+			id: `${index}-${clip.date}-${clip.fileName}`,
+			audioUrl: audioUrlFor(clip.date, answer.comName, clip.fileName),
+			detectedAt: clip.detectedAt,
+			confidence: clip.confidence,
+			answerSciName: answer.sciName,
+			choices: shuffle([answer, ...distractors], random).map(toChoice),
+		};
+	});
 
 	return {
 		id: `${Date.now().toString(36)}-${Math.floor(random() * 1e6).toString(36)}`,
@@ -119,44 +100,18 @@ export function buildRound(
 	};
 }
 
-export function pointsForAttempt(attempt: number): number {
-	return POINTS_BY_ATTEMPT[attempt - 1] ?? 0;
-}
-
 export type QuestionResult = {
 	attempts: number;
 };
 
 export type RoundScore = {
-	score: number;
-	maxScore: number;
 	firstTry: number;
 	answered: number;
-	bestStreak: number;
 };
 
 export function scoreRound(results: QuestionResult[]): RoundScore {
-	let score = 0;
-	let firstTry = 0;
-	let streak = 0;
-	let bestStreak = 0;
-
-	for (const result of results) {
-		score += pointsForAttempt(result.attempts);
-		if (result.attempts === 1) {
-			firstTry += 1;
-			streak += 1;
-			bestStreak = Math.max(bestStreak, streak);
-		} else {
-			streak = 0;
-		}
-	}
-
 	return {
-		score,
-		maxScore: results.length * (POINTS_BY_ATTEMPT[0] ?? 0),
-		firstTry,
+		firstTry: results.filter((result) => result.attempts === 1).length,
 		answered: results.length,
-		bestStreak,
 	};
 }
