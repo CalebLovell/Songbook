@@ -1,280 +1,159 @@
-# Setting up a Songbook station
+# Set up a Songbook station
 
-This guide takes a Raspberry Pi from a blank memory card to a station that is listening, and covers
-running it afterwards. Every step says what you should see when it worked. If an AI assistant is
-doing the setup for you, point it at [AI_SETUP.md](AI_SETUP.md) instead.
-
-It was last run end to end in November 2026 on a Raspberry Pi 3B+ with Raspberry Pi OS Lite
-(64-bit, Trixie) and a KTMicro USB microphone. That run confirmed every step except a first
-detection from a live bird. Please open an issue if anything differs for you.
-
-- [What you need](#what-you-need)
-- [1. Put it together](#1-put-it-together)
-- [2. Prepare the memory card](#2-prepare-the-memory-card)
-- [3. Install Songbook](#3-install-songbook)
-- [4. Open the web UI](#4-open-the-web-ui)
-- [5. Check the Health page](#5-check-the-health-page)
-- [The first hour](#the-first-hour)
-- [Troubleshooting](#troubleshooting)
-- [Updating](#updating)
-- [Backup and restore](#backup-and-restore)
-- [Making a station public](#making-a-station-public)
-- [Uninstalling](#uninstalling)
+From a blank memory card to a station that hears birds, in about 30 minutes. Using an AI
+assistant instead? Give it [AI_SETUP.md](AI_SETUP.md).
 
 ## What you need
 
-### What we've tested
+One of each:
 
-A station is **one Raspberry Pi** with one case, memory card and microphone. Several Pi models
-work, so the table lists each one we've tried; pick any one of them. One full station is verified
-so far, and the rest is marked as it goes through this guide.
-
-| Part | What we used | Status |
+| Part | What we use | Tested |
 | --- | --- | --- |
-| Raspberry Pi | [Raspberry Pi 3 Model B+](https://www.pishop.us/product/raspberry-pi-3-model-b-plus/) | Works. Installed in about 10 minutes, analyses each recording in about 2.6 s. |
-| Raspberry Pi | [Raspberry Pi 4 Model B, 1 GB](https://www.pishop.us/product/raspberry-pi-4-model-b-1gb/) | Not tested yet. 1 GB was enough on the 3B+. |
-| Case | [Miuzei case](https://www.amazon.com/stores/Miuzei/page/8572E409-B226-42AA-AEF9-99D89C6E2E3D) for Raspberry Pi 3, with fan, heatsinks and power supply | Works. Fan on 3.3 V, about 36 °C while running. |
-| Case | [Miuzei case](https://www.amazon.com/stores/Miuzei/page/8572E409-B226-42AA-AEF9-99D89C6E2E3D) for Raspberry Pi 4, with fan, heatsinks and power supply | Not tested yet. |
-| Memory card | [SanDisk Ultra 32 GB microSDHC](https://www.amazon.com/dp/B08GY9NYRM) | Recommended single card. Our station runs on a PNY Elite 32 GB from a multipack, which works; this SanDisk card isn't tested yet. A high-endurance card lasts longer in a station that writes all day. |
-| Microphone | [Movo M1 USB lavalier microphone](https://www.amazon.com/dp/B0176NRE1G) | Works. Shows up as "KTMicro UAC 1.0 Microphone" and records in mono. A quiet room peaked around −42 dB; how well it picks up distant birds is not tested yet. |
+| Raspberry Pi | [Pi 3 Model B+](https://www.pishop.us/product/raspberry-pi-3-model-b-plus/) or [Pi 4 Model B, 1 GB](https://www.pishop.us/product/raspberry-pi-4-model-b-1gb/) | 3B+ yes, 4 not yet |
+| Case with fan and power supply | [Miuzei](https://www.amazon.com/stores/Miuzei/page/8572E409-B226-42AA-AEF9-99D89C6E2E3D), for your Pi model | Pi 3 yes, Pi 4 not yet |
+| microSD card, 32 GB | [SanDisk Ultra 32 GB](https://www.amazon.com/dp/B08GY9NYRM) | A PNY 32 GB, yes |
+| USB microphone | [Movo M1](https://www.amazon.com/dp/B0176NRE1G) | Yes |
 
-### Choosing your own
+Any Raspberry Pi 5, 4B or 3B+ works. You also need a computer on the same Wi-Fi.
 
-- **One Raspberry Pi: a 5, 4B or 3B+.** The [BirdNET-Pi page at Cornell](https://birdnet.cornell.edu/birdnet-pi/)
-  recommends the 5 and 4B. A 3B+ works: in our run it analysed each 15-second recording in about
-  2.6 seconds and had about 400 MB of memory to spare. Songbook needs a 64-bit OS.
-- **A microSD card, high-endurance, 32 GB or larger.** 64 GB gives more room for recordings, as
-  [this hardware guide](https://github.com/wr/featherframe/wiki/Hardware-BirdNET) suggests.
-- **The official power supply.** A weak one makes the Pi unreliable, and Health warns about it.
-- **A case with a fan** is worth having for a station that runs all day.
-- **A USB microphone.** Any port on the Pi works. Start with the first one here unless you already
-  know you want more:
+## 1. Assemble
 
-| Microphone | Why | Catch |
-| --- | --- | --- |
-| **Boya BY-LM40** | Inexpensive and plugs straight into USB. Cornell names Boya among its preferred plug-and-play brands, alongside Saramonic. | [Less sensitive](https://github.com/wr/featherframe/wiki/Hardware-BirdNET) than the option below. |
-| **Clippy EM272** (Micbooster) with a mono USB sound card | [Described as](https://github.com/wr/featherframe/wiki/Hardware-BirdNET) the most recommended in the BirdNET-Pi community, and much more sensitive. | More parts. Cornell [advises avoiding external sound cards](https://birdnet.cornell.edu/birdnet-pi/) because of ground-loop buzz. |
+1. Peel the film off the heatsinks and stick them on the chips.
+2. Connect the fan to the **3.3 V** pins: red to pin 1, black to pin 6. (5 V is louder.)
+3. Put the Pi in the case. Leave the memory card out for now.
+4. Plug the microphone into any USB port.
 
-Interface, gain and background noise can matter as much as the mic's price; one
-[BirdNET-Pi discussion](https://github.com/Nachtzuster/BirdNET-Pi/discussions/639) is worth reading
-first.
+## 2. Write the memory card
 
-You also need a computer on the same network to prepare the card and open the web UI.
+1. On your computer, install [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
+   **2.0 or newer**. On Linux, use the download from that page: older versions from your
+   package manager ignore the Wi-Fi and SSH settings below.
+2. Put the memory card in your computer and open Imager.
+3. Choose:
+   - **Device:** your Pi model.
+   - **OS:** Raspberry Pi OS (other) → **Raspberry Pi OS Lite (64-bit)**.
+   - **Storage:** the memory card. It will be erased.
+4. When it offers customisation, fill in every setting:
+   - **Hostname:** leave it as `raspberrypi`. Songbook renames it later.
+   - **Username and password:** your choice. You use them in step 3.
+   - **Wi-Fi:** network name, password and country. A Pi 3B+ can only use 2.4 GHz Wi-Fi.
+   - **Time zone:** yours.
+   - **SSH:** on, with password login.
+5. Write the card. It takes a few minutes.
 
-## 1. Put it together
+## 3. Start the Pi
 
-- **Heatsinks:** peel the film off each one before sticking it on.
-- **Fan:** if your case has one, connect it to the **3.3 V** pins (low speed): red to pin 1, black
-  to pin 6. It is quiet and keeps a Pi cool enough. Use 5 V only if the Pi runs hot. Getting red and
-  black the wrong way round can damage the fan.
-- **Microphone:** plug it in before powering on. Keep it away from the case: fan vibration and
-  knocks reach the recordings as low thumps, which BirdNET can mistake for birds.
-- **Placement:** outdoors, away from traffic, fans and your own voice, and sheltered from wind and
-  rain. Cornell suggests a weatherproof junction box or a birdhouse-style mount, with acoustic
-  fabric over the mic.
+1. Put the memory card in the Pi and plug in the power.
+2. Wait 3 minutes.
+3. On your computer, open a terminal and log in to the Pi:
 
-## 2. Prepare the memory card
+   ```bash
+   ssh <username>@raspberrypi.local
+   ```
 
-Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) on your computer:
+   Type `yes` if asked to trust it, then your password.
 
-1. **Device:** your Pi model.
-2. **Operating system:** Raspberry Pi OS (other) → **Raspberry Pi OS Lite (64-bit)**.
-3. **Storage:** the microSD card. Everything on it is erased.
-4. **Customisation:** set all of these before writing.
-   - **Hostname:** `songbook`. The installer names the station `songbook` whatever you enter, or
-     `songbook-2` if another station on your network already has that name.
-   - **Username and password**, or an SSH public key. The installer needs the user to have
-     passwordless sudo, which is the Imager's default.
-   - **Wi-Fi name, password and country**, unless you use Ethernet. A Pi 3B+ can only join a
-     2.4 GHz network.
-   - **Time zone.** Detection times use it.
-   - **SSH: on.**
-5. Write the card, put it in the Pi and power it on.
+**You should see** a prompt ending in `@raspberrypi:~ $`.
 
-On a Linux computer you can do all of this from a terminal instead:
-`tools/flash_sd_card.sh --device /dev/mmcblk0 --hostname songbook --wifi "Network name" --country US`
-(`--help` lists the options). It asks for the Wi-Fi password and for `yes` before erasing.
+## 4. Install Songbook
 
-**You should see:** after 2–4 minutes, the Pi answers on your network:
-
-```bash
-ssh <user>@songbook.local
-```
-
-Before installing, check the OS, sudo and the mic:
-
-```bash
-uname -m && grep VERSION_CODENAME /etc/os-release && sudo -n true && echo sudo-ok
-```
-
-```bash
-arecord -l
-```
-
-The first prints `aarch64`, `VERSION_CODENAME=trixie` and `sudo-ok`. The second lists your mic as
-a capture device.
-
-## 3. Install Songbook
-
-On the Pi, as your normal user:
+Paste this into that terminal:
 
 ```bash
 curl -s https://raw.githubusercontent.com/CalebLovell/Songbook/main/newinstaller.sh | bash
 ```
 
-It installs the newest release and everything it needs. This took about 10 minutes on a 3B+.
+1. Wait about 10 minutes.
+2. When asked, choose a password for the Songbook website. Nothing shows as you type. Type it
+   twice.
+3. It prints the station's address and restarts the Pi. Note the address.
 
-1. **Near the end it asks you to choose a password** for the web UI's Settings, Review and Species
-   filter. The prompt shows nothing as you type, so check Caps Lock, then type it twice.
-2. **Then it shows the station's address and reboots,** which ends your SSH session. That is
-   expected.
+**You should see** `http://songbook.local`, or `http://songbook-2.local` if you already have a
+station.
 
-It keeps a log at `~/installation-<date>.txt`. It also guesses the station's location from your
-IP address using ip-api.com, which decides which species are expected there. If you left the
-Imager's time zone at its default, it takes the time zone from the same guess.
+## 5. Open the station
 
-## 4. Open the web UI
+1. Wait 2 minutes for the Pi to restart.
+2. In a browser, open the address from step 4. Type the `http://`.
+3. Sign in with your Songbook password and open **Health**.
+4. Fix anything yellow or red. Each card says how. In particular:
+   - **Location:** press **Check location**, correct it if needed, and save. It decides which
+     birds count.
+   - **Name:** press **Change name** and pick one. Visitors see it, so don't use your address.
 
-From a computer or phone on the same network, open `http://songbook.local`, or the address the
-installer showed if it chose `songbook-2`. Type the `http://`, or browsers may search for it
-instead. The name keeps working when your router gives the Pi a new IP address.
+**You should see** **Audio input** naming your microphone and "Hearing sound".
 
-If it doesn't load, use the Pi's IP address instead, from your router or `hostname -I` on the Pi.
-See [Can't reach the station](#cant-reach-the-station).
+## 6. Test it
 
-Anyone who can reach the station can view it. Sign in with your password to see Health, Settings,
-Review and Species filter.
+Play a recording of a local bird from your phone, about 30 cm (a foot) from the microphone, for
+30 seconds, in a quiet room.
 
-## 5. Check the Health page
+**You should see** the bird on the **Live** page within a minute.
 
-Sign in and open **Health**. It shows one card per part of the station, and anything that needs
-fixing turns yellow or red with what to do.
+Real birds are easiest to hear at dawn. Birds that don't live near you are filtered out.
 
-- **Audio input** names your microphone and shows how loud it is hearing, for example
-  "Hearing sound, peaking at −42 dB". If no mic is plugged in, or it records silence, the card
-  turns red. Fix it at the Pi, then press **Check again**.
-- **Location** stays yellow, showing roughly where the installer's guess points and the time
-  zone, until you press **Check location** and save. A VPN can make the guess wrong, and species
-  filtered out by a wrong location can't be recovered afterwards. Later, the card warns if the
-  time zone is hours away from the location.
-- **Name:** new stations are called "Backyard Station". Visitors see the name, so change it to one
-  of your own if you like, but don't use your address.
+## Placing the station
 
-## The first hour
+Outdoors, sheltered from rain and wind, away from roads, fans and people talking. Keep the
+microphone away from the case, so the fan's hum doesn't reach it.
 
-- The station records 15-second chunks and analyses each one, so a bird should appear within a
-  minute or so of being heard.
-- Pages stay empty until the first detection. That is normal, especially at midday or at night.
-  Dawn is the best first test.
-- **To test now,** play a recording of a bird that lives near you from your phone, about 30 cm
-  (a foot) from the mic, for 30 seconds, with the room quiet. A bird that doesn't live in your area
-  is filtered out by design.
-- Only detections at 70% confidence or higher are kept (**Settings → Detection**). Expect some wrong
-  guesses at first. Use **Review** to correct them rather than lowering the threshold right away.
-- Most of the interesting pages (trends, regulars, Highlights) need days of data to mean much.
+## If something goes wrong
 
-## Troubleshooting
+**`ssh` says it can't find `raspberrypi.local`.** Wait 2 more minutes. Then find the Pi's
+address in your router's device list and use `ssh <username>@<address>`. If the Pi isn't there,
+it didn't join Wi-Fi: rewrite the card, checking the Wi-Fi password and that Imager is 2.0 or
+newer.
 
-### No birds after a few hours
+**The browser can't open the station.**
+- Type `http://` before the address.
+- Try the IP address the installer printed.
+- Chrome with `DNS_PROBE_FINISHED_NXDOMAIN`: turn off **Use secure DNS** in
+  `chrome://settings/security`, or use the IP address.
+- Your device must be on the same Wi-Fi as the Pi, not a guest network.
 
-Start with **Health → Audio input**. If it is red, it says what is wrong. If it is green, check
-that recording and analysis are running:
+**Audio input says no microphone, or silence.** Unplug the microphone, plug it into another USB
+port, then press **Check again**.
 
-```bash
-journalctl -u birdnet_recording -u birdnet_analysis --since "1 hour ago"
-```
-
-Then play a clear bird call from a phone close to the mic. If it isn't detected, suspect the mic or
-its distance. If it is, the problem is placement or noise.
-
-### Wrong location, or the wrong kinds of birds
-
-A VPN or an unusual internet connection can give a bad guess, and a failed lookup leaves the
-location at 0, 0. Set the real values on **Health → Location**.
-
-### Microphone not found
-
-Health says "No microphone is plugged in". List what the Pi can see:
-
-```bash
-arecord -l
-```
-
-If the mic is missing, try another USB port or a powered hub.
-
-### Can't reach the station
-
-- **Type the `http://`.** Without it, browsers often search for the name instead.
-- **Try `http://songbook`.** Many routers know the station by its name without `.local`, which
-  helps on Android, where `.local` names often don't work.
-- **Use the IP address.** It's on your router's list of devices, or run `hostname -I` on the Pi.
-  If it keeps changing, reserve it for the Pi in your router's DHCP settings.
-- **Chrome says `DNS_PROBE_FINISHED_NXDOMAIN`:** Chrome's **Use secure DNS** (`chrome://settings/security`)
-  sends every lookup to an internet DNS provider, which doesn't know `.local` names. Use the IP
-  address, or set that option to your current service provider.
-- **Same network:** your device must be on the same network as the Pi, not a guest or IoT network.
-
-### Sign-in says the password is wrong
-
-Set a new one on the Pi. There is no default password and no reset by email.
+**The password doesn't work.** Set a new one. Log in to the Pi as in step 3 (using its new name)
+and run:
 
 ```bash
 sudo ~/BirdNET-Pi/scripts/set_web_ui_password.sh
 ```
 
-The prompt shows nothing as you type. After 5 wrong tries, sign-in makes you wait 30 seconds, and
-each further wrong try doubles the wait.
+After 5 wrong tries, sign-in makes you wait.
 
-## Updating
+**No birds after a day.** Check **Health → Audio input**, then repeat step 6.
 
-Stations update from this repository's GitHub releases. **Health → Updates** shows the installed
-version and the newest release, with **Check**, **Update to …** and an **Install automatically**
-switch (`AUTOMATIC_UPDATE` in `birdnet.conf`). Every night between 3 and 5 AM
-`birdnet_update.timer` looks for a new release: with the switch on it installs it, with it off it
-only marks Health in the sidebar so you can install it when you like.
+## Running the station
 
-```bash
-update_birdnet.sh        # install the newest release now
-update_birdnet.sh -c     # only check
-```
+**Updates** install themselves overnight when **Health → Updates → Install automatically** is
+on. With it off, Health shows when one is ready.
 
-An update downloads the release's prebuilt web UI beside the running one, checks it against the
-sha256 in the release's `release.json`, moves the code to the release's commit, and restarts. If the
-web UI doesn't answer afterwards, the station goes back to the version it had. Progress is in
-`~/BirdNET-Pi-web/update-status.json` and `journalctl -u birdnet_update_now`.
+**Backups:** **Health → Backups → Download a backup**.
 
-## Backup and restore
-
-Download a backup from **Health → Backups**, or on the Pi:
+**Uninstall:**
 
 ```bash
-./scripts/backup_data.sh -a backup -f /mnt/birds/backup.tar
-./scripts/backup_data.sh -a restore -f /mnt/birds/backup.tar
+/usr/local/bin/uninstall.sh && cd ~ && rm -drf BirdNET-Pi
 ```
 
-## Making a station public
+### Making a station public
 
 > [!CAUTION]
-> **A public station is a public microphone. Read this first.**
-> - **Visitors can play one clip per species.** Those clips are real audio from wherever your mic
->   is. Every other recording and the live stream require sign-in.
-> - **Each public clip is checked for a human voice first.** A voice check runs on the species' best
->   clip. If it hears a voice, the clip stays private and the next-best clip is checked instead. A
->   clip stays private until it passes. In testing, the check caught every voice 10 dB quieter than
->   the bird, about 60% at 20 dB quieter, and few at 30 dB quieter, so a faint voice can still get
->   through. It also listens only for voices, not for other household sounds.
-> - **The recording filter can miss speech too.** It drops audio when BirdNET ranks a human sound
->   among its top predictions. **Privacy threshold** (**Settings → Detection**, 0–3) widens how far down
->   the list it looks, and 0 still checks the top 10. Keep the mic away from patios, windows and
->   sidewalks.
-> - **Recording laws vary by place**, especially for conversations and neighbors. Check yours
->   before putting the mic outside or the station online. This is not legal advice.
-> - **Coordinates stay private.** Public pages don't include your latitude or longitude. The station
->   name is shown publicly, so don't use your address.
+> **A public station is a public microphone.**
+> - Visitors can play one clip per species, real audio from wherever your mic is. Every other
+>   recording and the live stream need sign-in.
+> - Each public clip is checked for a human voice first, but a faint voice can get through: in
+>   testing the check caught every voice 10 dB quieter than the bird, about 60% at 20 dB quieter,
+>   and few at 30 dB quieter. It listens only for voices.
+> - The recording filter drops audio when BirdNET hears a human sound among its top guesses.
+>   **Privacy threshold** (**Settings → Detection**, 0–3) makes it stricter.
+> - Recording laws vary by place. Check yours. This is not legal advice.
+> - Public pages never show your coordinates, but they do show the station name.
 
-The web UI serves port 80 on your network. To reach it from the internet, put a tunnel or reverse
-proxy that you control in front of it, then tell the web UI to trust the address that proxy
-forwards. Sign-in throttling then sees real visitors, and link previews use your public address.
+The station serves port 80 on your network. To put it on the internet, run a tunnel or reverse
+proxy on the Pi itself, such as `cloudflared`, then let the web UI trust it:
 
 ```bash
 sudo systemctl edit birdnet_web_ui.service
@@ -283,14 +162,4 @@ sudo systemctl edit birdnet_web_ui.service
 ```ini
 [Service]
 Environment=WEB_UI_TRUSTED_PROXY=1
-```
-
-Only set this behind a proxy running on the Pi itself, such as `cloudflared`. The app trusts
-forwarded addresses only from a connection on the same machine, so other devices on your network
-can't fake theirs.
-
-## Uninstalling
-
-```bash
-/usr/local/bin/uninstall.sh && cd ~ && rm -drf BirdNET-Pi
 ```
