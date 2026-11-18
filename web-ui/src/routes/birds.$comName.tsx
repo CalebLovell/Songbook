@@ -890,6 +890,9 @@ function VisitLogCard({
 			>
 				<div data-slot="card-header" className={VISIT_LOG_HEADER_CLASS}>
 					<Kicker as="h2">Visit log</Kicker>
+					<Count title={`${totalVisits.toLocaleString()} total visits`}>
+						{totalVisits.toLocaleString()}
+					</Count>
 				</div>
 
 				{visits.length === 0 ? (
