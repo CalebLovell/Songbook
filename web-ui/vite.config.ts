@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, realpathSync } from "node:fs";
+import { existsSync, mkdirSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -8,6 +8,7 @@ import { nitro } from "nitro/vite";
 import { defineConfig, type Plugin } from "vite";
 
 import { DEV_PASSWORD } from "./src/lib/dev-password.ts";
+import { DEFAULT_SITE_NAME } from "./src/lib/health-data.ts";
 
 /**
  * Gives `npm run dev` a station password of its own: a file inside the
@@ -41,6 +42,37 @@ function devStationPassword(): Plugin {
 	};
 }
 
+/**
+ * Gives `npm run dev` a BirdNET config of its own (`.dev/birdnet.conf`), as a
+ * fresh install writes it, so Health and Settings have a station name and
+ * location to show and edit. Delete it to start over. Saving never touches
+ * the system: dev skips the service restarts and time zone changes.
+ */
+function devStationConfig(): Plugin {
+	return {
+		name: "birdnet-dev-station-config",
+		apply: "serve",
+		config() {
+			process.env.BIRDNET_SKIP_SYSTEM_ACTIONS ??= "1";
+			const file = path.resolve(".dev/birdnet.conf");
+			process.env.BIRDNET_CONF ??= file;
+			if (process.env.BIRDNET_CONF !== file || existsSync(file)) return;
+			mkdirSync(path.dirname(file), { recursive: true });
+			writeFileSync(
+				file,
+				[
+					`SITE_NAME="${DEFAULT_SITE_NAME}"`,
+					"LATITUDE=0.0000",
+					"LONGITUDE=0.0000",
+					"LOCATION_SOURCE=ip",
+					'LOCATION_PLACE=""',
+					"",
+				].join("\n"),
+			);
+		},
+	};
+}
+
 // Run from the real folder even when started through a link to it (the old
 // BirdNET-Pi-Live path is a junction to this checkout): Vite and Nitro take
 // their root from the working directory, Node resolves modules by real path,
@@ -56,6 +88,7 @@ const config = defineConfig({
 	resolve: { tsconfigPaths: true },
 	plugins: [
 		devStationPassword(),
+		devStationConfig(),
 		nitro({
 			plugins: ["./src/server-plugins/voice-check.ts"],
 			rollupConfig: { external: [/^@sentry\//] },
