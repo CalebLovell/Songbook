@@ -1,8 +1,8 @@
 # Setting up a Songbook station
 
 This guide takes a Raspberry Pi from a blank memory card to a station that is listening, and covers
-running it afterwards. It is written for people and for AI assistants doing the setup on someone's
-behalf, so every step says what you should see when it worked.
+running it afterwards. Every step says what you should see when it worked. If an AI assistant is
+doing the setup for you, point it at [AI_SETUP.md](AI_SETUP.md) instead.
 
 It was last run end to end in November 2026 on a Raspberry Pi 3B+ with Raspberry Pi OS Lite
 (64-bit, Trixie) and a KTMicro USB microphone. That run confirmed every step except a first
@@ -73,6 +73,10 @@ Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) on your compute
    - **Time zone.** Detection times use it.
    - **SSH: on.**
 5. Write the card, put it in the Pi and power it on.
+
+On a Linux computer you can do all of this from a terminal instead:
+`tools/flash_sd_card.sh --device /dev/mmcblk0 --hostname songbook --wifi "Network name" --country US`
+(`--help` lists the options). It asks for the Wi-Fi password and for `yes` before erasing.
 
 **You should see:** after 2–4 minutes, the Pi answers on your network:
 

@@ -41,6 +41,8 @@ station, step by step.
 
 - [Setup guide](SETUP.md): what to buy, preparing the card, installing, the first hour and
   troubleshooting.
+- [AI setup instructions](AI_SETUP.md): the same setup as steps for an AI assistant working from
+  your computer, with checks after each step and the points where it hands over to you.
 - [Running a station](SETUP.md#updating): updates, backups, making a station public and
   uninstalling.
 - [Development](CONTRIBUTING.md): working on the web UI, and how releases are made.
