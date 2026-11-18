@@ -13,7 +13,6 @@ import {
 } from "./settings.server.ts";
 
 const withPrivacy = (privacyThreshold: number) => ({
-	speciesFrequencyThreshold: 0.03,
 	confidence: 0.7,
 	sensitivity: 1.25,
 	overlap: 0,
@@ -109,6 +108,36 @@ test("loads normalized configuration", async () => {
 	assert.equal(page.review.rareSpeciesMax, 10);
 });
 
+test("loads with defaults in place of out-of-range values", async () => {
+	const { file } = await fixtureConfig(
+		[
+			'SITE_NAME="Backyard"',
+			"LATITUDE=41.1",
+			"LONGITUDE=-93.2",
+			"CONFIDENCE=0",
+			"SENSITIVITY=2",
+			"OVERLAP=1.5",
+			"PRIVACY_THRESHOLD=5",
+			"HIGHLIGHT_RARE_MAX=0",
+			"HIGHLIGHT_RETURNED_DAYS=30",
+			"REVIEW_RARE_SPECIES_MAX=0",
+		].join("\n"),
+	);
+	const page = await loadSettingsPageData({
+		settingsPath: file,
+		currentTimezone: "America/Chicago",
+	});
+	assert.deepEqual(page.detection, {
+		confidence: 0.7,
+		sensitivity: 1.25,
+		overlap: 1.5,
+		privacyThreshold: 0,
+	});
+	assert.equal(page.highlights.rareMax, 5);
+	assert.equal(page.highlights.returnedDays, 30);
+	assert.equal(page.review.rareSpeciesMax, 10);
+});
+
 test("reset returns every card but Station to its defaults", async () => {
 	const { file } = await fixtureConfig(
 		[
@@ -147,7 +176,6 @@ test("reset returns every card but Station to its defaults", async () => {
 		currentTimezone: "America/Chicago",
 	});
 	assert.deepEqual(page.detection, {
-		speciesFrequencyThreshold: 0.03,
 		confidence: 0.7,
 		sensitivity: 1.25,
 		overlap: 0,

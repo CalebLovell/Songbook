@@ -417,6 +417,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   `RTSP_STREAM`, `RECORDING_LENGTH`, `EXTRACTION_LENGTH`, `AUDIOFMT`, `FULL_DISK`,
   `PURGE_THRESHOLD`, `PURGE_KEEP_PER_SPECIES` and `MAX_FILES_SPECIES` live only in the config
   file; no save, Factory defaults or restore touches them. Storage shows only on Health.
+  The Detection card has no species-frequency threshold either: `SF_THRESH` stays at 0.03 in
+  the config file, and the Species filter page's Always detect is the per-species override.
+  A config value outside a card's range shows as that field's default instead of failing
+  the page; the file keeps it until the card is saved.
 - **Health** (`/health`, signed in) shows no birds and no detection counts. The page has no summary of its own: one
   standard card per check, in a fixed order (Name, Location, Audio input, Power supply,
   BirdNET model, Storage, Updates, Backups). Cards carry no status pills: state shows in
@@ -493,7 +497,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Backups** carry the database, the settings cards that describe the data, species
   lists and optionally clips, as a tar whose last entry holds every file's checksum,
   so a cut-off download fails the check. Passwords, the Updates card and the config-only audio,
-  recording and storage values never travel: they belong to the machine or stay at install defaults. Add to `backupSettingsSchema` only
+  recording, storage and `SF_THRESH` values never travel: they belong to the machine or stay at install defaults. Add to `backupSettingsSchema` only
   what a new station should inherit.
 - **Restores** never touch live data until a backup has passed every check and the
   owner has seen what's in it. The database is replaced inside one transaction on the

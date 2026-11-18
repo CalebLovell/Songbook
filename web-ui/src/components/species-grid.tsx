@@ -88,7 +88,16 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 	return (
 		<li className={TILE_CLASS}>
 			<div className="flex min-w-0 items-center gap-3 max-[400px]:gap-2">
-				<SpeciesThumbnail imageUrl={item.imageUrl} comName={item.comName} />
+				<Link
+					to="/birds/$comName"
+					preload={false}
+					params={{ comName: comNameToSlug(item.comName) }}
+					tabIndex={-1}
+					aria-hidden="true"
+					className="shrink-0"
+				>
+					<SpeciesThumbnail imageUrl={item.imageUrl} comName={item.comName} />
+				</Link>
 
 				<div className="min-w-0 flex-1">
 					<Link

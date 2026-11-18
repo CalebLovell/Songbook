@@ -388,7 +388,14 @@ function DetectionCard({
 			</Field>
 			<Field
 				label="Sensitivity"
-				hint="How readily the model scores a sound as a bird."
+				hint="Higher values save fewer detections, not more, while Minimum confidence is above 50%."
+				info={
+					<>
+						Higher values pull every score toward 50% before Minimum confidence
+						is applied. A call scoring 88% at 1.0 scores 82% at 1.25 and 73% at
+						1.5. Lower it to save more detections, raise it to save fewer.
+					</>
+				}
 			>
 				<FieldInput
 					type="number"
@@ -426,47 +433,14 @@ function DetectionCard({
 				/>
 			</Field>
 			<Field
-				label="Species-frequency threshold"
-				hint="Narrows candidates using location and season."
-				info={
-					<>
-						How common a species must be near you before BirdNET will consider
-						it at all. The score behind this is roughly how often birders in
-						your area report that bird this week, so even an everyday yard bird
-						can sit well below 1.0. The 0.03 default is deliberately permissive.
-						Lower it to catch more species, raise it to cut false positives.
-						Species on Always detect skip this check entirely.
-					</>
-				}
-			>
-				<FieldInput
-					type="number"
-					min={0.0005}
-					max={0.99}
-					step={0.0005}
-					required
-					value={form.values.speciesFrequencyThreshold}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							speciesFrequencyThreshold: numberOr(
-								event,
-								form.values.speciesFrequencyThreshold,
-							),
-						})
-					}
-				/>
-			</Field>
-			<Field
 				label="Privacy threshold"
 				hint="Speech is filtered even at 0. Higher values catch fainter voices, and drop more birds by mistake."
 				info={
 					<>
 						BirdNET drops a chunk when a human sound is among its top 10 guesses
 						for it at 0, its top 60 at 1, and its top 180 at 3. The chunks
-						either side are dropped too. Saved clips longer than 9 seconds can
-						still reach past them into speech, and the live stream is never
-						filtered.
+						either side are dropped too, so a saved 6-second clip never reaches
+						into the speech it found. The live stream is never filtered.
 					</>
 				}
 			>

@@ -243,7 +243,7 @@ Download a backup from **Health → Backups**, or on the Pi:
 >   the bird, about 60% at 20 dB quieter, and few at 30 dB quieter, so a faint voice can still get
 >   through. It also listens only for voices, not for other household sounds.
 > - **The recording filter can miss speech too.** It drops audio when BirdNET ranks a human sound
->   among its top predictions. `PRIVACY_THRESHOLD` (**Settings → Privacy**, 0–3) widens how far down
+>   among its top predictions. **Privacy threshold** (**Settings → Detection**, 0–3) widens how far down
 >   the list it looks, and 0 still checks the top 10. Keep the mic away from patios, windows and
 >   sidewalks.
 > - **Recording laws vary by place**, especially for conversations and neighbors. Check yours

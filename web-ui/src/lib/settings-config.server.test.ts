@@ -239,7 +239,6 @@ test("saving a card leaves the config-only audio, recording and storage values a
 	await writeSettingsCard(
 		"detection",
 		{
-			speciesFrequencyThreshold: 0.03,
 			confidence: 0.8,
 			sensitivity: 1.25,
 			overlap: 0,

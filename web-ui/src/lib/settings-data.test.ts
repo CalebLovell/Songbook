@@ -8,13 +8,11 @@ import {
 
 test("accepts inclusive detector boundaries", () => {
 	const settings = parseSettingsCard("detection", {
-		speciesFrequencyThreshold: 0.0005,
 		confidence: 0.99,
 		sensitivity: 0.5,
 		overlap: 2.9,
 		privacyThreshold: 3,
 	});
-	assert.equal(settings.speciesFrequencyThreshold, 0.0005);
 	assert.equal(settings.confidence, 0.99);
 	assert.equal(settings.sensitivity, 0.5);
 	assert.equal(settings.overlap, 2.9);
@@ -22,7 +20,6 @@ test("accepts inclusive detector boundaries", () => {
 
 test("rejects detector values outside their supported ranges", () => {
 	const valid = {
-		speciesFrequencyThreshold: 0.03,
 		confidence: 0.7,
 		sensitivity: 1.25,
 		overlap: 0,
@@ -37,12 +34,6 @@ test("rejects detector values outside their supported ranges", () => {
 	);
 	assert.throws(() =>
 		parseSettingsCard("detection", { ...valid, sensitivity: 1.51 }),
-	);
-	assert.throws(() =>
-		parseSettingsCard("detection", {
-			...valid,
-			speciesFrequencyThreshold: 0.0004,
-		}),
 	);
 	assert.throws(() => parseSettingsCard("detection", { ...valid, overlap: 3 }));
 });

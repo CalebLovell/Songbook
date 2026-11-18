@@ -37,7 +37,6 @@ const CORE_CARDS: SettingsIndexEntry[] = [
 			"Minimum confidence",
 			"Sensitivity",
 			"Analysis overlap",
-			"Species-frequency threshold",
 			"Privacy threshold",
 		],
 		keywords: ["privacy", "human", "voice"],

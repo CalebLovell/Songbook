@@ -10,17 +10,20 @@ import {
 	stat,
 	writeFile,
 } from "node:fs/promises";
-
+import type { z } from "zod";
 import {
 	HIGHLIGHT_THRESHOLDS,
 	type HighlightThresholds,
 	thresholdsFromSettings,
 } from "./highlight-thresholds.ts";
+
 import {
 	artworkSettingsSchema,
 	DEFAULT_REVIEW_RARE_SPECIES_MAX,
+	detectionSettingsSchema,
 	highlightSettingsSchema,
 	parseSettingsCard,
+	reviewSettingsSchema,
 	SETTINGS_DEFAULTS,
 	type SettingsByKind,
 	type SettingsCardKind,
@@ -66,6 +69,21 @@ function integerValue(
 	return Number.isSafeInteger(parsed) ? parsed : fallback;
 }
 
+function validFieldsOr<T extends Record<string, unknown>>(
+	shape: { [K in keyof T]: z.ZodType },
+	saved: T,
+	fallback: T,
+): T {
+	return Object.fromEntries(
+		Object.entries(saved).map(([key, value]) => [
+			key,
+			shape[key as keyof T].safeParse(value).success
+				? value
+				: fallback[key as keyof T],
+		]),
+	) as T;
+}
+
 function artworkPreferenceFrom(values: Record<string, string>) {
 	return (
 		artworkSettingsSchema.safeParse({ preference: values.BIRD_ARTWORK }).data
@@ -94,68 +112,75 @@ export async function readSettingsPageValues(
 			timezone,
 			locationConfirmed: values.LOCATION_SOURCE?.trim() !== "ip",
 		}),
-		detection: parseSettingsCard("detection", {
-			speciesFrequencyThreshold: numberValue(
-				values,
-				"SF_THRESH",
-				defaults.detection.speciesFrequencyThreshold,
-			),
-			confidence: numberValue(
-				values,
-				"CONFIDENCE",
-				defaults.detection.confidence,
-			),
-			sensitivity: numberValue(
-				values,
-				"SENSITIVITY",
-				defaults.detection.sensitivity,
-			),
-			overlap: numberValue(values, "OVERLAP", defaults.detection.overlap),
-			privacyThreshold: numberValue(
-				values,
-				"PRIVACY_THRESHOLD",
-				defaults.detection.privacyThreshold,
-			),
-		}),
-		highlights: parseSettingsCard("highlights", {
-			rareMax: integerValue(
-				values,
-				"HIGHLIGHT_RARE_MAX",
-				defaults.highlights.rareMax,
-			),
-			returnedDays: integerValue(
-				values,
-				"HIGHLIGHT_RETURNED_DAYS",
-				defaults.highlights.returnedDays,
-			),
-			goneQuietDays: integerValue(
-				values,
-				"HIGHLIGHT_GONE_QUIET_DAYS",
-				defaults.highlights.goneQuietDays,
-			),
-			regularDays: integerValue(
-				values,
-				"HIGHLIGHT_REGULAR_DAYS",
-				defaults.highlights.regularDays,
-			),
-			vocalRatio: numberValue(
-				values,
-				"HIGHLIGHT_VOCAL_RATIO",
-				defaults.highlights.vocalRatio,
-			),
-		}),
+		detection: validFieldsOr(
+			detectionSettingsSchema.shape,
+			{
+				confidence: numberValue(
+					values,
+					"CONFIDENCE",
+					defaults.detection.confidence,
+				),
+				sensitivity: numberValue(
+					values,
+					"SENSITIVITY",
+					defaults.detection.sensitivity,
+				),
+				overlap: numberValue(values, "OVERLAP", defaults.detection.overlap),
+				privacyThreshold: numberValue(
+					values,
+					"PRIVACY_THRESHOLD",
+					defaults.detection.privacyThreshold,
+				),
+			},
+			defaults.detection,
+		),
+		highlights: validFieldsOr(
+			highlightSettingsSchema.shape,
+			{
+				rareMax: integerValue(
+					values,
+					"HIGHLIGHT_RARE_MAX",
+					defaults.highlights.rareMax,
+				),
+				returnedDays: integerValue(
+					values,
+					"HIGHLIGHT_RETURNED_DAYS",
+					defaults.highlights.returnedDays,
+				),
+				goneQuietDays: integerValue(
+					values,
+					"HIGHLIGHT_GONE_QUIET_DAYS",
+					defaults.highlights.goneQuietDays,
+				),
+				regularDays: integerValue(
+					values,
+					"HIGHLIGHT_REGULAR_DAYS",
+					defaults.highlights.regularDays,
+				),
+				vocalRatio: numberValue(
+					values,
+					"HIGHLIGHT_VOCAL_RATIO",
+					defaults.highlights.vocalRatio,
+				),
+			},
+			defaults.highlights,
+		),
 		artwork: { preference: artworkPreferenceFrom(values) },
 		playback: { boostQuietRecordings: boostQuietRecordingsFrom(values) },
 		updates: parseSettingsCard("updates", {
 			automatic: values.AUTOMATIC_UPDATE?.trim() === "1",
 		}),
-		review: parseSettingsCard("review", {
-			rareSpeciesMax: integerValue(
-				values,
-				"REVIEW_RARE_SPECIES_MAX",
-				DEFAULT_REVIEW_RARE_SPECIES_MAX,
-			),
-		}),
+		review: validFieldsOr(
+			reviewSettingsSchema.shape,
+			{
+				rareSpeciesMax: integerValue(
+					values,
+					"REVIEW_RARE_SPECIES_MAX",
+					DEFAULT_REVIEW_RARE_SPECIES_MAX,
+				),
+			},
+			defaults.review,
+		),
 	};
 }
 
@@ -183,7 +208,6 @@ function assignmentsFor<K extends SettingsCardKind>(
 		case "detection": {
 			const detection = value as SettingsByKind["detection"];
 			return {
-				SF_THRESH: String(detection.speciesFrequencyThreshold),
 				CONFIDENCE: String(detection.confidence),
 				SENSITIVITY: String(detection.sensitivity),
 				OVERLAP: String(detection.overlap),

@@ -359,14 +359,22 @@ function SpeciesHourRowView({
 		<div className={`${ROW_LAYOUT} border-line border-t`}>
 			<div className={`h-8 ${LABEL_LAYOUT}`}>
 				<div className="flex min-w-0 items-center gap-2">
-					<div className={BIRD_BOX_CLASS}>
+					<Link
+						to="/birds/$comName"
+						preload={false}
+						params={{ comName: comNameToSlug(row.comName) }}
+						tabIndex={-1}
+						aria-hidden="true"
+						className={BIRD_BOX_CLASS}
+					>
 						<SpeciesImage
 							imageUrl={row.imageUrl}
-							alt={row.comName}
+							alt=""
+							title={row.comName}
 							glyphClassName="size-3.5"
 							loading="lazy"
 						/>
-					</div>
+					</Link>
 					<Link
 						to="/birds/$comName"
 						preload={false}
