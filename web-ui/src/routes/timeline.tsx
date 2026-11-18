@@ -8,8 +8,19 @@ import {
 	stripSearchParams,
 	useRouteContext,
 } from "@tanstack/react-router";
-import { ArrowRight, CalendarRange, LayoutDashboard, List } from "lucide-react";
+import {
+	ArrowRight,
+	CalendarRange,
+	Images,
+	LayoutDashboard,
+	List,
+} from "lucide-react";
+import { useMemo } from "react";
 import { z } from "zod";
+import {
+	CollageCard,
+	CollageCardSkeleton,
+} from "~/components/collage-card.tsx";
 import {
 	DetectionsByHourCard,
 	DetectionsByHourCardSkeleton,
@@ -62,7 +73,7 @@ import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const DEFAULT_PERIOD: TimelinePeriod = "day";
 
-const TIMELINE_VIEWS = ["hours", "grid"] as const;
+const TIMELINE_VIEWS = ["hours", "grid", "collage"] as const;
 type TimelineView = (typeof TIMELINE_VIEWS)[number];
 const DEFAULT_VIEW: TimelineView = "hours";
 
@@ -189,8 +200,10 @@ function TimelineCardsShell({
 					summary={summary}
 					className={BODY_CARD_WIDTH}
 				/>
-			) : (
+			) : view === "grid" ? (
 				<SpeciesGridSkeleton summary={summary} className={BODY_CARD_WIDTH} />
+			) : (
+				<CollageCardSkeleton summary={summary} className={BODY_CARD_WIDTH} />
 			)}
 			<div className="mt-page grid min-w-0 gap-page md:max-[1799px]:grid-cols-2 min-[1800px]:mt-0 min-[1800px]:flex-1">
 				<HighlightsCard
@@ -432,6 +445,16 @@ function TimelineCards({
 
 	const summary = <WindowSummary rows={rows} />;
 
+	const collageSpecies = useMemo(
+		() =>
+			rows.map((row) => ({
+				comName: row.comName,
+				sciName: row.sciName,
+				count: row.totalDetections,
+			})),
+		[rows],
+	);
+
 	const hourActivity: HourActivity[] = Array.from(
 		{ length: 24 },
 		(_, hour) => ({
@@ -450,9 +473,17 @@ function TimelineCards({
 				summary={summary}
 				className={BODY_CARD_WIDTH}
 			/>
-		) : (
+		) : view === "grid" ? (
 			<SpeciesGrid
 				species={gridItems}
+				emptyMessage={emptyMessage}
+				emptyAction={emptyAction}
+				summary={summary}
+				className={BODY_CARD_WIDTH}
+			/>
+		) : (
+			<CollageCard
+				species={collageSpecies}
 				emptyMessage={emptyMessage}
 				emptyAction={emptyAction}
 				summary={summary}
@@ -498,6 +529,10 @@ const VIEW_META: Record<
 	grid: {
 		label: "Grid",
 		icon: LayoutDashboard,
+	},
+	collage: {
+		label: "Collage",
+		icon: Images,
 	},
 };
 

@@ -16,6 +16,7 @@ export const EMPTY = {
 			windowLabel
 				? `No detections recorded for ${windowLabel}.`
 				: "No detections recorded in this window.",
+		collageUnpainted: "No paintings yet for the birds in this window.",
 		birdVisits: "No visits recorded yet.",
 		birdRecording: "No recording to play yet.",
 	},

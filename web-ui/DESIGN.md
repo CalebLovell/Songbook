@@ -142,7 +142,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - Motion: 180ms ease for color/border/lift; `animate-rise-in` 700ms on mount;
   `animate-flash-in` 2.4s sand highlight for new arrivals; charts 500ms.
   Only linked cards lift on hover, and nothing inside them moves (a painting
-  that grew on hover was tried and dropped). Data that replaces a skeleton fades in over 150ms:
+  that grew on hover was tried and dropped; the collage is the exception). Data that replaces a skeleton fades in over 150ms:
   a card's children (never its header, marked `data-slot="card-header"`, so a
   hand-built header needs the attribute too) fade when they arrive after the
   page settled (`useSettledFlag` on the scroll pane), so cached pages and
@@ -256,6 +256,36 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   Their 12px squares miss the 24px target size, a known gap kept for the look. Hour bars on a species
   tile are the one exception to the shared heat scale: they compare a bird only
   with itself, as a linear share of its own peak.
+- **Collage** (`collage-card.tsx`): the Timeline's third view, after List and
+  Grid (Images icon), drawn from the same rows for whatever window is shown; it
+  is not a page of its own. Painted birds only, packed centre-out in an
+  ellipse shaped like the card, their areas set by detections^0.65. The flock
+  is drawn as large as fits: the layout searches for the biggest scale at which
+  every bird still packs inside the card's padding, so it fills the card and
+  shrinks together rather than clipping a bird. A resize repacks once the size
+  settles (150ms). From `xl` the card stands as tall as the window allows under
+  the masthead and toolbar, so the flock fills the screen without scrolling;
+  below that it is 70vh, between 28rem and 48rem. An empty window's card is
+  only as tall as its message. Birds may share bounding boxes but never silhouettes (alpha
+  masks, `lib/collage-layout.ts`), and every silhouette keeps a one-cell gap to
+  its four side neighbours (cells are 1/280 of the card's long side, so the gap
+  scales with the card; wider gaps read as scattered stickers and touching
+  outlines as a clump). The pointer and clicks hit-test the same masks, so the
+  bird under the cursor is the one you get. Hovering enlarges that bird
+  slightly (3%, 180ms) and pops a one-line tooltip over it ("Blue Jay — 1,284
+  detections", name bold, below the bird when it touches the top edge); the
+  rest stay as they are (dimming them felt glitchy). This is the one place a
+  hover grows an image. Names stay off the collage itself (nesting them along
+  each bird's edge was tried and dropped). Birds are a mix of perched and
+  in-flight paintings: a quarter of those with a flight painting fly (20% to
+  70% were compared), spread evenly across sizes by ranking the birds by
+  detections, cutting them into one band per flier and flying one random bird
+  in each band (`lib/collage-birds.ts`). A new draw is made each time the card
+  loads, and the Reshuffle icon button (dice, no text) at the right of its
+  header draws again. A station that prefers photos gets a photo mosaic instead:
+  every bird in the window as its photo, a rounded square (the photos aren't
+  cutouts, so they can't nest), sized and packed the same way, with the muted
+  bird glyph where there's no photo. No bird flies and there is no Reshuffle.
 - **Heat map text**: the timeline's hours are hidden from assistive tech, and a hidden
   table gives every species by hour at any width. A narrow card drops the hours for
   sighted users; that is a known gap against reflow, kept on purpose.
