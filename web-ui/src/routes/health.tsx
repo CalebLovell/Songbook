@@ -45,6 +45,7 @@ const polledUpdateStateQuery = queryOptions({
 
 const stationSettingsQuery = queryOptions({
 	...FORM_QUERY,
+	throwOnError: false,
 	queryKey: ["health-station-settings"],
 	queryFn: async () => {
 		const page = await getSettingsPage();
