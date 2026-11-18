@@ -143,10 +143,19 @@ export function RecentLogCard({
 								key={visit.key}
 								className={`${ROW_CLASS} ${freshKeys.has(visit.key) ? "animate-flash-in" : ""}`}
 							>
-								<SpeciesThumbnail
-									imageUrl={visit.imageUrl}
-									comName={visit.comName}
-								/>
+								<Link
+									to="/birds/$comName"
+									preload={false}
+									params={{ comName: visit.speciesSlug }}
+									tabIndex={-1}
+									aria-hidden="true"
+									className="shrink-0"
+								>
+									<SpeciesThumbnail
+										imageUrl={visit.imageUrl}
+										comName={visit.comName}
+									/>
+								</Link>
 
 								<div className="min-w-0 flex-1">
 									<div className="flex min-w-0 items-baseline gap-1.5">
