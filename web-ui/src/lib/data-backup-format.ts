@@ -8,7 +8,6 @@ import {
 	reviewSettingsSchema,
 	SETTINGS_DEFAULTS,
 	stationSettingsSchema,
-	storageSettingsSchema,
 } from "./settings-data.ts";
 
 export const BACKUP_FORMAT = "songbook-backup";
@@ -49,7 +48,6 @@ export type BackupChecksums = z.infer<typeof backupChecksumsSchema>;
 export const backupSettingsSchema = z.object({
 	station: stationSettingsSchema,
 	detection: detectionSettingsSchema,
-	storage: storageSettingsSchema,
 	review: reviewSettingsSchema,
 	highlights: highlightSettingsSchema,
 	artwork: artworkSettingsSchema,

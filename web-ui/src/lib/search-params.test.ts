@@ -36,7 +36,10 @@ test("a numeric species search reaches the birds page as a string", () => {
 });
 
 test("a settings tab in the URL selects that tab", () => {
-	assert.equal(validated(SettingsRoute, { tab: "storage" }).tab, "storage");
+	assert.equal(
+		validated(SettingsRoute, { tab: "preferences" }).tab,
+		"preferences",
+	);
 });
 
 test("a missing or unknown settings tab falls back to Station", () => {

@@ -408,14 +408,15 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   Settings holds only what someone might tweak to taste. A station left on every Settings
   default runs fine; one with a Health problem doesn't. So a value with no sensible
   default (station name, location and its time zone) is set on Health, not in Settings,
-  and Settings never says whether something is working or repeats a Health reading (its
-  Storage card gives no current fullness). The one shared control is Restart BirdNET:
+  and Settings never says whether something is working or repeats a Health reading. The one shared control is Restart BirdNET:
   Settings offers it only while a saved change waits to take effect. Settings has no Station tab; its
-  first tab is Detection. Settings has no Audio input or Recording card either: they are
-  technical knobs, not taste, and the install defaults are right (one USB mic on `default`;
-  15 s recordings, 6 s mp3 clips). `REC_CARD`, `CHANNELS`, `RTSP_STREAM`, `RECORDING_LENGTH`,
-  `EXTRACTION_LENGTH` and `AUDIOFMT` live only in the config file; no save, Factory defaults
-  or restore touches them.
+  first tab is Detection. Settings has no Audio input, Recording or Storage card either:
+  they are technical knobs, not taste, and the install defaults are right (one USB mic on
+  `default`; 15 s recordings, 6 s mp3 clips; past 95% full, delete the least confident clips
+  while each species keeps its 10 best, with no per-species cap). `REC_CARD`, `CHANNELS`,
+  `RTSP_STREAM`, `RECORDING_LENGTH`, `EXTRACTION_LENGTH`, `AUDIOFMT`, `FULL_DISK`,
+  `PURGE_THRESHOLD`, `PURGE_KEEP_PER_SPECIES` and `MAX_FILES_SPECIES` live only in the config
+  file; no save, Factory defaults or restore touches them. Storage shows only on Health.
 - **Health** (`/health`, signed in) shows no birds and no detection counts. The page has no summary of its own: one
   standard card per check, in a fixed order (Name, Location, Audio input, Power supply,
   BirdNET model, Storage, Updates, Backups). Cards carry no status pills: state shows in
@@ -437,7 +438,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   supply; Install (confirmed), Check for updates and the Install automatically On/Off, which saves on click (Updates lives only on Health; old `?tab=updates` links redirect there); Download a backup, whose dialog
   offers everything or without clips. A failing Audio input offers only Check again, which
   re-reads the station and toasts whether audio now works, since its fixes happen at the Pi.
-  Anything else that is a preference (storage rules, restoring a backup) links to its Settings tab. Card logic is pure in
+  A full disk offers no action: its fix is freeing space or a bigger SD card via backup and
+  restore. Restoring a backup links to the Data tab. Card logic is pure in
   `lib/health-cards.ts`. The Health row in the sidebar carries the only mark: the
   number of cards that need a look (problems, warnings and setup steps, an offered update
   included), clay when any is broken and sand otherwise, and nothing when all is well. The
@@ -490,8 +492,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the CLI reads stdin and never argv, and an unreadable file is an error, not "unset".
 - **Backups** carry the database, the settings cards that describe the data, species
   lists and optionally clips, as a tar whose last entry holds every file's checksum,
-  so a cut-off download fails the check. Passwords, the Updates card and the config-only audio
-  and recording values never travel: they belong to the machine or stay at install defaults. Add to `backupSettingsSchema` only
+  so a cut-off download fails the check. Passwords, the Updates card and the config-only audio,
+  recording and storage values never travel: they belong to the machine or stay at install defaults. Add to `backupSettingsSchema` only
   what a new station should inherit.
 - **Restores** never touch live data until a backup has passed every check and the
   owner has seen what's in it. The database is replaced inside one transaction on the

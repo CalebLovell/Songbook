@@ -9,7 +9,7 @@ import {
 	resetSettings,
 	restartStation,
 	saveDetectionSettings,
-	saveStorageSettings,
+	saveReviewSettings,
 } from "./settings.server.ts";
 
 const withPrivacy = (privacyThreshold: number) => ({
@@ -66,17 +66,10 @@ test("development skip is explicit while no-action cards save normally", async (
 	});
 	assert.equal(skipped.status, "saved-restart-skipped");
 
-	const storage = await fixtureConfig(
-		"FULL_DISK=purge\nPURGE_THRESHOLD=95\nMAX_FILES_SPECIES=0\n",
-	);
-	const saved = await saveStorageSettings(
-		{
-			fullDiskAction: "keep",
-			purgeThreshold: 90,
-			maxFilesPerSpecies: 100,
-			keepPerSpecies: 10,
-		},
-		{ settingsPath: storage.file },
+	const review = await fixtureConfig("REVIEW_RARE_SPECIES_MAX=10\n");
+	const saved = await saveReviewSettings(
+		{ rareSpeciesMax: 12 },
+		{ settingsPath: review.file },
 	);
 	assert.equal(saved.status, "saved");
 });
@@ -160,12 +153,6 @@ test("reset returns every card but Station to its defaults", async () => {
 		overlap: 0,
 		privacyThreshold: 0,
 	});
-	assert.deepEqual(page.storage, {
-		fullDiskAction: "purge",
-		purgeThreshold: 95,
-		maxFilesPerSpecies: 0,
-		keepPerSpecies: 10,
-	});
 	assert.deepEqual(page.review, { rareSpeciesMax: 10 });
 
 	assert.equal(page.station.siteName, "Backyard");
@@ -179,6 +166,9 @@ test("reset returns every card but Station to its defaults", async () => {
 	assert.match(after, /^RECORDING_LENGTH=30$/m);
 	assert.match(after, /^EXTRACTION_LENGTH=9$/m);
 	assert.match(after, /^AUDIOFMT=flac$/m);
+	assert.match(after, /^FULL_DISK=keep$/m);
+	assert.match(after, /^PURGE_THRESHOLD=40$/m);
+	assert.match(after, /^MAX_FILES_SPECIES=25$/m);
 });
 
 test("a config still naming removed models loads and saves", async () => {
@@ -251,16 +241,9 @@ test("a save that cannot restart says so in the reader's terms", async () => {
 });
 
 test("a card with nothing to restart just saves", async () => {
-	const { file } = await fixtureConfig(
-		"FULL_DISK=purge\nPURGE_THRESHOLD=95\nMAX_FILES_SPECIES=0\n",
-	);
-	const saved = await saveStorageSettings(
-		{
-			fullDiskAction: "keep",
-			purgeThreshold: 90,
-			maxFilesPerSpecies: 0,
-			keepPerSpecies: 10,
-		},
+	const { file } = await fixtureConfig("REVIEW_RARE_SPECIES_MAX=10\n");
+	const saved = await saveReviewSettings(
+		{ rareSpeciesMax: 12 },
 		{ settingsPath: file, skipSystemActions: true },
 	);
 	assert.equal(saved.status, "saved");
@@ -297,7 +280,7 @@ test("restarting distinguishes nothing to do from a declined restart", async () 
 	const runner = async () => {
 		commands++;
 	};
-	const nothing = await restartStation("storage", { runner });
+	const nothing = await restartStation("review", { runner });
 	assert.equal(nothing.status, "nothing-to-restart");
 	assert.match(nothing.message, /already live/);
 

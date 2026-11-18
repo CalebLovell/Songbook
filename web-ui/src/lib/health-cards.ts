@@ -409,7 +409,7 @@ function storageCard(health: StationHealth): HealthCardView {
 			used !== null
 				? { usedPercent: used, threshold: storage.threshold }
 				: null,
-		actions: failing ? [setting("storage", "Storage settings", true)] : [],
+		actions: [],
 	};
 }
 

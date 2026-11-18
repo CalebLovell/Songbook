@@ -80,31 +80,6 @@ test("validates station coordinates, timezone, and safe text", () => {
 	);
 });
 
-test("enforces storage boundaries", () => {
-	assert.deepEqual(
-		parseSettingsCard("storage", {
-			fullDiskAction: "purge",
-			purgeThreshold: 99,
-			maxFilesPerSpecies: 0,
-			keepPerSpecies: 10,
-		}),
-		{
-			fullDiskAction: "purge",
-			purgeThreshold: 99,
-			maxFilesPerSpecies: 0,
-			keepPerSpecies: 10,
-		},
-	);
-	assert.throws(() =>
-		parseSettingsCard("storage", {
-			fullDiskAction: "delete-everything",
-			purgeThreshold: 19,
-			maxFilesPerSpecies: -1,
-			keepPerSpecies: -1,
-		}),
-	);
-});
-
 test("defaults Review rarity to ten and rejects zero", () => {
 	assert.equal(DEFAULT_REVIEW_RARE_SPECIES_MAX, 10);
 	assert.deepEqual(parseSettingsCard("review", {}), { rareSpeciesMax: 10 });

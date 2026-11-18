@@ -29,7 +29,6 @@ import {
 	saveHighlightSettingsFn,
 	savePlaybackSettingsFn,
 	saveReviewSettingsFn,
-	saveStorageSettingsFn,
 } from "~/lib/settings.ts";
 import { forgetUnlockStatus } from "~/lib/unlock-status.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
@@ -67,7 +66,6 @@ function SettingsRoute() {
 	const page = useSkeletonMinimum(useQuery(settingsPageQuery).data);
 	const queryClient = useQueryClient();
 	const saveDetection = useServerFn(saveDetectionSettingsFn);
-	const saveStorage = useServerFn(saveStorageSettingsFn);
 	const saveReview = useServerFn(saveReviewSettingsFn);
 	const saveHighlights = useServerFn(saveHighlightSettingsFn);
 	const saveArtwork = useServerFn(saveArtworkSettingsFn);
@@ -114,7 +112,6 @@ function SettingsRoute() {
 			}}
 			savers={{
 				detection: (values) => refreshingData(saveDetection({ data: values })),
-				storage: (values) => refreshingData(saveStorage({ data: values })),
 				review: (values) => refreshingData(saveReview({ data: values })),
 				highlights: (values) =>
 					refreshingData(saveHighlights({ data: values })),

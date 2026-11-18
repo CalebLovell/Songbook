@@ -27,7 +27,6 @@ const saved = async <T,>(values: T) => ({
 const SAVERS = {
 	station: saved,
 	detection: saved,
-	storage: saved,
 	review: saved,
 	highlights: saved,
 	updates: saved,
@@ -60,7 +59,6 @@ test("every card with a default offers its own reset; Updates doesn't", () => {
 	);
 	for (const id of [
 		"detection",
-		"storage",
 		"review",
 		"highlights",
 		"artwork",
@@ -72,45 +70,45 @@ test("every card with a default offers its own reset; Updates doesn't", () => {
 
 test("a card's reset does nothing while it already holds the defaults", () => {
 	const markup = renderWithQueryClient(
-		<SettingsCards tab="storage" data={DATA} savers={SAVERS} />,
+		<SettingsCards tab="preferences" data={DATA} savers={SAVERS} />,
 	);
-	assert.match(resetButton(cardMarkup(markup, "storage")) ?? "", /disabled=""/);
+	assert.match(resetButton(cardMarkup(markup, "review")) ?? "", /disabled=""/);
 });
 
 test("a card's reset is live once a value differs from the default", () => {
 	const markup = renderWithQueryClient(
 		<SettingsCards
-			tab="storage"
+			tab="preferences"
 			data={{
 				...DATA,
-				storage: { ...DATA.storage, purgeThreshold: 80 },
+				review: { rareSpeciesMax: 12 },
 			}}
 			savers={SAVERS}
 		/>,
 	);
 	assert.doesNotMatch(
-		resetButton(cardMarkup(markup, "storage")) ?? "",
+		resetButton(cardMarkup(markup, "review")) ?? "",
 		/disabled=""/,
 	);
 });
 
 test("a card's footer runs reset first and Save last", () => {
 	const markup = renderWithQueryClient(
-		<SettingsCards tab="storage" data={DATA} savers={SAVERS} />,
+		<SettingsCards tab="preferences" data={DATA} savers={SAVERS} />,
 	);
-	const card = cardMarkup(markup, "storage");
+	const card = cardMarkup(markup, "review");
 	assert.ok(card.indexOf("Reset these settings") < card.indexOf(">Save<"));
 	assert.match(card, /ml-auto[^>]*>(?:(?!<\/button>).)*type="submit"/s);
 });
 
 test("Save and reset look disabled while there is nothing to do", () => {
 	const markup = renderWithQueryClient(
-		<SettingsCards tab="storage" data={DATA} savers={SAVERS} />,
+		<SettingsCards tab="preferences" data={DATA} savers={SAVERS} />,
 	);
 	const save = /<button[^>]*type="submit"[^>]*>/.exec(
-		cardMarkup(markup, "storage"),
+		cardMarkup(markup, "review"),
 	)?.[0];
-	const reset = resetButton(cardMarkup(markup, "storage"));
+	const reset = resetButton(cardMarkup(markup, "review"));
 	for (const button of [save, reset]) {
 		assert.match(button ?? "", /disabled=""/);
 		assert.match(button ?? "", /disabled:opacity-50/);

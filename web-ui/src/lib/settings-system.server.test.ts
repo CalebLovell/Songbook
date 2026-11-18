@@ -16,7 +16,6 @@ test("each card can invoke only its allowlisted services", async () => {
 	const expected = {
 		station: ["birdnet_analysis.service"],
 		detection: ["birdnet_analysis.service"],
-		storage: [],
 		review: [],
 	} as const;
 	for (const [kind, services] of Object.entries(expected)) {

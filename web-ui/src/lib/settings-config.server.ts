@@ -117,24 +117,6 @@ export async function readSettingsPageValues(
 				defaults.detection.privacyThreshold,
 			),
 		}),
-		storage: parseSettingsCard("storage", {
-			fullDiskAction: values.FULL_DISK ?? defaults.storage.fullDiskAction,
-			purgeThreshold: integerValue(
-				values,
-				"PURGE_THRESHOLD",
-				defaults.storage.purgeThreshold,
-			),
-			maxFilesPerSpecies: integerValue(
-				values,
-				"MAX_FILES_SPECIES",
-				defaults.storage.maxFilesPerSpecies,
-			),
-			keepPerSpecies: integerValue(
-				values,
-				"PURGE_KEEP_PER_SPECIES",
-				defaults.storage.keepPerSpecies,
-			),
-		}),
 		highlights: parseSettingsCard("highlights", {
 			rareMax: integerValue(
 				values,
@@ -206,15 +188,6 @@ function assignmentsFor<K extends SettingsCardKind>(
 				SENSITIVITY: String(detection.sensitivity),
 				OVERLAP: String(detection.overlap),
 				PRIVACY_THRESHOLD: String(detection.privacyThreshold),
-			};
-		}
-		case "storage": {
-			const storage = value as SettingsByKind["storage"];
-			return {
-				FULL_DISK: storage.fullDiskAction,
-				PURGE_THRESHOLD: String(storage.purgeThreshold),
-				MAX_FILES_SPECIES: String(storage.maxFilesPerSpecies),
-				PURGE_KEEP_PER_SPECIES: String(storage.keepPerSpecies),
 			};
 		}
 		case "review": {

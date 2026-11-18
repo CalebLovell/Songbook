@@ -214,25 +214,13 @@ test("appends the Review setting once and defaults older files", async () => {
 
 test("appends any key an older config never carried", async () => {
 	const file = await fixtureConfig("BIRDWEATHER_ID=keep-me\n");
-	await writeSettingsCard(
-		"storage",
-		{
-			fullDiskAction: "keep",
-			purgeThreshold: 80,
-			maxFilesPerSpecies: 5,
-			keepPerSpecies: 3,
-		},
-		file,
-	);
+	await writeSettingsCard("review", { rareSpeciesMax: 12 }, file);
 	const text = await readFile(file, "utf8");
 	assert.match(text, /^BIRDWEATHER_ID=keep-me$/m);
-	assert.match(text, /^FULL_DISK=keep$/m);
-	assert.match(text, /^PURGE_THRESHOLD=80$/m);
-	assert.match(text, /^MAX_FILES_SPECIES=5$/m);
-	assert.match(text, /^PURGE_KEEP_PER_SPECIES=3$/m);
+	assert.match(text, /^REVIEW_RARE_SPECIES_MAX=12$/m);
 });
 
-test("saving a card leaves the config-only audio and recording values alone", async () => {
+test("saving a card leaves the config-only audio, recording and storage values alone", async () => {
 	const file = await fixtureConfig(
 		[
 			"REC_CARD=hw:1,0",
@@ -242,6 +230,10 @@ test("saving a card leaves the config-only audio and recording values alone", as
 			"RECORDING_LENGTH=15",
 			"EXTRACTION_LENGTH=",
 			"AUDIOFMT=mp3",
+			"FULL_DISK=keep",
+			"PURGE_THRESHOLD=80",
+			"PURGE_KEEP_PER_SPECIES=3",
+			"MAX_FILES_SPECIES=5",
 		].join("\n"),
 	);
 	await writeSettingsCard(
@@ -263,6 +255,10 @@ test("saving a card leaves the config-only audio and recording values alone", as
 	assert.match(text, /^RECORDING_LENGTH=15$/m);
 	assert.match(text, /^EXTRACTION_LENGTH=$/m);
 	assert.match(text, /^AUDIOFMT=mp3$/m);
+	assert.match(text, /^FULL_DISK=keep$/m);
+	assert.match(text, /^PURGE_THRESHOLD=80$/m);
+	assert.match(text, /^PURGE_KEEP_PER_SPECIES=3$/m);
+	assert.match(text, /^MAX_FILES_SPECIES=5$/m);
 });
 
 test("rejects newlines before writing configuration strings", async () => {

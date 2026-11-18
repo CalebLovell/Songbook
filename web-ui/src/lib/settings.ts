@@ -11,7 +11,6 @@ import {
 	savePlaybackSettings,
 	saveReviewSettings,
 	saveStationSettings,
-	saveStorageSettings,
 	saveUpdateSettings,
 } from "./settings.server.ts";
 import {
@@ -21,7 +20,6 @@ import {
 	playbackSettingsSchema,
 	reviewSettingsSchema,
 	stationSettingsSchema,
-	storageSettingsSchema,
 	updateSettingsSchema,
 } from "./settings-data.ts";
 
@@ -38,11 +36,6 @@ export const saveDetectionSettingsFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
 	.validator(detectionSettingsSchema)
 	.handler(({ data }) => saveDetectionSettings(data));
-
-export const saveStorageSettingsFn = createServerFn({ method: "POST" })
-	.middleware([requireUnlocked])
-	.validator(storageSettingsSchema)
-	.handler(({ data }) => saveStorageSettings(data));
 
 export const saveReviewSettingsFn = createServerFn({ method: "POST" })
 	.middleware([requireUnlocked])
@@ -81,7 +74,6 @@ export const restartStationFn = createServerFn({ method: "POST" })
 				.enum([
 					"station",
 					"detection",
-					"storage",
 					"review",
 					"highlights",
 					"artwork",

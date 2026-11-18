@@ -21,7 +21,6 @@ export type SettingsSystemContext = {
 const SERVICES = {
 	station: ["birdnet_analysis.service"],
 	detection: ["birdnet_analysis.service"],
-	storage: [],
 	review: [],
 	highlights: [],
 	artwork: [],

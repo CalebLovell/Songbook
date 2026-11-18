@@ -375,10 +375,10 @@ function diskDetail({
 	action,
 }: Extract<StationToDo, { kind: "disk" }>) {
 	if (action === "purge")
-		return `The disk is ${usedPercent}% full, past the ${threshold}% where old recordings get removed, so removing them isn't keeping up. Free some space on the station or keep fewer recordings.`;
+		return `The disk is ${usedPercent}% full, past the ${threshold}% where old recordings get removed, so removing them isn't keeping up. Free some space on the station, or move to a bigger SD card by downloading a backup and restoring it there.`;
 	return usedPercent >= threshold
-		? `The disk is ${usedPercent}% full, past the ${threshold}% where the station stops recording. Free some space on the station or change what happens when it fills.`
-		: `The disk is ${usedPercent}% full, and the station stops recording at ${threshold}%. Free some space on the station or change what happens when it fills.`;
+		? `The disk is ${usedPercent}% full, past the ${threshold}% where the station stops recording. Free some space on the station, or move to a bigger SD card by downloading a backup and restoring it there.`
+		: `The disk is ${usedPercent}% full, and the station stops recording at ${threshold}%. Free some space on the station, or move to a bigger SD card by downloading a backup and restoring it there.`;
 }
 
 export function describeAudioProblem(problem: AudioProblem): ToDoCopy {

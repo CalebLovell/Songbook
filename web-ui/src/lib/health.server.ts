@@ -37,10 +37,10 @@ import {
 	parseBirdnetConfig,
 	resolveSettingsPath,
 } from "~/lib/settings-config.server.ts";
-import { SETTINGS_DEFAULTS } from "~/lib/settings-data.ts";
 import { readAnalyzerState } from "~/lib/station-status.server.ts";
 
 const DEFAULT_RECORDING_LENGTH_SECONDS = 15;
+const DEFAULT_PURGE_THRESHOLD = 95;
 
 type DiskReading = { usedPercent: number | null; freeBytes: number | null };
 
@@ -185,10 +185,7 @@ export async function loadStationHealth({
 		hostname: hostname(),
 		diskUsedPercent: disk.usedPercent,
 		purgeThreshold: config
-			? positiveNumber(
-					config.PURGE_THRESHOLD,
-					SETTINGS_DEFAULTS.storage.purgeThreshold,
-				)
+			? positiveNumber(config.PURGE_THRESHOLD, DEFAULT_PURGE_THRESHOLD)
 			: null,
 		fullDiskAction: config?.FULL_DISK === "keep" ? "keep" : "purge",
 	};

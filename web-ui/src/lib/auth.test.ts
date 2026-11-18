@@ -24,7 +24,6 @@ import {
 	saveDetectionSettingsFn,
 	saveReviewSettingsFn,
 	saveStationSettingsFn,
-	saveStorageSettingsFn,
 } from "./settings.ts";
 import { getSpeciesFilterPage, saveSpeciesFilter } from "./species-filter.ts";
 import { powerStationFn } from "./station-power.ts";
@@ -55,7 +54,6 @@ test("every gated server function carries requireUnlocked", () => {
 	void saveDetectionSettingsFn;
 	void saveReviewSettingsFn;
 	void saveStationSettingsFn;
-	void saveStorageSettingsFn;
 	void confirmReviewDetection;
 	void deleteReviewDetection;
 	void recategorizeReviewDetection;
@@ -70,7 +68,6 @@ test("every gated server function carries requireUnlocked", () => {
 	for (const name of [
 		"saveStationSettingsFn",
 		"saveDetectionSettingsFn",
-		"saveStorageSettingsFn",
 		"saveReviewSettingsFn",
 		"resetSettingsFn",
 		"restartStationFn",

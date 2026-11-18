@@ -17,7 +17,6 @@ import {
 	type SettingsCardKind,
 	type SettingsPageData,
 	type SettingsSaveResult,
-	type StorageSettings,
 } from "~/lib/settings-data.ts";
 import { errorMessage } from "~/lib/utils.ts";
 import { RestartButton } from "./restart-button.tsx";
@@ -32,7 +31,6 @@ type CardRestarter = () => Promise<{ message: string }>;
 
 export type SettingsSavers = {
 	detection?: Saver<DetectionSettings>;
-	storage?: Saver<StorageSettings>;
 	review?: Saver<ReviewSettings>;
 	highlights?: Saver<HighlightSettings>;
 	artwork?: Saver<ArtworkSettings>;
@@ -316,13 +314,6 @@ export function SettingsCards({
 				restart={restartFor("detection")}
 			/>
 		),
-		storage: (
-			<StorageCard
-				initial={data.storage}
-				save={savers.storage}
-				restart={restartFor("storage")}
-			/>
-		),
 		preferences: (
 			<div className="space-y-page">
 				<ArtworkSettingsCard
@@ -490,110 +481,6 @@ function DetectionCard({
 						form.setValues({
 							...form.values,
 							privacyThreshold: numberOr(event, form.values.privacyThreshold),
-						})
-					}
-				/>
-			</Field>
-		</SettingsCard>
-	);
-}
-
-function StorageCard({
-	initial,
-	save,
-	restart,
-}: {
-	initial: StorageSettings;
-	save?: Saver<StorageSettings>;
-	restart?: CardRestarter;
-}) {
-	const form = useCardSave(
-		"Storage",
-		initial,
-		save,
-		restart,
-		SETTINGS_DEFAULTS.storage as StorageSettings,
-	);
-	return (
-		<SettingsCard
-			title="Storage"
-			description="Decide what happens as the station fills its disk."
-			onSave={() => void form.submit()}
-			reset={resetControl(form)}
-			restart={restartControl(form)}
-			saveDisabled={form.saveDisabled}
-		>
-			<Field
-				label="When the disk fills"
-				hint={
-					form.values.fullDiskAction === "purge"
-						? "Removes the least confident recordings once the threshold is crossed. Detections stay."
-						: "Stops core services when space runs out instead of deleting recordings."
-				}
-			>
-				<FieldChoice
-					value={form.values.fullDiskAction}
-					options={[
-						{ value: "purge", label: "Purge old data" },
-						{ value: "keep", label: "Keep all data" },
-					]}
-					onChange={(fullDiskAction) =>
-						form.setValues({ ...form.values, fullDiskAction })
-					}
-				/>
-			</Field>
-			<Field
-				label="Disk-used threshold"
-				hint="How full the disk gets before that action runs."
-			>
-				<FieldInput
-					type="number"
-					min={20}
-					max={99}
-					required
-					unit="%"
-					value={form.values.purgeThreshold}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							purgeThreshold: numberOr(event, form.values.purgeThreshold),
-						})
-					}
-				/>
-			</Field>
-			<Field
-				label="Recordings always kept per species"
-				hint="A purge never takes a species below its most confident recordings."
-			>
-				<FieldInput
-					type="number"
-					min={0}
-					required
-					value={form.values.keepPerSpecies}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							keepPerSpecies: numberOr(event, form.values.keepPerSpecies),
-						})
-					}
-				/>
-			</Field>
-			<Field
-				label="Maximum files per species"
-				hint="0 keeps every recording, subject to disk-full handling."
-			>
-				<FieldInput
-					type="number"
-					min={0}
-					required
-					value={form.values.maxFilesPerSpecies}
-					onChange={(event) =>
-						form.setValues({
-							...form.values,
-							maxFilesPerSpecies: numberOr(
-								event,
-								form.values.maxFilesPerSpecies,
-							),
 						})
 					}
 				/>

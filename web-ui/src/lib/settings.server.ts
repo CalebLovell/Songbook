@@ -24,7 +24,6 @@ import {
 	type SettingsPageData,
 	type SettingsSaveResult,
 	type StationSettings,
-	type StorageSettings,
 	type UpdateSettings,
 } from "./settings-data.ts";
 import {
@@ -139,13 +138,6 @@ export function saveDetectionSettings(
 	dependencies: SettingsServerDependencies = {},
 ) {
 	return saveSettings("detection", input, dependencies);
-}
-
-export function saveStorageSettings(
-	input: StorageSettings,
-	dependencies: SettingsServerDependencies = {},
-) {
-	return saveSettings("storage", input, dependencies);
 }
 
 export function saveReviewSettings(

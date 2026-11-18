@@ -2,7 +2,6 @@ import type { LucideIcon } from "lucide-react";
 import {
 	Database,
 	FileDown,
-	HardDrive,
 	Heart,
 	Image,
 	RotateCcw,
@@ -14,12 +13,7 @@ import {
 
 import type { SearchSetting } from "~/lib/site-search.ts";
 
-export const SETTINGS_TABS = [
-	"detection",
-	"preferences",
-	"storage",
-	"data",
-] as const;
+export const SETTINGS_TABS = ["detection", "preferences", "data"] as const;
 
 export type SettingsTab = (typeof SETTINGS_TABS)[number];
 
@@ -95,20 +89,6 @@ const PREFERENCE_CARDS: SettingsIndexEntry[] = [
 	},
 ];
 
-const SYSTEM_CARDS: SettingsIndexEntry[] = [
-	{
-		title: "Storage",
-		tab: "storage",
-		icon: HardDrive,
-		fields: [
-			"When the disk fills",
-			"Disk-used threshold",
-			"Maximum files per species",
-		],
-		keywords: ["disk", "purge"],
-	},
-];
-
 const DATA_CARDS: SettingsIndexEntry[] = [
 	{
 		title: "Restore",
@@ -129,7 +109,6 @@ const DATA_CARDS: SettingsIndexEntry[] = [
 export const SETTINGS_INDEX: SettingsIndexEntry[] = [
 	...CORE_CARDS,
 	...PREFERENCE_CARDS,
-	...SYSTEM_CARDS,
 	...DATA_CARDS,
 ];
 
@@ -139,6 +118,5 @@ export const SETTINGS_SECTIONS: Pick<
 >[] = [
 	...CORE_CARDS,
 	{ title: "Preferences", tab: "preferences", icon: Heart },
-	...SYSTEM_CARDS,
 	{ title: "Data", tab: "data", icon: Database },
 ];
