@@ -24,7 +24,7 @@ Pi.
 
 ## Quick start
 
-You need a Raspberry Pi 5, 4B or 3B+ running Raspberry Pi OS Lite (64-bit), and a USB microphone.
+You need one Raspberry Pi (a 5, 4B or 3B+) running Raspberry Pi OS Lite (64-bit), and a USB microphone.
 On the Pi, run:
 
 ```bash

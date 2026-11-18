@@ -23,7 +23,24 @@ detection from a live bird. Please open an issue if anything differs for you.
 
 ## What you need
 
-- **A Raspberry Pi 5, 4B or 3B+.** The [BirdNET-Pi page at Cornell](https://birdnet.cornell.edu/birdnet-pi/)
+### What we've tested
+
+A station is **one Raspberry Pi** with one case, memory card and microphone. Several Pi models
+work, so the table lists each one we've tried; pick any one of them. One full station is verified
+so far, and the rest is marked as it goes through this guide.
+
+| Part | What we used | Status |
+| --- | --- | --- |
+| Raspberry Pi | [Raspberry Pi 3 Model B+](https://www.pishop.us/product/raspberry-pi-3-model-b-plus/) | Works. Installed in about 10 minutes, analyses each recording in about 2.6 s. |
+| Raspberry Pi | [Raspberry Pi 4 Model B, 1 GB](https://www.pishop.us/product/raspberry-pi-4-model-b-1gb/) | Not tested yet. 1 GB was enough on the 3B+. |
+| Case | [Miuzei case](https://www.amazon.com/stores/Miuzei/page/8572E409-B226-42AA-AEF9-99D89C6E2E3D) for Raspberry Pi 3, with fan, heatsinks and power supply | Works. Fan on 3.3 V, about 36 °C while running. |
+| Case | [Miuzei case](https://www.amazon.com/stores/Miuzei/page/8572E409-B226-42AA-AEF9-99D89C6E2E3D) for Raspberry Pi 4, with fan, heatsinks and power supply | Not tested yet. |
+| Memory card | [SanDisk Ultra 32 GB microSDHC](https://www.amazon.com/dp/B08GY9NYRM) | Recommended single card. Our station runs on a PNY Elite 32 GB from a multipack, which works; this SanDisk card isn't tested yet. A high-endurance card lasts longer in a station that writes all day. |
+| Microphone | [Movo M1 USB lavalier microphone](https://www.amazon.com/dp/B0176NRE1G) | Works. Shows up as "KTMicro UAC 1.0 Microphone" and records in mono. A quiet room peaked around −42 dB; how well it picks up distant birds is not tested yet. |
+
+### Choosing your own
+
+- **One Raspberry Pi: a 5, 4B or 3B+.** The [BirdNET-Pi page at Cornell](https://birdnet.cornell.edu/birdnet-pi/)
   recommends the 5 and 4B. A 3B+ works: in our run it analysed each 15-second recording in about
   2.6 seconds and had about 400 MB of memory to spare. Songbook needs a 64-bit OS.
 - **A microSD card, high-endurance, 32 GB or larger.** 64 GB gives more room for recordings, as
