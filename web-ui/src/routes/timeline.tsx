@@ -11,7 +11,7 @@ import {
 	LayoutDashboard,
 	List,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { z } from "zod";
 import {
 	CollageCard,
@@ -66,6 +66,10 @@ import {
 	timelineTotals,
 } from "~/lib/timeline-share.ts";
 import {
+	loadTimelineView,
+	saveTimelineView,
+} from "~/lib/timeline-view-preference.ts";
+import {
 	currentAnchor,
 	isValidAnchor,
 	spelledDate,
@@ -84,7 +88,7 @@ const timelineSearchSchema = z.object({
 		.enum(TIMELINE_PERIODS)
 		.default(DEFAULT_PERIOD)
 		.catch(DEFAULT_PERIOD),
-	view: z.enum(TIMELINE_VIEWS).default(DEFAULT_VIEW).catch(DEFAULT_VIEW),
+	view: z.enum(TIMELINE_VIEWS).optional().catch(undefined),
 	date: z.coerce.string().optional().catch(undefined),
 });
 
@@ -118,7 +122,8 @@ export const Route = createFileRoute("/timeline")({
 
 function Timeline() {
 	const search = Route.useSearch();
-	const { period, view } = search;
+	const { period } = search;
+	const view = search.view ?? DEFAULT_VIEW;
 	const anchor = resolveAnchor(period, search.date);
 	const page = useQuery({
 		...timelineQuery({ period, anchor }),
@@ -139,6 +144,19 @@ function Timeline() {
 			resetScroll: false,
 		});
 
+	const urlNamesView = search.view !== undefined;
+	useEffect(() => {
+		if (urlNamesView) return;
+		const saved = loadTimelineView(TIMELINE_VIEWS);
+		if (saved && saved !== DEFAULT_VIEW) {
+			navigate({
+				search: (prev) => ({ ...prev, view: saved }),
+				replace: true,
+				resetScroll: false,
+			});
+		}
+	}, [urlNamesView, navigate]);
+
 	if (current?.body.kind === "not-a-date") {
 		return <NotADate date={anchor} />;
 	}
@@ -154,7 +172,10 @@ function Timeline() {
 					viewSwitch={
 						<ViewToggle
 							view={view}
-							onViewChange={(next) => show({ view: next })}
+							onViewChange={(next) => {
+								saveTimelineView(next);
+								show({ view: next });
+							}}
 						/>
 					}
 					onChange={show}
