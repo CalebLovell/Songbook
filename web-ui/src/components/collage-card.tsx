@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Dices } from "lucide-react";
 import {
 	type ReactNode,
 	useContext,
@@ -8,16 +7,18 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { CARD_HEADER_CLASS } from "~/components/card-header.tsx";
+import {
+	CARD_HEADER_CLASS,
+	CARD_HEADER_TEXT_BUTTON_CLASS,
+} from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import {
 	ArtworkPreferenceContext,
 	SpeciesImage,
 } from "~/components/species-image.tsx";
-import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
-import { ShellBar, ShellSized } from "~/components/ui/shell.tsx";
+import { ShellSized } from "~/components/ui/shell.tsx";
 import {
 	type CollageSource,
 	collageBirdsFrom,
@@ -44,7 +45,7 @@ const COLLAGE_FILLED_CLASS =
 	"h-[clamp(28rem,70vh,48rem)] xl:h-[calc(100dvh_-_var(--masthead-h)_-_2.125rem_-_4*var(--page-gap))] xl:min-h-[28rem]";
 const COLLAGE_AREA_CLASS = "relative mt-page flex-1";
 const RESIZE_SETTLE_MS = 150;
-const POP_SPREAD_MS = 60;
+const POP_SPREAD_MS = 1200;
 
 const DEFAULT_TITLE = "Collage";
 
@@ -72,14 +73,13 @@ function CollageHeader({
 
 function ReshuffleButton({ onClick }: { onClick?: () => void }) {
 	return (
-		<Button
-			variant="outline"
-			size="icon-xs"
-			icon={Dices}
-			aria-label="Reshuffle"
-			title="Reshuffle"
+		<button
+			type="button"
+			className={CARD_HEADER_TEXT_BUTTON_CLASS}
 			onClick={onClick}
-		/>
+		>
+			Reshuffle
+		</button>
 	);
 }
 
@@ -109,15 +109,13 @@ export function CollageCardSkeleton({
 				action={
 					trailing ??
 					(reshuffle ? (
-						<ShellSized className="rounded-md">
+						<ShellSized className="rounded-sm">
 							<ReshuffleButton />
 						</ShellSized>
 					) : null)
 				}
 			/>
-			<div data-entrance="own" className={COLLAGE_AREA_CLASS}>
-				<ShellBar className="size-full rounded-md" />
-			</div>
+			<div data-entrance="own" className={COLLAGE_AREA_CLASS} />
 		</Card>
 	);
 }
@@ -181,7 +179,7 @@ export function CollageCard({
 			) : birds.length === 0 ? (
 				<EmptyNote>{EMPTY.window.collageUnpainted}</EmptyNote>
 			) : (
-				<CollageArea birds={birds} />
+				<CollageArea key={mixSeed} birds={birds} />
 			)}
 		</Card>
 	);
@@ -220,6 +218,11 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 	};
 
 	const byKey = new Map(birds.map((bird, index) => [bird.comName, index]));
+	const popRolls = useRef(new Map<string, number>());
+	const popDelays = useMemo(
+		() => randomPopDelays(layout?.placements ?? [], popRolls.current),
+		[layout],
+	);
 
 	return (
 		// biome-ignore lint/a11y/useKeyWithClickEvents: each bird is also a focusable link; the area only hit-tests silhouettes for the pointer
@@ -242,7 +245,7 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 		>
 			{layout ? (
 				<ul aria-label="Birds" className="absolute inset-0">
-					{layout.placements.map((placement, order) => {
+					{layout.placements.map((placement) => {
 						const index = byKey.get(placement.key) ?? -1;
 						const bird = birds[index];
 						if (!bird) return null;
@@ -255,7 +258,7 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 									lifted && "z-10",
 								)}
 								style={{
-									animationDelay: `${popDelay(order, layout.placements.length)}ms`,
+									animationDelay: `${popDelays.get(placement.key) ?? 0}ms`,
 									left: placement.x,
 									top: placement.y,
 									width: placement.width,
@@ -309,17 +312,30 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 					areaWidth={size.width}
 				/>
 			) : null}
-			{layout ? null : (
-				<div aria-busy="true" className="absolute inset-0">
-					<ShellBar className="size-full rounded-md" />
-				</div>
-			)}
+			{layout ? null : <div aria-busy="true" className="absolute inset-0" />}
 		</div>
 	);
 }
 
-function popDelay(order: number, count: number) {
-	return count > 1 ? Math.round((order / (count - 1)) * POP_SPREAD_MS) : 0;
+function randomPopDelays(
+	placements: readonly CollagePlacement[],
+	rolls: Map<string, number>,
+): Map<string, number> {
+	const rollFor = (key: string) => {
+		const roll = rolls.get(key) ?? Math.random();
+		rolls.set(key, roll);
+		return roll;
+	};
+	const sequence = [...placements].sort(
+		(a, b) => rollFor(a.key) - rollFor(b.key),
+	);
+	const last = Math.max(1, sequence.length - 1);
+	return new Map(
+		sequence.map((placement, rank) => [
+			placement.key,
+			Math.round((rank / last) * POP_SPREAD_MS),
+		]),
+	);
 }
 
 const POPUP_GAP = 6;

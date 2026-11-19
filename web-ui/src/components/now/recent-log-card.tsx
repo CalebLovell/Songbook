@@ -1,7 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
-import { CardHeader } from "~/components/card-header.tsx";
+import {
+	CARD_HEADER_LINK_CLASS,
+	CardHeader,
+} from "~/components/card-header.tsx";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
@@ -25,8 +28,6 @@ const ROW_BUTTON = {
 	labelClassName: "@min-[26rem]:inline hidden",
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
-const HEADER_LINK_CLASS =
-	"inline-flex items-center gap-1 text-xs no-underline hover:underline";
 
 function RecentLogHeader({ day, date }: { day: ShownDay; date?: string }) {
 	return (
@@ -34,7 +35,7 @@ function RecentLogHeader({ day, date }: { day: ShownDay; date?: string }) {
 			<Link
 				to="/timeline"
 				search={date ? { period: "day", date } : undefined}
-				className={HEADER_LINK_CLASS}
+				className={CARD_HEADER_LINK_CLASS}
 			>
 				All of {day}
 				<ArrowRight aria-hidden className="size-3" />

@@ -240,9 +240,11 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   shown when there is some (`useLastDefined`, so a pull to refresh keeps its
   shape), else a typical sample.
   No animation between the two: shells show from the first frame and content
-  replaces them in place. The collage is the one exception: its skeleton holds until every
-  painting is decoded, then the birds pop in in layout order (140ms each, spread
-  over 60ms, so about 200ms in all).
+  replaces them in place. The collage is the one exception: its picture area draws no shell
+  (the birds' pop-in is its loading cue), stays empty until every painting is
+  decoded, then the birds pop in in a random order, kept for the
+  life of the layout so a resize doesn't reorder them (500ms each, starts
+  spread over 1s). A reshuffle pops them in again in a fresh order.
 - **Keyboard**: every page opens with a skip link, and a page change moves focus to
   `main` (tabindex -1, never ringed) and speaks the title. A scroll key with nothing
   focused goes to `main`, the only scroller. Page-wide single-key shortcuts ignore
@@ -288,8 +290,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   70% were compared), spread evenly across sizes by ranking the birds by
   detections, cutting them into one band per flier and flying one random bird
   in each band (`lib/collage-birds.ts`). A new draw is made each time the card
-  loads, and the Reshuffle icon button (dice, no text) at the right of its
-  header draws again. A station that prefers photos gets a photo mosaic instead:
+  loads, and a "Reshuffle" text button at the right of its header draws
+  again, styled like the "All of today" header link
+  (`CARD_HEADER_TEXT_BUTTON_CLASS`). A station that prefers photos gets a photo mosaic instead:
   every bird in the window as its photo, a rounded square (the photos aren't
   cutouts, so they can't nest), sized and packed the same way, with the muted
   bird glyph where there's no photo. No bird flies and there is no Reshuffle.
