@@ -108,7 +108,7 @@ export function highlightGuide(
 		{
 			kind: "activity",
 			name: "Trend",
-			meaning: `Activity compared with ${unit.last}.`,
+			meaning: `Activity vs. ${period === "day" ? "the previous 24 hours" : unit.last}.`,
 		},
 		busiest,
 		{ kind: "new", name: "New", meaning: "First record ever." },
@@ -145,7 +145,7 @@ export function highlightGuide(
 		{
 			kind: "routine",
 			name: "Gone quiet",
-			meaning: "A regular that has stopped singing.",
+			meaning: "A regular that stopped singing.",
 		},
 	];
 }
