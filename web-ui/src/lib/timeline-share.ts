@@ -1,6 +1,6 @@
 import type { Highlight } from "~/lib/highlights-data.ts";
 import { formatHighlightLines } from "~/lib/highlights-share.ts";
-import { shareHeader, shareTopBird, shareTotals } from "~/lib/share-card.ts";
+import { shareHeader, sharePodium, shareTotals } from "~/lib/share-card.ts";
 import type { TimelinePeriod } from "~/lib/timeline-periods.ts";
 
 const HOURS = 24;
@@ -37,6 +37,23 @@ function hourTotals(rows: TimelineShareRow[]): number[] {
 	return totals;
 }
 
+export function timelineTotals(rows: TimelineShareRow[]): {
+	species: number;
+	detections: number;
+	peakHour: number | null;
+} {
+	const byHour = hourTotals(rows);
+	const peakHour = byHour.reduce(
+		(best, count, hour) => (count > byHour[best] ? hour : best),
+		0,
+	);
+	return {
+		species: rows.length,
+		detections: rows.reduce((sum, row) => sum + row.totalDetections, 0),
+		peakHour: byHour[peakHour] > 0 ? peakHour : null,
+	};
+}
+
 export function formatTimelineShareCard(card: TimelineShareCard): string {
 	const { period, rows } = card;
 	const header = shareHeader(card.heading, card.stationName);
@@ -45,22 +62,12 @@ export function formatTimelineShareCard(card: TimelineShareCard): string {
 		return `${header}\n🤫  Nothing heard ${PERIOD_NOUN[period]}.`;
 	}
 
-	const detections = rows.reduce((sum, row) => sum + row.totalDetections, 0);
-	const byHour = hourTotals(rows);
-
-	const peakHour = byHour.reduce(
-		(best, count, hour) => (count > byHour[best] ? hour : best),
-		0,
-	);
-
 	const totals = shareTotals({
-		species: rows.length,
-		detections,
-		peakHour: byHour[peakHour] > 0 ? peakHour : null,
+		...timelineTotals(rows),
 		highlights: card.highlights,
 	});
 
-	const topBird = shareTopBird(
+	const podium = sharePodium(
 		[...rows]
 			.sort((a, b) => b.totalDetections - a.totalDetections)
 			.map((row) => ({ comName: row.comName, count: row.totalDetections })),
@@ -72,7 +79,7 @@ export function formatTimelineShareCard(card: TimelineShareCard): string {
 		header,
 		"",
 		...totals,
-		...topBird,
+		...podium,
 		...(highlights.length > 0 ? ["", ...highlights] : []),
 	].join("\n");
 }

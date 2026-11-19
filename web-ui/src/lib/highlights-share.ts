@@ -1,5 +1,7 @@
 import type { Highlight, SpeciesHighlightKind } from "~/lib/highlights-data.ts";
 
+type ActivityDirection = Extract<Highlight, { kind: "activity" }>["direction"];
+
 const SPECIES_LEADS: Record<
 	SpeciesHighlightKind,
 	{ emoji: string; name: string }
@@ -13,26 +15,57 @@ const SPECIES_LEADS: Record<
 	"after-dark": { emoji: "🌙", name: "After dark" },
 };
 
-export function formatActivityLines(highlights: Highlight[]): string[] {
+const ACTIVITY_EMOJI: Record<ActivityDirection, string> = {
+	up: "📈",
+	down: "📉",
+	level: "➡️",
+};
+
+export type ShareHighlightLine = {
+	emoji: string;
+	lead: string | null;
+	bird: string | null;
+	text: string;
+};
+
+export function activityLines(highlights: Highlight[]): ShareHighlightLine[] {
 	return highlights.flatMap((highlight) => {
 		if (highlight.kind !== "activity") return [];
 		const { direction, percent, baselineLabel } = highlight;
-		if (direction === "level") return [`➡️  The same as ${baselineLabel}`];
-		return [
-			`${direction === "up" ? "📈  Up" : "📉  Down"} ${percent}% from ${baselineLabel}`,
-		];
+		const text =
+			direction === "level"
+				? `The same as ${baselineLabel}`
+				: `${direction === "up" ? "Up" : "Down"} ${percent}% from ${baselineLabel}`;
+		return [{ emoji: ACTIVITY_EMOJI[direction], lead: null, bird: null, text }];
 	});
 }
 
-export function formatHighlightLines(highlights: Highlight[]): string[] {
+export function speciesLines(highlights: Highlight[]): ShareHighlightLine[] {
 	return highlights.flatMap((highlight) => {
 		if (!("birds" in highlight)) return [];
 		const [lead] = highlight.birds;
 		if (!lead) return [];
+		const more = highlight.total - 1;
 		const { emoji, name } = SPECIES_LEADS[highlight.kind];
-		const rest = highlight.total - 1;
 		return [
-			`${emoji}  ${name} · ${lead.comName}${rest > 0 ? ` +${rest.toLocaleString()}` : ""}`,
+			{
+				emoji,
+				lead: name,
+				bird: lead.comName,
+				text: `${lead.comName}${more > 0 ? ` +${more.toLocaleString()}` : ""}`,
+			},
 		];
 	});
+}
+
+export function formatShareLine({ emoji, lead, text }: ShareHighlightLine) {
+	return `${emoji}  ${lead ? `${lead} · ` : ""}${text}`;
+}
+
+export function formatActivityLines(highlights: Highlight[]): string[] {
+	return activityLines(highlights).map(formatShareLine);
+}
+
+export function formatHighlightLines(highlights: Highlight[]): string[] {
+	return speciesLines(highlights).map(formatShareLine);
 }

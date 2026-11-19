@@ -28,6 +28,13 @@ function dateLabel(date: string): string {
 	});
 }
 
+export const PODIUM_SIZE = 3;
+const MEDALS = ["🥇", "🥈", "🥉"];
+
+export function shareTitle(period: string): string {
+	return `${period} Summary`;
+}
+
 export function shareHeader(
 	[period, date]: string[],
 	stationName?: string,
@@ -35,7 +42,7 @@ export function shareHeader(
 	return [
 		"📖  Songbook",
 		...(stationName ? [`📍  ${stationName}`] : []),
-		`📅  ${[`${period} Summary`, ...(date ? [date] : [])].join(" · ")}`,
+		`📅  ${[shareTitle(period), ...(date ? [date] : [])].join(" · ")}`,
 	].join("\n");
 }
 
@@ -57,11 +64,15 @@ export function shareTotals({
 	];
 }
 
-export function shareTopBird(
+export function sharePodium(
 	ranked: { comName: string; count: number }[],
 ): string[] {
-	const [top] = ranked;
-	return top ? [`🥇  ${top.comName} · ${top.count.toLocaleString()}`] : [];
+	return ranked
+		.slice(0, PODIUM_SIZE)
+		.map(
+			(bird, place) =>
+				`${MEDALS[place]}  ${bird.comName} · ${bird.count.toLocaleString()}`,
+		);
 }
 
 export function formatShareCard(card: ShareCard): string {
@@ -92,7 +103,7 @@ export function formatShareCard(card: ShareCard): string {
 		header,
 		"",
 		...totals,
-		...shareTopBird(card.topSpecies),
+		...sharePodium(card.topSpecies),
 		...(highlights.length > 0 ? ["", ...highlights] : []),
 	].join("\n");
 }

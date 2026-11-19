@@ -23,7 +23,11 @@ import {
 } from "~/components/detections-by-hour-card.tsx";
 import { HighlightsCard } from "~/components/highlights-card.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
-import { ShareButton, useShare } from "~/components/share-button.tsx";
+import {
+	ShareButton,
+	type ShareContent,
+	useShare,
+} from "~/components/share-button.tsx";
 import { InMenuBar } from "~/components/sidebar/mobile-nav.tsx";
 import {
 	SpeciesByHourCard,
@@ -57,7 +61,10 @@ import {
 	TIMELINE_PERIODS,
 	type TimelinePeriod,
 } from "~/lib/timeline-periods.ts";
-import { formatTimelineShareCard } from "~/lib/timeline-share.ts";
+import {
+	formatTimelineShareCard,
+	timelineTotals,
+} from "~/lib/timeline-share.ts";
 import {
 	currentAnchor,
 	isValidAnchor,
@@ -263,21 +270,46 @@ function TimelineHeader({
 	const toolbarData = data ?? staleData;
 	const { auth } = useRouteContext({ from: "__root__" });
 
-	const loadShare = async () =>
-		period === "day"
-			? formatShareCard({
-					...(await getDayShareCard({ data: anchor })),
+	const loadShare = async (): Promise<ShareContent> => {
+		const heading = headerLines(period, anchor);
+		const stationName = auth.siteName;
+		const birds = rows.map((row) => ({
+			comName: row.comName,
+			sciName: row.sciName,
+			count: row.totalDetections,
+		}));
+		if (period === "day") {
+			const day = await getDayShareCard({ data: anchor });
+			return {
+				text: formatShareCard({ ...day, highlights, heading, stationName }),
+				image: {
+					heading,
+					stationName,
+					species: day.species,
+					detections: day.detections,
+					peakHour: day.busiestHour?.hour ?? null,
+					birds,
 					highlights,
-					heading: headerLines(period, anchor),
-					stationName: auth.siteName,
-				})
-			: formatTimelineShareCard({
-					period,
-					heading: headerLines(period, anchor),
-					rows,
-					highlights,
-					stationName: auth.siteName,
-				});
+				},
+			};
+		}
+		return {
+			text: formatTimelineShareCard({
+				period,
+				heading,
+				rows,
+				highlights,
+				stationName,
+			}),
+			image: {
+				heading,
+				stationName,
+				...timelineTotals(rows),
+				birds,
+				highlights,
+			},
+		};
+	};
 	const share = useShare({
 		subject: `${period}:${anchor}`,
 		hasData: data !== null,

@@ -4,7 +4,7 @@ import test from "node:test";
 import { formatShareCard } from "./share-card.ts";
 import { formatTimelineShareCard } from "./timeline-share.ts";
 
-test("day share card keeps one line per highlight and only the top bird", () => {
+test("day share card keeps one line per highlight and the top three birds", () => {
 	const text = formatShareCard({
 		date: "2026-11-10",
 		window: "day",
@@ -13,6 +13,8 @@ test("day share card keeps one line per highlight and only the top bird", () => 
 		topSpecies: [
 			{ comName: "Carolina Wren", count: 312 },
 			{ comName: "Northern Cardinal", count: 204 },
+			{ comName: "Blue Jay", count: 170 },
+			{ comName: "Tufted Titmouse", count: 90 },
 		],
 		busiestHour: { hour: 7, count: 200 },
 		heading: ["Day", "Mon, Nov 10"],
@@ -53,6 +55,8 @@ test("day share card keeps one line per highlight and only the top bird", () => 
 			"🌅  Peak hour · 7 AM",
 			"📈  Up 18% from yesterday",
 			"🥇  Carolina Wren · 312",
+			"🥈  Northern Cardinal · 204",
+			"🥉  Blue Jay · 170",
 			"",
 			"🐣  New · Fox Sparrow",
 			"🏠  Regulars · Carolina Wren +10",

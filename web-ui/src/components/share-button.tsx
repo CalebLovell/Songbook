@@ -1,8 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { Check, Copy, RotateCw, Share2, X } from "lucide-react";
+import {
+	Check,
+	Copy,
+	FileText,
+	Image,
+	RotateCw,
+	Share2,
+	X,
+} from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useEffect, useRef, useState } from "react";
-
+import { ShareImagePanel } from "~/components/share-image-panel.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { CARD_CLASS } from "~/components/ui/card.tsx";
 import {
@@ -13,7 +21,13 @@ import {
 } from "~/components/ui/confirm-dialog.tsx";
 import { ShellLines } from "~/components/ui/shell.tsx";
 import { toast } from "~/components/ui/toaster.tsx";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import { copyText } from "~/lib/copy-text.ts";
+import {
+	buildShareImage,
+	type ShareImageInput,
+	type ShareImageModel,
+} from "~/lib/share-image.ts";
 import { cn } from "~/lib/utils.ts";
 
 const COPIED_FEEDBACK_MS = 2_000;
@@ -36,9 +50,13 @@ function hasShareSheet(): boolean {
 	);
 }
 
+export type ShareContent = { text: string; image: ShareImageInput | null };
+
+type ShareFormat = "text" | "image";
+
 type ShareSummary =
 	| { status: "loading" }
-	| { status: "ready"; text: string }
+	| { status: "ready"; text: string; image: ShareImageModel | null }
 	| { status: "failed" };
 
 export type ShareState = {
@@ -54,23 +72,26 @@ export function useShare({
 }: {
 	subject: string;
 	hasData: boolean;
-	load: () => Promise<string>;
+	load: () => Promise<ShareContent>;
 }): ShareState {
 	const {
-		data: text,
+		data: content,
 		isError,
 		isFetching,
 		refetch,
 	} = useQuery({
 		queryKey: ["share-summary", subject],
-		queryFn: load,
+		queryFn: async () => {
+			const { text, image } = await load();
+			return { text, image: image ? buildShareImage(image) : null };
+		},
 		enabled: hasData,
 		staleTime: Number.POSITIVE_INFINITY,
 		gcTime: 0,
 	});
 
 	let summary: ShareSummary = { status: "loading" };
-	if (text !== undefined) summary = { status: "ready", text };
+	if (content !== undefined) summary = { status: "ready", ...content };
 	else if (isError && !isFetching) summary = { status: "failed" };
 
 	return {
@@ -83,6 +104,8 @@ export function useShare({
 function ShareDialogContent({ state }: { state: ShareState }) {
 	const { summary } = state;
 	const text = summary.status === "ready" ? summary.text : null;
+	const image = summary.status === "ready" ? summary.image : null;
+	const [format, setFormat] = useState<ShareFormat>("text");
 	const contentRef = useRef<HTMLDivElement>(null);
 	const primaryRef = useRef<HTMLButtonElement>(null);
 	const [justCopied, setJustCopied] = useState(false);
@@ -143,61 +166,92 @@ function ShareDialogContent({ state }: { state: ShareState }) {
 						</Dialog.Close>
 					</div>
 
-					<div
-						data-testid="share-preview"
-						aria-busy={summary.status === "loading"}
-						className="min-h-0 overflow-y-auto whitespace-pre-wrap rounded-md border border-line bg-meadow p-page text-sm leading-relaxed"
-					>
-						{summary.status === "ready" && summary.text}
-						{summary.status === "loading" && (
-							<ShellLines widths={SUMMARY_SHELL_WIDTHS} />
-						)}
-						{summary.status === "failed" && (
-							<span className="text-muted-foreground">
-								Could not build the summary.
-							</span>
-						)}
-					</div>
+					{image && (
+						<ToggleGroup
+							type="single"
+							variant="outline"
+							aria-label="Share as"
+							className="w-full"
+							value={format}
+							onValueChange={(next) => {
+								if (next) setFormat(next as ShareFormat);
+							}}
+						>
+							<ToggleGroupItem value="text" className="flex-1 gap-1.5">
+								<FileText aria-hidden="true" />
+								Text
+							</ToggleGroupItem>
+							<ToggleGroupItem value="image" className="flex-1 gap-1.5">
+								<Image aria-hidden="true" />
+								Image
+							</ToggleGroupItem>
+						</ToggleGroup>
+					)}
 
-					<div className={MODAL_ACTIONS_CLASS}>
-						{summary.status === "failed" ? (
-							<Button
-								type="button"
-								size="default"
-								icon={RotateCw}
-								onClick={state.retry}
+					{image && (
+						<div className={format === "image" ? "contents" : "hidden"}>
+							<ShareImagePanel model={image} />
+						</div>
+					)}
+					{(!image || format === "text") && (
+						<>
+							<div
+								data-testid="share-preview"
+								aria-busy={summary.status === "loading"}
+								className="min-h-0 overflow-y-auto whitespace-pre-wrap rounded-md border border-line bg-meadow p-page text-sm leading-relaxed"
 							>
-								Try again
-							</Button>
-						) : (
-							<>
-								<Button
-									ref={offerShareSheet ? undefined : primaryRef}
-									type="button"
-									size="default"
-									variant={offerShareSheet ? "outline" : "default"}
-									icon={justCopied ? Check : Copy}
-									loading={text === null}
-									onClick={copy}
-									className={COPY_BUTTON_CLASS}
-								>
-									{justCopied ? "Copied" : "Copy"}
-								</Button>
-								{offerShareSheet && (
+								{summary.status === "ready" && summary.text}
+								{summary.status === "loading" && (
+									<ShellLines widths={SUMMARY_SHELL_WIDTHS} />
+								)}
+								{summary.status === "failed" && (
+									<span className="text-muted-foreground">
+										Could not build the summary.
+									</span>
+								)}
+							</div>
+
+							<div className={MODAL_ACTIONS_CLASS}>
+								{summary.status === "failed" ? (
 									<Button
-										ref={primaryRef}
 										type="button"
 										size="default"
-										icon={Share2}
-										loading={text === null}
-										onClick={openShareSheet}
+										icon={RotateCw}
+										onClick={state.retry}
 									>
-										Share
+										Try again
 									</Button>
+								) : (
+									<>
+										<Button
+											ref={offerShareSheet ? undefined : primaryRef}
+											type="button"
+											size="default"
+											variant={offerShareSheet ? "outline" : "default"}
+											icon={justCopied ? Check : Copy}
+											loading={text === null}
+											onClick={copy}
+											className={COPY_BUTTON_CLASS}
+										>
+											{justCopied ? "Copied" : "Copy"}
+										</Button>
+										{offerShareSheet && (
+											<Button
+												ref={primaryRef}
+												type="button"
+												size="default"
+												icon={Share2}
+												loading={text === null}
+												onClick={openShareSheet}
+											>
+												Share
+											</Button>
+										)}
+									</>
 								)}
-							</>
-						)}
-					</div>
+							</div>
+						</>
+					)}
 				</Dialog.Content>
 			</Dialog.Overlay>
 		</Dialog.Portal>

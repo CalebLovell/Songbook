@@ -345,7 +345,21 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   keep its slide.
 - **Sharing**: Share opens a modal showing the exact text that will be sent, on a
   meadow well; opening it sends nothing. Copy is always there, and a touch screen
-  with a share sheet adds Share as the primary button.
+  with a share sheet adds Share as the primary button. A Text / Image toggle offers
+  the same summary as a 1080×1920 portrait card drawn on a canvas in the browser
+  (`lib/share-image.ts` picks what goes on it, `lib/share-image-canvas.ts` draws
+  it). The two mirror each other: the same "Weekly Summary" title and date, the
+  same top three birds (🥇🥈🥉 in the text; on the card, 1st as a large painting
+  and 2nd and 3rd as ranked rows with thumbnails, rank numerals in sand, grey and
+  clay), and the same highlight lines, built once by `lib/highlights-share.ts`.
+  The card sets highlights as a label column (moss kicker labels, no icons) where
+  the text uses emoji. As in the app, bird names are moss at 600 and the title is
+  moss; the header is the real `SongbookWordmark`. Paintings stand bare, with no
+  disc behind them. It uses theme tokens, so it matches the theme it was made
+  in, and nothing is generated or sent anywhere. It starts drawing when the modal
+  opens, so switching to Image is instant. Image offers Download always, Copy
+  where the browser can put an image on the clipboard (not on plain-HTTP LAN
+  addresses), and Share as primary where the share sheet takes files.
 - **Explanations**: `InfoTip` opens a modal from the info icon. `Hint` is the hover
   tooltip, and a tap opens it too.
 - **Outcomes** arrive as toasts, never as a status line or coloured stripe on a
