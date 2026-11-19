@@ -44,6 +44,7 @@ const COLLAGE_FILLED_CLASS =
 	"h-[clamp(28rem,70vh,48rem)] xl:h-[calc(100dvh_-_var(--masthead-h)_-_2.125rem_-_4*var(--page-gap))] xl:min-h-[28rem]";
 const COLLAGE_AREA_CLASS = "relative mt-page flex-1";
 const RESIZE_SETTLE_MS = 150;
+const POP_SPREAD_MS = 60;
 
 const DEFAULT_TITLE = "Collage";
 
@@ -114,7 +115,7 @@ export function CollageCardSkeleton({
 					) : null)
 				}
 			/>
-			<div className={COLLAGE_AREA_CLASS}>
+			<div data-entrance="own" className={COLLAGE_AREA_CLASS}>
 				<ShellBar className="size-full rounded-md" />
 			</div>
 		</Card>
@@ -225,6 +226,7 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 		// biome-ignore lint/a11y/noStaticElementInteractions: as above
 		<div
 			ref={areaRef}
+			data-entrance="own"
 			className={cn(COLLAGE_AREA_CLASS, hoveredIndex >= 0 && "cursor-pointer")}
 			onPointerMove={(event) => hover(indexAt(event))}
 			onPointerLeave={() => hover(-1)}
@@ -240,7 +242,7 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 		>
 			{layout ? (
 				<ul aria-label="Birds" className="absolute inset-0">
-					{layout.placements.map((placement) => {
+					{layout.placements.map((placement, order) => {
 						const index = byKey.get(placement.key) ?? -1;
 						const bird = birds[index];
 						if (!bird) return null;
@@ -248,8 +250,12 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 						return (
 							<li
 								key={placement.key}
-								className={cn("absolute", lifted && "z-10")}
+								className={cn(
+									"absolute animate-collage-pop motion-reduce:animate-none",
+									lifted && "z-10",
+								)}
 								style={{
+									animationDelay: `${popDelay(order, layout.placements.length)}ms`,
 									left: placement.x,
 									top: placement.y,
 									width: placement.width,
@@ -310,6 +316,10 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 			)}
 		</div>
 	);
+}
+
+function popDelay(order: number, count: number) {
+	return count > 1 ? Math.round((order / (count - 1)) * POP_SPREAD_MS) : 0;
 }
 
 const POPUP_GAP = 6;

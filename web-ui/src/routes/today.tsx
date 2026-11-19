@@ -49,7 +49,7 @@ import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 const POLL_INTERVAL_MS = 10_000;
 const FLASH_DURATION_MS = 2_400;
 const NEW_BIRD_ANNOUNCE_GAP_MS = 60_000;
-// 9.875rem is the header: the bird page profile card, 156px plus its 2px border.
+// 9.875rem is the header at xl: its 7.75rem row, 1rem padding each side and a 2px border.
 const WINDOW_FIT_CLASS =
 	"xl:h-[calc(100dvh-9.875rem-3*var(--page-gap))] xl:min-h-[28rem]";
 // Source order is the reading and tab order (activity, Today, By hour); from lg the

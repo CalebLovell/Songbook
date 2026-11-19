@@ -18,7 +18,6 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SpeciesFilterRouteImport } from './routes/species-filter'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as TodayRouteImport } from './routes/today'
-import { Route as ApiLiveStreamRouteImport } from './routes/api/live-stream'
 import { Route as BirdsIndexRouteImport } from './routes/birds.index'
 import { Route as BirdsComNameRouteImport } from './routes/birds.$comName'
 import { Route as ApiDataBackupRouteImport } from './routes/api/data/backup'
@@ -81,11 +80,6 @@ const TodayRoute = TodayRouteImport.update({
   path: '/today',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiLiveStreamRoute = ApiLiveStreamRouteImport.update({
-  id: '/api/live-stream',
-  path: '/api/live-stream',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const BirdsIndexRoute = BirdsIndexRouteImport.update({
   id: '/birds/',
   path: '/birds/',
@@ -130,7 +124,6 @@ export interface FileRoutesByFullPath {
   '/species-filter': typeof SpeciesFilterRoute
   '/timeline': typeof TimelineRoute
   '/today': typeof TodayRoute
-  '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
   '/birds/': typeof BirdsIndexRoute
   '/api/data/backup': typeof ApiDataBackupRoute
@@ -150,7 +143,6 @@ export interface FileRoutesByTo {
   '/species-filter': typeof SpeciesFilterRoute
   '/timeline': typeof TimelineRoute
   '/today': typeof TodayRoute
-  '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
   '/birds': typeof BirdsIndexRoute
   '/api/data/backup': typeof ApiDataBackupRoute
@@ -171,7 +163,6 @@ export interface FileRoutesById {
   '/species-filter': typeof SpeciesFilterRoute
   '/timeline': typeof TimelineRoute
   '/today': typeof TodayRoute
-  '/api/live-stream': typeof ApiLiveStreamRoute
   '/birds/$comName': typeof BirdsComNameRoute
   '/birds/': typeof BirdsIndexRoute
   '/api/data/backup': typeof ApiDataBackupRoute
@@ -193,7 +184,6 @@ export interface FileRouteTypes {
     | '/species-filter'
     | '/timeline'
     | '/today'
-    | '/api/live-stream'
     | '/birds/$comName'
     | '/birds/'
     | '/api/data/backup'
@@ -213,7 +203,6 @@ export interface FileRouteTypes {
     | '/species-filter'
     | '/timeline'
     | '/today'
-    | '/api/live-stream'
     | '/birds/$comName'
     | '/birds'
     | '/api/data/backup'
@@ -233,7 +222,6 @@ export interface FileRouteTypes {
     | '/species-filter'
     | '/timeline'
     | '/today'
-    | '/api/live-stream'
     | '/birds/$comName'
     | '/birds/'
     | '/api/data/backup'
@@ -254,7 +242,6 @@ export interface RootRouteChildren {
   SpeciesFilterRoute: typeof SpeciesFilterRoute
   TimelineRoute: typeof TimelineRoute
   TodayRoute: typeof TodayRoute
-  ApiLiveStreamRoute: typeof ApiLiveStreamRoute
   BirdsComNameRoute: typeof BirdsComNameRoute
   BirdsIndexRoute: typeof BirdsIndexRoute
   ApiDataBackupRoute: typeof ApiDataBackupRoute
@@ -342,13 +329,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TodayRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/live-stream': {
-      id: '/api/live-stream'
-      path: '/api/live-stream'
-      fullPath: '/api/live-stream'
-      preLoaderRoute: typeof ApiLiveStreamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/birds/': {
       id: '/birds/'
       path: '/birds'
@@ -406,7 +386,6 @@ const rootRouteChildren: RootRouteChildren = {
   SpeciesFilterRoute: SpeciesFilterRoute,
   TimelineRoute: TimelineRoute,
   TodayRoute: TodayRoute,
-  ApiLiveStreamRoute: ApiLiveStreamRoute,
   BirdsComNameRoute: BirdsComNameRoute,
   BirdsIndexRoute: BirdsIndexRoute,
   ApiDataBackupRoute: ApiDataBackupRoute,

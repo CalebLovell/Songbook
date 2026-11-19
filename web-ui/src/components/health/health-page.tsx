@@ -13,7 +13,6 @@ import {
 import { useState } from "react";
 
 import { CardHeader } from "~/components/card-header.tsx";
-import { LiveAudioCard } from "~/components/health/live-audio-card.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
@@ -127,7 +126,6 @@ export function HealthPage({
 				{cards.map((card) => (
 					<HealthCard key={card.id} card={card} handlers={handlers} />
 				))}
-				<LiveAudioCard />
 			</div>
 		</PageWrap>
 	);

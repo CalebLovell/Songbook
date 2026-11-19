@@ -5,7 +5,7 @@ import {
 	useRouter,
 	useRouterState,
 } from "@tanstack/react-router";
-import { Activity, CircleAlert, Compass, Copy, RotateCcw } from "lucide-react";
+import { CircleAlert, Compass, Copy, RotateCcw, Sun } from "lucide-react";
 import { type MouseEvent, useEffect } from "react";
 
 import { StatusPage } from "~/components/status-page.tsx";
@@ -56,7 +56,7 @@ export function RouteNotFound() {
 						to="/today"
 						variant={suggestion ? "outline" : "default"}
 						size="sm"
-						icon={Activity}
+						icon={Sun}
 					>
 						Go to Today
 					</ButtonLink>
@@ -151,7 +151,7 @@ export function RouteError({ error }: ErrorComponentProps) {
 					>
 						Try again
 					</Button>
-					<ButtonLink to="/today" variant="outline" size="sm" icon={Activity}>
+					<ButtonLink to="/today" variant="outline" size="sm" icon={Sun}>
 						Go to Today
 					</ButtonLink>
 				</>

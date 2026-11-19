@@ -1,6 +1,5 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
 import {
-	Activity,
 	AudioWaveform,
 	CalendarRange,
 	Feather,
@@ -10,6 +9,7 @@ import {
 	SearchCheck,
 	Settings,
 	SlidersHorizontal,
+	Sun,
 } from "lucide-react";
 import { useId } from "react";
 
@@ -49,7 +49,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 			>
 				<SectionLabel id={`${id}-explore`}>Explore</SectionLabel>
 				<Link to="/today" {...linkProps}>
-					<NavIcon icon={Activity} />
+					<NavIcon icon={Sun} />
 					Today
 				</Link>
 				<Link

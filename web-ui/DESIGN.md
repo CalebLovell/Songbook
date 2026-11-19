@@ -149,7 +149,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   Only linked cards lift on hover, and nothing inside them moves (a painting
   that grew on hover was tried and dropped; the collage is the exception). Data that replaces a skeleton fades in over 150ms:
   a card's children (never its header, marked `data-slot="card-header"`, so a
-  hand-built header needs the attribute too) fade when they arrive after the
+  hand-built header needs the attribute too, and a child that runs its own entrance opts out with `data-entrance="own"`) fade when they arrive after the
   page settled (`useSettledFlag` on the scroll pane), so cached pages and
   navigation stay instant. Switching light/dark crossfades over 200ms (view
   transition). No page transitions, scroll reveals, count-ups or springs.
@@ -240,7 +240,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   shown when there is some (`useLastDefined`, so a pull to refresh keeps its
   shape), else a typical sample.
   No animation between the two: shells show from the first frame and content
-  replaces them in place.
+  replaces them in place. The collage is the one exception: its skeleton holds until every
+  painting is decoded, then the birds pop in in layout order (140ms each, spread
+  over 60ms, so about 200ms in all).
 - **Keyboard**: every page opens with a skip link, and a page change moves focus to
   `main` (tabindex -1, never ringed) and speaks the title. A scroll key with nothing
   focused goes to `main`, the only scroller. Page-wide single-key shortcuts ignore
@@ -335,7 +337,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   contain any visible label. Give
   the player a `key` per clip; it moves the playhead by `transform` written to the
   DOM, never through React state. Spectrograms draw in the browser, capped at
-  15kHz, on the same paper-to-moss ramp as the live feed.
+  15kHz, on the paper-to-moss ramp.
 - **Confirmations** all use `ConfirmDialog`: full-size buttons, an icon on each,
   Escape cancels, focus starts on Cancel. Both are `type="button"` because the
   dialog often sits inside the form it guards.
@@ -426,10 +428,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   switch re-anchors on the latest day in the window with detections. Only a Daily
   address that isn't a date replaces the page. An empty station keeps its controls.
 - **Today** is the station's today at a glance (since midnight), in two
-  columns (2:3 from `lg`) under a header. The header is the bird page's profile card
-  (`bird-profile-card.tsx`, the same in-flight painting, name over binomial),
-  filled with the newest bird ("Heard 2 minutes ago at 7:58 AM", play,
-  confidence), full width. Below, the left column holds Recent
+  columns (2:3 from `lg`) under a header. The header is its own Now hearing card
+  (`now-header.tsx`, not the bird page's profile card): the newest bird's painting
+  in a 9.5rem column, name over binomial, then the time ago in moss over "last heard
+  <date, time>", confidence and play, full width. Below, the left column holds Recent
   activity (the latest visits, flashing in as they arrive; "All of today" to
   Timeline sits in its header, and it has no info popup) at its full length,
   then By hour: the bird page's Detections by hour card as bars, each colored
@@ -490,7 +492,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   has to know.
   Playback's boost (on by default) works the same way: `applyClipBoost` routes every
   clip player through a shared gain and limiter during the tap, since iOS Safari only
-  starts audio from a gesture. Live audio (Listen, on Health) keeps its own gain and compression popover.
+  starts audio from a gesture.
 - **Health or Settings**: Health holds everything the station needs to work, and
   Settings holds only what someone might tweak to taste. A station left on every Settings
   default runs fine; one with a Health problem doesn't. So a value with no sensible
