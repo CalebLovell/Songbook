@@ -265,6 +265,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   Their 12px squares miss the 24px target size, a known gap kept for the look. Hour bars on a species
   tile are the one exception to the shared heat scale: they compare a bird only
   with itself, as a linear share of its own peak.
+- **Grid** (`species-grid.tsx`): the Timeline's second view. Its Activity header
+  is a card of its own and each species tile is a card on the paper below it,
+  never tiles inside an Activity card. An empty window keeps one card.
 - **Collage** (`collage-card.tsx`): the Timeline's third view, after List and
   Grid (Images icon), drawn from the same rows for whatever window is shown, and
   Live's day; it is not a page of its own. Painted birds only, packed centre-out in an
