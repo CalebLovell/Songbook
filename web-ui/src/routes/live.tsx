@@ -1,41 +1,67 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import {
+	keepPreviousData,
+	type QueryKey,
+	queryOptions,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import {
+	type ReactNode,
+	type RefObject,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 
-import { HighlightsCard } from "~/components/highlights-card.tsx";
-import { CurrentBirdCard } from "~/components/now/current-bird-card.tsx";
-import { LiveAudioCard } from "~/components/now/live-audio-card.tsx";
+import {
+	CollageCard,
+	CollageCardSkeleton,
+} from "~/components/collage-card.tsx";
+import {
+	HOUR_BARS_MIN_PX,
+	HourBarsCard,
+	HourBarsCardSkeleton,
+	sumHours,
+} from "~/components/now/hour-bars-card.tsx";
+import { NowHeader, NowHeaderShell } from "~/components/now/now-header.tsx";
 import {
 	RecentLogCard,
 	RecentLogCardSkeleton,
 } from "~/components/now/recent-log-card.tsx";
 import {
-	type HeroShellBird,
-	SpeciesHeroCardShell,
-} from "~/components/species-hero-card.tsx";
+	HeaderSunTimes,
+	HeaderSunTimesSkeleton,
+} from "~/components/species-by-hour-card.tsx";
+import { WindowSummary } from "~/components/timeline/window-summary.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { announce } from "~/lib/announce.ts";
-import { formatDateTime } from "~/lib/date-format.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
-import {
-	getLiveHighlights,
-	type LiveHighlights,
-} from "~/lib/live-highlights.ts";
-import {
-	type CurrentBird,
-	getNowSnapshot,
-	type NowSnapshot,
-} from "~/lib/now.ts";
-import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
-import { formatTimeAgo } from "~/lib/time-ago.ts";
-import { useLastDefined } from "~/lib/use-last-defined.ts";
+import { getNowSnapshot, type NowSnapshot, type ShownDay } from "~/lib/now.ts";
+import { prefetchInBrowser } from "~/lib/query-client.ts";
+import type { WindowSun } from "~/lib/sun-times.ts";
+import type { TimelineRow } from "~/lib/timeline.ts";
+import { type TimelinePageData, timelineQuery } from "~/lib/timeline-page.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const POLL_INTERVAL_MS = 10_000;
 const FLASH_DURATION_MS = 2_400;
 const NEW_BIRD_ANNOUNCE_GAP_MS = 60_000;
-const HIGHLIGHTS_EMPTY = EMPTY.window.last24Hours;
+// 9.875rem is the header: the bird page profile card, 156px plus its 2px border.
+const WINDOW_FIT_CLASS =
+	"xl:h-[calc(100dvh-9.875rem-3*var(--page-gap))] xl:min-h-[28rem]";
+// Source order is the reading and tab order (activity, Today, By hour); from lg the
+// grid places By hour under activity on the left and Today across both rows on the right.
+const BODY_GRID_CLASS = `mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:grid-rows-[auto_1fr] xl:grid-rows-[auto_minmax(0,1fr)] xl:items-stretch ${WINDOW_FIT_CLASS}`;
+const FEED_SLOT_CLASS = "min-w-0 lg:col-start-1 lg:row-start-1 xl:self-start";
+const HOURS_SLOT_CLASS = "flex min-w-0 flex-col lg:col-start-1 lg:row-start-2";
+const COLLAGE_FIT_CLASS = `lg:col-start-2 lg:row-span-2 lg:row-start-1 ${WINDOW_FIT_CLASS}`;
+const DAY_LABEL: Record<ShownDay, string> = {
+	today: "Today",
+	yesterday: "Yesterday",
+};
 
 function useAnnounceNewBird(comName: string | null) {
 	const spoken = useRef({ comName, at: 0 });
@@ -54,12 +80,6 @@ const snapshotQuery = queryOptions({
 	refetchInterval: POLL_INTERVAL_MS,
 });
 
-const highlightsQuery = queryOptions({
-	...PAGE_QUERY,
-	queryKey: ["live-highlights"],
-	queryFn: () => getLiveHighlights(),
-});
-
 export const Route = createFileRoute("/live")({
 	head: () =>
 		pageHead(
@@ -69,8 +89,6 @@ export const Route = createFileRoute("/live")({
 	component: Live,
 	loader: ({ context }) => {
 		prefetchInBrowser(context.queryClient, snapshotQuery);
-		prefetchInBrowser(context.queryClient, highlightsQuery);
-		return { unlocked: context.auth.unlocked };
 	},
 });
 
@@ -97,105 +115,201 @@ function useFreshKeys(keys: string[]): Set<string> {
 }
 
 function Live() {
-	const { unlocked } = Route.useLoaderData();
 	const snapshot = useSkeletonMinimum(useQuery(snapshotQuery).data);
-	const highlights = useSkeletonMinimum(useQuery(highlightsQuery).data);
-	const lastSnapshot = useLastDefined(snapshot);
 
-	if (!snapshot) {
-		return (
-			<LiveShell unlocked={unlocked} bird={shellBird(lastSnapshot?.current)} />
-		);
-	}
-	return (
-		<LiveBody snapshot={snapshot} highlights={highlights} unlocked={unlocked} />
-	);
+	if (!snapshot) return <LiveShell />;
+	return <LiveBody snapshot={snapshot} />;
 }
 
-function shellBird(current: CurrentBird | null | undefined) {
-	if (!current) return undefined;
-	return {
-		comName: current.comName,
-		sciName: current.sciName,
-		relativeTime: formatTimeAgo(current.ageMs),
-		heardAt: formatDateTime(current.detectedAt),
-		confidence: current.confidence,
-	} satisfies HeroShellBird;
+const WIDE_QUERY = "(min-width: 80rem)";
+const RECENT_LABEL = "Recent detections";
+
+function useRowsThatFit(
+	gridRef: RefObject<HTMLDivElement | null>,
+	hasRows: boolean,
+): number | undefined {
+	const [rows, setRows] = useState<number>();
+	useEffect(() => {
+		const grid = gridRef.current;
+		if (!grid || !hasRows) return;
+		const measure = () => {
+			const list = grid.querySelector(
+				`section[aria-label="${RECENT_LABEL}"] ul`,
+			);
+			const card = list?.closest("section");
+			const row = list?.children[1] ?? list?.children[0];
+			if (!list || !card || !row || !window.matchMedia(WIDE_QUERY).matches) {
+				setRows(undefined);
+				return;
+			}
+			const gap = Number.parseFloat(getComputedStyle(grid).rowGap) || 0;
+			const chrome =
+				card.getBoundingClientRect().height -
+				list.getBoundingClientRect().height;
+			const room = grid.clientHeight - gap - HOUR_BARS_MIN_PX - chrome;
+			setRows(
+				Math.max(1, Math.floor(room / row.getBoundingClientRect().height)),
+			);
+		};
+		const observer = new ResizeObserver(measure);
+		observer.observe(grid);
+		measure();
+		return () => observer.disconnect();
+	}, [gridRef, hasRows]);
+	return rows;
 }
 
-function LiveShell({
-	unlocked,
-	bird,
+function LiveLayout({
+	header,
+	hours,
+	collage,
+	feed,
+	gridRef,
 }: {
-	unlocked: boolean;
-	bird: HeroShellBird | undefined;
+	header: ReactNode;
+	hours: ReactNode;
+	collage: ReactNode;
+	feed: ReactNode;
+	gridRef?: RefObject<HTMLDivElement | null>;
 }) {
 	return (
 		<PageWrap>
-			<SpeciesHeroCardShell label="Last 24 hours" bird={bird} />
-
-			<div className="mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
-				<RecentLogCardSkeleton />
-
-				<div className="grid grid-cols-1 gap-page">
-					<LiveAudioCard unlocked={unlocked} />
-					<div>
-						<HighlightsCard
-							highlights={null}
-							period="live"
-							emptyMessage={HIGHLIGHTS_EMPTY}
-						/>
-					</div>
-				</div>
+			{header}
+			<div ref={gridRef} className={BODY_GRID_CLASS}>
+				<div className={FEED_SLOT_CLASS}>{feed}</div>
+				{collage}
+				<div className={HOURS_SLOT_CLASS}>{hours}</div>
 			</div>
 		</PageWrap>
 	);
 }
 
-function LiveBody({
-	snapshot,
-	highlights,
-	unlocked,
-}: {
-	snapshot: NowSnapshot;
-	highlights: LiveHighlights | undefined;
-	unlocked: boolean;
-}) {
-	const freshKeys = useFreshKeys(snapshot.recent.map((row) => row.key));
+function LiveShell() {
+	return (
+		<LiveLayout
+			header={<NowHeaderShell />}
+			feed={<RecentLogCardSkeleton day="today" />}
+			hours={<HourBarsCardSkeleton />}
+			collage={
+				<CollageCardSkeleton
+					title={DAY_LABEL.today}
+					summary={<WindowSummary rows={null} />}
+					trailing={<HeaderSunTimesSkeleton />}
+					className={COLLAGE_FIT_CLASS}
+				/>
+			}
+		/>
+	);
+}
 
+function useRefetchOnNewDetection(
+	latestKey: string | undefined,
+	queryKey: QueryKey,
+) {
+	const queryClient = useQueryClient();
+	const seen = useRef(latestKey);
+	useEffect(() => {
+		if (latestKey === seen.current) return;
+		seen.current = latestKey;
+		queryClient.invalidateQueries({ queryKey });
+	}, [latestKey, queryKey, queryClient]);
+}
+
+function useCollageSpecies(rows: TimelineRow[] | null) {
+	const signature = (rows ?? [])
+		.map((row) => `${row.comName}:${row.totalDetections}`)
+		.join("|");
+	// biome-ignore lint/correctness/useExhaustiveDependencies: a refetch returns new rows for the same birds; repack the collage only when the birds change
+	return useMemo(
+		() =>
+			rows?.map((row) => ({
+				comName: row.comName,
+				sciName: row.sciName,
+				count: row.totalDetections,
+			})) ?? null,
+		[signature],
+	);
+}
+
+type DayBody = { rows: TimelineRow[]; sun: WindowSun };
+
+function dayBody(page: TimelinePageData | undefined): DayBody | null {
+	return page?.body.kind === "rows"
+		? { rows: page.body.rows, sun: page.body.sun }
+		: null;
+}
+
+function LiveBody({ snapshot }: { snapshot: NowSnapshot }) {
+	const dayQuery = timelineQuery({ period: "day", anchor: snapshot.date });
+	const body = dayBody(
+		useQuery({ ...dayQuery, placeholderData: keepPreviousData }).data,
+	);
+	const rows = body?.rows ?? null;
+	const title = DAY_LABEL[snapshot.day];
+	const sunTimes = body?.sun.available ? (
+		<HeaderSunTimes sun={body.sun} />
+	) : undefined;
+	const collageSpecies = useCollageSpecies(rows);
+	const heroKey = snapshot.current?.key;
+	const freshKeys = useFreshKeys(snapshot.recent.map((visit) => visit.key));
+	const freshHeroKeys = useFreshKeys(heroKey ? [heroKey] : []);
+	const lastHour =
+		snapshot.day === "today" ? Number(snapshot.generatedAt.slice(11, 13)) : 23;
+
+	const gridRef = useRef<HTMLDivElement>(null);
+	const rowsThatFit = useRowsThatFit(gridRef, snapshot.recent.length > 0);
+
+	useRefetchOnNewDetection(heroKey, dayQuery.queryKey);
 	useAnnounceNewBird(snapshot.current?.comName ?? null);
 
-	const heroKey = snapshot.current?.key;
-	const freshHeroKeys = useFreshKeys(heroKey ? [heroKey] : []);
-	const heroIsNew = heroKey !== undefined && freshHeroKeys.has(heroKey);
-
 	return (
-		<PageWrap>
-			<CurrentBirdCard
-				current={snapshot.current}
-				hasAnyDetections={snapshot.hasAnyDetections}
-				generatedAt={snapshot.generatedAt}
-				flash={heroIsNew}
-			/>
-
-			<div className="mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+		<LiveLayout
+			gridRef={gridRef}
+			header={
+				<NowHeader
+					current={snapshot.current}
+					hasAnyDetections={snapshot.hasAnyDetections}
+					generatedAt={snapshot.generatedAt}
+					flash={heroKey !== undefined && freshHeroKeys.has(heroKey)}
+				/>
+			}
+			feed={
 				<RecentLogCard
 					recent={snapshot.recent}
+					day={snapshot.day}
+					date={snapshot.date}
 					generatedAt={snapshot.generatedAt}
 					freshKeys={freshKeys}
+					limit={rowsThatFit}
 				/>
-
-				<div className="grid grid-cols-1 gap-page">
-					<LiveAudioCard unlocked={unlocked} />
-
-					<HighlightsCard
-						highlights={highlights?.highlights ?? null}
-						thresholds={highlights?.thresholds}
-						period="live"
-						emptyMessage={HIGHLIGHTS_EMPTY}
+			}
+			hours={
+				rows ? (
+					<HourBarsCard hours={sumHours(rows)} lastHour={lastHour} />
+				) : (
+					<HourBarsCardSkeleton />
+				)
+			}
+			collage={
+				collageSpecies ? (
+					<CollageCard
+						species={collageSpecies}
+						emptyMessage={EMPTY.window.today}
+						title={title}
+						summary={<WindowSummary rows={rows} />}
+						trailing={sunTimes}
+						reshuffle={false}
+						className={COLLAGE_FIT_CLASS}
 					/>
-				</div>
-			</div>
-		</PageWrap>
+				) : (
+					<CollageCardSkeleton
+						title={title}
+						summary={<WindowSummary rows={null} />}
+						trailing={<HeaderSunTimesSkeleton />}
+						className={COLLAGE_FIT_CLASS}
+					/>
+				)
+			}
+		/>
 	);
 }

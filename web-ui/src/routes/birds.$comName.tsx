@@ -14,6 +14,10 @@ import {
 	BestRecordingCard,
 	BestRecordingCardSkeleton,
 } from "~/components/best-recording-card.tsx";
+import {
+	BirdProfileCard,
+	BirdProfileCardShell,
+} from "~/components/bird-profile-card.tsx";
 import { CardHeader } from "~/components/card-header.tsx";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import {
@@ -45,7 +49,7 @@ import {
 } from "~/components/ui/page-stepper.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
-import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
+import { ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import {
 	Tooltip,
 	TooltipContent,
@@ -263,33 +267,16 @@ function BirdResult({
 function SpeciesDetailShell({ year }: { year: number }) {
 	return (
 		<PageWrap className="@container/bird pt-0">
-			<Card
-				as="section"
-				aria-busy="true"
-				aria-label="Bird profile"
-				className={PROFILE_CARD_CLASS}
-			>
-				<div className={PROFILE_PORTRAIT_CLASS}>
-					<ShellBar className="size-full rounded-md" />
-				</div>
-				<div aria-hidden="true" className={PROFILE_TEXT_CLASS}>
-					<div className="min-w-0">
-						<ShellText
-							className="font-bold text-2xl sm:text-3xl"
-							barClassName="w-64 max-w-full"
-						/>
-						<ShellText className="text-xs" barClassName="w-32" />
-					</div>
-					<ShellText className="text-sm" barClassName="w-80 max-w-full" />
-					<div className="relative z-10 flex flex-wrap items-center gap-2">
-						<ShellSized className="rounded-md">
-							<Button variant="outline" size="sm" icon={ExternalLink}>
-								eBird
-							</Button>
-						</ShellSized>
-					</div>
-				</div>
-			</Card>
+			<BirdProfileCardShell
+				className="mt-page"
+				actions={
+					<ShellSized className="rounded-md">
+						<Button variant="outline" size="sm" icon={ExternalLink}>
+							eBird
+						</Button>
+					</ShellSized>
+				}
+			/>
 
 			<div className={COLUMNS_CLASS}>
 				<Card
@@ -667,12 +654,6 @@ function WeekdayLabels() {
 	);
 }
 
-const PROFILE_CARD_CLASS =
-	"mt-page grid overflow-hidden p-0 sm:grid-cols-[11.5rem_minmax(0,1fr)]";
-const PROFILE_PORTRAIT_CLASS =
-	"flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4";
-const PROFILE_TEXT_CLASS =
-	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-39 sm:justify-between sm:pl-0";
 const COLUMNS_CLASS =
 	"mt-page grid @min-[80rem]/bird:grid-cols-[minmax(0,max-content)_minmax(20rem,1fr)] grid-cols-[minmax(0,1fr)] items-stretch gap-page";
 const VISIT_LOG_CLASS = "flex min-w-0 flex-col";
@@ -766,25 +747,13 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 		? formatTimeAgo(lastVisit.ageMs + offsetMs)
 		: formatHeardDate(detail.lastDetected.date);
 	return (
-		<Card as="section" aria-label="Bird profile" className={PROFILE_CARD_CLASS}>
-			<div className={PROFILE_PORTRAIT_CLASS}>
-				<SpeciesImage
-					imageUrl={detail.imageUrl}
-					alt={detail.comName}
-					glyphClassName="size-16"
-					cropToPainting
-				/>
-			</div>
-
-			<div className={PROFILE_TEXT_CLASS}>
-				<div className="min-w-0">
-					<h1 className="font-bold text-2xl text-moss sm:text-3xl">
-						{detail.comName}
-					</h1>
-					<p className="text-bark text-xs italic">{detail.sciName}</p>
-				</div>
-
-				<p className="text-muted-foreground text-sm tabular-nums">
+		<BirdProfileCard
+			className="mt-page"
+			imageUrl={detail.imageUrl}
+			comName={detail.comName}
+			sciName={detail.sciName}
+			line={
+				<p>
 					Last heard{" "}
 					<span className="font-semibold text-foreground">{lastHeard}</span>
 					{lastVisit && detail.lastDetected.date ? (
@@ -806,13 +775,15 @@ function SummaryCard({ detail }: { detail: SpeciesDetail }) {
 						</>
 					) : null}
 				</p>
+			}
+			actions={
 				<SpeciesActions
 					speciesLink={detail.speciesLink}
 					comName={detail.comName}
 					size="sm"
 				/>
-			</div>
-		</Card>
+			}
+		/>
 	);
 }
 

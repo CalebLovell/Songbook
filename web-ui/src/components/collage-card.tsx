@@ -45,10 +45,14 @@ const COLLAGE_FILLED_CLASS =
 const COLLAGE_AREA_CLASS = "relative mt-page flex-1";
 const RESIZE_SETTLE_MS = 150;
 
+const DEFAULT_TITLE = "Collage";
+
 function CollageHeader({
+	title,
 	summary,
 	action,
 }: {
+	title: string;
 	summary?: ReactNode;
 	action?: ReactNode;
 }) {
@@ -56,7 +60,7 @@ function CollageHeader({
 		<div data-slot="card-header" className={`${CARD_HEADER_CLASS} gap-3 py-2`}>
 			<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
 				<Kicker as="h2" className="shrink-0">
-					Collage
+					{title}
 				</Kicker>
 				{summary}
 			</div>
@@ -79,25 +83,35 @@ function ReshuffleButton({ onClick }: { onClick?: () => void }) {
 }
 
 export function CollageCardSkeleton({
+	title = DEFAULT_TITLE,
 	summary,
+	trailing,
+	reshuffle = true,
 	className = "",
 }: {
+	title?: string;
 	summary?: ReactNode;
+	trailing?: ReactNode;
+	reshuffle?: boolean;
 	className?: string;
 }) {
 	return (
 		<Card
 			as="section"
 			aria-busy="true"
-			aria-label="Collage"
+			aria-label={title}
 			className={cn(COLLAGE_CARD_CLASS, COLLAGE_FILLED_CLASS, className)}
 		>
 			<CollageHeader
+				title={title}
 				summary={summary}
 				action={
-					<ShellSized className="rounded-md">
-						<ReshuffleButton />
-					</ShellSized>
+					trailing ??
+					(reshuffle ? (
+						<ShellSized className="rounded-md">
+							<ReshuffleButton />
+						</ShellSized>
+					) : null)
 				}
 			/>
 			<div className={COLLAGE_AREA_CLASS}>
@@ -111,13 +125,19 @@ export function CollageCard({
 	species,
 	emptyMessage,
 	emptyAction,
+	title = DEFAULT_TITLE,
 	summary,
+	trailing,
+	reshuffle = true,
 	className = "",
 }: {
 	species: readonly CollageSource[];
 	emptyMessage: string;
 	emptyAction?: ReactNode;
+	title?: string;
 	summary?: ReactNode;
+	trailing?: ReactNode;
+	reshuffle?: boolean;
 	className?: string;
 }) {
 	const photos = useContext(ArtworkPreferenceContext) === "photos";
@@ -135,7 +155,7 @@ export function CollageCard({
 	return (
 		<Card
 			as="section"
-			aria-label="Collage"
+			aria-label={title}
 			className={cn(
 				COLLAGE_CARD_CLASS,
 				birds.length > 0 && COLLAGE_FILLED_CLASS,
@@ -143,11 +163,13 @@ export function CollageCard({
 			)}
 		>
 			<CollageHeader
+				title={title}
 				summary={summary}
 				action={
-					birds.length > 0 && !photos ? (
+					trailing ??
+					(reshuffle && birds.length > 0 && !photos ? (
 						<ReshuffleButton onClick={() => setMixSeed(randomMixSeed())} />
-					) : null
+					) : null)
 				}
 			/>
 			{species.length === 0 ? (

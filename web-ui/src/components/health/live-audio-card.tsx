@@ -22,11 +22,6 @@ import { useLiveAudio } from "~/lib/use-live-audio.ts";
 
 const STREAM_URL = "/api/live-stream";
 
-export function LiveAudioCard({ unlocked }: { unlocked: boolean }) {
-	if (!unlocked) return null;
-	return <PlayerPanel />;
-}
-
 function CardShell({
 	children,
 	status,
@@ -46,7 +41,7 @@ function CardShell({
 	);
 }
 
-function PlayerPanel() {
+export function LiveAudioCard() {
 	const live = useLiveAudio(STREAM_URL);
 	const isPlaying = liveAudioIsPlaying(live.state);
 	const isOffline = live.state.status === "offline";

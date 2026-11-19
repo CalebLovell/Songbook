@@ -1,12 +1,6 @@
 import type { Highlight } from "~/lib/highlights-data.ts";
 
-export type HighlightPeriod =
-	| "live"
-	| "day"
-	| "week"
-	| "month"
-	| "year"
-	| "all";
+export type HighlightPeriod = "day" | "week" | "month" | "year" | "all";
 
 export type Lookback = { days: number; weeks: number; months: number };
 
@@ -56,7 +50,6 @@ export function thresholdsFromSettings(
 
 export function lookbackFor(lookback: Lookback, period: HighlightPeriod) {
 	switch (period) {
-		case "live":
 		case "day":
 			return lookback.days;
 		case "week":
@@ -80,7 +73,6 @@ const UNIT: Record<
 	Exclude<HighlightPeriod, "all">,
 	{ one: string; this: string; last: string }
 > = {
-	live: { one: "day", this: "today", last: "yesterday" },
 	day: { one: "day", this: "today", last: "yesterday" },
 	week: { one: "week", this: "this week", last: "last week" },
 	month: { one: "month", this: "this month", last: "last month" },
@@ -116,7 +108,7 @@ export function highlightGuide(
 		{
 			kind: "activity",
 			name: "Trend",
-			meaning: `Activity compared with ${period === "live" ? "the previous 24 hours" : unit.last}.`,
+			meaning: `Activity compared with ${unit.last}.`,
 		},
 		busiest,
 		{ kind: "new", name: "New", meaning: "First record ever." },
@@ -139,7 +131,7 @@ export function highlightGuide(
 			kind: "consistent",
 			name: "Regular",
 			meaning:
-				period === "live" || period === "day"
+				period === "day"
 					? `Heard ${thresholds.consistent.streakDays}+ days straight.`
 					: period === "year"
 						? `Heard on over ${thresholds.consistent.yearShare}% of days.`

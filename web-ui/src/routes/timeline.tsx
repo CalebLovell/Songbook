@@ -1,8 +1,4 @@
-import {
-	keepPreviousData,
-	queryOptions,
-	useQuery,
-} from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	stripSearchParams,
@@ -40,10 +36,9 @@ import {
 } from "~/components/species-grid.tsx";
 import { StatusPage } from "~/components/status-page.tsx";
 import { PeriodToolbar } from "~/components/timeline/period-toolbar.tsx";
+import { WindowSummary } from "~/components/timeline/window-summary.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
-import { Count } from "~/components/ui/count.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
-import { ShellFigure } from "~/components/ui/shell.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import { TooltipProvider } from "~/components/ui/tooltip.tsx";
 import { getDayShareCard } from "~/lib/day-share.ts";
@@ -51,12 +46,12 @@ import { EMPTY } from "~/lib/empty-messages.ts";
 import type { HighlightThresholds } from "~/lib/highlight-thresholds.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
-import { PAGE_QUERY, prefetchInBrowser } from "~/lib/query-client.ts";
+import { prefetchInBrowser } from "~/lib/query-client.ts";
 import { formatShareCard } from "~/lib/share-card.ts";
 import type { HourActivity } from "~/lib/stats-data.ts";
 import type { WindowSun } from "~/lib/sun-times.ts";
 import type { TimelineData, TimelineRow } from "~/lib/timeline.ts";
-import { getTimelinePage, type TimelinePageData } from "~/lib/timeline-page.ts";
+import { type TimelinePageData, timelineQuery } from "~/lib/timeline-page.ts";
 import {
 	TIMELINE_PERIOD_LABELS,
 	TIMELINE_PERIODS,
@@ -91,13 +86,6 @@ function resolveAnchor(period: TimelinePeriod, date: string | undefined) {
 	if (isValidAnchor(period, date)) return date;
 	return period === "day" ? date : currentAnchor(period);
 }
-
-const timelineQuery = (data: { period: TimelinePeriod; anchor: string }) =>
-	queryOptions({
-		...PAGE_QUERY,
-		queryKey: ["timeline", data],
-		queryFn: () => getTimelinePage({ data }),
-	});
 
 export const Route = createFileRoute("/timeline")({
 	head: () =>
@@ -349,38 +337,6 @@ function headerLines(period: TimelinePeriod, anchor: string): string[] {
 
 function safeWindow(period: TimelinePeriod, anchor: string) {
 	return isValidAnchor(period, anchor) ? windowFor(period, anchor) : null;
-}
-
-function WindowSummary({ rows }: { rows: TimelineRow[] | null }) {
-	const detections = rows?.reduce((sum, row) => sum + row.totalDetections, 0);
-
-	return (
-		<div className="flex min-w-0 items-center gap-2.5">
-			<span className="h-4 w-px shrink-0 bg-line" aria-hidden="true" />
-			<div className="flex translate-y-[-1.5px] items-center gap-2 truncate text-[13px] text-muted-foreground">
-				<span className="whitespace-nowrap">
-					{detections === undefined ? (
-						<ShellFigure />
-					) : (
-						<Count>{detections.toLocaleString()}</Count>
-					)}{" "}
-					detections
-				</span>
-				<span
-					className="size-0.75 shrink-0 rounded-full bg-muted-foreground opacity-60"
-					aria-hidden="true"
-				/>
-				<span className="whitespace-nowrap">
-					{rows ? (
-						<Count>{rows.length.toLocaleString()}</Count>
-					) : (
-						<ShellFigure />
-					)}{" "}
-					species
-				</span>
-			</div>
-		</div>
-	);
 }
 
 function TimelineCards({

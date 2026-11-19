@@ -1,8 +1,10 @@
+import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { dayIdFor, isDayId } from "~/lib/day.ts";
 import type { HighlightThresholds } from "~/lib/highlight-thresholds.ts";
+import { PAGE_QUERY } from "~/lib/query-client.ts";
 import { readHighlightThresholds } from "~/lib/settings-config.server.ts";
 import { readStationLocation } from "~/lib/station-location.server.ts";
 import { sampleDays, type WindowSun, windowSun } from "~/lib/sun-times.ts";
@@ -89,3 +91,10 @@ function sunDays(nav: TimelineNav): string[] {
 		? sampleDays(nav.stationRange.first, nav.stationRange.last)
 		: [];
 }
+
+export const timelineQuery = (data: TimelinePageRequest) =>
+	queryOptions({
+		...PAGE_QUERY,
+		queryKey: ["timeline", data],
+		queryFn: () => getTimelinePage({ data }),
+	});

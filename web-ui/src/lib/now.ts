@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { avg, count, desc, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
 import { dataVersion, db } from "~/db/index.ts";
 import { detections } from "~/db/schema.ts";
@@ -8,20 +8,17 @@ import { canHearEveryClip } from "~/lib/clip-access.server.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import { shareRead } from "~/lib/shared-read.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
+import { stationToday } from "~/lib/station-time.ts";
+import { addDays } from "~/lib/timeline-window.ts";
 import {
-	countVisits,
 	groupVisits,
 	localTimestamp,
 	timestampToMillis,
-	type Visit,
 } from "~/lib/visits.ts";
 
-export const detectedAt = sql<string>`datetime(${detections.Date} || ' ' || ${detections.Time})`;
-export const isLast24h = sql`${detections.Date} >= date('now', '-1 day', 'localtime') and datetime(${detections.Date} || ' ' || ${detections.Time}) >= datetime('now', '-24 hours', 'localtime')`;
+const detectedAt = sql<string>`datetime(${detections.Date} || ' ' || ${detections.Time})`;
 
-type NowSummary = {
-	detections: number;
-};
+export type ShownDay = "today" | "yesterday";
 
 export type CurrentBird = {
 	key: string;
@@ -33,11 +30,6 @@ export type CurrentBird = {
 	ageMs: number;
 	confidence: number | null;
 	audioUrl: string | null;
-	countLast24h: number;
-	visitsLast24h: number;
-	averageConfidence: number | null;
-	firstHeardLast24h: string | null;
-	allTimeCount: number;
 };
 
 export type RecentVisit = {
@@ -58,44 +50,28 @@ export type NowSnapshot = {
 	generatedAt: string;
 	current: CurrentBird | null;
 	hasAnyDetections: boolean;
-	summary: NowSummary;
+	day: ShownDay;
+	date: string;
 	recent: RecentVisit[];
 };
 
-export const RECENT_LIMIT = 10;
+export const RECENT_LIMIT = 6;
 
-function detectionKey(row: { detectedAt: string; fileName: string }): string {
-	return `${row.detectedAt}-${row.fileName}`;
-}
-
-type WindowRow = {
+type LatestRow = {
 	comName: string;
 	sciName: string;
 	date: string;
 	detectedAt: string;
 	confidence: number | null;
 	fileName: string;
-	timestamp: string;
 };
 
-async function buildCurrentBird(
-	latest: WindowRow,
-	windowRows: WindowRow[],
+function buildCurrentBird(
+	latest: LatestRow,
 	withAudio: boolean,
-): Promise<Omit<CurrentBird, "ageMs">> {
-	const [allTime] = await db
-		.select({
-			allTimeCount: count(),
-			averageConfidence: avg(detections.Confidence),
-		})
-		.from(detections)
-		.where(sql`${detections.Com_Name} = ${latest.comName}`);
-	const moments = windowRows
-		.filter((row) => row.comName === latest.comName)
-		.map((row) => row.detectedAt);
-
+): Omit<CurrentBird, "ageMs"> {
 	return {
-		key: detectionKey(latest),
+		key: detectionKeyOf(latest) ?? "",
 		comName: latest.comName,
 		sciName: latest.sciName,
 		speciesSlug: comNameToSlug(latest.comName),
@@ -105,48 +81,41 @@ async function buildCurrentBird(
 		audioUrl: withAudio
 			? audioUrlFor(latest.date, latest.comName, latest.fileName)
 			: null,
-		countLast24h: moments.length,
-		visitsLast24h: countVisits(moments),
-		averageConfidence:
-			allTime.averageConfidence != null
-				? Number(allTime.averageConfidence)
-				: null,
-		firstHeardLast24h: moments.reduce((earliest, moment) =>
-			moment < earliest ? moment : earliest,
-		),
-		allTimeCount: allTime.allTimeCount,
 	};
 }
 
-async function getWindowRows(): Promise<WindowRow[]> {
-	const rows = await db
-		.select({
-			comName: detections.Com_Name,
-			sciName: detections.Sci_Name,
-			date: detections.Date,
-			detectedAt,
-			confidence: detections.Confidence,
-			fileName: detections.File_Name,
-		})
-		.from(detections)
-		.where(isLast24h)
-		.orderBy(desc(detections.Date), desc(detections.Time));
-	return rows.map((row) => ({ ...row, timestamp: row.detectedAt }));
-}
+const detectionColumns = {
+	comName: detections.Com_Name,
+	sciName: detections.Sci_Name,
+	date: detections.Date,
+	detectedAt,
+	confidence: detections.Confidence,
+	fileName: detections.File_Name,
+};
 
-async function hasAnyDetections(): Promise<boolean> {
+async function latestOn(date: string): Promise<LatestRow | undefined> {
 	const [row] = await db
-		.select({ rowId: sql<number>`rowid` })
+		.select(detectionColumns)
 		.from(detections)
+		.where(eq(detections.Date, date))
+		.orderBy(desc(detections.Date), desc(detections.Time))
 		.limit(1);
-	return row !== undefined;
+	return row;
 }
 
-function buildRecentVisits(
-	log: Visit<WindowRow>[],
+async function recentOn(
+	date: string,
+	heroKey: string | undefined,
 	withAudio: boolean,
-): Omit<RecentVisit, "ageMs">[] {
-	return log.slice(0, RECENT_LIMIT).map((visit) => {
+): Promise<Omit<RecentVisit, "ageMs">[]> {
+	const rows = await db
+		.select(detectionColumns)
+		.from(detections)
+		.where(eq(detections.Date, date));
+	const visits = groupVisits(
+		rows.map((row) => ({ ...row, timestamp: row.detectedAt })),
+	).filter((visit) => detectionKeyOf(visit.moments.at(-1)) !== heroKey);
+	return visits.slice(0, RECENT_LIMIT).map((visit) => {
 		const first = visit.moments[0];
 		const last = visit.moments[visit.moments.length - 1];
 		const best = visit.moments.reduce((top, moment) =>
@@ -169,20 +138,41 @@ function buildRecentVisits(
 	});
 }
 
-async function loadNowData(withAudio: boolean) {
-	const rows = await getWindowRows();
-	const latest = rows.at(0);
-	const heroKey = latest && detectionKey(latest);
-	const log = groupVisits(rows).filter(
-		(visit) =>
-			detectionKey(visit.moments[visit.moments.length - 1]) !== heroKey,
-	);
+function detectionKeyOf(row: LatestRow | undefined): string | undefined {
+	return row && `${row.detectedAt}-${row.fileName}`;
+}
 
+async function hasAnyDetections(): Promise<boolean> {
+	const [row] = await db
+		.select({ rowId: sql<number>`rowid` })
+		.from(detections)
+		.limit(1);
+	return row !== undefined;
+}
+
+async function readShownDay() {
+	const today = stationToday();
+	const latestToday = await latestOn(today);
+	if (latestToday)
+		return { day: "today" as const, date: today, latest: latestToday };
+	const yesterday = addDays(today, -1);
 	return {
-		current: latest ? await buildCurrentBird(latest, rows, withAudio) : null,
+		day: "yesterday" as const,
+		date: yesterday,
+		latest: await latestOn(yesterday),
+	};
+}
+
+async function loadNowData(withAudio: boolean) {
+	const { day, date, latest } = await readShownDay();
+	return {
+		current: latest ? buildCurrentBird(latest, withAudio) : null,
 		hasAnyDetections: latest ? true : await hasAnyDetections(),
-		summary: { detections: rows.length },
-		recent: buildRecentVisits(log, withAudio),
+		day,
+		date,
+		recent: latest
+			? await recentOn(date, detectionKeyOf(latest), withAudio)
+			: [],
 	};
 }
 
@@ -205,23 +195,20 @@ function readNowData(withAudio: boolean) {
 export const getNowSnapshot = createServerFn({ method: "GET" }).handler(
 	async (): Promise<NowSnapshot> => {
 		const generatedAtDate = new Date();
-		const generatedAtMs = generatedAtDate.getTime();
-		const { current, hasAnyDetections, summary, recent } = await readNowData(
+		const { current, recent, ...rest } = await readNowData(
 			await canHearEveryClip(),
 		);
+		const ageOf = (timestamp: string) =>
+			generatedAtDate.getTime() - timestampToMillis(timestamp);
 
 		return {
 			generatedAt: localTimestamp(generatedAtDate),
-			current: current && {
-				...current,
-				ageMs: generatedAtMs - timestampToMillis(current.detectedAt),
-			},
-			hasAnyDetections,
-			summary,
+			current: current && { ...current, ageMs: ageOf(current.detectedAt) },
 			recent: recent.map((visit) => ({
 				...visit,
-				ageMs: generatedAtMs - timestampToMillis(visit.lastAt),
+				ageMs: ageOf(visit.lastAt),
 			})),
+			...rest,
 		};
 	},
 );

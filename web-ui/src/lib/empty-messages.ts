@@ -10,8 +10,8 @@ export const EMPTY = {
 	window: {
 		liveQuietTitle: "All Quiet",
 		liveQuietBody:
-			"Nothing heard in the last 24 hours. New detections will appear here on their own.",
-		last24Hours: "No detections recorded in the last 24 hours.",
+			"Nothing heard yet today. New detections will appear here on their own.",
+		today: "No detections recorded yet today.",
 		timelineWindow: (windowLabel: string | null) =>
 			windowLabel
 				? `No detections recorded for ${windowLabel}.`

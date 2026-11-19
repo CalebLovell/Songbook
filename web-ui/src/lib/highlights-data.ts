@@ -103,7 +103,7 @@ export function formatRate(rate: number): string {
 }
 
 export function windowPhrase(period: HighlightPeriod): string {
-	return period === "live" || period === "day"
+	return period === "day"
 		? "today"
 		: period === "all"
 			? "all time"
@@ -114,7 +114,7 @@ export function formatAfterDark(
 	{ nights, latest }: Pick<NightSighting, "nights" | "latest">,
 	period: HighlightPeriod,
 ): string {
-	const oneDay = period === "live" || period === "day";
+	const oneDay = period === "day";
 	if (nights > 1 && !oneDay) return `${nights} nights`;
 	const [hour, minute] = latest.split(":").map(Number);
 	return `at ${formatSunClock(hour * 60 + minute)}`;
@@ -129,7 +129,6 @@ export function formatVocal({
 }
 
 const PREVIOUS_PERIOD: Record<HighlightPeriod, string> = {
-	live: "yesterday",
 	day: "yesterday",
 	week: "last week",
 	month: "last month",
@@ -210,7 +209,7 @@ export function judgeHighlights(
 		return count;
 	};
 	const isConsistent = (name: string) => {
-		if (period === "live" || period === "day") {
+		if (period === "day") {
 			const streak = streakOf(name);
 			regularShare.set(name, streak);
 			regularNote.set(

@@ -8,71 +8,52 @@ import { RecordingButton } from "~/components/recording-button.tsx";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Count } from "~/components/ui/count.tsx";
-import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
-import { RECENT_LIMIT, type RecentVisit } from "~/lib/now.ts";
+import { RECENT_LIMIT, type RecentVisit, type ShownDay } from "~/lib/now.ts";
 import { formatClockRange, formatTimeAgo } from "~/lib/time-ago.ts";
 import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
-import { VISIT_GAP_MINUTES } from "~/lib/visits.ts";
 
 const CARD_CLASS = "@container flex flex-col";
+const LISTED_CARD_CLASS = `${CARD_CLASS} pb-0`;
 const ROW_CLASS = "flex items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
+const LIST_CLASS = "-mx-page divide-y";
 const TIME_COLUMN_CLASS = "@min-[26rem]:block hidden shrink-0 text-right";
 const ROW_BUTTON = {
 	size: "sm" as const,
 	labelClassName: "@min-[26rem]:inline hidden",
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
-const FOOTER_CLASS =
-	"-mx-page mt-auto -mb-page flex min-h-11.25 shrink-0 items-center justify-end border-t px-page";
-const FOOTER_LINK_CLASS =
+const HEADER_LINK_CLASS =
 	"inline-flex items-center gap-1 text-xs no-underline hover:underline";
 
-function RecentLogHeader() {
+function RecentLogHeader({ day, date }: { day: ShownDay; date?: string }) {
 	return (
 		<CardHeader title="Recent activity">
-			<InfoTip label="Recent activity" size="default">
-				<p>
-					The live activity from your station is updated here in real time, and
-					detections are listed from most recent to least recent. Visits are
-					combined when the same bird is heard repeatedly without a{" "}
-					{VISIT_GAP_MINUTES} minute gap.
-				</p>
-				<p>
-					Each row displays the species, number of detections, when they were
-					heard, and the confidence percentile assigned by the BirdNET
-					algorithm. The link in the bottom right redirects to the complete
-					timeline view for the day.
-				</p>
-			</InfoTip>
+			<Link
+				to="/timeline"
+				search={date ? { period: "day", date } : undefined}
+				className={HEADER_LINK_CLASS}
+			>
+				All of {day}
+				<ArrowRight aria-hidden className="size-3" />
+			</Link>
 		</CardHeader>
 	);
 }
 
-function RecentLogFooter() {
-	return (
-		<div className={FOOTER_CLASS}>
-			<Link to="/timeline" className={FOOTER_LINK_CLASS}>
-				All of today
-				<ArrowRight aria-hidden className="size-3" />
-			</Link>
-		</div>
-	);
-}
-
-export function RecentLogCardSkeleton() {
+export function RecentLogCardSkeleton({ day }: { day: ShownDay }) {
 	const canListen = useCanListen();
 	return (
 		<Card
 			as="section"
 			aria-busy="true"
 			aria-label="Recent detections"
-			className={CARD_CLASS}
+			className={LISTED_CARD_CLASS}
 		>
-			<RecentLogHeader />
-			<ul aria-hidden="true" className="-mx-page divide-y">
+			<RecentLogHeader day={day} />
+			<ul aria-hidden="true" className={LIST_CLASS}>
 				{Array.from({ length: RECENT_LIMIT }, (_, index) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 					<li key={index} className={ROW_CLASS}>
@@ -107,7 +88,6 @@ export function RecentLogCardSkeleton() {
 					</li>
 				))}
 			</ul>
-			<RecentLogFooter />
 		</Card>
 	);
 }
@@ -116,25 +96,35 @@ const NAME_WIDTHS = ["w-36", "w-28", "w-44", "w-32", "w-40"];
 
 export function RecentLogCard({
 	recent,
+	day,
+	date,
 	generatedAt,
 	freshKeys,
+	limit,
 }: {
 	recent: RecentVisit[];
+	day: ShownDay;
+	date: string;
 	generatedAt: string;
 	freshKeys: Set<string>;
+	limit?: number;
 }) {
 	const canListen = useCanListen();
 	const offsetMs = useAgeOffset(generatedAt);
 
 	return (
-		<Card as="section" aria-label="Recent detections" className={CARD_CLASS}>
-			<RecentLogHeader />
+		<Card
+			as="section"
+			aria-label="Recent detections"
+			className={recent.length > 0 ? LISTED_CARD_CLASS : CARD_CLASS}
+		>
+			<RecentLogHeader day={day} date={date} />
 
 			{recent.length === 0 ? (
-				<EmptyNote>{EMPTY.window.last24Hours}</EmptyNote>
+				<EmptyNote>{EMPTY.window.today}</EmptyNote>
 			) : (
-				<ul className="-mx-page divide-y">
-					{recent.map((visit) => {
+				<ul className={LIST_CLASS}>
+					{recent.slice(0, limit).map((visit) => {
 						const clock = formatClockRange(visit.firstAt, visit.lastAt);
 						const age = formatTimeAgo(visit.ageMs + offsetMs);
 
@@ -210,8 +200,6 @@ export function RecentLogCard({
 					})}
 				</ul>
 			)}
-
-			{recent.length > 0 ? <RecentLogFooter /> : null}
 		</Card>
 	);
 }

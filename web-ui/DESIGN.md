@@ -181,7 +181,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
   `/` to focus), then two nav sections: Explore (Live Feed, Timeline, All Birds, Detections,
   Learn) for everyone, and Station (Review, Health, Species Filter, Settings) right below it only
-  when signed in. Nothing else sits low in the sidebar except the foot: account card, theme switcher, then a full-bleed status bar under a hairline, in the sidebar and the phone drawer alike (the slot under the wordmark belongs to the site name). The bar shows station status on the left (a moss dot that pings while listening, a still grey dot when Offline or Unknown; signed in, it links to Health) and `Songbook <version>` on the right, linking to the GitHub repo; the version is the release tag baked in at build time (`VITE_SONGBOOK_VERSION`), so dev builds show just Songbook. It is the only place status shows; the Live hero carries none. The foot keeps a fixed 1rem gap on every width, like the nav rows above it; `--page-gap` halving on phones is for page cards, not the drawer.
+  when signed in. Nothing else sits low in the sidebar except the foot: account card, theme switcher, then a full-bleed status bar under a hairline, in the sidebar and the phone drawer alike (the slot under the wordmark belongs to the site name). The bar shows station status on the left (a moss dot that pings while listening, a still grey dot when Offline or Unknown; signed in, it links to Health) and `Songbook <version>` on the right, linking to the GitHub repo; the version is the release tag baked in at build time (`VITE_SONGBOOK_VERSION`), so dev builds show just Songbook. It is the only place status shows; Live's Now header carries none. The foot keeps a fixed 1rem gap on every width, like the nav rows above it; `--page-gap` halving on phones is for page cards, not the drawer.
 - **Account card**: the sidebar's last item, never a nav row. One line of bold title and
   one muted line beside a 36px round icon well, then a 34px borderless icon action:
   sign out when signed in, a link to `/sign-in?next=` when not, a chevron to `/sign-in` when
@@ -257,8 +257,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   tile are the one exception to the shared heat scale: they compare a bird only
   with itself, as a linear share of its own peak.
 - **Collage** (`collage-card.tsx`): the Timeline's third view, after List and
-  Grid (Images icon), drawn from the same rows for whatever window is shown; it
-  is not a page of its own. Painted birds only, packed centre-out in an
+  Grid (Images icon), drawn from the same rows for whatever window is shown, and
+  Live's day; it is not a page of its own. Painted birds only, packed centre-out in an
   ellipse shaped like the card, their areas set by detections^0.65. The flock
   is drawn as large as fits: the layout searches for the biggest scale at which
   every bird still packs inside the card's padding, so it fills the card and
@@ -368,8 +368,6 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   through the card's padding and pad back in with `--page-gap`, never a fixed 16px.
 - Mastheads stand `--masthead-h`, level with the sidebar's wordmark band. Their
   words come from `lib/page-headers.ts`.
-- The Live hero and the bird page's profile share one geometry (a 120px portrait
-  centred in a 9.5rem column), so a bird keeps its size and place between them.
 - The bird page's visit log shows 10 rows a page and never scrolls. Its full page
   sets the row's height; the hour and month charts beside it stretch to match it,
   never the other way round.
@@ -405,9 +403,38 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the station. The arrows walk one window at a time with no limit, and a period
   switch re-anchors on the latest day in the window with detections. Only a Daily
   address that isn't a date replaces the page. An empty station keeps its controls.
-- **Live** is bounded to a rolling 24 hours. Log rows are visits (`lib/visits.ts`),
-  and a bird sits in the hero or the log, not both.
-- **Highlights**: the rules are pure and shared by Live and Timeline
+- **Live** is the station's today at a glance (since midnight), in two
+  columns (2:3 from `lg`) under a header. The header is the bird page's profile card
+  (`bird-profile-card.tsx`, the same in-flight painting, name over binomial),
+  filled with the newest bird ("Heard 2 minutes ago at 7:58 AM", play,
+  confidence), full width. Below, the left column holds Recent
+  activity (the latest visits, flashing in as they arrive; "All of today" to
+  Timeline sits in its header, and it has no info popup) at its full length,
+  then By hour: the bird page's Detections by hour card as bars, each colored
+  by the Activity heat ramp (`heatColor`, log scale, the busiest in full moss) (same
+  header band, grid, axes, hover popover and cursor band, hidden from assistive
+  tech beside its own data table, no tab stops). Every hour without detections,
+  quiet so far or still ahead, keeps a short `track` stub (a stacked series left
+  out of the popover), so the day reads as 24 slots, and the collage on the right is titled
+  Today (Yesterday overnight) with the Activity card's header: the day's
+  detections and species, and sunrise and sunset in place of Reshuffle, which
+  Live doesn't offer. From `xl` both columns are as tall as the window allows under
+  the header: Recent activity shows up to 6 visits (`RECENT_LIMIT`), as many
+  whole rows of those as fit while By hour
+  keeps at least 12rem (measured on resize, so the list ends on a row with no
+  empty foot), and By hour stretches to fill what is left, so the page doesn't
+  scroll. In one column (below `lg`) it stacks: header,
+  Recent activity, Today, By hour. That is also the source and tab order at
+  every width: from `lg` grid placement, never `order`, moves By hour under
+  the activity card, so keyboard focus never jumps past the list to Today. The bars and
+  collage read Timeline's Daily query (`timelineQuery` in
+  `lib/timeline-page.ts`), so the pages share a cache; the header and list come
+  from the polled snapshot, and the day cards refetch only when its newest
+  detection changes. The collage repacks only when a bird or its count changes.
+  Until today's first detection everything shows yesterday, so the page isn't
+  blank overnight. Live carries no Highlights and no audio stream: Highlights
+  belong to Timeline with its Share, and Listen is a Health card.
+- **Highlights**: the rules are pure and belong to Timeline
   (`lib/highlights-data.ts`), with thresholds and their guide together in
   `lib/highlight-thresholds.ts`. A day with no recordings means the station was
   down: it is skipped, not held against a bird.
@@ -441,7 +468,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   has to know.
   Playback's boost (on by default) works the same way: `applyClipBoost` routes every
   clip player through a shared gain and limiter during the tap, since iOS Safari only
-  starts audio from a gesture. Live audio keeps its own gain and compression popover.
+  starts audio from a gesture. Live audio (Listen, on Health) keeps its own gain and compression popover.
 - **Health or Settings**: Health holds everything the station needs to work, and
   Settings holds only what someone might tweak to taste. A station left on every Settings
   default runs fine; one with a Health problem doesn't. So a value with no sensible

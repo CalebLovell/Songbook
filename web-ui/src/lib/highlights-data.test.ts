@@ -370,7 +370,6 @@ test("a line names a few birds and counts the rest", () => {
 
 test("time away and time silent count in the window's own unit", () => {
 	assert.equal(formatAwayIn(12, "day"), "12 days");
-	assert.equal(formatAwayIn(12, "live"), "12 days");
 	assert.equal(formatAwayIn(8, "week"), "1 week");
 	assert.equal(formatAwayIn(23, "week"), "3 weeks");
 	assert.equal(formatAwayIn(150, "month"), "5 months");
