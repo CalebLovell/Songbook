@@ -47,7 +47,7 @@ const COLLAGE_AREA_CLASS = "relative mt-page flex-1";
 const RESIZE_SETTLE_MS = 150;
 const POP_SPREAD_MS = 1200;
 
-const DEFAULT_TITLE = "Collage";
+const DEFAULT_TITLE = "Activity";
 
 function CollageHeader({
 	title,
