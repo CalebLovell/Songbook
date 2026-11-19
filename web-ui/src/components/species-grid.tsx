@@ -130,7 +130,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 					</div>
 				</div>
 
-				<div className="flex shrink-0 flex-col items-end gap-1.5">
+				<div className="flex shrink-0 flex-col items-end">
 					<Count>{item.count.toLocaleString()}</Count>
 					<div className="flex flex-wrap items-center justify-end gap-1.5">
 						<SpeciesFlagPills
@@ -189,7 +189,7 @@ export function SpeciesGridSkeleton({
 								/>
 								<ShellText className="text-xs" barClassName="w-24" />
 							</div>
-							<div className="flex shrink-0 flex-col items-end gap-1.5">
+							<div className="flex shrink-0 flex-col items-end">
 								<ShellText
 									className={cn(COUNT_CLASS, "w-10")}
 									barClassName="right-0 left-auto w-8"
