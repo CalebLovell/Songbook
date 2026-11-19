@@ -137,6 +137,11 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   segments are joined. The one other exception is the recording player's
   strip under its spectrogram (play, time, date, confidence): a fixed 8px
   (`gap-2`) at every width, because the wider gap looked worse there.
+- Gaps are measured between what is visible, not between hit areas. When
+  two controls both carry invisible padding (a round icon button beside the
+  wordmark's hover pill), pull one in with a negative margin so the visible
+  gap matches the gutter -- the menu bar's wordmark sits `-ml-2` against the
+  menu button.
 - Search boxes all read "Search…" (one ellipsis character), never what they
   search; the specific scope goes in the `aria-label`.
 - Motion: 180ms ease for color/border/lift; `animate-rise-in` 700ms on mount;
@@ -366,6 +371,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   auto track, so a name truncates instead of widening the page.
 - Cards are titled with `CardHeader`, a 45px band. Bands, hairlines and rows bleed
   through the card's padding and pad back in with `--page-gap`, never a fixed 16px.
+- The sidebar's wordmark band stands `--masthead-h` with its hairline. The
+  wordmark link (24px wordmark, site name under it) fills the band less 0.5rem
+  on every side, so its focus ring fits inside the card.
 - Mastheads stand `--masthead-h`, level with the sidebar's wordmark band. Their
   words come from `lib/page-headers.ts`.
 - The bird page's visit log shows 10 rows a page and never scrolls. Its full page

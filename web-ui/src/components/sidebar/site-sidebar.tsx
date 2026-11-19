@@ -14,21 +14,23 @@ export function SidebarBody({
 }) {
 	const { auth } = useRouteContext({ from: "__root__" });
 	return (
-		<div className="flex min-h-full flex-col pt-3">
+		<div className={`flex min-h-full flex-col ${withTitle ? "" : "pt-3"}`}>
 			{withTitle ? (
 				<>
-					<Link
-						to="/"
-						onClick={onNavigate}
-						className="flex h-[calc(var(--masthead-h)-14px)] flex-col items-start px-5.5 pt-1 pb-3 no-underline"
-					>
-						<SongbookWordmark className="shrink-0 text-[24px] text-moss" />
-						{auth.siteName ? (
-							<span className="mt-0.5 text-muted-foreground text-xs">
-								{auth.siteName}
-							</span>
-						) : null}
-					</Link>
+					<div className="flex h-[calc(var(--masthead-h)-2px)] p-2">
+						<Link
+							to="/"
+							onClick={onNavigate}
+							className="flex flex-1 flex-col items-start rounded-sm px-3.5 pt-2 no-underline"
+						>
+							<SongbookWordmark className="shrink-0 text-[24px] text-moss" />
+							{auth.siteName ? (
+								<span className="mt-0.5 text-muted-foreground text-xs leading-4">
+									{auth.siteName}
+								</span>
+							) : null}
+						</Link>
+					</div>
 					<div aria-hidden="true" className="mb-page h-px bg-line" />
 				</>
 			) : null}

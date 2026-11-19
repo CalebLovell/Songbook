@@ -63,7 +63,7 @@ export function MobileNav() {
 						/>
 					) : null}
 				</button>
-				<SiteName />
+				<SiteName className="-ml-2" />
 				<div id={MENU_BAR_SLOT_ID} className="ml-auto flex items-center" />
 			</div>
 
@@ -155,12 +155,18 @@ const DRAWER_BAR_CLASS = `${BAR_BASE_CLASS} px-3`;
 const ROUND_BUTTON_CLASS =
 	"flex size-8 pointer-coarse:size-9 items-center justify-center rounded-full bg-paper-raised text-moss hover:bg-meadow";
 
-function SiteName({ onClick }: { onClick?: () => void }) {
+function SiteName({
+	onClick,
+	className = "",
+}: {
+	onClick?: () => void;
+	className?: string;
+}) {
 	return (
 		<Link
 			to="/"
 			onClick={onClick}
-			className="flex h-8 pointer-coarse:h-9 items-center gap-2 rounded-md px-2 font-semibold text-lg no-underline hover:bg-meadow"
+			className={`${className} flex h-8 pointer-coarse:h-9 items-center gap-2 rounded-md px-2 font-semibold text-lg no-underline hover:bg-meadow`}
 		>
 			<SongbookWordmark className="shrink-0 text-[24px] text-moss" />
 		</Link>
