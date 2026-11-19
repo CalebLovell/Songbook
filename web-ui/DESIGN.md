@@ -439,7 +439,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   header band, grid, axes, hover popover and cursor band, hidden from assistive
   tech beside its own data table, no tab stops). Every hour without detections,
   quiet so far or still ahead, keeps a short `track` stub (a stacked series left
-  out of the popover), so the day reads as 24 slots, and the collage on the right is titled
+  out of the popover, a fixed 3px), so the day reads as 24 slots, and any hour
+  with a detection draws at least 6px so it always stands taller than a stub. The collage on the right is titled
   Today (Yesterday overnight) with the Activity card's header: the day's
   detections and species, and sunrise and sunset in place of Reshuffle, which
   Live doesn't offer. From `xl` both columns are as tall as the window allows under

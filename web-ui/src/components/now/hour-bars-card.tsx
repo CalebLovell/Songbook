@@ -33,8 +33,9 @@ const FIT_CLASS = "min-h-72 xl:min-h-48 xl:flex-1";
 export const HOUR_BARS_MIN_PX = 192;
 // What a 192px card leaves for the plot under its header band and padding.
 const CHART_MIN_PX = 96;
-// A quiet hour shows a stub this share of the busiest hour, so the day keeps all 24 slots.
-const STUB_SHARE = 0.03;
+// A quiet hour keeps a stub so the day shows all 24 slots; any detection stands taller than it.
+const STUB_PX = 3;
+const MIN_BAR_PX = 6;
 const EVEN_HOURS = Array.from({ length: 12 }, (_, index) => index * 2);
 
 export function sumHours(rows: readonly { hourCounts: number[] }[]): number[] {
@@ -61,11 +62,14 @@ export function HourBarsCard({
 	const reducedMotion = useReducedMotion();
 	const theme = useTheme();
 	const peak = Math.max(...hours, 1);
-	const stub = peak * STUB_SHARE;
 	const data = hours.map((count, hour) => {
 		const shown = hour > lastHour ? null : count;
-		return { hour, count: shown, stub: shown ? null : stub };
+		return { hour, count: shown, stub: shown ? null : 0 };
 	});
+	const barMinPx = (_: unknown, index: number) =>
+		(data[index]?.count ?? 0) > 0 ? MIN_BAR_PX : 0;
+	const stubMinPx = (_: unknown, index: number) =>
+		data[index]?.stub == null ? 0 : STUB_PX;
 	const heatBar = (bar: BarShapeProps) => (
 		<Rectangle
 			{...bar}
@@ -135,6 +139,7 @@ export function HourBarsCard({
 							isAnimationActive={!reducedMotion}
 							animationDuration={CHART_ANIMATION_MS}
 							radius={[2, 2, 0, 0]}
+							minPointSize={barMinPx}
 							shape={heatBar}
 						/>
 						<Bar
@@ -143,6 +148,7 @@ export function HourBarsCard({
 							tooltipType="none"
 							isAnimationActive={false}
 							radius={[1, 1, 0, 0]}
+							minPointSize={stubMinPx}
 							fill="var(--track)"
 						/>
 					</BarChart>
