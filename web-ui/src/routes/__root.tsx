@@ -10,6 +10,7 @@ import { MainFocus } from "~/components/main-focus.tsx";
 import { PullToRefresh } from "~/components/pull-to-refresh.tsx";
 import { RouteError, RouteNotFound } from "~/components/root-status.tsx";
 import { ServiceWorkerRegistration } from "~/components/service-worker.tsx";
+import { BottomTabBar } from "~/components/sidebar/bottom-tab-bar.tsx";
 import { MobileNav } from "~/components/sidebar/mobile-nav.tsx";
 import { SiteSidebar } from "~/components/sidebar/site-sidebar.tsx";
 import { ArtworkPreferenceContext } from "~/components/species-image.tsx";
@@ -47,7 +48,7 @@ export const Route = createRootRouteWithContext<{
 			},
 			{
 				name: "viewport",
-				content: "width=device-width, initial-scale=1",
+				content: "width=device-width, initial-scale=1, viewport-fit=cover",
 			},
 			{ name: "theme-color", content: LIGHT_BROWSER_BAR_COLOR },
 			{
@@ -131,6 +132,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 										{children}
 									</main>
 								</PullToRefresh>
+								<BottomTabBar />
 							</div>
 						</div>
 					</BoostQuietRecordingsContext.Provider>

@@ -384,6 +384,14 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   `resetScroll: false`.
 - The sidebar takes its column from `xl` (1280px), the narrowest window that still
   fits the timeline's full heat map beside it. Below that the menu bar stands in.
+- Below `xl`, wherever the menu bar stands in for the sidebar (phones and
+  tablets), a bottom tab bar (`bottom-tab-bar.tsx`) also holds the five Explore
+  pages, from the same list as the sidebar (`EXPLORE_LINKS`). It sits under
+  `main` in the column, never over it, and pads for the home indicator
+  (`safe-area-inset-bottom`, which needs `viewport-fit=cover`). Each tab is an
+  icon over an 11px label in its own flush cell, with `--line` hairlines
+  between cells; active fills the whole cell (down through the home-indicator
+  padding) in the nav rows' active fill. Station pages stay in the drawer.
 - Anything in a variable-width track responds to its card through container
   queries, not the viewport.
 - Grids holding long names use `minmax(0,1fr)` or `grid-cols-1`, never the implicit

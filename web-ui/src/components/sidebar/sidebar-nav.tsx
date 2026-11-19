@@ -1,19 +1,15 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
 import {
-	AudioWaveform,
-	CalendarRange,
-	Feather,
 	HeartPulse,
-	Lightbulb,
 	type LucideIcon,
 	SearchCheck,
 	Settings,
 	SlidersHorizontal,
-	Sun,
 } from "lucide-react";
 import { useId } from "react";
 
 import { AccountCard } from "~/components/sidebar/account-card.tsx";
+import { EXPLORE_LINKS } from "~/components/sidebar/explore-links.ts";
 import { SidebarStatusBar } from "~/components/sidebar/sidebar-status-bar.tsx";
 import { ThemeSwitcher } from "~/components/sidebar/theme-switcher.tsx";
 import type { HealthAttention } from "~/lib/health-cards.ts";
@@ -48,39 +44,12 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 				aria-labelledby={`${id}-explore`}
 			>
 				<SectionLabel id={`${id}-explore`}>Explore</SectionLabel>
-				<Link to="/today" {...linkProps}>
-					<NavIcon icon={Sun} />
-					Today
-				</Link>
-				<Link
-					to="/timeline"
-					activeOptions={{ includeSearch: false }}
-					{...linkProps}
-				>
-					<NavIcon icon={CalendarRange} />
-					Timeline
-				</Link>
-				<Link to="/birds" {...linkProps}>
-					<NavIcon icon={Feather} />
-					All Birds
-				</Link>
-				<Link
-					to="/detections"
-					search={{
-						page: 1,
-						sort: "recorded",
-						direction: "desc",
-					}}
-					activeOptions={{ includeSearch: false }}
-					{...linkProps}
-				>
-					<NavIcon icon={AudioWaveform} />
-					Detections
-				</Link>
-				<Link to="/learn" {...linkProps}>
-					<NavIcon icon={Lightbulb} />
-					Learn
-				</Link>
+				{EXPLORE_LINKS.map(({ label, icon, link }) => (
+					<Link key={label} {...link} {...linkProps}>
+						<NavIcon icon={icon} />
+						{label}
+					</Link>
+				))}
 			</nav>
 
 			{auth.unlocked ? (
