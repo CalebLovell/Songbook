@@ -24,10 +24,10 @@ export type SitePage = {
 
 export const SITE_PAGES: readonly SitePage[] = [
 	{
-		label: "Live Feed",
-		to: "/live",
+		label: "Today",
+		to: "/today",
 		icon: Activity,
-		header: PAGE_HEADERS.live,
+		header: PAGE_HEADERS.today,
 	},
 	{
 		label: "Timeline",
@@ -109,7 +109,7 @@ function editDistance(a: string, b: string): number {
 }
 
 export function sitePageFor(pathname: string): SitePage | undefined {
-	const segment = firstSegment(pathname) || "live";
+	const segment = firstSegment(pathname) || "today";
 	return SITE_PAGES.find((page) => slugOf(page) === segment);
 }
 

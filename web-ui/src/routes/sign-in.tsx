@@ -15,7 +15,7 @@ import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { safeNext } from "~/lib/require-unlocked.ts";
 
-const AFTER_SIGN_IN = "/live";
+const AFTER_SIGN_IN = "/today";
 
 export const Route = createFileRoute("/sign-in")({
 	head: () => pageHead("Sign in"),

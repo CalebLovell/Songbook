@@ -613,8 +613,8 @@ function HighlightsSettingsCard({
 	return (
 		<SettingsCard
 			title="Highlights"
-			description="Decide which birds the Highlights card calls out on the Live page and timeline."
-			confirmDescription="This writes the values in this card to the station's configuration. Nothing restarts: the Live page and timeline judge by them from their next load."
+			description="Decide which birds the Highlights card calls out on the Today page and timeline."
+			confirmDescription="This writes the values in this card to the station's configuration. Nothing restarts: the Today page and timeline judge by them from their next load."
 			onSave={() => void form.submit()}
 			reset={resetControl(form, RESET_NO_RESTART_DESCRIPTION)}
 			saveDisabled={form.saveDisabled}

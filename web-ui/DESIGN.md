@@ -179,7 +179,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Nav rows**: active is marked by fill alone (a step deeper than the meadow
   hover), never bolder text. Gated pages stay listed with a lock icon.
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
-  `/` to focus), then two nav sections: Explore (Live Feed, Timeline, All Birds, Detections,
+  `/` to focus), then two nav sections: Explore (Today, Timeline, All Birds, Detections,
   Learn) for everyone, and Station (Review, Health, Species Filter, Settings) right below it only
   when signed in. Nothing else sits low in the sidebar except the foot: account card, theme switcher, then a full-bleed status bar under a hairline, in the sidebar and the phone drawer alike (the slot under the wordmark belongs to the site name). The bar shows station status on the left (a moss dot that pings while listening, a still grey dot when Offline or Unknown; signed in, it links to Health) and `Songbook <version>` on the right, linking to the GitHub repo; the version is the release tag baked in at build time (`VITE_SONGBOOK_VERSION`), so dev builds show just Songbook. It is the only place status shows; Live's Now header carries none. The foot keeps a fixed 1rem gap on every width, like the nav rows above it; `--page-gap` halving on phones is for page cards, not the drawer.
 - **Account card**: the sidebar's last item, never a nav row. One line of bold title and
@@ -403,7 +403,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the station. The arrows walk one window at a time with no limit, and a period
   switch re-anchors on the latest day in the window with detections. Only a Daily
   address that isn't a date replaces the page. An empty station keeps its controls.
-- **Live** is the station's today at a glance (since midnight), in two
+- **Today** is the station's today at a glance (since midnight), in two
   columns (2:3 from `lg`) under a header. The header is the bird page's profile card
   (`bird-profile-card.tsx`, the same in-flight painting, name over binomial),
   filled with the newest bird ("Heard 2 minutes ago at 7:58 AM", play,

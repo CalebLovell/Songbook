@@ -22,7 +22,7 @@ const OUTPUT_DIR = path.resolve("../.github/assets/screenshots");
 const SAMPLE_CONFIG = 'SITE_NAME="Backyard Station"\n';
 
 const PAGES = [
-	{ name: "live", path: "/live" },
+	{ name: "today", path: "/today" },
 	{ name: "timeline", path: "/timeline" },
 	{ name: "detections", path: "/detections" },
 	{ name: "birds", path: "/birds" },
@@ -38,7 +38,7 @@ const SIZES = [
 async function waitForServer(server: ChildProcess) {
 	for (let attempt = 0; attempt < 60; attempt += 1) {
 		if (server.exitCode !== null) break;
-		const up = await fetch(`${ORIGIN}/live`).then(
+		const up = await fetch(`${ORIGIN}/today`).then(
 			(response) => response.ok,
 			() => false,
 		);

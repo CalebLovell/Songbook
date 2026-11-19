@@ -54,7 +54,7 @@ jobs:
 
       - name: The web UI serves its pages
         run: |
-          for page in live timeline detections birds learn; do
+          for page in today timeline detections birds learn; do
             curl -fsS -L -o /dev/null --retry 20 --retry-delay 3 --retry-all-errors "http://localhost/$page"
           done
 

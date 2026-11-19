@@ -9,7 +9,7 @@ import { DEV_PASSWORD } from "../src/lib/dev-password.ts";
  * station is where most past breakages hid.
  */
 
-const PUBLIC_PAGES = ["/live", "/timeline", "/detections", "/birds", "/learn"];
+const PUBLIC_PAGES = ["/today", "/timeline", "/detections", "/birds", "/learn"];
 const GATED_PAGES = ["/review", "/settings", "/species-filter"];
 // The dev server's own password; set SMOKE_PASSWORD to test any other station.
 const PASSWORD = process.env.SMOKE_PASSWORD ?? DEV_PASSWORD;
@@ -62,7 +62,7 @@ test("a bird profile loads", async ({ page }) => {
 
 test("the root address redirects to the live page", async ({ page }) => {
 	await expectPageLoads(page, "/");
-	await expect(page).toHaveURL(/\/live/);
+	await expect(page).toHaveURL(/\/today/);
 });
 
 test("an unknown address gets the not-found card", async ({ page }) => {

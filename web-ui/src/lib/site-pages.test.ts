@@ -17,12 +17,12 @@ test("an address that resembles no page suggests nothing", () => {
 });
 
 test("a short slug tolerates fewer typos than a long one", () => {
-	assert.equal(closestSitePage("/lve")?.to, "/live");
+	assert.equal(closestSitePage("/tody")?.to, "/today");
 	assert.equal(closestSitePage("/lv"), undefined);
 });
 
 test("an error page wears the header of the section it happened in", () => {
-	assert.equal(sitePageFor("/")?.to, "/live");
+	assert.equal(sitePageFor("/")?.to, "/today");
 	assert.equal(sitePageFor("/birds/northern-cardinal")?.to, "/birds");
 	assert.equal(sitePageFor("/species-filter")?.header.title, "Species Filter");
 	assert.equal(sitePageFor("/sign-in"), undefined);

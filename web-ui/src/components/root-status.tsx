@@ -53,12 +53,12 @@ export function RouteNotFound() {
 						</ButtonLink>
 					) : null}
 					<ButtonLink
-						to="/live"
+						to="/today"
 						variant={suggestion ? "outline" : "default"}
 						size="sm"
 						icon={Activity}
 					>
-						Go to Live
+						Go to Today
 					</ButtonLink>
 				</>
 			}
@@ -151,8 +151,8 @@ export function RouteError({ error }: ErrorComponentProps) {
 					>
 						Try again
 					</Button>
-					<ButtonLink to="/live" variant="outline" size="sm" icon={Activity}>
-						Go to Live
+					<ButtonLink to="/today" variant="outline" size="sm" icon={Activity}>
+						Go to Today
 					</ButtonLink>
 				</>
 			}

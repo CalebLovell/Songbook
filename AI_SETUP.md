@@ -128,7 +128,7 @@ ssh <user>@<hostname>.local 'journalctl -u birdnet_analysis --since "-2 min" --n
 A count above 0 means recordings are being analysed. Then check the pages:
 
 ```bash
-ssh <user>@<hostname>.local 'for page in live timeline birds learn; do curl -s -o /dev/null -w "%{http_code} " http://localhost/$page; done'
+ssh <user>@<hostname>.local 'for page in today timeline birds learn; do curl -s -o /dev/null -w "%{http_code} " http://localhost/$page; done'
 ```
 
 **Success:** `200 200 200 200`.

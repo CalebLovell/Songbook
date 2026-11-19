@@ -5,7 +5,7 @@ import { DEV_PASSWORD } from "../src/lib/dev-password.ts";
 
 const PASSWORD = process.env.SMOKE_PASSWORD ?? DEV_PASSWORD;
 const PUBLIC_PAGES = [
-	"/live",
+	"/today",
 	"/timeline",
 	"/detections",
 	"/birds",
@@ -83,7 +83,7 @@ test.describe("page navigation", () => {
 	test("changing page moves focus to the content and announces it", async ({
 		page,
 	}) => {
-		await settle(page, "/live");
+		await settle(page, "/today");
 		await page.locator('nav a[href^="/birds"]').first().focus();
 		await page.keyboard.press("Enter");
 		await expect(page).toHaveURL(/\/birds/);
@@ -132,7 +132,7 @@ test.describe("mobile menu", () => {
 	test.use({ viewport: { width: 390, height: 844 } });
 
 	test("holds focus, then gives it back", async ({ page }) => {
-		await settle(page, "/live");
+		await settle(page, "/today");
 		const opener = page.getByRole("button", { name: "Open navigation" });
 		await opener.focus();
 		await page.keyboard.press("Enter");
@@ -298,7 +298,7 @@ test.describe("reduced motion", () => {
 	test.use({ reducedMotion: "reduce" });
 
 	test("stops looping and entrance animation", async ({ page }) => {
-		await settle(page, "/live");
+		await settle(page, "/today");
 		const durations = await page.evaluate(() =>
 			["animate-live-pulse", "animate-rise-in", "animate-spin"].map((name) => {
 				const probe = document.createElement("div");

@@ -48,9 +48,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 				aria-labelledby={`${id}-explore`}
 			>
 				<SectionLabel id={`${id}-explore`}>Explore</SectionLabel>
-				<Link to="/live" {...linkProps}>
+				<Link to="/today" {...linkProps}>
 					<NavIcon icon={Activity} />
-					Live Feed
+					Today
 				</Link>
 				<Link
 					to="/timeline"

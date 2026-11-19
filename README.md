@@ -11,12 +11,12 @@ in a web interface you host yourself. No account and no subscription. Your recor
 Pi.
 
 <p align="center">
-  <img src=".github/assets/screenshots/live-desktop.jpg" alt="The Live page: the latest bird heard and today's recent activity" width="820" />
+  <img src=".github/assets/screenshots/today-desktop.jpg" alt="The Today page: the latest bird heard and today's recent activity" width="820" />
 </p>
 
 ## Features
 
-- **Live** shows what was just heard. **Timeline** shows any day, week, month or year.
+- **Today** shows what was just heard. **Timeline** shows any day, week, month or year.
 - **All Birds** has a page per species: history, peak hours and its best recording.
 - **Learn** quizzes you on the calls your own station recorded.
 - **Review** and **Species filter** let you correct mistakes, behind a password.

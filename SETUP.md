@@ -88,7 +88,7 @@ station.
 Play a recording of a local bird from your phone, about 30 cm (a foot) from the microphone, for
 30 seconds, in a quiet room.
 
-**You should see** the bird on the **Live** page within a minute.
+**You should see** the bird on the **Today** page within a minute.
 
 Real birds are easiest to hear at dawn. Birds that don't live near you are filtered out.
 
