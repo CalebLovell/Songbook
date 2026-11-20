@@ -19,3 +19,8 @@ Don't add comments to `web-ui/src`: name things well and put durable rules in `w
   terminal, and do not pick a different port.
 - Reload the existing tab (navigate to the same URL, or `window.location.reload()`)
   rather than opening new tabs.
+- The launch config runs `web-ui/scripts/dev-server.sh`, which starts the
+  server detached (so it outlives the session that started it) or attaches to
+  the one already on 5199. Either way `preview_start` succeeds; never treat
+  "already running" as an error. Its log is `web-ui/.dev/dev-server-5199.log`.
+  Restart it only when needed, with `fuser -k 5199/tcp` then `preview_start`.

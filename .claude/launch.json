@@ -5,8 +5,7 @@
 			"name": "web-ui",
 			"runtimeExecutable": "bash",
 			"runtimeArgs": [
-				"-c",
-				"source \"$HOME/.nvm/nvm.sh\" && nvm use --silent && npm run dev -- --port 5199 --strictPort"
+				"scripts/dev-server.sh"
 			],
 			"cwd": "web-ui",
 			"port": 5199
@@ -14,7 +13,14 @@
 		{
 			"name": "chorus",
 			"runtimeExecutable": "C:/Users/caleb/Projects/BirdNET-Pi-Chorus/engine/.venv/Scripts/chorus.exe",
-			"runtimeArgs": ["demo", "--live", "--data", "C:/Users/caleb/Projects/BirdNET-Pi-Chorus/.data/demo-latest", "--web", "C:/Users/caleb/Projects/BirdNET-Pi-Chorus/web/build"],
+			"runtimeArgs": [
+				"demo",
+				"--live",
+				"--data",
+				"C:/Users/caleb/Projects/BirdNET-Pi-Chorus/.data/demo-latest",
+				"--web",
+				"C:/Users/caleb/Projects/BirdNET-Pi-Chorus/web/build"
+			],
 			"port": 8390
 		}
 	]
