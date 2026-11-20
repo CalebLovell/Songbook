@@ -55,9 +55,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 			{auth.unlocked ? (
 				<nav
 					className="mt-3 flex flex-col gap-0.5"
-					aria-labelledby={`${id}-station`}
+					aria-labelledby={`${id}-manage`}
 				>
-					<SectionLabel id={`${id}-station`}>Station</SectionLabel>
+					<SectionLabel id={`${id}-manage`}>Manage</SectionLabel>
 					<Link
 						to="/review"
 						search={{ page: 1 }}
