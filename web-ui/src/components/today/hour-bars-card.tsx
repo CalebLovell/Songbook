@@ -27,7 +27,7 @@ import { useTheme } from "~/lib/theme.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 import { useReducedMotion } from "~/lib/use-reduced-motion.ts";
 
-const TITLE = "By hour";
+const TITLE = "Hourly activity";
 // From xl the chart takes whatever height Recent activity leaves above it.
 const FIT_CLASS = "min-h-72 xl:min-h-48 xl:flex-1";
 export const HOUR_BARS_MIN_PX = 192;

@@ -455,7 +455,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   <date, time>", confidence and play, full width. Below, the left column holds Recent
   activity (the latest visits, flashing in as they arrive; "All of today" to
   Timeline sits in its header, and it has no info popup) at its full length,
-  then By hour: the bird page's Detections by hour card as bars, each colored
+  then Hourly activity: the bird page's Detections by hour card as bars, each colored
   by the Activity heat ramp (`heatColor`, log scale, the busiest in full moss) (same
   header band, grid, axes, hover popover and cursor band, hidden from assistive
   tech beside its own data table, no tab stops). Every hour without detections,
@@ -466,12 +466,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   detections and species, and sunrise and sunset in place of Reshuffle, which
   Live doesn't offer. From `xl` both columns are as tall as the window allows under
   the header: Recent activity shows up to 6 visits (`RECENT_LIMIT`), as many
-  whole rows of those as fit while By hour
+  whole rows of those as fit while Hourly activity
   keeps at least 12rem (measured on resize, so the list ends on a row with no
-  empty foot), and By hour stretches to fill what is left, so the page doesn't
+  empty foot), and Hourly activity stretches to fill what is left, so the page doesn't
   scroll. In one column (below `lg`) it stacks: header,
-  Recent activity, Today, By hour. That is also the source and tab order at
-  every width: from `lg` grid placement, never `order`, moves By hour under
+  Recent activity, Today, Hourly activity. That is also the source and tab order at
+  every width: from `lg` grid placement, never `order`, moves Hourly activity under
   the activity card, so keyboard focus never jumps past the list to Today. The bars and
   collage read Timeline's Daily query (`timelineQuery` in
   `lib/timeline-page.ts`), so the pages share a cache; the header and list come

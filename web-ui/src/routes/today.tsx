@@ -59,8 +59,8 @@ const NEW_BIRD_ANNOUNCE_GAP_MS = 60_000;
 // 9.875rem is the header at xl: its 7.75rem row, 1rem padding each side and a 2px border.
 const WINDOW_FIT_CLASS =
 	"xl:h-[calc(100dvh-9.875rem-3*var(--page-gap))] xl:min-h-[28rem]";
-// Source order is the reading and tab order (activity, Today, By hour); from lg the
-// grid places By hour under activity on the left and Today across both rows on the right.
+// Source order is the reading and tab order (Recent activity, Today, Hourly activity); from lg the
+// grid places Hourly activity under Recent activity on the left and Today across both rows on the right.
 const BODY_GRID_CLASS = `mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:grid-rows-[auto_1fr] xl:grid-rows-[auto_minmax(0,1fr)] xl:items-stretch ${WINDOW_FIT_CLASS}`;
 const FEED_SLOT_CLASS = "min-w-0 lg:col-start-1 lg:row-start-1 xl:self-start";
 const HOURS_SLOT_CLASS = "flex min-w-0 flex-col lg:col-start-1 lg:row-start-2";
