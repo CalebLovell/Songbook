@@ -139,16 +139,13 @@ function Detections() {
 										q: search.species,
 									})}
 									download
-									aria-label="Download CSV"
 									title={
 										isFiltered
 											? "Every detection matching these filters, on every page"
 											: "Every detection this station has logged"
 									}
 								>
-									<span>
-										<span className="@max-[30rem]:hidden">Download </span>CSV
-									</span>
+									Download
 								</a>
 							</Button>
 						) : null

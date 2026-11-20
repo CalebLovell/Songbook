@@ -517,9 +517,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   for the owner and visitors. Nothing on Settings restarts BirdNET or affects whether the
   station works, and Settings never repeats a Station reading. A setting finds its page by
   what it is about: if it changes what the station hears or keeps, it is Station; if it changes
-  what people see, it is Settings. Exporting detections is neither: it is Download CSV on
+  what people see, it is Settings. Exporting detections is neither: it is the Download button on
   Detections, which exports exactly what the search and date filters match, every page of it.
-  It sits in the toolbar beside the date range (just "CSV" under 30rem), never in the page header.
+  It sits in the toolbar beside the date range, labelled just Download (the file is a CSV), never in the page header.
   There is no Audio input, Recording or Storage setting anywhere:
   they are technical knobs, not taste, and the install defaults are right (one USB mic on
   `default`; 15 s recordings, 6 s mp3 clips; past 95% full, delete the least confident clips
