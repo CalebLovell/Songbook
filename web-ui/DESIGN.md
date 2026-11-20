@@ -304,7 +304,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   bird glyph where there's no photo. No bird flies and there is no Reshuffle.
 - **Heat map text**: the timeline's hours are hidden from assistive tech, and a hidden
   table gives every species by hour at any width. A narrow card drops the hours for
-  sighted users; that is a known gap against reflow, kept on purpose.
+  sighted users; that is a known gap against reflow, kept on purpose. Each
+  species row is one link to the bird, from the card's edge up to the hours
+  (the name's link stretches over the row); flag pills and hour cells sit above
+  it, so only the hours stay out of the link.
 - **Tables** (Detections, Species Filter): one grid with the header, body and
   rows as subgrids, so only the rows scroll and the columns still align. Header,
   rows and footer stand the same height. Width follows the card: under 36rem the

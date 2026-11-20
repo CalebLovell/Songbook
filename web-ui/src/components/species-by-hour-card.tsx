@@ -356,17 +356,10 @@ function SpeciesHourRowView({
 	heatMax: number;
 }) {
 	return (
-		<div className={`${ROW_LAYOUT} border-line border-t`}>
+		<div className={`relative ${ROW_LAYOUT} border-line border-t`}>
 			<div className={`h-8 ${LABEL_LAYOUT}`}>
 				<div className="flex min-w-0 items-center gap-2">
-					<Link
-						to="/birds/$comName"
-						preload={false}
-						params={{ comName: comNameToSlug(row.comName) }}
-						tabIndex={-1}
-						aria-hidden="true"
-						className={BIRD_BOX_CLASS}
-					>
+					<div className={BIRD_BOX_CLASS}>
 						<SpeciesImage
 							imageUrl={row.imageUrl}
 							alt=""
@@ -374,16 +367,16 @@ function SpeciesHourRowView({
 							glyphClassName="size-3.5"
 							loading="lazy"
 						/>
-					</Link>
+					</div>
 					<Link
 						to="/birds/$comName"
 						preload={false}
 						params={{ comName: comNameToSlug(row.comName) }}
-						className="min-w-0 truncate font-semibold text-sm no-underline hover:underline"
+						className="min-w-0 truncate font-semibold text-sm no-underline after:absolute after:inset-0 hover:underline"
 					>
 						{row.comName}
 					</Link>
-					<div className="flex shrink-0 items-center gap-2">
+					<div className="relative flex shrink-0 items-center gap-2">
 						<SpeciesFlagPills
 							isNew={row.isNew}
 							isReturned={row.isReturned}
@@ -403,7 +396,10 @@ function SpeciesHourRowView({
 				</Count>
 			</div>
 
-			<div aria-hidden="true" className={HOURS_LAYOUT}>
+			<div
+				aria-hidden="true"
+				className={`relative -me-page pe-page ${HOURS_LAYOUT}`}
+			>
 				<HeatRow row={row} heatMax={heatMax} />
 			</div>
 		</div>
