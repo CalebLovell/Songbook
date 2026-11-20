@@ -94,6 +94,12 @@ function GameInfo({
 	);
 }
 
+function GameNotice({ notice }: { notice?: string }) {
+	return notice ? (
+		<p className="text-muted-foreground text-sm">{notice}</p>
+	) : null;
+}
+
 export function LearnGameSkeleton() {
 	return (
 		<div className="@container/quiz">
@@ -200,7 +206,13 @@ export function LearnGameSkeleton() {
 	);
 }
 
-export function LearnGameEmpty({ message }: { message: string }) {
+export function LearnGameEmpty({
+	message,
+	notice,
+}: {
+	message: string;
+	notice?: string;
+}) {
 	return (
 		<div className="@container/quiz">
 			<div className={QUIZ_GRID_CLASS}>
@@ -212,6 +224,7 @@ export function LearnGameEmpty({ message }: { message: string }) {
 					<header data-slot="card-header" className={GAME_HEADER_CLASS}>
 						<Kicker as="h2">Bird quiz</Kicker>
 					</header>
+					<GameNotice notice={notice} />
 					<p className="text-muted-foreground text-sm">{message}</p>
 				</Card>
 
@@ -235,6 +248,7 @@ export function LearnGame({
 	isLoadingNextRound,
 	isPaused = false,
 	focusClipOnStart = false,
+	notice,
 }: {
 	round: LearnRound;
 	thresholds: PoolThresholds;
@@ -244,6 +258,7 @@ export function LearnGame({
 	isLoadingNextRound: boolean;
 	isPaused?: boolean;
 	focusClipOnStart?: boolean;
+	notice?: string;
 }) {
 	const [progress, setProgress] = useState(initialProgress);
 	const nextButton = useRef<HTMLButtonElement>(null);
@@ -354,6 +369,7 @@ export function LearnGame({
 						<Kicker as="h2">Bird quiz</Kicker>
 						<GameInfo thresholds={thresholds} />
 					</header>
+					<GameNotice notice={notice} />
 
 					<div className="flex @3xl/quiz:hidden flex-col gap-2">
 						<div className="flex justify-between text-muted-foreground text-xs tabular-nums">

@@ -53,6 +53,9 @@ export const Route = createFileRoute("/learn")({
 	component: Learn,
 });
 
+const SETTLING_NOTICE =
+	"This station is new, so Common, Uncommon and Rare will shift as more birds are heard.";
+
 type LoadedRound = Awaited<ReturnType<typeof getLearnRound>>;
 
 function Learn() {
@@ -67,6 +70,7 @@ function Learn() {
 	const forPool = useSkeletonMinimum(
 		roundQuery.isPlaceholderData ? undefined : roundQuery.data,
 	);
+	const notice = roundQuery.data?.isSettling ? SETTLING_NOTICE : undefined;
 	const [isConfirmingNewRound, setIsConfirmingNewRound] = useState(false);
 	const hasRound = (forPool?.round.questions.length ?? 0) > 0;
 	const [isRoundFinished, setIsRoundFinished] = useState(false);
@@ -95,12 +99,6 @@ function Learn() {
 						: undefined
 				}
 			/>
-			{roundQuery.data?.isSettling ? (
-				<p className="mt-page text-muted-foreground text-sm">
-					This station is new, so Common, Uncommon and Rare will shift as more
-					birds are heard.
-				</p>
-			) : null}
 
 			<div className="mt-page w-full">
 				{forPool ? (
@@ -113,6 +111,7 @@ function Learn() {
 						isConfirmingNewRound={isConfirmingNewRound}
 						onConfirmingDone={() => setIsConfirmingNewRound(false)}
 						onFinishedChange={setIsRoundFinished}
+						notice={notice}
 					/>
 				) : (
 					<LearnGameSkeleton />
@@ -130,6 +129,7 @@ function LearnRoundView({
 	isConfirmingNewRound,
 	onConfirmingDone,
 	onFinishedChange,
+	notice,
 }: {
 	loaded: LoadedRound;
 	pool: LearnPool;
@@ -138,6 +138,7 @@ function LearnRoundView({
 	isConfirmingNewRound: boolean;
 	onConfirmingDone: () => void;
 	onFinishedChange: (isFinished: boolean) => void;
+	notice?: string;
 }) {
 	const [saved] = useState(() => loadResumableGame(pool, loaded.round));
 	const { round, requestNextRound, cancelNextRound } = useHeldRound(
@@ -164,7 +165,7 @@ function LearnRoundView({
 	};
 
 	return round.questions.length === 0 ? (
-		<EmptyPool hasAnyDetections={loaded.hasAnyDetections} />
+		<EmptyPool hasAnyDetections={loaded.hasAnyDetections} notice={notice} />
 	) : (
 		<>
 			<LearnGame
@@ -198,9 +199,16 @@ function LearnRoundView({
 	);
 }
 
-function EmptyPool({ hasAnyDetections }: { hasAnyDetections: boolean }) {
+function EmptyPool({
+	hasAnyDetections,
+	notice,
+}: {
+	hasAnyDetections: boolean;
+	notice?: string;
+}) {
 	return (
 		<LearnGameEmpty
+			notice={notice}
 			message={
 				hasAnyDetections ? EMPTY.filter.learnPool : EMPTY.station.recordings
 			}
