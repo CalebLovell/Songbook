@@ -1,5 +1,11 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, realpathSync, writeFileSync } from "node:fs";
+import {
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	realpathSync,
+	writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -42,10 +48,18 @@ function devStationPassword(): Plugin {
 	};
 }
 
+const DEV_STATION_LOCATION = {
+	LATITUDE: "42.4440",
+	LONGITUDE: "-76.5019",
+	LOCATION_PLACE: '"Ithaca, NY"',
+};
+
 /**
  * Gives `npm run dev` a BirdNET config of its own (`.dev/birdnet.conf`), as a
- * fresh install writes it, so Health and Settings have a station name and
- * location to show and edit. Delete it to start over. Saving never touches
+ * fresh install writes it after guessing the location from its IP, so Health
+ * and Settings have a station name and location to show and edit, and the
+ * timeline has sunrise and sunset. A config still at 0, 0 gets the same
+ * guessed location on start. Delete it to start over. Saving never touches
  * the system: dev skips the service restarts and time zone changes.
  */
 function devStationConfig(): Plugin {
@@ -56,21 +70,43 @@ function devStationConfig(): Plugin {
 			process.env.BIRDNET_SKIP_SYSTEM_ACTIONS ??= "1";
 			const file = path.resolve(".dev/birdnet.conf");
 			process.env.BIRDNET_CONF ??= file;
-			if (process.env.BIRDNET_CONF !== file || existsSync(file)) return;
+			if (process.env.BIRDNET_CONF !== file) return;
+			if (existsSync(file)) {
+				guessDevLocationIfUnset(file);
+				return;
+			}
 			mkdirSync(path.dirname(file), { recursive: true });
 			writeFileSync(
 				file,
 				[
 					`SITE_NAME="${DEFAULT_SITE_NAME}"`,
-					"LATITUDE=0.0000",
-					"LONGITUDE=0.0000",
+					`LATITUDE=${DEV_STATION_LOCATION.LATITUDE}`,
+					`LONGITUDE=${DEV_STATION_LOCATION.LONGITUDE}`,
 					"LOCATION_SOURCE=ip",
-					'LOCATION_PLACE=""',
+					`LOCATION_PLACE=${DEV_STATION_LOCATION.LOCATION_PLACE}`,
 					"",
 				].join("\n"),
 			);
 		},
 	};
+}
+
+function guessDevLocationIfUnset(file: string) {
+	const text = readFileSync(file, "utf8");
+	const coordinate = (key: string) =>
+		Number(new RegExp(`^${key}=(.*)$`, "m").exec(text)?.[1] ?? 0);
+	if (coordinate("LATITUDE") !== 0 || coordinate("LONGITUDE") !== 0) return;
+	let updated = text;
+	for (const [key, value] of Object.entries(DEV_STATION_LOCATION)) {
+		const line = new RegExp(`^${key}=.*$`, "m");
+		updated = line.test(updated)
+			? updated.replace(line, `${key}=${value}`)
+			: `${updated.replace(/\n?$/, "\n")}${key}=${value}\n`;
+	}
+	updated = /^LOCATION_SOURCE=/m.test(updated)
+		? updated.replace(/^LOCATION_SOURCE=.*$/m, "LOCATION_SOURCE=ip")
+		: `${updated}LOCATION_SOURCE=ip\n`;
+	writeFileSync(file, updated);
 }
 
 // Run from the real folder even when started through a link to it (the old
