@@ -20,30 +20,37 @@ import {
 	CollageCardSkeleton,
 } from "~/components/collage-card.tsx";
 import {
-	HOUR_BARS_MIN_PX,
-	HourBarsCard,
-	HourBarsCardSkeleton,
-	sumHours,
-} from "~/components/now/hour-bars-card.tsx";
-import { NowHeader, NowHeaderShell } from "~/components/now/now-header.tsx";
-import {
-	RecentLogCard,
-	RecentLogCardSkeleton,
-} from "~/components/now/recent-log-card.tsx";
-import {
 	HeaderSunTimes,
 	HeaderSunTimesSkeleton,
 } from "~/components/species-by-hour-card.tsx";
 import { WindowSummary } from "~/components/timeline/window-summary.tsx";
+import {
+	HOUR_BARS_MIN_PX,
+	HourBarsCard,
+	HourBarsCardSkeleton,
+	sumHours,
+} from "~/components/today/hour-bars-card.tsx";
+import {
+	RecentLogCard,
+	RecentLogCardSkeleton,
+} from "~/components/today/recent-log-card.tsx";
+import {
+	TodayHeader,
+	TodayHeaderShell,
+} from "~/components/today/today-header.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { announce } from "~/lib/announce.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
-import { getNowSnapshot, type NowSnapshot, type ShownDay } from "~/lib/now.ts";
 import { prefetchInBrowser } from "~/lib/query-client.ts";
 import type { WindowSun } from "~/lib/sun-times.ts";
 import type { TimelineRow } from "~/lib/timeline.ts";
 import { type TimelinePageData, timelineQuery } from "~/lib/timeline-page.ts";
+import {
+	getTodaySnapshot,
+	type ShownDay,
+	type TodaySnapshot,
+} from "~/lib/today.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const POLL_INTERVAL_MS = 10_000;
@@ -75,8 +82,8 @@ function useAnnounceNewBird(comName: string | null) {
 }
 
 const snapshotQuery = queryOptions({
-	queryKey: ["now-snapshot"],
-	queryFn: () => getNowSnapshot(),
+	queryKey: ["today-snapshot"],
+	queryFn: () => getTodaySnapshot(),
 	refetchInterval: POLL_INTERVAL_MS,
 });
 
@@ -187,7 +194,7 @@ function LiveLayout({
 function TodayShell() {
 	return (
 		<LiveLayout
-			header={<NowHeaderShell />}
+			header={<TodayHeaderShell />}
 			feed={<RecentLogCardSkeleton day="today" />}
 			hours={<HourBarsCardSkeleton />}
 			collage={
@@ -239,7 +246,7 @@ function dayBody(page: TimelinePageData | undefined): DayBody | null {
 		: null;
 }
 
-function TodayBody({ snapshot }: { snapshot: NowSnapshot }) {
+function TodayBody({ snapshot }: { snapshot: TodaySnapshot }) {
 	const dayQuery = timelineQuery({ period: "day", anchor: snapshot.date });
 	const body = dayBody(
 		useQuery({ ...dayQuery, placeholderData: keepPreviousData }).data,
@@ -266,7 +273,7 @@ function TodayBody({ snapshot }: { snapshot: NowSnapshot }) {
 		<LiveLayout
 			gridRef={gridRef}
 			header={
-				<NowHeader
+				<TodayHeader
 					current={snapshot.current}
 					hasAnyDetections={snapshot.hasAnyDetections}
 					generatedAt={snapshot.generatedAt}

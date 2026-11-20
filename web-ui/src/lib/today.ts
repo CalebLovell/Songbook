@@ -46,7 +46,7 @@ export type RecentVisit = {
 	audioUrl: string | null;
 };
 
-export type NowSnapshot = {
+export type TodaySnapshot = {
 	generatedAt: string;
 	current: CurrentBird | null;
 	hasAnyDetections: boolean;
@@ -192,8 +192,8 @@ function readNowData(withAudio: boolean) {
 	return read();
 }
 
-export const getNowSnapshot = createServerFn({ method: "GET" }).handler(
-	async (): Promise<NowSnapshot> => {
+export const getTodaySnapshot = createServerFn({ method: "GET" }).handler(
+	async (): Promise<TodaySnapshot> => {
 		const generatedAtDate = new Date();
 		const { current, recent, ...rest } = await readNowData(
 			await canHearEveryClip(),

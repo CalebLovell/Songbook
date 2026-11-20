@@ -8,8 +8,8 @@ import { Card } from "~/components/ui/card.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { formatDateTime } from "~/lib/date-format.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
-import type { CurrentBird } from "~/lib/now.ts";
 import { formatTimeAgo } from "~/lib/time-ago.ts";
+import type { CurrentBird } from "~/lib/today.ts";
 import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
 import { cn } from "~/lib/utils.ts";
@@ -48,7 +48,7 @@ function HeaderCard({
 	);
 }
 
-export function NowHeaderShell() {
+export function TodayHeaderShell() {
 	return (
 		<HeaderCard
 			busy
@@ -96,7 +96,7 @@ function HeaderTextShell() {
 	);
 }
 
-export function NowHeader({
+export function TodayHeader({
 	current,
 	hasAnyDetections,
 	generatedAt,

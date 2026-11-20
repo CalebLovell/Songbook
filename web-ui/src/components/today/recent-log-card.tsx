@@ -13,8 +13,8 @@ import { Card } from "~/components/ui/card.tsx";
 import { Count } from "~/components/ui/count.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
-import { RECENT_LIMIT, type RecentVisit, type ShownDay } from "~/lib/now.ts";
 import { formatClockRange, formatTimeAgo } from "~/lib/time-ago.ts";
+import { RECENT_LIMIT, type RecentVisit, type ShownDay } from "~/lib/today.ts";
 import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
 

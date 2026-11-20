@@ -449,7 +449,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   address that isn't a date replaces the page. An empty station keeps its controls.
 - **Today** is the station's today at a glance (since midnight), in two
   columns (2:3 from `lg`) under a header. The header is its own Now hearing card
-  (`now-header.tsx`, not the bird page's profile card): the newest bird's painting
+  (`today-header.tsx`, not the bird page's profile card): the newest bird's painting
   in a 9.5rem column, name over binomial, then the time ago in moss over "last heard
   <date, time>", confidence and play, full width. Below, the left column holds Recent
   activity (the latest visits, flashing in as they arrive; "All of today" to
