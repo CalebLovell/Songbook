@@ -649,9 +649,34 @@ def keep_what_touches_the_animal(painted, cut, pose: str, low: float = 14, high:
     labels, _ = ndimage.label(alpha > 0.5)
     main = np.isin(labels, np.unique(labels[animal]))
     alpha = alpha * ndimage.binary_dilation(main, iterations=3)
-    out = painted.convert('RGBA')
-    out.putalpha(Image.fromarray((alpha * 255).round().astype(np.uint8)))
-    return out
+    rgb, alpha = remove_paper_from_edges(rgb, alpha, paper)
+    return Image.fromarray(np.dstack([rgb, alpha * 255]).round().astype(np.uint8), 'RGBA')
+
+
+def remove_paper_from_edges(rgb, alpha, paper):
+    """The outline's soft pixels are part paper, so on a dark page the animal
+    shows a pale rim. This takes the paper out of their colour (falling back
+    to the nearest solid colour where too little paint is left to trust), and
+    pulls in the outermost row where it is paler than the plumage just
+    inside -- but not where it is darker, which is the painted ink line."""
+    import numpy as np
+    from scipy import ndimage
+
+    lum = rgb @ np.array([0.299, 0.587, 0.114], np.float32)
+    depth = ndimage.distance_transform_edt(alpha >= 0.98)
+    _, (dy, dx) = ndimage.distance_transform_edt(depth < 3, return_indices=True)
+    paler = np.clip((lum - lum[dy, dx] - 10) / 40, 0, 1) * (depth < 3)
+    alpha = alpha + paler * (ndimage.grey_erosion(alpha, size=(3, 3)) - alpha) * 0.6
+
+    solid = alpha >= 0.9
+    if not solid.any():
+        return rgb, alpha
+    _, (iy, ix) = ndimage.distance_transform_edt(~solid, return_indices=True)
+    unmixed = np.clip((rgb - (1 - alpha[..., None]) * paper) / np.maximum(alpha, 1e-3)[..., None], 0, 255)
+    trust = np.clip((alpha - 0.15) / 0.5, 0, 1)[..., None]
+    rgb = np.where(solid[..., None], rgb, trust * unmixed + (1 - trust) * rgb[iy, ix])
+    rgb[alpha == 0] = 0
+    return rgb, alpha
 
 
 # Every illustration ships on the same square canvas so the web UI's slots

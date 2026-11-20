@@ -214,6 +214,42 @@ class PaperTest(unittest.TestCase):
         self.assertEqual(alpha.getpixel((200, 200)), 255)
 
 
+class EdgeTest(unittest.TestCase):
+    def setUp(self):
+        try:
+            import numpy as np
+            import scipy  # noqa: F401
+        except ImportError:
+            self.skipTest("numpy/scipy not installed")
+        self.np = np
+        self.paper = np.array([243, 232, 207], np.float32)
+
+    def edge(self, inside, rim):
+        """A 40x40 opaque `inside` block with a one-pixel `rim` row at half
+        alpha above it and an opaque `rim` row inside that."""
+        np = self.np
+        rgb = np.zeros((60, 60, 3), np.float32)
+        alpha = np.zeros((60, 60), np.float32)
+        rgb[10:50, 10:50] = inside
+        alpha[10:50, 10:50] = 1
+        rgb[10, 10:50] = rim
+        rgb[9, 10:50] = 0.5 * np.array(inside, np.float32) + 0.5 * self.paper
+        alpha[9, 10:50] = 0.5
+        return illustrate.remove_paper_from_edges(rgb, alpha, self.paper)
+
+    def test_a_dark_bird_has_no_pale_rim(self):
+        """Catches the glowing outline round the Black-capped Chickadee's cap
+        on a dark page."""
+        rgb, alpha = self.edge(inside=(20, 20, 20), rim=(120, 115, 100))
+        on_black = rgb[9:12, 30] * alpha[9:12, 30, None]
+        self.assertTrue((on_black.max(axis=1) < 60).all(), on_black)
+
+    def test_the_painted_ink_line_stays(self):
+        """Catches the swan losing its dark outline on a light page."""
+        _, alpha = self.edge(inside=(240, 235, 220), rim=(90, 90, 90))
+        self.assertEqual(alpha[10, 30], 1)
+
+
 class CanvasTest(unittest.TestCase):
     def setUp(self):
         try:
