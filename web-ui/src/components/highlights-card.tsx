@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
 	AudioLines,
 	Clock,
@@ -33,6 +34,7 @@ import type {
 	SpeciesHighlightKind,
 } from "~/lib/highlights-data.ts";
 import { plural } from "~/lib/number-format.ts";
+import { comNameToSlug } from "~/lib/species-slug.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 
 export function HighlightsCard({
@@ -291,7 +293,13 @@ function BirdNames({
 						: rest === 0 && i === birds.length - 1
 							? " and "
 							: ", "}
-					{bird.comName}
+					<Link
+						to="/birds/$comName"
+						params={{ comName: comNameToSlug(bird.comName) }}
+						className="no-underline hover:underline"
+					>
+						{bird.comName}
+					</Link>
 				</Fragment>
 			))}
 			{rest > 0 ? ` and ${rest} more` : null}
