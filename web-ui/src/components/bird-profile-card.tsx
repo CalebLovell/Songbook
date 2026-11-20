@@ -9,8 +9,34 @@ const PROFILE_CARD_CLASS =
 	"grid overflow-hidden p-0 sm:grid-cols-[11.5rem_minmax(0,1fr)]";
 const PROFILE_PORTRAIT_CLASS =
 	"flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4";
-const PROFILE_TEXT_CLASS =
+export const PROFILE_TEXT_CLASS =
 	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-39 sm:justify-between sm:pl-0";
+
+export function ProfileCardFrame({
+	label,
+	portrait,
+	busy,
+	className,
+	children,
+}: {
+	label: string;
+	portrait: ReactNode;
+	busy?: boolean;
+	className?: string;
+	children: ReactNode;
+}) {
+	return (
+		<Card
+			as="section"
+			aria-label={label}
+			aria-busy={busy || undefined}
+			className={cn(PROFILE_CARD_CLASS, className)}
+		>
+			<div className={PROFILE_PORTRAIT_CLASS}>{portrait}</div>
+			{children}
+		</Card>
+	);
+}
 
 export function BirdProfileCard({
 	label = "Bird profile",
@@ -32,20 +58,18 @@ export function BirdProfileCard({
 	className?: string;
 }) {
 	return (
-		<Card
-			as="section"
-			aria-label={label}
-			className={cn(PROFILE_CARD_CLASS, className)}
-		>
-			<div className={PROFILE_PORTRAIT_CLASS}>
+		<ProfileCardFrame
+			label={label}
+			className={className}
+			portrait={
 				<SpeciesImage
 					imageUrl={imageUrl}
 					alt={comName}
 					glyphClassName="size-16"
 					cropToPainting
 				/>
-			</div>
-
+			}
+		>
 			<div className={PROFILE_TEXT_CLASS}>
 				<div className="min-w-0">
 					<h1 className="font-bold text-2xl text-moss sm:text-3xl">
@@ -56,7 +80,25 @@ export function BirdProfileCard({
 				<div className="text-muted-foreground text-sm tabular-nums">{line}</div>
 				{actions}
 			</div>
-		</Card>
+		</ProfileCardFrame>
+	);
+}
+
+export function ProfileTextShell({ actions }: { actions: ReactNode }) {
+	return (
+		<div aria-hidden="true" className={PROFILE_TEXT_CLASS}>
+			<div className="min-w-0">
+				<ShellText
+					className="font-bold text-2xl sm:text-3xl"
+					barClassName="w-64 max-w-full"
+				/>
+				<ShellText className="text-xs" barClassName="w-32" />
+			</div>
+			<ShellText className="text-sm" barClassName="w-80 max-w-full" />
+			<div className="relative z-10 flex flex-wrap items-center gap-2">
+				{actions}
+			</div>
+		</div>
 	);
 }
 
@@ -72,28 +114,13 @@ export function BirdProfileCardShell({
 	className?: string;
 }) {
 	return (
-		<Card
-			as="section"
-			aria-busy="true"
-			aria-label={label}
-			className={cn(PROFILE_CARD_CLASS, className)}
+		<ProfileCardFrame
+			busy
+			label={label}
+			className={className}
+			portrait={portrait ?? <ShellBar className="size-full rounded-md" />}
 		>
-			<div className={PROFILE_PORTRAIT_CLASS}>
-				{portrait ?? <ShellBar className="size-full rounded-md" />}
-			</div>
-			<div aria-hidden="true" className={PROFILE_TEXT_CLASS}>
-				<div className="min-w-0">
-					<ShellText
-						className="font-bold text-2xl sm:text-3xl"
-						barClassName="w-64 max-w-full"
-					/>
-					<ShellText className="text-xs" barClassName="w-32" />
-				</div>
-				<ShellText className="text-sm" barClassName="w-80 max-w-full" />
-				<div className="relative z-10 flex flex-wrap items-center gap-2">
-					{actions}
-				</div>
-			</div>
-		</Card>
+			<ProfileTextShell actions={actions} />
+		</ProfileCardFrame>
 	);
 }
