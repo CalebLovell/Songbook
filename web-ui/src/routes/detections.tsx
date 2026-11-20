@@ -115,7 +115,15 @@ function Detections() {
 					icon={AudioWaveform}
 					title={PAGE_HEADERS.detections.title}
 					description={PAGE_HEADERS.detections.description}
-					action={
+				/>
+
+				<DetectionsFilters
+					search={search}
+					onSearchChange={(nextSearch) => {
+						setRowSelection({});
+						navigate({ search: nextSearch, replace: true });
+					}}
+					tools={
 						auth.unlocked ? (
 							<Button
 								asChild
@@ -131,25 +139,20 @@ function Detections() {
 										q: search.species,
 									})}
 									download
+									aria-label="Download CSV"
 									title={
 										isFiltered
 											? "Every detection matching these filters, on every page"
 											: "Every detection this station has logged"
 									}
 								>
-									Download CSV
+									<span>
+										<span className="@max-[30rem]:hidden">Download </span>CSV
+									</span>
 								</a>
 							</Button>
 						) : null
 					}
-				/>
-
-				<DetectionsFilters
-					search={search}
-					onSearchChange={(nextSearch) => {
-						setRowSelection({});
-						navigate({ search: nextSearch, replace: true });
-					}}
 				/>
 			</div>
 

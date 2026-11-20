@@ -77,7 +77,7 @@ type DetectionsTableProps = {
 type DetectionsFiltersProps = Pick<
 	DetectionsTableProps,
 	"search" | "onSearchChange"
->;
+> & { tools?: ReactNode };
 
 const FIRST_COLUMN_CLASSES = "pl-page";
 const CELL_GAP = "px-cell";
@@ -143,7 +143,7 @@ function DateRangeFilter({
 			aria-label="Date range"
 			className={cn(
 				JOINED_CONTROL_CLASS,
-				"h-8.5 pointer-coarse:h-9 @min-[38rem]:w-auto w-full shrink-0 focus-within:border-focus-ring",
+				"h-8.5 pointer-coarse:h-9 min-w-0 @min-[38rem]:flex-none flex-1 focus-within:border-focus-ring",
 			)}
 		>
 			<DateSegment
@@ -276,6 +276,7 @@ function DetectionSelectionBar({
 export function DetectionsFilters({
 	search,
 	onSearchChange,
+	tools,
 }: DetectionsFiltersProps) {
 	function updateSearch(change: Partial<DetectionWorkspaceSearch>) {
 		onSearchChange({ ...search, ...change });
@@ -312,12 +313,13 @@ export function DetectionsFilters({
 						className={TOOLBAR_SORT_CLASS}
 					/>
 				</div>
-				<div className="@max-[38rem]:order-first @min-[38rem]:w-auto w-full">
+				<div className="@max-[38rem]:order-first flex @min-[38rem]:w-auto w-full items-center gap-page">
 					<DateRangeFilter
 						from={search.from}
 						to={search.to}
 						onChange={({ from, to }) => updateSearch({ page: 1, from, to })}
 					/>
+					{tools}
 				</div>
 			</div>
 		</div>

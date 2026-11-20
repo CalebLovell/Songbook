@@ -519,6 +519,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   what it is about: if it changes what the station hears or keeps, it is Station; if it changes
   what people see, it is Settings. Exporting detections is neither: it is Download CSV on
   Detections, which exports exactly what the search and date filters match, every page of it.
+  It sits in the toolbar beside the date range (just "CSV" under 30rem), never in the page header.
   There is no Audio input, Recording or Storage setting anywhere:
   they are technical knobs, not taste, and the install defaults are right (one USB mic on
   `default`; 15 s recordings, 6 s mp3 clips; past 95% full, delete the least confident clips
