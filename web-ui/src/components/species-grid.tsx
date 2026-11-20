@@ -40,6 +40,8 @@ const TILE_CLASS = cn(
 	CARD_CLASS,
 	"flex min-h-16 min-w-0 flex-col gap-2 px-3 py-2 max-[400px]:px-2",
 );
+const LINKED_TILE_CLASS =
+	"relative hover:transform-[translateY(-2px)] hover:border-hover-line has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2";
 const HEADER_CARD_CLASS = "py-0";
 const HEADER_ROW_CLASS = "flex min-h-11.25 min-w-0 items-center gap-3";
 
@@ -103,25 +105,19 @@ export function SpeciesGrid({
 
 function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 	return (
-		<li className={TILE_CLASS}>
+		<li className={cn(TILE_CLASS, LINKED_TILE_CLASS)}>
 			<div className="flex min-w-0 items-center gap-3 max-[400px]:gap-2">
-				<Link
-					to="/birds/$comName"
-					preload={false}
-					params={{ comName: comNameToSlug(item.comName) }}
-					tabIndex={-1}
-					aria-hidden="true"
-					className="shrink-0"
-				>
+				<div className="shrink-0">
 					<SpeciesThumbnail imageUrl={item.imageUrl} comName={item.comName} />
-				</Link>
+				</div>
 
 				<div className="min-w-0 flex-1">
 					<Link
 						to="/birds/$comName"
 						preload={false}
 						params={{ comName: comNameToSlug(item.comName) }}
-						className="block max-w-fit truncate font-medium no-underline hover:underline"
+						data-card-link=""
+						className="block max-w-fit truncate font-medium no-underline after:absolute after:inset-0 focus-visible:outline-none"
 					>
 						{item.comName}
 					</Link>
@@ -132,7 +128,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 
 				<div className="flex shrink-0 flex-col items-end">
 					<Count>{item.count.toLocaleString()}</Count>
-					<div className="flex flex-wrap items-center justify-end gap-1.5">
+					<div className="relative flex flex-wrap items-center justify-end gap-1.5">
 						<SpeciesFlagPills
 							isNew={item.isNew}
 							isReturned={item.isReturned}
