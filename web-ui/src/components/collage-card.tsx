@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { ChevronRight } from "lucide-react";
 import {
 	type ReactNode,
 	useContext,
@@ -191,6 +192,8 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 	const masks = useMasks(birds);
 	const navigate = useNavigate();
 	const [hoveredIndex, setHoveredIndex] = useState(-1);
+	const [tapped, setTapped] = useState(false);
+	const lastPointerType = useRef("mouse");
 
 	const layout = useMemo<CollageLayout | null>(() => {
 		if (!masks || !size) return null;
@@ -206,9 +209,27 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 	}, [birds, masks, size]);
 
 	const hover = (index: number) => {
+		setTapped(false);
 		if (index === hoveredIndex) return;
 		setHoveredIndex(index);
 	};
+
+	const openBird = (bird: ShownCollageBird) =>
+		navigate({
+			to: "/birds/$comName",
+			params: { comName: comNameToSlug(bird.comName) },
+		});
+
+	useEffect(() => {
+		if (!tapped) return;
+		const dismissOutside = (event: PointerEvent) => {
+			if (areaRef.current?.contains(event.target as Node)) return;
+			setTapped(false);
+			setHoveredIndex(-1);
+		};
+		document.addEventListener("pointerdown", dismissOutside);
+		return () => document.removeEventListener("pointerdown", dismissOutside);
+	}, [tapped]);
 
 	const indexAt = (event: React.PointerEvent | React.MouseEvent) => {
 		const area = areaRef.current;
@@ -231,16 +252,28 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 			ref={areaRef}
 			data-entrance="own"
 			className={cn(COLLAGE_AREA_CLASS, hoveredIndex >= 0 && "cursor-pointer")}
-			onPointerMove={(event) => hover(indexAt(event))}
-			onPointerLeave={() => hover(-1)}
+			onPointerDown={(event) => {
+				lastPointerType.current = event.pointerType;
+			}}
+			onPointerMove={(event) => {
+				if (event.pointerType === "mouse") hover(indexAt(event));
+			}}
+			onPointerLeave={(event) => {
+				if (event.pointerType === "mouse") hover(-1);
+			}}
 			onClick={(event) => {
-				const bird = birds[indexAt(event)];
-				if (bird) {
-					navigate({
-						to: "/birds/$comName",
-						params: { comName: comNameToSlug(bird.comName) },
-					});
+				const index = indexAt(event);
+				const bird = birds[index];
+				if (lastPointerType.current === "mouse") {
+					if (bird) openBird(bird);
+					return;
 				}
+				if (bird && tapped && index === hoveredIndex) {
+					openBird(bird);
+					return;
+				}
+				setHoveredIndex(index);
+				setTapped(index >= 0);
 			}}
 		>
 			{layout ? (
@@ -310,6 +343,7 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 						(placement) => placement.key === birds[hoveredIndex]?.comName,
 					)}
 					areaWidth={size.width}
+					tapped={tapped}
 				/>
 			) : null}
 			{layout ? null : <div aria-busy="true" className="absolute inset-0" />}
@@ -345,10 +379,12 @@ function HoverPopup({
 	bird,
 	placement,
 	areaWidth,
+	tapped,
 }: {
 	bird: ShownCollageBird | undefined;
 	placement: CollagePlacement | undefined;
 	areaWidth: number;
+	tapped: boolean;
 }) {
 	const [popupWidth, setPopupWidth] = useState(0);
 
@@ -367,7 +403,10 @@ function HoverPopup({
 				if (node) setPopupWidth(node.offsetWidth);
 			}}
 			aria-hidden="true"
-			className="pointer-events-none absolute z-20 whitespace-nowrap rounded-sm border border-line bg-paper-raised px-2 py-1 text-[13px] text-ink shadow-md"
+			className={cn(
+				"absolute z-20 whitespace-nowrap rounded-sm border border-line bg-paper-raised text-[13px] text-ink shadow-md",
+				tapped ? "pointer-events-auto" : "pointer-events-none px-2 py-1",
+			)}
 			style={{
 				left,
 				top: below
@@ -376,9 +415,33 @@ function HoverPopup({
 				transform: below ? "translateX(-50%)" : "translate(-50%, -100%)",
 			}}
 		>
+			{tapped ? (
+				<Link
+					to="/birds/$comName"
+					params={{ comName: comNameToSlug(bird.comName) }}
+					tabIndex={-1}
+					onClick={(event) => event.stopPropagation()}
+					className="flex items-center gap-1 py-2 pr-1.5 pl-2.5"
+				>
+					<PopupLabel bird={bird} />
+					<ChevronRight
+						aria-hidden="true"
+						className="size-4 text-muted-foreground"
+					/>
+				</Link>
+			) : (
+				<PopupLabel bird={bird} />
+			)}
+		</div>
+	);
+}
+
+function PopupLabel({ bird }: { bird: ShownCollageBird }) {
+	return (
+		<span>
 			<span className="font-semibold">{bird.comName}</span>
 			{` — ${bird.count.toLocaleString()} ${plural(bird.count, "detection")}`}
-		</div>
+		</span>
 	);
 }
 

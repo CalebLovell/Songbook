@@ -286,7 +286,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   bird under the cursor is the one you get. Hovering enlarges that bird
   slightly (3%, 180ms) and pops a one-line tooltip over it ("Blue Jay — 1,284
   detections", name bold, below the bird when it touches the top edge); the
-  rest stay as they are (dimming them felt glitchy). This is the one place a
+  rest stay as they are (dimming them felt glitchy). Touch and pen have no
+  hover, so their first tap on a bird lifts it and shows the tooltip as a link
+  with a chevron; tapping that bird again or the tooltip opens it, and a tap
+  anywhere else dismisses it. A mouse click opens the bird straight away. This is the one place a
   hover grows an image. Names stay off the collage itself (nesting them along
   each bird's edge was tried and dropped). Birds are a mix of perched and
   in-flight paintings: a quarter of those with a flight painting fly (20% to
