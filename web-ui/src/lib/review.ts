@@ -11,7 +11,7 @@ import {
 	recategorizeDetection,
 } from "~/lib/review.server.ts";
 import { reviewSearchSchema, type SpeciesOption } from "~/lib/review-data.ts";
-import { readReviewRareSpeciesMax } from "~/lib/settings.server.ts";
+import { readHighlightThresholds } from "~/lib/settings-config.server.ts";
 
 const rowIdSchema = z.object({ rowId: z.number().int().positive() });
 
@@ -23,7 +23,7 @@ export const getReviewPage = createServerFn({ method: "GET" })
 			sqlite,
 			extractedDir(),
 			data,
-			await readReviewRareSpeciesMax(),
+			(await readHighlightThresholds()).rareMax,
 		),
 	);
 export const getReviewSpecies = createServerFn({ method: "GET" })

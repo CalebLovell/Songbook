@@ -1,26 +1,26 @@
 import { useMutation } from "@tanstack/react-query";
 import {
-	ArrowRight,
 	Download,
-	HeartPulse,
 	type LucideIcon,
 	MapPin,
 	PenLine,
 	Power,
+	RadioTower,
 	RefreshCw,
 	RotateCcw,
+	SlidersHorizontal,
+	Upload,
 } from "lucide-react";
 import { useState } from "react";
 
 import { CardHeader } from "~/components/card-header.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
-import { ButtonLink } from "~/components/ui/button-link.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
-import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
+import { toast } from "~/components/ui/toaster.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import {
 	type HealthAction,
@@ -33,6 +33,8 @@ import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import type { UpdateState } from "~/lib/updates-data.ts";
 import { errorMessage } from "~/lib/utils.ts";
 import { BackupButton } from "./backup-dialog.tsx";
+import { DetectionButton, type DetectionEditing } from "./detection-dialog.tsx";
+import { RestoreButton } from "./restore-dialog.tsx";
 import {
 	LocationDialog,
 	type StationEditing,
@@ -48,6 +50,7 @@ export type HealthHandlers = {
 	onCheckAudio: () => Promise<StationHealth>;
 	onInstallUpdate: () => Promise<void>;
 	station: StationEditing | null;
+	detection: DetectionEditing | null;
 	automaticUpdates: AutomaticUpdates | null;
 };
 
@@ -134,9 +137,9 @@ export function HealthPage({
 function HealthHeader() {
 	return (
 		<PageHeaderCard
-			icon={HeartPulse}
-			title={PAGE_HEADERS.health.title}
-			description={PAGE_HEADERS.health.description}
+			icon={RadioTower}
+			title={PAGE_HEADERS.station.title}
+			description={PAGE_HEADERS.station.description}
 		/>
 	);
 }
@@ -152,8 +155,9 @@ function HealthCard({
 	return (
 		<Card
 			as="section"
+			id={card.id}
 			aria-labelledby={titleId}
-			className={`flex flex-col gap-page overflow-hidden ${CARD_TONE_CLASS[card.tone] ?? ""}`}
+			className={`flex scroll-mt-4 flex-col gap-page overflow-hidden ${CARD_TONE_CLASS[card.tone] ?? ""}`}
 		>
 			<CardHeader
 				titleId={titleId}
@@ -203,7 +207,7 @@ function HealthCard({
 				<div className="mt-auto flex flex-wrap gap-page">
 					{card.actions.map((action) => (
 						<HealthActionButton
-							key={action.kind === "setting" ? action.label : action.kind}
+							key={action.kind}
 							action={action}
 							handlers={handlers}
 						/>
@@ -297,19 +301,10 @@ function HealthActionButton({
 	action: HealthAction;
 	handlers: HealthHandlers;
 }) {
-	if (action.kind === "setting")
-		return (
-			<ButtonLink
-				to="/settings"
-				search={{ tab: action.tab }}
-				variant={action.primary ? "default" : "outline"}
-				size="default"
-				icon={ArrowRight}
-				iconPosition="end"
-			>
-				{action.label}
-			</ButtonLink>
-		);
+	if (action.kind === "tune-detection")
+		return <DetectionButton editing={handlers.detection} />;
+	if (action.kind === "restore-backup")
+		return <RestoreButton primary={action.primary} />;
 	if (action.kind === "restart-birdnet")
 		return (
 			<RestartBirdnetButton
@@ -549,8 +544,7 @@ function PowerButton({
 		mutationFn: () => onPower(action),
 		onSuccess: (result) => {
 			setAsking(false);
-			if (copy.destructive) destructiveToast(result.message, { id: "power" });
-			else toast.success(result.message, { id: "power" });
+			toast.success(result.message, { id: "power" });
 		},
 		onError: (error) => {
 			setAsking(false);
@@ -608,7 +602,10 @@ const SKELETON_CARDS: {
 	},
 	{
 		title: "BirdNET model",
-		buttons: [{ label: "Restart BirdNET", icon: RefreshCw }],
+		buttons: [
+			{ label: "Restart BirdNET", icon: RefreshCw },
+			{ label: "Tune detection", icon: SlidersHorizontal },
+		],
 	},
 	{ title: "Storage", meter: true, buttons: [] },
 	{
@@ -617,7 +614,10 @@ const SKELETON_CARDS: {
 	},
 	{
 		title: "Backups",
-		buttons: [{ label: "Download a backup", icon: Download }],
+		buttons: [
+			{ label: "Download a backup", icon: Download },
+			{ label: "Restore a backup", icon: Upload },
+		],
 	},
 ];
 

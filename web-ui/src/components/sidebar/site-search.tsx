@@ -7,7 +7,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
 	SETTINGS_INDEX,
 	type SettingsIndexEntry,
-} from "~/components/settings/settings-index.ts";
+} from "~/components/sidebar/settings-index.ts";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
 import { Count } from "~/components/ui/count.tsx";
 import { Input } from "~/components/ui/input.tsx";
@@ -118,7 +118,7 @@ export function SiteSearch({ onNavigate }: { onNavigate?: () => void }) {
 		} else if (result.kind === "page") {
 			navigate({ to: result.page.to });
 		} else {
-			navigate({ to: "/settings", search: { tab: result.setting.tab } });
+			navigate({ to: result.setting.to, hash: result.setting.hash });
 		}
 		close();
 		onNavigate?.();

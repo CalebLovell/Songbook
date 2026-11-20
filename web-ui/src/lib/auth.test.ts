@@ -19,10 +19,10 @@ import {
 } from "./review.ts";
 import {
 	getSettingsPage,
-	resetSettingsFn,
+	resetPreferencesFn,
 	restartStationFn,
 	saveDetectionSettingsFn,
-	saveReviewSettingsFn,
+	savePreferencesFn,
 	saveStationSettingsFn,
 } from "./settings.ts";
 import { getSpeciesFilterPage, saveSpeciesFilter } from "./species-filter.ts";
@@ -49,10 +49,10 @@ function assertGated(source: string, name: string) {
 test("every gated server function carries requireUnlocked", () => {
 	void requireUnlocked;
 	void saveSpeciesFilter;
-	void resetSettingsFn;
+	void resetPreferencesFn;
 	void restartStationFn;
 	void saveDetectionSettingsFn;
-	void saveReviewSettingsFn;
+	void savePreferencesFn;
 	void saveStationSettingsFn;
 	void confirmReviewDetection;
 	void deleteReviewDetection;
@@ -68,8 +68,8 @@ test("every gated server function carries requireUnlocked", () => {
 	for (const name of [
 		"saveStationSettingsFn",
 		"saveDetectionSettingsFn",
-		"saveReviewSettingsFn",
-		"resetSettingsFn",
+		"savePreferencesFn",
+		"resetPreferencesFn",
 		"restartStationFn",
 		"getSettingsPage",
 	]) {

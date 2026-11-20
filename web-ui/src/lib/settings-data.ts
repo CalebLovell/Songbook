@@ -7,8 +7,6 @@ import {
 } from "~/lib/illustrations.ts";
 import { isKnownTimezone } from "~/lib/timezones.ts";
 
-export const DEFAULT_REVIEW_RARE_SPECIES_MAX = 10;
-
 const hasNoControlCharacters = (value: string) =>
 	[...value].every((character) => {
 		const code = character.charCodeAt(0);
@@ -39,15 +37,6 @@ export const detectionSettingsSchema = z.object({
 	privacyThreshold: z.number().finite().min(0).max(3),
 });
 
-export const reviewSettingsSchema = z.object({
-	rareSpeciesMax: z
-		.number()
-		.int()
-		.min(1)
-		.max(10_000)
-		.default(DEFAULT_REVIEW_RARE_SPECIES_MAX),
-});
-
 export const highlightSettingsSchema = z.object({
 	rareMax: z.number().int().min(1).max(1000),
 	returnedDays: z.number().int().min(2).max(90),
@@ -68,7 +57,6 @@ export const updateSettingsSchema = z.object({ automatic: z.boolean() });
 
 export type StationSettings = z.infer<typeof stationSettingsSchema>;
 export type DetectionSettings = z.infer<typeof detectionSettingsSchema>;
-export type ReviewSettings = z.infer<typeof reviewSettingsSchema>;
 export type HighlightSettings = z.infer<typeof highlightSettingsSchema>;
 export type ArtworkSettings = z.infer<typeof artworkSettingsSchema>;
 export type PlaybackSettings = z.infer<typeof playbackSettingsSchema>;
@@ -77,7 +65,6 @@ export type UpdateSettings = z.infer<typeof updateSettingsSchema>;
 export type SettingsCardKind =
 	| "station"
 	| "detection"
-	| "review"
 	| "highlights"
 	| "artwork"
 	| "playback"
@@ -86,7 +73,6 @@ export type SettingsCardKind =
 export type SettingsByKind = {
 	station: StationSettings;
 	detection: DetectionSettings;
-	review: ReviewSettings;
 	highlights: HighlightSettings;
 	artwork: ArtworkSettings;
 	playback: PlaybackSettings;
@@ -104,7 +90,6 @@ export const SETTINGS_DEFAULTS = {
 		overlap: 0,
 		privacyThreshold: 0,
 	},
-	review: { rareSpeciesMax: DEFAULT_REVIEW_RARE_SPECIES_MAX },
 	highlights: {
 		rareMax: HIGHLIGHT_THRESHOLDS.rareMax,
 		returnedDays: HIGHLIGHT_THRESHOLDS.returned.days,
@@ -114,18 +99,28 @@ export const SETTINGS_DEFAULTS = {
 	},
 	artwork: { preference: DEFAULT_ARTWORK_PREFERENCE },
 	playback: { boostQuietRecordings: true },
-} satisfies Omit<SettingsByKind, "station" | "updates">;
+	updates: { automatic: true },
+} satisfies Omit<SettingsByKind, "station">;
 
-export const RESETTABLE_CARDS = [
-	"detection",
-	"review",
-	"highlights",
+export const preferencesSchema = z.object({
+	artwork: artworkSettingsSchema,
+	playback: playbackSettingsSchema,
+	highlights: highlightSettingsSchema,
+});
+
+export type PreferenceSettings = z.infer<typeof preferencesSchema>;
+
+export const PREFERENCE_CARDS = [
 	"artwork",
 	"playback",
-] as const satisfies readonly Exclude<
-	SettingsCardKind,
-	"station" | "updates"
->[];
+	"highlights",
+] as const satisfies readonly (keyof PreferenceSettings & SettingsCardKind)[];
+
+export const PREFERENCE_DEFAULTS: PreferenceSettings = {
+	artwork: SETTINGS_DEFAULTS.artwork,
+	playback: SETTINGS_DEFAULTS.playback,
+	highlights: SETTINGS_DEFAULTS.highlights,
+};
 
 export type SettingsSaveResult<T> = {
 	status: "saved" | "saved-restart-skipped" | "saved-action-failed";
@@ -136,7 +131,6 @@ export type SettingsSaveResult<T> = {
 const schemas = {
 	station: stationSettingsSchema,
 	detection: detectionSettingsSchema,
-	review: reviewSettingsSchema,
 	highlights: highlightSettingsSchema,
 	artwork: artworkSettingsSchema,
 	playback: playbackSettingsSchema,

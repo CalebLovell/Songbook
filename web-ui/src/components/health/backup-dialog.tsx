@@ -2,19 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { Download, X } from "lucide-react";
 import { useState } from "react";
 
-import { DATA_SUMMARY_KEY } from "~/components/settings/data-cards.tsx";
-import { FieldChoice } from "~/components/settings/settings-cards.tsx";
+import { FieldChoice } from "~/components/form-fields.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { MODAL_ACTIONS_CLASS } from "~/components/ui/confirm-dialog.tsx";
 import { ModalDialog } from "~/components/ui/modal-dialog.tsx";
 import { ShellText } from "~/components/ui/shell.tsx";
-import { getDataSummaryFn } from "~/lib/data.ts";
 import {
 	backupUrl,
 	type DataSummary,
 	formatBytes,
 } from "~/lib/data-backup-format.ts";
-import { PAGE_QUERY } from "~/lib/query-client.ts";
+import { dataSummaryQuery } from "./restore-dialog.tsx";
 
 type Contents = "clips" | "records";
 
@@ -32,11 +30,7 @@ function backupContents(summary: DataSummary, includeClips: boolean) {
 function BackupDialog({ onClose }: { onClose: () => void }) {
 	const [contents, setContents] = useState<Contents>("clips");
 	const includeClips = contents === "clips";
-	const { data: summary } = useQuery({
-		...PAGE_QUERY,
-		queryKey: DATA_SUMMARY_KEY,
-		queryFn: () => getDataSummaryFn(),
-	});
+	const { data: summary } = useQuery(dataSummaryQuery);
 	return (
 		<ModalDialog
 			title="Download a backup"

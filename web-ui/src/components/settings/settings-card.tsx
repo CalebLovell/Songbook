@@ -1,120 +1,281 @@
+import { useMutation } from "@tanstack/react-query";
 import { RotateCcw, Save, X } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 
 import { CardHeader } from "~/components/card-header.tsx";
+import {
+	Field,
+	FieldChoice,
+	FieldInput,
+	numberOr,
+} from "~/components/form-fields.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
-import { settingsCardId } from "./settings-index.ts";
+import { toast } from "~/components/ui/toaster.tsx";
+import {
+	type HighlightSettings,
+	PREFERENCE_DEFAULTS,
+	type PreferenceSettings,
+	type SettingsSaveResult,
+} from "~/lib/settings-data.ts";
+import { errorMessage } from "~/lib/utils.ts";
 
-const DEFAULT_CONFIRM_DESCRIPTION =
-	"This writes the values in this card to the station's configuration and restarts BirdNET so they take effect, which interrupts recording for a moment. Other cards are left as they are.";
+export type SettingsWriter = () => Promise<
+	SettingsSaveResult<PreferenceSettings>
+>;
 
-export const RESET_RESTARTS_DESCRIPTION =
-	"Every value in this card goes back to what a fresh install writes, and any edits you haven't saved are dropped. BirdNET restarts so they take effect, which interrupts recording for a moment. Other cards are left as they are.";
+export type SettingsActions = {
+	save: (
+		values: PreferenceSettings,
+	) => Promise<SettingsSaveResult<PreferenceSettings>>;
+	reset: SettingsWriter;
+};
+
+const TOAST_ID = "settings";
+const HEADING_ID = "settings-card";
+
+function same(a: unknown, b: unknown) {
+	return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function useSettingsForm(
+	initial: PreferenceSettings,
+	actions: SettingsActions | null,
+) {
+	const [values, setValues] = useState(initial);
+	const [saved, setSaved] = useState(initial);
+	const [seenInitial, setSeenInitial] = useState(initial);
+	if (!same(initial, seenInitial)) {
+		setSeenInitial(initial);
+		setSaved(initial);
+		if (same(values, saved)) setValues(initial);
+	}
+
+	const write = useMutation({
+		mutationFn: (run: SettingsWriter) => run(),
+		onMutate: () => toast.loading("Saving settings…", { id: TOAST_ID }),
+		onSuccess: (result) => {
+			setValues(result.values);
+			setSaved(result.values);
+			toast.success(result.message, { id: TOAST_ID });
+		},
+		onError: (error) =>
+			toast.error(errorMessage(error, "Your settings weren't changed."), {
+				id: TOAST_ID,
+			}),
+	});
+
+	const busy = !actions || write.isPending;
+	return {
+		values,
+		setValues,
+		saveDisabled: busy || same(values, saved),
+		resetDisabled:
+			busy ||
+			(same(values, PREFERENCE_DEFAULTS) && same(saved, PREFERENCE_DEFAULTS)),
+		save: () => {
+			if (actions) write.mutate(() => actions.save(values));
+		},
+		reset: () => {
+			if (actions) write.mutate(actions.reset);
+		},
+	};
+}
 
 export function SettingsCard({
-	title,
-	description,
-	onSave,
-	confirmDescription = DEFAULT_CONFIRM_DESCRIPTION,
-	reset,
-	restart,
-	saveDisabled,
-	children,
+	initial,
+	actions,
 }: {
-	title: string;
-	description: string;
-	onSave: () => void;
-	confirmDescription?: string;
-	reset?: { onReset: () => void; disabled: boolean; description: string };
-	restart?: ReactNode;
-	saveDisabled?: boolean;
-	children: ReactNode;
+	initial: PreferenceSettings;
+	actions: SettingsActions | null;
 }) {
-	const [confirming, setConfirming] = useState(false);
+	const form = useSettingsForm(initial, actions);
 	const [confirmingReset, setConfirmingReset] = useState(false);
-	const cardId = settingsCardId(title);
-	const headingId = `settings-${cardId}`;
+	const { artwork, playback, highlights } = form.values;
+	const setHighlight =
+		(key: keyof HighlightSettings) => (event: ChangeEvent<HTMLInputElement>) =>
+			form.setValues({
+				...form.values,
+				highlights: {
+					...highlights,
+					[key]: numberOr(event, highlights[key]),
+				},
+			});
 
 	return (
-		<Card
-			as="section"
-			id={cardId}
-			aria-labelledby={headingId}
-			className="scroll-mt-4"
-		>
+		<Card as="section" aria-labelledby={HEADING_ID}>
 			<form
-				className="flex h-full flex-col"
+				className="flex flex-col"
 				onSubmit={(event) => {
 					event.preventDefault();
-					setConfirming(true);
+					form.save();
 				}}
 			>
-				<CardHeader as="h2" titleId={headingId} title={title} />
+				<CardHeader as="h2" titleId={HEADING_ID} title="Settings" />
 
-				<p className="py-page text-muted-foreground text-sm leading-relaxed">
-					{description}
-				</p>
+				<div className="[&>:first-child]:border-t-0">
+					<Field
+						label="Show birds as"
+						hint="A bird with only one of these always shows that one."
+					>
+						<FieldChoice
+							value={artwork.preference}
+							options={[
+								{ value: "illustrations", label: "Illustrations" },
+								{ value: "photos", label: "Photos" },
+							]}
+							onChange={(preference) =>
+								form.setValues({ ...form.values, artwork: { preference } })
+							}
+						/>
+					</Field>
+					<Field
+						label="Boost quiet recordings"
+						hint="Makes faint, far-off calls louder, and keeps loud ones from distorting. Live audio has its own controls."
+					>
+						<FieldChoice
+							value={playback.boostQuietRecordings ? "on" : "off"}
+							options={[
+								{ value: "on", label: "On" },
+								{ value: "off", label: "Off" },
+							]}
+							onChange={(choice) =>
+								form.setValues({
+									...form.values,
+									playback: { boostQuietRecordings: choice === "on" },
+								})
+							}
+						/>
+					</Field>
 
-				<div className="flex-1">{children}</div>
+					<Field
+						label="Rare"
+						hint="A species with this many records or fewer, in all. It is flagged Rare on Today and the timeline, its unsure calls wait on Review, and it sets Learn's rare pool."
+					>
+						<FieldInput
+							type="number"
+							min={1}
+							max={1000}
+							required
+							unit="records"
+							value={highlights.rareMax}
+							onChange={setHighlight("rareMax")}
+						/>
+					</Field>
+					<Field
+						label="Returned"
+						hint="Back after going unheard for at least this long."
+					>
+						<FieldInput
+							type="number"
+							min={2}
+							max={90}
+							required
+							unit="days"
+							value={highlights.returnedDays}
+							onChange={setHighlight("returnedDays")}
+						/>
+					</Field>
+					<Field
+						label="Gone quiet"
+						hint="Heard every day for this long, then not today."
+					>
+						<FieldInput
+							type="number"
+							min={2}
+							max={90}
+							required
+							unit="days"
+							value={highlights.goneQuietDays}
+							onChange={setHighlight("goneQuietDays")}
+						/>
+					</Field>
+					<Field
+						label="Regular"
+						hint="Heard this many days in a row, today included."
+					>
+						<FieldInput
+							type="number"
+							min={2}
+							max={90}
+							required
+							unit="days"
+							value={highlights.regularDays}
+							onChange={setHighlight("regularDays")}
+						/>
+					</Field>
+					<Field
+						label="Vocal"
+						hint="Calling this many times more than its usual day."
+					>
+						<FieldInput
+							type="number"
+							min={1.5}
+							max={20}
+							step={0.5}
+							required
+							unit="×"
+							value={highlights.vocalRatio}
+							onChange={setHighlight("vocalRatio")}
+						/>
+					</Field>
+				</div>
 
 				<div className="-mx-page flex flex-wrap items-center gap-page border-t px-page pt-page">
-					{reset ? (
-						<Button
-							type="button"
-							variant="outline"
-							size="default"
-							icon={RotateCcw}
-							disabled={reset.disabled}
-							onClick={() => setConfirmingReset(true)}
-						>
-							Reset these settings
-						</Button>
-					) : null}
-					<div className="ml-auto flex flex-wrap items-center justify-end gap-page">
-						{restart}
-						<Button
-							type="submit"
-							size="default"
-							icon={Save}
-							disabled={saveDisabled}
-						>
-							Save
-						</Button>
-					</div>
+					<Button
+						type="button"
+						variant="outline"
+						size="default"
+						icon={RotateCcw}
+						disabled={form.resetDisabled}
+						onClick={() => setConfirmingReset(true)}
+					>
+						Reset settings
+					</Button>
+					<Button
+						type="submit"
+						size="default"
+						icon={Save}
+						className="ml-auto"
+						disabled={form.saveDisabled}
+					>
+						Save
+					</Button>
 				</div>
 			</form>
 
-			{confirming ? (
+			{confirmingReset ? (
 				<ConfirmDialog
-					title={`Save ${title.toLowerCase()} settings?`}
-					description={confirmDescription}
-					confirmLabel="Save changes"
-					confirmIcon={Save}
-					onCancel={() => setConfirming(false)}
-					onConfirm={() => {
-						setConfirming(false);
-						onSave();
-					}}
-				/>
-			) : null}
-
-			{confirmingReset && reset ? (
-				<ConfirmDialog
-					title={`Reset ${title.toLowerCase()} settings?`}
-					description={reset.description}
+					title="Reset every setting?"
+					description="Everything in this card goes back to what a fresh install writes, and edits you haven't saved are dropped. This cannot be undone."
 					cancelIcon={X}
 					confirmIcon={RotateCcw}
-					confirmLabel="Reset these settings"
+					confirmLabel="Reset settings"
 					destructive
 					onCancel={() => setConfirmingReset(false)}
 					onConfirm={() => {
 						setConfirmingReset(false);
-						reset.onReset();
+						form.reset();
 					}}
-				/>
+				>
+					<p className="text-muted-foreground text-xs leading-relaxed">
+						Your detections, recordings and everything on Station are left as
+						they are.
+					</p>
+				</ConfirmDialog>
 			) : null}
 		</Card>
+	);
+}
+
+const SKELETON_VALUES_CLASS =
+	"[&_:is(input,select,textarea)]:animate-pulse! [&_:is(input,select,textarea)]:border-transparent! [&_:is(input,select,textarea)]:bg-muted! [&_:is(input,select,textarea)]:bg-none! [&_:is(input,select,textarea)]:text-transparent! [&_:is(input,textarea)::placeholder]:text-transparent! **:data-[slot=toggle-group-item]:animate-pulse! **:data-[slot=toggle-group-item]:border-paper-raised! **:data-[slot=toggle-group-item]:bg-muted! **:data-[slot=toggle-group-item]:text-transparent!";
+
+export function SettingsCardSkeleton() {
+	return (
+		<div inert aria-busy="true" className={SKELETON_VALUES_CLASS}>
+			<SettingsCard initial={PREFERENCE_DEFAULTS} actions={null} />
+		</div>
 	);
 }

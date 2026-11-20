@@ -16,7 +16,7 @@ import test from "node:test";
 
 import {
 	parseBirdnetConfig,
-	readReviewRareSpeciesMax,
+	readHighlightThresholds,
 	readSettingsPageValues,
 	resolveSettingsPath,
 	writeSettingsCard,
@@ -192,32 +192,39 @@ test("saves through a symlinked config into the real file", async (t) => {
 	}
 	await chmod(linkDirectory, 0o555);
 	try {
-		await writeSettingsCard("review", { rareSpeciesMax: 12 }, link);
+		await writeSettingsCard("playback", { boostQuietRecordings: false }, link);
 	} finally {
 		await chmod(linkDirectory, 0o755);
 	}
-	assert.match(await readFile(real, "utf8"), /^REVIEW_RARE_SPECIES_MAX=12$/m);
+	assert.match(await readFile(real, "utf8"), /^BOOST_QUIET_RECORDINGS=0$/m);
 	assert.ok((await lstat(link)).isSymbolicLink());
 	assert.deepEqual(await readdir(path.dirname(real)), ["birdnet.conf"]);
 });
 
-test("appends the Review setting once and defaults older files", async () => {
+test("appends the Rare setting once and defaults older files", async () => {
 	const file = await fixtureConfig("CONFIDENCE=0.7\n");
-	assert.equal(await readReviewRareSpeciesMax(file), 10);
-	await writeSettingsCard("review", { rareSpeciesMax: 12 }, file);
-	await writeSettingsCard("review", { rareSpeciesMax: 14 }, file);
+	assert.equal((await readHighlightThresholds(file)).rareMax, 5);
+	const highlights = {
+		rareMax: 12,
+		returnedDays: 14,
+		goneQuietDays: 7,
+		regularDays: 7,
+		vocalRatio: 3,
+	};
+	await writeSettingsCard("highlights", highlights, file);
+	await writeSettingsCard("highlights", { ...highlights, rareMax: 14 }, file);
 	const text = await readFile(file, "utf8");
-	assert.equal(text.match(/^REVIEW_RARE_SPECIES_MAX=/gm)?.length, 1);
-	assert.match(text, /^REVIEW_RARE_SPECIES_MAX=14$/m);
-	assert.equal(await readReviewRareSpeciesMax(file), 14);
+	assert.equal(text.match(/^HIGHLIGHT_RARE_MAX=/gm)?.length, 1);
+	assert.match(text, /^HIGHLIGHT_RARE_MAX=14$/m);
+	assert.equal((await readHighlightThresholds(file)).rareMax, 14);
 });
 
 test("appends any key an older config never carried", async () => {
 	const file = await fixtureConfig("BIRDWEATHER_ID=keep-me\n");
-	await writeSettingsCard("review", { rareSpeciesMax: 12 }, file);
+	await writeSettingsCard("playback", { boostQuietRecordings: false }, file);
 	const text = await readFile(file, "utf8");
 	assert.match(text, /^BIRDWEATHER_ID=keep-me$/m);
-	assert.match(text, /^REVIEW_RARE_SPECIES_MAX=12$/m);
+	assert.match(text, /^BOOST_QUIET_RECORDINGS=0$/m);
 });
 
 test("saving a card leaves the config-only audio, recording and storage values alone", async () => {

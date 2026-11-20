@@ -19,11 +19,9 @@ import {
 
 import {
 	artworkSettingsSchema,
-	DEFAULT_REVIEW_RARE_SPECIES_MAX,
 	detectionSettingsSchema,
 	highlightSettingsSchema,
 	parseSettingsCard,
-	reviewSettingsSchema,
 	SETTINGS_DEFAULTS,
 	type SettingsByKind,
 	type SettingsCardKind,
@@ -170,17 +168,6 @@ export async function readSettingsPageValues(
 		updates: parseSettingsCard("updates", {
 			automatic: values.AUTOMATIC_UPDATE?.trim() === "1",
 		}),
-		review: validFieldsOr(
-			reviewSettingsSchema.shape,
-			{
-				rareSpeciesMax: integerValue(
-					values,
-					"REVIEW_RARE_SPECIES_MAX",
-					DEFAULT_REVIEW_RARE_SPECIES_MAX,
-				),
-			},
-			defaults.review,
-		),
 	};
 }
 
@@ -213,10 +200,6 @@ function assignmentsFor<K extends SettingsCardKind>(
 				OVERLAP: String(detection.overlap),
 				PRIVACY_THRESHOLD: String(detection.privacyThreshold),
 			};
-		}
-		case "review": {
-			const review = value as SettingsByKind["review"];
-			return { REVIEW_RARE_SPECIES_MAX: String(review.rareSpeciesMax) };
 		}
 		case "artwork": {
 			const artwork = value as SettingsByKind["artwork"];
@@ -281,22 +264,6 @@ export async function writeSettingsCard<K extends SettingsCardKind>(
 		await rm(temporaryPath, { force: true });
 	}
 	return parseSettingsCard(kind, values);
-}
-
-export async function readReviewRareSpeciesMax(
-	settingsPath = resolveSettingsPath(),
-) {
-	try {
-		const values = parseBirdnetConfig(await readFile(settingsPath, "utf8"));
-		const parsed = Number(values.REVIEW_RARE_SPECIES_MAX);
-		return Number.isSafeInteger(parsed) && parsed >= 1 && parsed <= 10_000
-			? parsed
-			: DEFAULT_REVIEW_RARE_SPECIES_MAX;
-	} catch (error) {
-		if ((error as NodeJS.ErrnoException).code === "ENOENT")
-			return DEFAULT_REVIEW_RARE_SPECIES_MAX;
-		throw error;
-	}
 }
 
 export async function readHighlightThresholds(

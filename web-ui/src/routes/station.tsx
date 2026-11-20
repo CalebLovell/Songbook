@@ -17,6 +17,7 @@ import { requireUnlocked } from "~/lib/require-unlocked.ts";
 import {
 	getSettingsPage,
 	restartStationFn,
+	saveDetectionSettingsFn,
 	saveStationSettingsFn,
 	saveUpdateSettingsFn,
 } from "~/lib/settings.ts";
@@ -52,13 +53,14 @@ const stationSettingsQuery = queryOptions({
 		return {
 			values: page.station,
 			timezones: page.supportedTimezones,
+			detection: page.detection,
 			automaticUpdates: page.updates.automatic,
 		};
 	},
 });
 
-export const Route = createFileRoute("/health")({
-	head: () => pageHead("Health"),
+export const Route = createFileRoute("/station")({
+	head: () => pageHead("Station"),
 	beforeLoad: ({ context, location }) =>
 		requireUnlocked(context.auth, location),
 	loader: ({ context }) => {
@@ -79,6 +81,7 @@ function HealthRoute() {
 	const restart = useServerFn(restartStationFn);
 	const power = useServerFn(powerStationFn);
 	const saveStation = useServerFn(saveStationSettingsFn);
+	const saveDetection = useServerFn(saveDetectionSettingsFn);
 	const saveUpdates = useServerFn(saveUpdateSettingsFn);
 	const checkForUpdates = useServerFn(checkForUpdatesFn);
 	const installUpdate = useServerFn(installUpdateFn);
@@ -116,6 +119,16 @@ function HealthRoute() {
 								await queryClient.invalidateQueries({
 									queryKey: stationSettingsQuery.queryKey,
 								});
+								return result;
+							},
+						}
+					: null,
+				detection: station
+					? {
+							values: station.detection,
+							save: async (values) => {
+								const result = await saveDetection({ data: values });
+								await queryClient.invalidateQueries();
 								return result;
 							},
 						}

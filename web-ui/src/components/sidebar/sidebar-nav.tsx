@@ -1,7 +1,7 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
 import {
-	HeartPulse,
 	type LucideIcon,
+	RadioTower,
 	SearchCheck,
 	Settings,
 	SlidersHorizontal,
@@ -67,9 +67,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 						<NavIcon icon={SearchCheck} />
 						Review
 					</Link>
-					<Link to="/health" {...linkProps}>
-						<NavIcon icon={HeartPulse} />
-						Health
+					<Link to="/station" {...linkProps}>
+						<NavIcon icon={RadioTower} />
+						Station
 						{healthMark ? (
 							<NavCount className="ml-auto" attention={healthMark} />
 						) : null}

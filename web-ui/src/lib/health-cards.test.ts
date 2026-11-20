@@ -226,9 +226,13 @@ test("a stopped model makes Restart BirdNET the primary action", () => {
 	});
 	const model = card(view, "model");
 	assert.equal(model.problem?.title, "Bird analysis has stopped");
-	assert.deepEqual(model.actions, [{ kind: "restart-birdnet", primary: true }]);
+	assert.deepEqual(model.actions, [
+		{ kind: "restart-birdnet", primary: true },
+		{ kind: "tune-detection" },
+	]);
 	assert.deepEqual(card(health({}), "model").actions, [
 		{ kind: "restart-birdnet", primary: false },
+		{ kind: "tune-detection" },
 	]);
 });
 
@@ -326,7 +330,7 @@ test("an up-to-date station says when it last checked", () => {
 	assert.deepEqual(updates?.details, ["Up to date. Checked 3 hours ago."]);
 });
 
-test("name and location are changed on Health itself", () => {
+test("name and location are changed on Station itself", () => {
 	assert.deepEqual(card(health({}), "name").actions, [
 		{ kind: "edit-name", primary: false },
 	]);
@@ -348,6 +352,7 @@ test("name and location are changed on Health itself", () => {
 	);
 	assert.deepEqual(card(health({}), "backups").actions, [
 		{ kind: "download-backup" },
+		{ kind: "restore-backup", primary: false },
 	]);
 });
 

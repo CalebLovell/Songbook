@@ -23,7 +23,7 @@ import {
 	SearchInput,
 } from "~/components/ui/search-input.tsx";
 import { SelectionBar } from "~/components/ui/selection-bar.tsx";
-import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
+import { toast } from "~/components/ui/toaster.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import {
@@ -346,8 +346,7 @@ export function SpeciesFilterPage({
 			if (clearSelection) setSelected(new Set());
 			setDialog(null);
 			await onCommitted?.();
-			if (messages.destructive) destructiveToast(messages.success);
-			else toast.success(messages.success);
+			toast.success(messages.success);
 		},
 		onError: (error, { messages }) => {
 			toast.error(errorMessage(error, messages.failure));

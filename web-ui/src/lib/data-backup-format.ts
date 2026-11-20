@@ -5,7 +5,6 @@ import {
 	detectionSettingsSchema,
 	highlightSettingsSchema,
 	playbackSettingsSchema,
-	reviewSettingsSchema,
 	SETTINGS_DEFAULTS,
 	stationSettingsSchema,
 } from "./settings-data.ts";
@@ -48,7 +47,6 @@ export type BackupChecksums = z.infer<typeof backupChecksumsSchema>;
 export const backupSettingsSchema = z.object({
 	station: stationSettingsSchema,
 	detection: detectionSettingsSchema,
-	review: reviewSettingsSchema,
 	highlights: highlightSettingsSchema,
 	artwork: artworkSettingsSchema,
 	playback: playbackSettingsSchema.default(SETTINGS_DEFAULTS.playback),
@@ -129,7 +127,7 @@ const dayParam = z.iso.date().optional().catch(undefined);
 export const detectionExportQuerySchema = z.object({
 	from: dayParam,
 	to: dayParam,
-	species: z.string().min(1).max(200).optional().catch(undefined),
+	q: z.string().min(1).max(200).optional().catch(undefined),
 });
 export type DetectionExportQuery = z.infer<typeof detectionExportQuerySchema>;
 
@@ -137,7 +135,7 @@ export function detectionExportUrl(query: DetectionExportQuery): string {
 	const params = new URLSearchParams();
 	if (query.from) params.set("from", query.from);
 	if (query.to) params.set("to", query.to);
-	if (query.species) params.set("species", query.species);
+	if (query.q) params.set("q", query.q);
 	const search = params.toString();
 	return `/api/data/export${search ? `?${search}` : ""}`;
 }

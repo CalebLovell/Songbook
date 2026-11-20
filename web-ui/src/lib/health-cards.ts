@@ -1,4 +1,3 @@
-import type { SettingsTab } from "~/components/settings/settings-index.ts";
 import { formatBytes } from "~/lib/data-backup-format.ts";
 import {
 	BOOT_GRACE_SECONDS,
@@ -27,8 +26,9 @@ export type HealthCardId =
 	| "storage";
 
 export type HealthAction =
-	| { kind: "setting"; tab: SettingsTab; label: string; primary: boolean }
 	| { kind: "restart-birdnet"; primary: boolean }
+	| { kind: "tune-detection" }
+	| { kind: "restore-backup"; primary: boolean }
 	| { kind: "edit-name"; primary: boolean }
 	| { kind: "edit-location"; primary: boolean; check?: true }
 	| { kind: "download-backup" }
@@ -99,14 +99,6 @@ function coordinate(value: number) {
 function copyFor(toDo: Parameters<typeof describeToDo>[0]) {
 	const { title, detail } = describeToDo(toDo);
 	return { title, detail };
-}
-
-function setting(
-	tab: SettingsTab,
-	label: string,
-	primary: boolean,
-): HealthAction {
-	return { kind: "setting", tab, label, primary };
 }
 
 function waitingDetail(health: StationHealth, otherwise: string) {
@@ -185,7 +177,10 @@ function modelCard(health: StationHealth): HealthCardView {
 				: [`${model} is checking every recording for birds.`],
 		problem: failing ? copyFor({ kind: "analyzer" }) : null,
 		meter: null,
-		actions: [{ kind: "restart-birdnet", primary: failing }],
+		actions: [
+			{ kind: "restart-birdnet", primary: failing },
+			{ kind: "tune-detection" },
+		],
 	};
 }
 
@@ -338,7 +333,7 @@ function backupsCard(health: StationHealth): HealthCardView {
 				detail:
 					"Restore a backup from your old station to keep every detection, review and setting.",
 			},
-			actions: [setting("data", "Restore a backup", false)],
+			actions: [{ kind: "restore-backup", primary: false }],
 		};
 	if (ageSeconds === null && (historyDays ?? 0) < BACKUP_WORTHY_HISTORY_DAYS)
 		return {
@@ -351,7 +346,10 @@ function backupsCard(health: StationHealth): HealthCardView {
 					: "Worth downloading one once your station has a month of detections.",
 			],
 			problem: null,
-			actions: [{ kind: "download-backup" }],
+			actions: [
+				{ kind: "download-backup" },
+				{ kind: "restore-backup", primary: false },
+			],
 		};
 	if (ageSeconds === null)
 		return {
@@ -362,7 +360,10 @@ function backupsCard(health: StationHealth): HealthCardView {
 				"A backup keeps your detections safe if the memory card fails.",
 			],
 			problem: null,
-			actions: [{ kind: "download-backup" }],
+			actions: [
+				{ kind: "download-backup" },
+				{ kind: "restore-backup", primary: false },
+			],
 		};
 	const stale = ageSeconds > STALE_BACKUP_SECONDS;
 	return {
@@ -376,7 +377,10 @@ function backupsCard(health: StationHealth): HealthCardView {
 					detail: "Download a fresh one to keep recent detections safe.",
 				}
 			: null,
-		actions: [{ kind: "download-backup" }],
+		actions: [
+			{ kind: "download-backup" },
+			{ kind: "restore-backup", primary: false },
+		],
 	};
 }
 

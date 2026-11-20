@@ -3,7 +3,7 @@ import "@tanstack/react-start/server-only";
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 
-import { RESETTABLE_CARDS, type SettingsCardKind } from "./settings-data.ts";
+import type { SettingsCardKind } from "./settings-data.ts";
 
 export type SettingsCommandRunner = (
 	executable: string,
@@ -21,7 +21,6 @@ export type SettingsSystemContext = {
 const SERVICES = {
 	station: ["birdnet_analysis.service"],
 	detection: ["birdnet_analysis.service"],
-	review: [],
 	highlights: [],
 	artwork: [],
 	playback: [],
@@ -43,10 +42,12 @@ const defaultRunner: SettingsCommandRunner = (executable, args, stdin) =>
 		if (stdin !== undefined) child.stdin?.end(stdin);
 	});
 
-function servicesFor(card?: SettingsCardKind): string[] {
-	return card
-		? [...SERVICES[card]]
-		: [...new Set(RESETTABLE_CARDS.flatMap((kind) => SERVICES[kind]))];
+export function servicesFor(
+	cards: readonly SettingsCardKind[] = Object.keys(
+		SERVICES,
+	) as SettingsCardKind[],
+): string[] {
+	return [...new Set(cards.flatMap((kind) => SERVICES[kind]))];
 }
 
 function skipRequested(context: SettingsSystemContext) {
@@ -57,11 +58,11 @@ function skipRequested(context: SettingsSystemContext) {
 }
 
 export async function restartServices(
-	card?: SettingsCardKind,
+	cards?: readonly SettingsCardKind[],
 	context: SettingsSystemContext = {},
 	runner: SettingsCommandRunner = defaultRunner,
 ) {
-	const services = servicesFor(card);
+	const services = servicesFor(cards);
 	if (services.length === 0) return { attempted: false, skipped: false };
 	if (skipRequested(context)) return { attempted: false, skipped: true };
 	await runner("sudo", ["systemctl", "restart", ...services]);
@@ -112,7 +113,7 @@ export async function runCardSystemActions(
 		kind === "station" &&
 		context.timezone !== undefined &&
 		context.timezone !== context.previousTimezone;
-	const hasActions = timezoneChanges || servicesFor(kind).length > 0;
+	const hasActions = timezoneChanges || servicesFor([kind]).length > 0;
 	if (skipRequested(context)) return { attempted: false, skipped: hasActions };
 
 	let attempted = false;
@@ -130,6 +131,6 @@ export async function runCardSystemActions(
 				`${context.timezone as string}\n`,
 			);
 	}
-	const restart = await restartServices(kind, context, runner);
+	const restart = await restartServices([kind], context, runner);
 	return { attempted: attempted || restart.attempted, skipped: false };
 }

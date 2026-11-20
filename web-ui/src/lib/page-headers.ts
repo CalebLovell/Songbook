@@ -45,13 +45,13 @@ export const PAGE_HEADERS = {
 		title: "Species Filter",
 		description: "Decide which installed species BirdNET may detect.",
 	},
-	health: {
-		title: "Health",
-		description: "How the station is doing, and what it needs.",
+	station: {
+		title: "Station",
+		description: "How the station is doing, how it listens, and what it needs.",
 	},
 	settings: {
 		title: "Settings",
-		description: "Adjust how your station runs.",
+		description: "How birds look, sound and get called out across the site.",
 	},
 	signIn: {
 		title: "Sign in",

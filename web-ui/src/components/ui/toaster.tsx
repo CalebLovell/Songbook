@@ -4,21 +4,12 @@ import {
 	CircleAlert,
 	Info,
 	LoaderCircle,
-	Trash2,
 } from "lucide-react";
-import { type ExternalToast, Toaster as Sonner, toast } from "sonner";
+import { Toaster as Sonner, toast } from "sonner";
 import { CARD_CLASS } from "~/components/ui/card.tsx";
 import { cn } from "~/lib/utils.ts";
 
 export { toast };
-
-export function destructiveToast(message: string, data?: ExternalToast) {
-	return toast.success(message, {
-		...data,
-		icon: <Trash2 className="size-4 text-destructive" />,
-		className: "toast-destructive",
-	});
-}
 
 export function Toaster() {
 	return (

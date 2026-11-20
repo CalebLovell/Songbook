@@ -7,7 +7,7 @@ import {
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { RowSelectionState } from "@tanstack/react-table";
-import { AudioWaveform, X } from "lucide-react";
+import { AudioWaveform, FileDown, X } from "lucide-react";
 import { useState } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 import { DeleteDetectionsDialog } from "~/components/detections/delete-detections-dialog.tsx";
@@ -20,7 +20,8 @@ import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
-import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
+import { toast } from "~/components/ui/toaster.tsx";
+import { detectionExportUrl } from "~/lib/data-backup-format.ts";
 import {
 	type DetectionWorkspaceSearch,
 	detectionWorkspaceSearchSchema,
@@ -86,7 +87,7 @@ function Detections() {
 					description: `${result.failedFiles} audio ${plural(result.failedFiles, "file")} could not be removed.`,
 				});
 			} else {
-				destructiveToast(deleted);
+				toast.success(deleted);
 			}
 
 			if (search.page > 1 && selectedCount === page?.rows.length) {
@@ -114,6 +115,33 @@ function Detections() {
 					icon={AudioWaveform}
 					title={PAGE_HEADERS.detections.title}
 					description={PAGE_HEADERS.detections.description}
+					action={
+						auth.unlocked ? (
+							<Button
+								asChild
+								variant="outline"
+								size="lg"
+								icon={FileDown}
+								className="shrink-0"
+							>
+								<a
+									href={detectionExportUrl({
+										from: search.from,
+										to: search.to,
+										q: search.species,
+									})}
+									download
+									title={
+										isFiltered
+											? "Every detection matching these filters, on every page"
+											: "Every detection this station has logged"
+									}
+								>
+									Download CSV
+								</a>
+							</Button>
+						) : null
+					}
 				/>
 
 				<DetectionsFilters

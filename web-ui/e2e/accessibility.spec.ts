@@ -110,8 +110,8 @@ test.describe("page navigation", () => {
 test.describe("confirmation dialogs", () => {
 	test("hold focus, then give it back", async ({ page }) => {
 		await signIn(page);
-		await settle(page, "/settings");
-		const opener = page.getByRole("button", { name: /factory defaults/i });
+		await settle(page, "/station");
+		const opener = page.getByRole("button", { name: /restart the pi/i });
 		await opener.focus();
 		await page.keyboard.press("Enter");
 

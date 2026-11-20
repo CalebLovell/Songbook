@@ -513,16 +513,26 @@ test("the CSV lists every detection in time order under a header", async () => {
 	assert.ok(lines[1].startsWith("2026-07-05,06:00:00,Turdus migratorius"));
 });
 
-test("the CSV filters by date and species", async () => {
+test("the CSV filters by date and by the Detections search's matches", async () => {
 	const source = await sourceStation();
 	const dated = (await csvText(source, { from: "2026-07-06" }))
 		.trim()
 		.split("\r\n");
 	assert.equal(dated.length, 3);
-	const bird = (await csvText(source, { species: "Spinus tristis" }))
+	const bird = (
+		await csvText(source, {
+			match: { comNames: ["American Goldfinch"], percent: null },
+		})
+	)
 		.trim()
 		.split("\r\n");
 	assert.equal(bird.length, 2);
+	const nothingMatched = (
+		await csvText(source, { match: { comNames: [], percent: null } })
+	)
+		.trim()
+		.split("\r\n");
+	assert.equal(nothingMatched.length, 1);
 	const none = (await csvText(source, { to: "2020-01-01" }))
 		.trim()
 		.split("\r\n");

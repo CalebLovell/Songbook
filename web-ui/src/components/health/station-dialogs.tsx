@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import { Check, X } from "lucide-react";
 import { type ReactNode, type SyntheticEvent, useId, useState } from "react";
 
-import { StationLocation } from "~/components/settings/station-location.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { MODAL_ACTIONS_CLASS } from "~/components/ui/confirm-dialog.tsx";
 import { Input } from "~/components/ui/input.tsx";
@@ -15,6 +14,7 @@ import type {
 import { modernTimezone } from "~/lib/timezones.ts";
 import { useClientValue } from "~/lib/use-client-value.ts";
 import { errorMessage } from "~/lib/utils.ts";
+import { StationLocation } from "./station-location.tsx";
 
 export type StationSaver = (
 	values: StationSettings,
@@ -26,9 +26,12 @@ export type StationEditing = {
 	save: StationSaver;
 };
 
-const TOAST_ID = "health-station";
+const TOAST_ID = "health-dialog-save";
 
-function useStationSave(save: StationSaver, onSaved: () => void) {
+export function useDialogSave<T>(
+	save: (values: T) => Promise<SettingsSaveResult<T>>,
+	onSaved: () => void,
+) {
 	return useMutation({
 		mutationFn: save,
 		onMutate: () => toast.loading("Saving…", { id: TOAST_ID }),
@@ -74,7 +77,7 @@ function Field({
 	);
 }
 
-function DialogActions({
+export function DialogActions({
 	pending,
 	onCancel,
 }: {
@@ -108,7 +111,7 @@ export function StationNameDialog({
 }) {
 	const id = useId();
 	const [siteName, setSiteName] = useState(editing.values.siteName);
-	const save = useStationSave(editing.save, onClose);
+	const save = useDialogSave(editing.save, onClose);
 	function submit(event: SyntheticEvent) {
 		event.preventDefault();
 		save.mutate({ ...editing.values, siteName });
@@ -176,7 +179,7 @@ export function LocationDialog({
 }) {
 	const id = useId();
 	const [values, setValues] = useState(editing.values);
-	const save = useStationSave(editing.save, onClose);
+	const save = useDialogSave(editing.save, onClose);
 	function submit(event: SyntheticEvent) {
 		event.preventDefault();
 		save.mutate({ ...values, locationConfirmed: true });

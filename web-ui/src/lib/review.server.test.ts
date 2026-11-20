@@ -82,7 +82,7 @@ test("the queue holds only rarely heard species, rarest first", async () => {
 	const audio = path.join(root, "By_Date", "2026-07-27", "Cedar_Waxwing");
 	mkdirSync(audio, { recursive: true });
 	writeFileSync(path.join(audio, "Cedar_Waxwing-0.mp3"), "audio");
-	const page = loadReviewPage(database, root, { page: 1 }, undefined, 50);
+	const page = loadReviewPage(database, root, { page: 1 }, 9, 50);
 	assert.deepEqual(
 		[...new Set(page.candidates.map((row) => row.comName))],
 		["Cedar Waxwing", "Common Loon", "Barred Owl"],
@@ -97,46 +97,43 @@ test("the queue holds only rarely heard species, rarest first", async () => {
 test("the queue pages in order, and a page past the end falls back", async () => {
 	const database = bandedFixture();
 	const root = await mkdtemp(path.join(tmpdir(), "birdnet-review-paged-"));
-	const all = loadReviewPage(database, root, { page: 1 }, undefined, 50);
-	const second = loadReviewPage(database, root, { page: 2 }, undefined, 4);
+	const all = loadReviewPage(database, root, { page: 1 }, 9, 50);
+	const second = loadReviewPage(database, root, { page: 2 }, 9, 4);
 	assert.equal(second.page, 2);
 	assert.equal(second.total, 6);
 	assert.deepEqual(
 		second.candidates.map((row) => row.rowId),
 		all.candidates.slice(4).map((row) => row.rowId),
 	);
-	assert.equal(
-		loadReviewPage(database, root, { page: 9 }, undefined, 4).page,
-		2,
-	);
+	assert.equal(loadReviewPage(database, root, { page: 9 }, 9, 4).page, 2);
 	database.close();
 });
 
 test("an empty queue says whether the station has recorded anything", async () => {
 	const database = bandedFixture();
 	const root = await mkdtemp(path.join(tmpdir(), "birdnet-review-empty-"));
-	const nothingQueued = loadReviewPage(database, root, { page: 1 }, 1, 50);
+	const nothingQueued = loadReviewPage(database, root, { page: 1 }, 0, 50);
 	assert.equal(nothingQueued.total, 0);
 	assert.equal(nothingQueued.hasAnyDetections, true);
 	database.exec("DELETE FROM detections");
 	assert.equal(
-		loadReviewPage(database, root, { page: 1 }, undefined, 50).hasAnyDetections,
+		loadReviewPage(database, root, { page: 1 }, 9, 50).hasAnyDetections,
 		false,
 	);
 	database.close();
 });
 
-test("configured rarity changes the queue at a strict boundary", async () => {
+test("configured rarity changes the queue, counting the threshold itself as rare", async () => {
 	const database = bandedFixture();
 	const root = await mkdtemp(path.join(tmpdir(), "birdnet-review-configured-"));
-	const underThree = loadReviewPage(database, root, { page: 1 }, 3, 50);
+	const underThree = loadReviewPage(database, root, { page: 1 }, 2, 50);
 	assert.deepEqual(
 		[...new Set(underThree.candidates.map((row) => row.comName))],
 		["Cedar Waxwing", "Common Loon"],
 	);
-	assert.equal(underThree.rareSpeciesMax, 3);
+	assert.equal(underThree.rareSpeciesMax, 2);
 	assert.equal(
-		loadReviewPage(database, root, { page: 1 }, 11, 50).speciesTotal,
+		loadReviewPage(database, root, { page: 1 }, 10, 50).speciesTotal,
 		4,
 	);
 	database.close();
@@ -150,7 +147,7 @@ test("a recording BirdNET was already sure about stays out of the queue", async 
 		)
 		.run();
 	const root = await mkdtemp(path.join(tmpdir(), "birdnet-review-confident-"));
-	const page = loadReviewPage(database, root, { page: 1 }, undefined, 50);
+	const page = loadReviewPage(database, root, { page: 1 }, 9, 50);
 	assert.equal(
 		page.candidates.some((row) => (row.confidence ?? 0) >= 0.9),
 		false,
@@ -188,14 +185,14 @@ test("signing off twice leaves one review", () => {
 test("a signed-off detection drops out of the queue", async () => {
 	const database = bandedFixture();
 	const root = await mkdtemp(path.join(tmpdir(), "birdnet-review-signed-"));
-	const before = loadReviewPage(database, root, { page: 1 }, undefined, 50);
+	const before = loadReviewPage(database, root, { page: 1 }, 9, 50);
 	assert.equal(before.total, 6);
 	const waxwing = before.candidates.find(
 		(row) => row.comName === "Cedar Waxwing",
 	);
 	assert.ok(waxwing);
 	correctDetection(database, waxwing.rowId);
-	const after = loadReviewPage(database, root, { page: 1 }, undefined, 50);
+	const after = loadReviewPage(database, root, { page: 1 }, 9, 50);
 	assert.equal(after.total, 5);
 	assert.equal(
 		after.candidates.some((row) => row.comName === "Cedar Waxwing"),
@@ -207,7 +204,7 @@ test("a signed-off detection drops out of the queue", async () => {
 test("deleting a detection takes its review with it", async () => {
 	const database = bandedFixture();
 	const root = await mkdtemp(path.join(tmpdir(), "birdnet-review-deleted-"));
-	const page = loadReviewPage(database, root, { page: 1 }, undefined, 50);
+	const page = loadReviewPage(database, root, { page: 1 }, 9, 50);
 	const row = page.candidates[0];
 	assert.ok(row);
 	correctDetection(database, row.rowId);
@@ -223,10 +220,7 @@ test("the queue works on a station that has never reviewed anything", async () =
 		database.prepare("SELECT 1 FROM sqlite_master WHERE name='reviews'").get(),
 		undefined,
 	);
-	assert.equal(
-		loadReviewPage(database, root, { page: 1 }, undefined, 50).total,
-		6,
-	);
+	assert.equal(loadReviewPage(database, root, { page: 1 }, 9, 50).total, 6);
 	database.close();
 });
 

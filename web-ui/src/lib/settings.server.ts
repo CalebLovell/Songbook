@@ -5,7 +5,6 @@ import { readFile } from "node:fs/promises";
 import { timezoneOptions } from "~/lib/timezones.ts";
 
 import {
-	readReviewRareSpeciesMax,
 	readSettingsPageValues,
 	resolveSettingsPath,
 	writeSettingsCard,
@@ -15,10 +14,11 @@ import {
 	type DetectionSettings,
 	type HighlightSettings,
 	type PlaybackSettings,
+	PREFERENCE_CARDS,
+	PREFERENCE_DEFAULTS,
+	type PreferenceSettings,
 	parseSettingsCard,
-	RESETTABLE_CARDS,
-	type ReviewSettings,
-	SETTINGS_DEFAULTS,
+	preferencesSchema,
 	type SettingsByKind,
 	type SettingsCardKind,
 	type SettingsPageData,
@@ -31,8 +31,6 @@ import {
 	runCardSystemActions,
 	type SettingsCommandRunner,
 } from "./settings-system.server.ts";
-
-export { readReviewRareSpeciesMax };
 
 export type SettingsServerDependencies = {
 	settingsPath?: string;
@@ -69,8 +67,6 @@ export async function loadSettingsPageData(
 }
 
 const SAVED_NEEDS_RESTART = "Saved. Restart BirdNET for this to take effect.";
-const RESET_NEEDS_RESTART =
-	"Reset to defaults. Restart BirdNET for this to take effect.";
 
 async function saveSettings<K extends SettingsCardKind>(
 	kind: K,
@@ -140,13 +136,6 @@ export function saveDetectionSettings(
 	return saveSettings("detection", input, dependencies);
 }
 
-export function saveReviewSettings(
-	input: ReviewSettings,
-	dependencies: SettingsServerDependencies = {},
-) {
-	return saveSettings("review", input, dependencies);
-}
-
 export function saveUpdateSettings(
 	input: UpdateSettings,
 	dependencies: SettingsServerDependencies = {},
@@ -175,38 +164,42 @@ export function savePlaybackSettings(
 	return saveSettings("playback", input, dependencies);
 }
 
-export type SettingsResetResult = {
-	status: "reset" | "reset-restart-skipped" | "reset-action-failed";
-	message: string;
-};
-
-export async function resetSettings(
+export async function savePreferences(
+	input: PreferenceSettings,
 	dependencies: SettingsServerDependencies = {},
-): Promise<SettingsResetResult> {
+): Promise<SettingsSaveResult<PreferenceSettings>> {
+	const values = preferencesSchema.parse(input);
+	await writePreferences(values, dependencies, "Settings could not be saved.");
+	return { status: "saved", values, message: "Settings saved." };
+}
+
+export async function resetPreferences(
+	dependencies: SettingsServerDependencies = {},
+): Promise<SettingsSaveResult<PreferenceSettings>> {
+	await writePreferences(
+		PREFERENCE_DEFAULTS,
+		dependencies,
+		"Settings could not be reset.",
+	);
+	return {
+		status: "saved",
+		values: PREFERENCE_DEFAULTS,
+		message: "Settings are back to their defaults.",
+	};
+}
+
+async function writePreferences(
+	values: PreferenceSettings,
+	dependencies: SettingsServerDependencies,
+	failure: string,
+) {
 	const settingsPath = dependencies.settingsPath ?? resolveSettingsPath();
-	for (const kind of RESETTABLE_CARDS) {
-		try {
-			await writeSettingsCard(kind, SETTINGS_DEFAULTS[kind], settingsPath);
-		} catch {
-			throw new Error("Settings could not be reset.");
-		}
-	}
 	try {
-		const action = await restartServices(
-			undefined,
-			{ skipSystemActions: dependencies.skipSystemActions },
-			dependencies.runner,
-		);
-		return action.skipped
-			? { status: "reset-restart-skipped", message: RESET_NEEDS_RESTART }
-			: {
-					status: "reset",
-					message: action.attempted
-						? "Reset to defaults and now in effect."
-						: "Reset to defaults.",
-				};
-	} catch {
-		return { status: "reset-action-failed", message: RESET_NEEDS_RESTART };
+		for (const kind of PREFERENCE_CARDS)
+			await writeSettingsCard(kind, values[kind], settingsPath);
+	} catch (error) {
+		console.error("[settings] writing preferences failed:", error);
+		throw new Error(failure);
 	}
 }
 
@@ -221,7 +214,7 @@ export async function restartStation(
 ): Promise<RestartResult> {
 	try {
 		const action = await restartServices(
-			card,
+			card ? [card] : undefined,
 			{ skipSystemActions: dependencies.skipSystemActions },
 			dependencies.runner,
 		);

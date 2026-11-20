@@ -9,13 +9,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DetectionsRouteImport } from './routes/detections'
-import { Route as HealthRouteImport } from './routes/health'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SpeciesFilterRouteImport } from './routes/species-filter'
+import { Route as StationRouteImport } from './routes/station'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as TodayRouteImport } from './routes/today'
 import { Route as BirdsIndexRouteImport } from './routes/birds.index'
@@ -33,11 +33,6 @@ const IndexRoute = IndexRouteImport.update({
 const DetectionsRoute = DetectionsRouteImport.update({
   id: '/detections',
   path: '/detections',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HealthRoute = HealthRouteImport.update({
-  id: '/health',
-  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnRoute = LearnRouteImport.update({
@@ -68,6 +63,11 @@ const SignInRoute = SignInRouteImport.update({
 const SpeciesFilterRoute = SpeciesFilterRouteImport.update({
   id: '/species-filter',
   path: '/species-filter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StationRoute = StationRouteImport.update({
+  id: '/station',
+  path: '/station',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TimelineRoute = TimelineRouteImport.update({
@@ -115,13 +115,13 @@ const ApiAudioDateSpeciesAndFileRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/detections': typeof DetectionsRoute
-  '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/species-filter': typeof SpeciesFilterRoute
+  '/station': typeof StationRoute
   '/timeline': typeof TimelineRoute
   '/today': typeof TodayRoute
   '/birds/$comName': typeof BirdsComNameRoute
@@ -134,13 +134,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/detections': typeof DetectionsRoute
-  '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/species-filter': typeof SpeciesFilterRoute
+  '/station': typeof StationRoute
   '/timeline': typeof TimelineRoute
   '/today': typeof TodayRoute
   '/birds/$comName': typeof BirdsComNameRoute
@@ -154,13 +154,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/detections': typeof DetectionsRoute
-  '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/live': typeof LiveRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/species-filter': typeof SpeciesFilterRoute
+  '/station': typeof StationRoute
   '/timeline': typeof TimelineRoute
   '/today': typeof TodayRoute
   '/birds/$comName': typeof BirdsComNameRoute
@@ -175,13 +175,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/detections'
-    | '/health'
     | '/learn'
     | '/live'
     | '/review'
     | '/settings'
     | '/sign-in'
     | '/species-filter'
+    | '/station'
     | '/timeline'
     | '/today'
     | '/birds/$comName'
@@ -194,13 +194,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/detections'
-    | '/health'
     | '/learn'
     | '/live'
     | '/review'
     | '/settings'
     | '/sign-in'
     | '/species-filter'
+    | '/station'
     | '/timeline'
     | '/today'
     | '/birds/$comName'
@@ -213,13 +213,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/detections'
-    | '/health'
     | '/learn'
     | '/live'
     | '/review'
     | '/settings'
     | '/sign-in'
     | '/species-filter'
+    | '/station'
     | '/timeline'
     | '/today'
     | '/birds/$comName'
@@ -233,13 +233,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DetectionsRoute: typeof DetectionsRoute
-  HealthRoute: typeof HealthRoute
   LearnRoute: typeof LearnRoute
   LiveRoute: typeof LiveRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
   SignInRoute: typeof SignInRoute
   SpeciesFilterRoute: typeof SpeciesFilterRoute
+  StationRoute: typeof StationRoute
   TimelineRoute: typeof TimelineRoute
   TodayRoute: typeof TodayRoute
   BirdsComNameRoute: typeof BirdsComNameRoute
@@ -264,13 +264,6 @@ declare module '@tanstack/react-router' {
       path: '/detections'
       fullPath: '/detections'
       preLoaderRoute: typeof DetectionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/health': {
-      id: '/health'
-      path: '/health'
-      fullPath: '/health'
-      preLoaderRoute: typeof HealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn': {
@@ -313,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/species-filter'
       fullPath: '/species-filter'
       preLoaderRoute: typeof SpeciesFilterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/station': {
+      id: '/station'
+      path: '/station'
+      fullPath: '/station'
+      preLoaderRoute: typeof StationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/timeline': {
@@ -377,13 +377,13 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DetectionsRoute: DetectionsRoute,
-  HealthRoute: HealthRoute,
   LearnRoute: LearnRoute,
   LiveRoute: LiveRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
   SignInRoute: SignInRoute,
   SpeciesFilterRoute: SpeciesFilterRoute,
+  StationRoute: StationRoute,
   TimelineRoute: TimelineRoute,
   TodayRoute: TodayRoute,
   BirdsComNameRoute: BirdsComNameRoute,

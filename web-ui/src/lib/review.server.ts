@@ -11,6 +11,7 @@ import {
 	removeClipFile,
 	resolveDetectionClipPath,
 } from "~/lib/detection-file-path.server.ts";
+import { HIGHLIGHT_THRESHOLDS } from "~/lib/highlight-thresholds.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
 import {
 	parseSpeciesCatalog,
@@ -19,7 +20,6 @@ import {
 	recategorizedFileName,
 	type SpeciesOption,
 } from "~/lib/review-data.ts";
-import { DEFAULT_REVIEW_RARE_SPECIES_MAX } from "~/lib/settings-data.ts";
 import { type SpeciesLink, speciesLinkFor } from "~/lib/species-link.ts";
 
 export type ReviewCandidate = {
@@ -92,7 +92,7 @@ function rareAndUnsure(reviewed: boolean): string {
 	const unreviewed = reviewed
 		? ` AND NOT EXISTS (SELECT 1 FROM reviews r WHERE ${REVIEW_MATCHES_DETECTION})`
 		: "";
-	return `SELECT d.rowid rowId, d.Date date, d.Time time, d.Sci_Name sciName, d.Com_Name comName, d.Confidence confidence, d.File_Name fileName, lifetime.lifetime_count lifetimeCount FROM detections d JOIN (SELECT Sci_Name, Com_Name, COUNT(*) lifetime_count FROM detections GROUP BY Sci_Name, Com_Name) lifetime ON lifetime.Sci_Name = d.Sci_Name AND lifetime.Com_Name = d.Com_Name WHERE lifetime.lifetime_count < ? AND (d.Confidence IS NULL OR d.Confidence < ${CONFIDENT_MIN})${unreviewed}`;
+	return `SELECT d.rowid rowId, d.Date date, d.Time time, d.Sci_Name sciName, d.Com_Name comName, d.Confidence confidence, d.File_Name fileName, lifetime.lifetime_count lifetimeCount FROM detections d JOIN (SELECT Sci_Name, Com_Name, COUNT(*) lifetime_count FROM detections GROUP BY Sci_Name, Com_Name) lifetime ON lifetime.Sci_Name = d.Sci_Name AND lifetime.Com_Name = d.Com_Name WHERE lifetime.lifetime_count <= ? AND (d.Confidence IS NULL OR d.Confidence < ${CONFIDENT_MIN})${unreviewed}`;
 }
 
 type RawCandidate = {
@@ -110,7 +110,7 @@ export function loadReviewPage(
 	database: DatabaseSync,
 	extractedRoot: string,
 	search: ReviewSearch,
-	rareSpeciesMax = DEFAULT_REVIEW_RARE_SPECIES_MAX,
+	rareSpeciesMax = HIGHLIGHT_THRESHOLDS.rareMax,
 	pageSize = REVIEW_PAGE_SIZE,
 ): ReviewPage {
 	const queue = rareAndUnsure(reviewsTableExists(database));

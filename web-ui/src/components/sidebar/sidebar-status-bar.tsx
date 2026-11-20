@@ -32,7 +32,7 @@ function HealthLink({
 }) {
 	return (
 		<Link
-			to="/health"
+			to="/station"
 			title={title}
 			className={`${className} no-underline hover:underline`}
 		>

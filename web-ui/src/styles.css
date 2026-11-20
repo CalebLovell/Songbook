@@ -311,18 +311,6 @@
   }
 }
 
-/* A destructive action that succeeded (`destructiveToast`) takes the error
-   tone over sonner's success one. Unlayered, so it outranks the toaster's
-   `data-[type=success]` utilities without needing `!important`. */
-[data-sonner-toast].toast-destructive {
-	border-color: var(--toast-error-line);
-	background: var(--toast-error-fill);
-}
-
-[data-sonner-toast].toast-destructive [data-title] {
-	color: var(--destructive);
-}
-
 /* Toasts (`ui/toaster.tsx`) slide in from the right edge they are pinned to,
    and leave the same way, rather than sonner's default drop from above. Only
    the enter and exit states are touched: once a toast is in, sonner's own

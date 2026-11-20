@@ -51,11 +51,26 @@ function confidencePercent(query: string): number | null {
 	return percent >= 0 && percent <= 100 ? percent : null;
 }
 
+export type DetectionSearchMatch = {
+	comNames: string[];
+	percent: number | null;
+};
+
+export async function detectionSearchMatch(
+	text: string,
+): Promise<DetectionSearchMatch> {
+	return {
+		comNames: await fuzzySpeciesNames(text),
+		percent: confidencePercent(text),
+	};
+}
+
 async function detectionFilters(search: DetectionWorkspaceSearch) {
 	const filters = [];
 	if (search.species) {
-		const matches = await fuzzySpeciesNames(search.species);
-		const percent = confidencePercent(search.species);
+		const { comNames: matches, percent } = await detectionSearchMatch(
+			search.species,
+		);
 		const clauses = [];
 		if (matches.length > 0) clauses.push(inArray(detections.Com_Name, matches));
 		if (percent !== null) {

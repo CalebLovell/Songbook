@@ -6,10 +6,11 @@ import test from "node:test";
 
 import {
 	loadSettingsPageData,
-	resetSettings,
+	resetPreferences,
 	restartStation,
 	saveDetectionSettings,
-	saveReviewSettings,
+	savePreferences,
+	saveUpdateSettings,
 } from "./settings.server.ts";
 
 const withPrivacy = (privacyThreshold: number) => ({
@@ -65,10 +66,10 @@ test("development skip is explicit while no-action cards save normally", async (
 	});
 	assert.equal(skipped.status, "saved-restart-skipped");
 
-	const review = await fixtureConfig("REVIEW_RARE_SPECIES_MAX=10\n");
-	const saved = await saveReviewSettings(
-		{ rareSpeciesMax: 12 },
-		{ settingsPath: review.file },
+	const updates = await fixtureConfig("AUTOMATIC_UPDATE=1\n");
+	const saved = await saveUpdateSettings(
+		{ automatic: false },
+		{ settingsPath: updates.file },
 	);
 	assert.equal(saved.status, "saved");
 });
@@ -105,7 +106,6 @@ test("loads normalized configuration", async () => {
 	assert.equal(page.station.siteName, "Backyard");
 	assert.equal(page.station.timezone, "America/Chicago");
 	assert.ok(page.supportedTimezones.includes("America/Chicago"));
-	assert.equal(page.review.rareSpeciesMax, 10);
 });
 
 test("loads with defaults in place of out-of-range values", async () => {
@@ -135,68 +135,54 @@ test("loads with defaults in place of out-of-range values", async () => {
 	});
 	assert.equal(page.highlights.rareMax, 5);
 	assert.equal(page.highlights.returnedDays, 30);
-	assert.equal(page.review.rareSpeciesMax, 10);
 });
 
-test("reset returns every card but Station to its defaults", async () => {
+test("a preferences reset returns only the preferences and leaves the station alone", async () => {
 	const { file } = await fixtureConfig(
 		[
-			'SITE_NAME="Backyard"',
-			"LATITUDE=41.1",
-			"LONGITUDE=-93.2",
-			"MODEL=Perch_v2",
-			"DATA_MODEL_VERSION=2",
-			"SF_THRESH=0.5",
+			"SITE_NAME=Backyard",
 			"CONFIDENCE=0.95",
-			"SENSITIVITY=0.8",
-			"OVERLAP=2",
-			"PRIVACY_THRESHOLD=2.5",
-			"REC_CARD=hw:1,0",
-			"CHANNELS=1",
-			'RTSP_STREAM="rtsp://camera/live"',
-			"RTSP_STREAM_TO_LIVESTREAM=0",
-			"RECORDING_LENGTH=30",
-			"EXTRACTION_LENGTH=9",
-			"AUDIOFMT=flac",
-			"FULL_DISK=keep",
-			"PURGE_THRESHOLD=40",
-			"MAX_FILES_SPECIES=25",
-			"REVIEW_RARE_SPECIES_MAX=99",
+			"HIGHLIGHT_RARE_MAX=40",
+			"BIRD_ARTWORK=photos",
+			"BOOST_QUIET_RECORDINGS=0",
 			"BIRDWEATHER_ID=secret-that-must-survive",
 		].join("\n"),
 	);
-	const result = await resetSettings({
-		settingsPath: file,
-		skipSystemActions: true,
-	});
-	assert.equal(result.status, "reset-restart-skipped");
-
+	const result = await resetPreferences({ settingsPath: file });
+	assert.equal(result.status, "saved");
 	const page = await loadSettingsPageData({
 		settingsPath: file,
 		currentTimezone: "America/Chicago",
 	});
-	assert.deepEqual(page.detection, {
-		confidence: 0.7,
-		sensitivity: 1.25,
-		overlap: 0,
-		privacyThreshold: 0,
-	});
-	assert.deepEqual(page.review, { rareSpeciesMax: 10 });
-
+	assert.equal(page.highlights.rareMax, 5);
+	assert.equal(page.artwork.preference, "illustrations");
+	assert.equal(page.playback.boostQuietRecordings, true);
+	assert.equal(page.detection.confidence, 0.95);
 	assert.equal(page.station.siteName, "Backyard");
-	assert.equal(page.station.latitude, 41.1);
-	assert.equal(page.station.longitude, -93.2);
-	const after = await readFile(file, "utf8");
-	assert.match(after, /^BIRDWEATHER_ID=secret-that-must-survive$/m);
-	assert.match(after, /^REC_CARD=hw:1,0$/m);
-	assert.match(after, /^CHANNELS=1$/m);
-	assert.match(after, /^RTSP_STREAM="rtsp:\/\/camera\/live"$/m);
-	assert.match(after, /^RECORDING_LENGTH=30$/m);
-	assert.match(after, /^EXTRACTION_LENGTH=9$/m);
-	assert.match(after, /^AUDIOFMT=flac$/m);
-	assert.match(after, /^FULL_DISK=keep$/m);
-	assert.match(after, /^PURGE_THRESHOLD=40$/m);
-	assert.match(after, /^MAX_FILES_SPECIES=25$/m);
+	assert.match(
+		await readFile(file, "utf8"),
+		/^BIRDWEATHER_ID=secret-that-must-survive$/m,
+	);
+});
+
+test("saving preferences writes every part at once", async () => {
+	const { file } = await fixtureConfig("HIGHLIGHT_RARE_MAX=5\n");
+	const before = await loadSettingsPageData({
+		settingsPath: file,
+		currentTimezone: "America/Chicago",
+	});
+	await savePreferences(
+		{
+			artwork: { preference: "photos" },
+			playback: { boostQuietRecordings: false },
+			highlights: { ...before.highlights, rareMax: 8 },
+		},
+		{ settingsPath: file },
+	);
+	const text = await readFile(file, "utf8");
+	assert.match(text, /^BIRD_ARTWORK=photos$/m);
+	assert.match(text, /^BOOST_QUIET_RECORDINGS=0$/m);
+	assert.match(text, /^HIGHLIGHT_RARE_MAX=8$/m);
 });
 
 test("a config still naming removed models loads and saves", async () => {
@@ -215,35 +201,6 @@ test("a config still naming removed models loads and saves", async () => {
 	);
 	assert.equal(result.values.confidence, 0.9);
 	assert.match(await readFile(file, "utf8"), /^CONFIDENCE=0.9$/m);
-});
-
-test("reset restarts each affected service once", async () => {
-	const { file } = await fixtureConfig("PRIVACY_THRESHOLD=1\n");
-	const commands: string[][] = [];
-	const result = await resetSettings({
-		settingsPath: file,
-		runner: async (executable, args) => {
-			commands.push([executable, ...args]);
-		},
-	});
-	assert.equal(result.status, "reset");
-	assert.equal(commands.length, 1);
-	const services = commands[0].slice(3);
-	assert.deepEqual(services, [...new Set(services)]);
-	assert.ok(services.includes("birdnet_analysis.service"));
-});
-
-test("a failed restart still reports the reset that landed", async () => {
-	const { file } = await fixtureConfig("PRIVACY_THRESHOLD=1\n");
-	const result = await resetSettings({
-		settingsPath: file,
-		runner: async () => {
-			throw new Error("systemctl exposed output");
-		},
-	});
-	assert.equal(result.status, "reset-action-failed");
-	assert.doesNotMatch(result.message, /systemctl exposed output/);
-	assert.match(await readFile(file, "utf8"), /^PRIVACY_THRESHOLD=0$/m);
 });
 
 test("a save that cannot restart says so in the reader's terms", async () => {
@@ -269,9 +226,9 @@ test("a save that cannot restart says so in the reader's terms", async () => {
 });
 
 test("a card with nothing to restart just saves", async () => {
-	const { file } = await fixtureConfig("REVIEW_RARE_SPECIES_MAX=10\n");
-	const saved = await saveReviewSettings(
-		{ rareSpeciesMax: 12 },
+	const { file } = await fixtureConfig("AUTOMATIC_UPDATE=1\n");
+	const saved = await saveUpdateSettings(
+		{ automatic: false },
 		{ settingsPath: file, skipSystemActions: true },
 	);
 	assert.equal(saved.status, "saved");
@@ -308,7 +265,7 @@ test("restarting distinguishes nothing to do from a declined restart", async () 
 	const runner = async () => {
 		commands++;
 	};
-	const nothing = await restartStation("review", { runner });
+	const nothing = await restartStation("artwork", { runner });
 	assert.equal(nothing.status, "nothing-to-restart");
 	assert.match(nothing.message, /already live/);
 

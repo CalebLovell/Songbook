@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-	DEFAULT_REVIEW_RARE_SPECIES_MAX,
-	parseSettingsCard,
-} from "./settings-data.ts";
+import { parseSettingsCard } from "./settings-data.ts";
 
 test("accepts inclusive detector boundaries", () => {
 	const settings = parseSettingsCard("detection", {
@@ -69,10 +66,4 @@ test("validates station coordinates, timezone, and safe text", () => {
 			timezone: "Not/A_Zone",
 		}),
 	);
-});
-
-test("defaults Review rarity to ten and rejects zero", () => {
-	assert.equal(DEFAULT_REVIEW_RARE_SPECIES_MAX, 10);
-	assert.deepEqual(parseSettingsCard("review", {}), { rareSpeciesMax: 10 });
-	assert.throws(() => parseSettingsCard("review", { rareSpeciesMax: 0 }));
 });

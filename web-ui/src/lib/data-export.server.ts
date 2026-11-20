@@ -2,7 +2,13 @@ import "@tanstack/react-start/server-only";
 
 import { DatabaseSync } from "node:sqlite";
 
-import type { DetectionExportQuery } from "./data-backup-format.ts";
+import type { DetectionSearchMatch } from "./detections.ts";
+
+export type DetectionCsvFilter = {
+	from?: string;
+	to?: string;
+	match?: DetectionSearchMatch;
+};
 
 const COLUMNS = [
 	"Date",
@@ -37,10 +43,10 @@ function csvLine(values: readonly unknown[]): string {
 
 export async function* detectionCsvChunks(
 	databasePath: string,
-	query: DetectionExportQuery,
+	query: DetectionCsvFilter,
 ): AsyncGenerator<string> {
 	const filters: string[] = [];
-	const filterValues: string[] = [];
+	const filterValues: (string | number)[] = [];
 	if (query.from) {
 		filters.push("Date >= ?");
 		filterValues.push(query.from);
@@ -49,9 +55,18 @@ export async function* detectionCsvChunks(
 		filters.push("Date <= ?");
 		filterValues.push(query.to);
 	}
-	if (query.species) {
-		filters.push("Sci_Name = ?");
-		filterValues.push(query.species);
+	if (query.match) {
+		const { comNames, percent } = query.match;
+		const either: string[] = [];
+		if (comNames.length > 0) {
+			either.push(`Com_Name IN (${comNames.map(() => "?").join(", ")})`);
+			filterValues.push(...comNames);
+		}
+		if (percent !== null) {
+			either.push("CAST(ROUND(Confidence * 100) AS INTEGER) = ?");
+			filterValues.push(percent);
+		}
+		filters.push(either.length > 0 ? `(${either.join(" OR ")})` : "1 = 0");
 	}
 	const select = `SELECT rowid AS row_id, ${COLUMNS.join(", ")} FROM detections`;
 	const order = `ORDER BY Date, Time, rowid LIMIT ${BATCH_ROWS}`;
@@ -84,7 +99,7 @@ export async function* detectionCsvChunks(
 	}
 }
 
-export function detectionCsvFileName(query: DetectionExportQuery): string {
+export function detectionCsvFileName(query: DetectionCsvFilter): string {
 	const range = [query.from, query.to].filter(Boolean).join("-to-");
 	return `songbook-detections${range ? `-${range}` : ""}.csv`;
 }

@@ -1,24 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import {
-	Calendar,
-	type Download,
-	FileDown,
-	RotateCcw,
-	Trash2,
-	Undo2,
-	Upload,
-	X,
-} from "lucide-react";
-import { type ReactNode, useRef, useState } from "react";
+import { RotateCcw, Trash2, Undo2, Upload, X } from "lucide-react";
+import { useRef, useState } from "react";
 
-import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
-import { Card } from "~/components/ui/card.tsx";
-import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
+import {
+	ConfirmDialog,
+	MODAL_ACTIONS_CLASS,
+} from "~/components/ui/confirm-dialog.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
-import { destructiveToast, toast } from "~/components/ui/toaster.tsx";
+import { ModalDialog } from "~/components/ui/modal-dialog.tsx";
+import { toast } from "~/components/ui/toaster.tsx";
 import {
 	applyRestoreFn,
 	deleteSafetyCopyFn,
@@ -28,7 +21,6 @@ import {
 } from "~/lib/data.ts";
 import {
 	type DataSummary,
-	detectionExportUrl,
 	formatBytes,
 	RESTORE_UPLOAD_URL,
 	type RestoreOutcome,
@@ -37,72 +29,22 @@ import {
 } from "~/lib/data-backup-format.ts";
 import { formatDate, formatDateTime } from "~/lib/date-format.ts";
 import { PAGE_QUERY, refreshAllData } from "~/lib/query-client.ts";
-import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 import { errorMessage } from "~/lib/utils.ts";
-import { Field, FieldSelect } from "./settings-cards.tsx";
-import { settingsCardId } from "./settings-index.ts";
 
 export const DATA_SUMMARY_KEY = ["data-summary"];
-const TOAST_ID = "settings-data";
+
+export const dataSummaryQuery = {
+	...PAGE_QUERY,
+	queryKey: DATA_SUMMARY_KEY,
+	queryFn: () => getDataSummaryFn(),
+};
+
+const TOAST_ID = "health-restore";
 const UPLOAD_TOO_BIG =
 	"The upload was cut off. Large backups have to be restored from your home network, so open Songbook there and try again.";
 
 function count(value: number) {
 	return value.toLocaleString("en-US");
-}
-
-function DataCard({
-	title,
-	description,
-	footer,
-	children,
-}: {
-	title: string;
-	description: string;
-	footer?: ReactNode;
-	children?: ReactNode;
-}) {
-	const cardId = settingsCardId(title);
-	const headingId = `settings-${cardId}`;
-	return (
-		<Card
-			as="section"
-			id={cardId}
-			aria-labelledby={headingId}
-			className="scroll-mt-4"
-		>
-			<div className="flex h-full flex-col">
-				<CardHeader as="h2" titleId={headingId} title={title} />
-				<p className="py-page text-muted-foreground text-sm leading-relaxed">
-					{description}
-				</p>
-				<div className="flex-1">{children}</div>
-				{footer ? (
-					<div className="-mx-page flex flex-wrap items-center justify-end gap-page border-t px-page pt-page">
-						{footer}
-					</div>
-				) : null}
-			</div>
-		</Card>
-	);
-}
-
-function DownloadLink({
-	href,
-	icon,
-	label,
-}: {
-	href: string;
-	icon: typeof Download;
-	label: string;
-}) {
-	return (
-		<Button asChild size="default" icon={icon}>
-			<a href={href} download>
-				{label}
-			</a>
-		</Button>
-	);
 }
 
 function uploadBackup(file: File, onProgress: (percent: number) => void) {
@@ -145,15 +87,15 @@ function Figure({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="min-w-0">
 			<Kicker>{label}</Kicker>
-			<p className="font-semibold text-xl tabular-nums">{value}</p>
+			<p className="m-0 font-semibold text-xl tabular-nums">{value}</p>
 		</div>
 	);
 }
 
 function StagedBackup({ staged }: { staged: RestorePreview }) {
 	return (
-		<div className="-mx-page space-y-page border-t px-page py-page">
-			<p className="text-sm">
+		<div className="space-y-page rounded-md bg-muted p-page">
+			<p className="m-0 text-sm">
 				This backup of {staged.stationName || "a station"} was saved{" "}
 				{formatDateTime(staged.createdAt)} and passed its checks.
 			</p>
@@ -170,7 +112,7 @@ function StagedBackup({ staged }: { staged: RestorePreview }) {
 				/>
 			</div>
 			{staged.firstDate && staged.lastDate ? (
-				<p className="text-muted-foreground text-sm">
+				<p className="m-0 text-muted-foreground text-sm">
 					Detections from {formatDate(staged.firstDate)} to{" "}
 					{formatDate(staged.lastDate)}.
 				</p>
@@ -188,8 +130,8 @@ function UploadProgress({
 }) {
 	const checking = percent >= 100;
 	return (
-		<div className="-mx-page space-y-page border-t px-page py-page">
-			<p className="text-sm">
+		<div className="space-y-page">
+			<p className="m-0 text-sm">
 				{checking
 					? "Checking the backup. Nothing on the station has changed."
 					: `Uploading the backup: ${percent}%. Nothing on the station has changed.`}
@@ -223,7 +165,7 @@ function outcomeToast(outcome: RestoreOutcome) {
 	else toast.success(outcome.message, { id: TOAST_ID });
 }
 
-function SafetyCopyRow({
+function SafetyCopy({
 	createdAt,
 	onDone,
 }: {
@@ -251,7 +193,7 @@ function SafetyCopyRow({
 		mutationFn: () => deleteFn(),
 		onSuccess: async () => {
 			setConfirming(null);
-			destructiveToast("Safety copy deleted.", { id: TOAST_ID });
+			toast.success("Safety copy deleted.", { id: TOAST_ID });
 			await onDone();
 		},
 		onError: (error) => {
@@ -262,31 +204,33 @@ function SafetyCopyRow({
 		},
 	});
 	return (
-		<>
-			<Field
-				label="Safety copy"
-				readOnly
-				hint={`Your station as it was before the restore on ${formatDateTime(createdAt)}. It takes up disk space until you undo or delete it, and you need to do one of those before restoring again.`}
-			>
-				<div className="flex flex-wrap justify-end gap-page">
-					<Button
-						variant="outline"
-						size="default"
-						icon={Trash2}
-						onClick={() => setConfirming("delete")}
-					>
-						Delete
-					</Button>
-					<Button
-						variant="outline"
-						size="default"
-						icon={Undo2}
-						onClick={() => setConfirming("undo")}
-					>
-						Undo restore
-					</Button>
-				</div>
-			</Field>
+		<div className="space-y-page rounded-md bg-muted p-page">
+			<div>
+				<p className="m-0 font-semibold text-sm">Safety copy</p>
+				<p className="m-0 text-muted-foreground text-xs leading-relaxed">
+					Your station as it was before the restore on{" "}
+					{formatDateTime(createdAt)}. It takes up disk space until you undo or
+					delete it, and you need to do one of those before restoring again.
+				</p>
+			</div>
+			<div className="flex flex-wrap gap-page">
+				<Button
+					variant="outline"
+					size="default"
+					icon={Undo2}
+					onClick={() => setConfirming("undo")}
+				>
+					Undo restore
+				</Button>
+				<Button
+					variant="outline"
+					size="default"
+					icon={Trash2}
+					onClick={() => setConfirming("delete")}
+				>
+					Delete
+				</Button>
+			</div>
 			{confirming === "undo" ? (
 				<ConfirmDialog
 					title="Undo the last restore?"
@@ -311,18 +255,14 @@ function SafetyCopyRow({
 					onConfirm={() => remove.mutate()}
 				/>
 			) : null}
-		</>
+		</div>
 	);
 }
 
-function RestoreCard({
-	summary,
-	onChanged,
-}: {
-	summary: DataSummary | undefined;
-	onChanged: () => Promise<void>;
-}) {
+function RestoreDialog({ onClose }: { onClose: () => void }) {
+	const router = useRouter();
 	const queryClient = useQueryClient();
+	const { data: summary } = useQuery(dataSummaryQuery);
 	const applyFn = useServerFn(applyRestoreFn);
 	const discardFn = useServerFn(discardStagedBackupFn);
 	const fileInput = useRef<HTMLInputElement>(null);
@@ -331,6 +271,10 @@ function RestoreCard({
 	const [confirming, setConfirming] = useState(false);
 	const staged = summary?.staged ?? null;
 	const safetyCopy = summary?.safetyCopy ?? null;
+
+	const onChanged = async () => {
+		await refreshAllData(router, queryClient);
+	};
 
 	const clearStaged = () =>
 		queryClient.setQueryData<DataSummary>(DATA_SUMMARY_KEY, (current) =>
@@ -365,6 +309,7 @@ function RestoreCard({
 			clearStaged();
 			outcomeToast(outcome);
 			await onChanged();
+			onClose();
 		},
 		onError: async (error) => {
 			setConfirming(false);
@@ -388,44 +333,18 @@ function RestoreCard({
 		},
 	});
 
-	const footer =
-		percent !== null ? null : staged ? (
-			<>
-				<Button
-					variant="outline"
-					size="default"
-					icon={X}
-					disabled={discard.isPending}
-					onClick={() => discard.mutate()}
-				>
-					Discard
-				</Button>
-				<Button
-					variant="destructive"
-					size="default"
-					icon={RotateCcw}
-					onClick={() => setConfirming(true)}
-				>
-					Restore this backup
-				</Button>
-			</>
-		) : (
-			<Button
-				size="default"
-				icon={Upload}
-				disabled={!summary || safetyCopy !== null}
-				onClick={() => fileInput.current?.click()}
-			>
-				Choose backup file
-			</Button>
-		);
+	const close = () => {
+		cancelUpload.current?.();
+		onClose();
+	};
 
 	return (
-		<DataCard
-			title="Restore"
-			description="Replace this station's data with a Songbook backup. The file is fully checked before anything changes, and you decide after seeing what's in it. Backups over 100 MB may need to be restored from your home network."
-			footer={footer}
-		>
+		<ModalDialog title="Restore a backup" className="max-w-xl" onClose={close}>
+			<p className="m-0 text-muted-foreground text-sm leading-relaxed">
+				Replace this station's data with a Songbook backup. The file is fully
+				checked before anything changes, and you decide after seeing what's in
+				it. Backups over 100 MB may need to be restored from your home network.
+			</p>
 			<input
 				ref={fileInput}
 				type="file"
@@ -439,7 +358,7 @@ function RestoreCard({
 				}}
 			/>
 			{safetyCopy ? (
-				<SafetyCopyRow createdAt={safetyCopy.createdAt} onDone={onChanged} />
+				<SafetyCopy createdAt={safetyCopy.createdAt} onDone={onChanged} />
 			) : null}
 			{percent !== null ? (
 				<UploadProgress
@@ -449,6 +368,47 @@ function RestoreCard({
 			) : staged ? (
 				<StagedBackup staged={staged} />
 			) : null}
+			<div className={MODAL_ACTIONS_CLASS}>
+				<Button
+					type="button"
+					variant="outline"
+					size="lg"
+					icon={X}
+					onClick={close}
+				>
+					Close
+				</Button>
+				{percent !== null ? null : staged ? (
+					<>
+						<Button
+							variant="outline"
+							size="lg"
+							icon={Trash2}
+							disabled={discard.isPending}
+							onClick={() => discard.mutate()}
+						>
+							Discard
+						</Button>
+						<Button
+							variant="destructive"
+							size="lg"
+							icon={RotateCcw}
+							onClick={() => setConfirming(true)}
+						>
+							Restore this backup
+						</Button>
+					</>
+				) : (
+					<Button
+						size="lg"
+						icon={Upload}
+						disabled={!summary || safetyCopy !== null}
+						onClick={() => fileInput.current?.click()}
+					>
+						Choose backup file
+					</Button>
+				)}
+			</div>
 			{confirming && staged ? (
 				<ConfirmDialog
 					title="Replace this station's data?"
@@ -469,122 +429,24 @@ function RestoreCard({
 					</p>
 				</ConfirmDialog>
 			) : null}
-		</DataCard>
+		</ModalDialog>
 	);
 }
 
-function DateField({
-	label,
-	value,
-	min,
-	max,
-	onChange,
-}: {
-	label: string;
-	value: string;
-	min?: string;
-	max?: string;
-	onChange: (value: string) => void;
-}) {
+export function RestoreButton({ primary }: { primary: boolean }) {
+	const [open, setOpen] = useState(false);
 	return (
-		<Field label={label} readOnly>
-			<div className="relative flex h-8.5 pointer-coarse:h-9 items-center gap-2 rounded-md border border-input bg-card px-3 pointer-coarse:text-base text-sm transition-colors hover:bg-accent">
-				<Calendar
-					className="size-4 shrink-0 text-muted-foreground"
-					aria-hidden="true"
-				/>
-				<span className={value ? "" : "text-muted-foreground"}>
-					{value ? formatDate(value) : "Any date"}
-				</span>
-				<input
-					aria-label={label}
-					className="absolute inset-0 size-full cursor-pointer text-base opacity-0"
-					type="date"
-					value={value}
-					min={min}
-					max={max}
-					onClick={(event) => {
-						try {
-							event.currentTarget.showPicker?.();
-						} catch {}
-					}}
-					onChange={(event) => onChange(event.target.value)}
-				/>
-			</div>
-		</Field>
-	);
-}
-
-function ExportCard({ summary }: { summary: DataSummary | undefined }) {
-	const [from, setFrom] = useState("");
-	const [to, setTo] = useState("");
-	const [species, setSpecies] = useState("");
-	return (
-		<DataCard
-			title="Export detections"
-			description="Download detections as a spreadsheet, to read yourself or bring into another tool. This doesn't include clips, and it can't rebuild a station; use a backup for that."
-			footer={
-				<DownloadLink
-					href={detectionExportUrl({
-						from: from || undefined,
-						to: to || undefined,
-						species: species || undefined,
-					})}
-					icon={FileDown}
-					label="Download CSV"
-				/>
-			}
-		>
-			<DateField
-				label="From"
-				value={from}
-				min={summary?.firstDate ?? undefined}
-				max={to || (summary?.lastDate ?? undefined)}
-				onChange={setFrom}
-			/>
-			<DateField
-				label="To"
-				value={to}
-				min={from || (summary?.firstDate ?? undefined)}
-				max={summary?.lastDate ?? undefined}
-				onChange={setTo}
-			/>
-			<Field label="Species">
-				<FieldSelect
-					value={species}
-					onChange={(event) => setSpecies(event.target.value)}
-				>
-					<option value="">All species</option>
-					{summary?.species.map((bird) => (
-						<option key={bird.sciName} value={bird.sciName}>
-							{bird.comName}
-						</option>
-					))}
-				</FieldSelect>
-			</Field>
-		</DataCard>
-	);
-}
-
-export function DataCards({ active }: { active: boolean }) {
-	const router = useRouter();
-	const queryClient = useQueryClient();
-	const { data } = useQuery({
-		...PAGE_QUERY,
-		queryKey: DATA_SUMMARY_KEY,
-		queryFn: () => getDataSummaryFn(),
-		enabled: active,
-	});
-	const summary = useSkeletonMinimum(data);
-	return (
-		<div className="space-y-page">
-			<RestoreCard
-				summary={summary}
-				onChanged={async () => {
-					await refreshAllData(router, queryClient);
-				}}
-			/>
-			<ExportCard summary={summary} />
-		</div>
+		<>
+			<Button
+				type="button"
+				variant={primary ? "default" : "outline"}
+				size="default"
+				icon={Upload}
+				onClick={() => setOpen(true)}
+			>
+				Restore a backup
+			</Button>
+			{open ? <RestoreDialog onClose={() => setOpen(false)} /> : null}
+		</>
 	);
 }

@@ -8,6 +8,7 @@ import {
 	detectionCsvChunks,
 	detectionCsvFileName,
 } from "~/lib/data-export.server.ts";
+import { detectionSearchMatch } from "~/lib/detections.ts";
 
 export const Route = createFileRoute("/api/data/export")({
 	server: {
@@ -19,15 +20,20 @@ export const Route = createFileRoute("/api/data/export")({
 				const query = detectionExportQuerySchema.parse({
 					from: params.get("from") ?? undefined,
 					to: params.get("to") ?? undefined,
-					species: params.get("species") ?? undefined,
+					q: params.get("q") ?? undefined,
 				});
+				const filter = {
+					from: query.from,
+					to: query.to,
+					match: query.q ? await detectionSearchMatch(query.q) : undefined,
+				};
 				const stream = Readable.from(
-					detectionCsvChunks(stationDataPaths().databasePath, query),
+					detectionCsvChunks(stationDataPaths().databasePath, filter),
 				);
 				return new Response(Readable.toWeb(stream) as ReadableStream, {
 					headers: {
 						"Content-Type": "text/csv; charset=utf-8",
-						"Content-Disposition": `attachment; filename="${detectionCsvFileName(query)}"`,
+						"Content-Disposition": `attachment; filename="${detectionCsvFileName(filter)}"`,
 						"Cache-Control": "private, no-store",
 					},
 				});

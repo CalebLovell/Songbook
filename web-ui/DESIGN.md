@@ -54,7 +54,7 @@ for a meaning; don't write a new mix inline when one exists:
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
 | `--row-well` | the slack under a paged list's rows on a short page (`RowWell`) |
-| `--toast-{success,warning,error}-fill/-line` | outcome tones: toasts, Health cards, quiz answers, warning wells; title is moss / bark / clay, neutral toasts stay white |
+| `--toast-{success,warning,error}-fill/-line` | outcome tones: toasts, Station cards, quiz answers, warning wells; title is moss / bark / clay, neutral toasts stay white |
 
 Confidence pills are three bands, not a ramp (`lib/confidence.ts`): green at
 90% and up (`CONFIDENT_MIN`, the same line review uses), amber from 80%, and
@@ -185,8 +185,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   hover), never bolder text. Gated pages stay listed with a lock icon.
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
   `/` to focus), then two nav sections: Explore (Today, Timeline, All Birds, Detections,
-  Learn) for everyone, and Station (Review, Health, Species Filter, Settings) right below it only
-  when signed in. Nothing else sits low in the sidebar except the foot: account card, theme switcher, then a full-bleed status bar under a hairline, in the sidebar and the phone drawer alike (the slot under the wordmark belongs to the site name). The bar shows station status on the left (a moss dot that pings while listening, a still grey dot when Offline or Unknown; signed in, it links to Health) and `Songbook <version>` on the right, linking to the GitHub repo; the version is the release tag baked in at build time (`VITE_SONGBOOK_VERSION`), so dev builds show just Songbook. It is the only place status shows; Live's Now header carries none. The foot keeps a fixed 1rem gap on every width, like the nav rows above it; `--page-gap` halving on phones is for page cards, not the drawer.
+  Learn) for everyone, and Station (Review, Station, Species Filter, Settings) right below it only
+  when signed in. Nothing else sits low in the sidebar except the foot: account card, theme switcher, then a full-bleed status bar under a hairline, in the sidebar and the phone drawer alike (the slot under the wordmark belongs to the site name). The bar shows station status on the left (a moss dot that pings while listening, a still grey dot when Offline or Unknown; signed in, it links to Station) and `Songbook <version>` on the right, linking to the GitHub repo; the version is the release tag baked in at build time (`VITE_SONGBOOK_VERSION`), so dev builds show just Songbook. It is the only place status shows; Live's Now header carries none. The foot keeps a fixed 1rem gap on every width, like the nav rows above it; `--page-gap` halving on phones is for page cards, not the drawer.
 - **Account card**: the sidebar's last item, never a nav row. One line of bold title and
   one muted line beside a 36px round icon well, then a 34px borderless icon action:
   sign out when signed in, a link to `/sign-in?next=` when not, a chevron to `/sign-in` when
@@ -225,7 +225,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the station's release every 5 minutes and on focus (`useFollowRelease`). A
   page left on an old release reloads itself once it is hidden, or after 5
   minutes untouched, but never while audio plays or a field has focus. Pull to
-  refresh reloads the whole page when a newer release is out, and the Health
+  refresh reloads the whole page when a newer release is out, and the Station
   page reloads as soon as an install it is watching finishes.
   Anything that doesn't depend on the data (titles, labels, controls driven
   by the URL) renders as itself at once. Every card that fetches has a
@@ -377,7 +377,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Explanations**: `InfoTip` opens a modal from the info icon. `Hint` is the hover
   tooltip, and a tap opens it too.
 - **Outcomes** arrive as toasts, never as a status line or coloured stripe on a
-  card. A destructive action that succeeded wears clay, not moss.
+  card. A toast's colour follows the outcome, never the kind of action: anything that
+  succeeded is moss, a destructive delete or reset included; a failure is clay.
 - **Announcements**: anything that changes in place without moving focus and that
   a screen reader needs (result counts, a selection, a quiz guess) goes through
   `announce` or `useAnnounceChange`, which speak from one polite region. Live says
@@ -478,7 +479,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   detection changes. The collage repacks only when a bird or its count changes.
   Until today's first detection everything shows yesterday, so the page isn't
   blank overnight. Live carries no Highlights and no audio stream: Highlights
-  belong to Timeline with its Share, and Listen is a Health card.
+  belong to Timeline with its Share, and Listen is a Station card.
 - **Highlights**: the rules are pure and belong to Timeline
   (`lib/highlights-data.ts`), with thresholds and their guide together in
   `lib/highlight-thresholds.ts`. A day with no recordings means the station was
@@ -487,8 +488,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   location, and a call before dawn belongs to the night before. Night is when
   BirdNET misfires most, so a bird needs one call at 85%+ and insect lookalikes
   (`INSECT_LOOKALIKES`) never count.
-- **Rare** has one meaning, the owner's `rareMax`, for the Rare flag and the quiz
-  pools alike. Pools split by familiarity, never by time. Common is ranked, not a
+- **Rare** has one meaning, the owner's `rareMax` (that many records or fewer, in all),
+  for the Rare flag, the Review queue and the quiz pools alike. Pools split by familiarity, never by time. Common is ranked, not a
   fixed count: the most-heard third of species past rare, with a floor
   (`COMMON_FLOOR`) so a young station's first loud hour doesn't fill it; Uncommon is
   what lies between. While the station has under `SETTLING_DAYS` days of detections
@@ -501,37 +502,35 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   A guess is spoken and leaves its choice focusable (`aria-disabled`); focus then
   follows the round: Next after a right answer, the clip after Next, the results at
   the end.
-- **Settings**: a save writes the config, then restarts the card's services. A
-  refused and a declined restart read the same, and the card keeps offering Restart
-  until the values are live. One tab per card,
-  except Preferences, which stacks the cards about taste rather than running the
-  station (Artwork, Playback, Highlights, Review), and Data (Restore, Export detections); the tab is held in the URL (`?tab=`); every card stays mounted behind its tab, so switching
-  never drops an unsaved edit. The toolbar's Factory defaults covers every card; a card's own
-  footer reset covers only that card and goes through its normal save. A card's Save and reset show as disabled
-  when there is nothing to do. Artwork picks illustrations or photos for the whole
+- **Settings** (`/settings`, signed in) is one card with one Save: Show birds as,
+  Boost quiet recordings, then Rare and the other Highlights thresholds. Nothing in it
+  restarts anything. Reset settings sits in the card's footer, asks first, and returns
+  every value to its default; Save and Reset show as disabled when there is nothing to do. Artwork picks illustrations or photos for the whole
   station; `SpeciesImage` applies it, so data keeps naming the painting and no page
   has to know.
   Playback's boost (on by default) works the same way: `applyClipBoost` routes every
   clip player through a shared gain and limiter during the tap, since iOS Safari only
   starts audio from a gesture.
-- **Health or Settings**: Health holds everything the station needs to work, and
-  Settings holds only what someone might tweak to taste. A station left on every Settings
-  default runs fine; one with a Health problem doesn't. So a value with no sensible
-  default (station name, location and its time zone) is set on Health, not in Settings,
-  and Settings never says whether something is working or repeats a Health reading. The one shared control is Restart BirdNET:
-  Settings offers it only while a saved change waits to take effect. Settings has no Station tab; its
-  first tab is Detection. Settings has no Audio input, Recording or Storage card either:
+- **Station or Settings**: split by subject, not by "status vs config". Station is the
+  station itself: its readings, its setup (name, location), how it listens (Detection), its
+  upkeep (updates, backups and restores). Settings is how the site shows and judges birds,
+  for the owner and visitors. Nothing on Settings restarts BirdNET or affects whether the
+  station works, and Settings never repeats a Station reading. A setting finds its page by
+  what it is about: if it changes what the station hears or keeps, it is Station; if it changes
+  what people see, it is Settings. Exporting detections is neither: it is Download CSV on
+  Detections, which exports exactly what the search and date filters match, every page of it.
+  There is no Audio input, Recording or Storage setting anywhere:
   they are technical knobs, not taste, and the install defaults are right (one USB mic on
   `default`; 15 s recordings, 6 s mp3 clips; past 95% full, delete the least confident clips
   while each species keeps its 10 best, with no per-species cap). `REC_CARD`, `CHANNELS`,
   `RTSP_STREAM`, `RECORDING_LENGTH`, `EXTRACTION_LENGTH`, `AUDIOFMT`, `FULL_DISK`,
   `PURGE_THRESHOLD`, `PURGE_KEEP_PER_SPECIES` and `MAX_FILES_SPECIES` live only in the config
-  file; no save, Factory defaults or restore touches them. Storage shows only on Health.
-  The Detection card has no species-frequency threshold either: `SF_THRESH` stays at 0.03 in
+  file; no save, reset or restore touches them. Storage shows only on Station.
+  Detection has no species-frequency threshold either: `SF_THRESH` stays at 0.03 in
   the config file, and the Species filter page's Always detect is the per-species override.
   A config value outside a card's range shows as that field's default instead of failing
   the page; the file keeps it until the card is saved.
-- **Health** (`/health`, signed in) shows no birds and no detection counts. The page has no summary of its own: one
+- **Station** (`/station`, signed in; code and checks still say health) shows no birds and no detection counts. The page has no summary of its own: one
   standard card per check, in a fixed order (Name, Location, Audio input, Power supply,
   BirdNET model, Storage, Updates, Backups). Cards carry no status pills: state shows in
   the card itself. A healthy card is plain, with its reading as the figure and a sentence
@@ -547,14 +546,17 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   A station still on the default name only warns on its Name card, never puts the station in
   setup, so a station that keeps it still shows real problems in red. A reading
   this computer can't give says "Not known" in muted text. Power supply and Updates only
-  ever warn. Actions live on the card they act on: Restart BirdNET; Change
+  ever warn. Actions live on the card they act on: Restart BirdNET and Tune detection
+  (a dialog of the four Detection values, which restarts BirdNET on save) on BirdNET model; Change
   or Set name and location, each in a small dialog; Restart the Pi and Shut down on Power
-  supply; Install (confirmed), Check for updates and the Install automatically On/Off, which saves on click (Updates lives only on Health; old `?tab=updates` links redirect there); Download a backup, whose dialog
-  offers everything or without clips. A failing Audio input offers only Check again, which
+  supply; Install (confirmed), Check for updates and the Install automatically On/Off, which saves on click; Download a backup, whose dialog
+  offers everything or without clips, and Restore a backup, whose dialog uploads, shows what's
+  in the file, then asks before replacing anything, and holds the safety copy's Undo and Delete. A failing Audio input offers only Check again, which
   re-reads the station and toasts whether audio now works, since its fixes happen at the Pi.
   A full disk offers no action: its fix is freeing space or a bigger SD card via backup and
-  restore. Restoring a backup links to the Data tab. Card logic is pure in
-  `lib/health-cards.ts`. The Health row in the sidebar carries the only mark: the
+  restore. Station has no reset: name and location have no default, and Detection is a
+  handful of values on one dialog. Card logic is pure in
+  `lib/health-cards.ts`. The Station row in the sidebar carries the only mark: the
   number of cards that need a look (problems, warnings and setup steps, an offered update
   included), clay when any is broken and sand otherwise, and nothing when all is well. The
   phone's menu button shows the same as a dot.

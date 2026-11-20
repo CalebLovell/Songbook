@@ -91,7 +91,7 @@ const NOT_A_BACKUP =
 const SAFETY_COPY_EXISTS =
 	"Undo the last restore or delete its safety copy before restoring again.";
 const NEEDS_RESTART =
-	"BirdNET could not be restarted. Restart it from Settings so it starts recording again.";
+	"BirdNET could not be restarted. Restart it from Station so it starts recording again.";
 
 let busy = false;
 
@@ -445,7 +445,6 @@ async function applySettings(sourceDir: string, paths: DataPaths) {
 	);
 	await writeSettingsCard("station", settings.station, paths.settingsPath);
 	await writeSettingsCard("detection", settings.detection, paths.settingsPath);
-	await writeSettingsCard("review", settings.review, paths.settingsPath);
 	await writeSettingsCard(
 		"highlights",
 		settings.highlights,
