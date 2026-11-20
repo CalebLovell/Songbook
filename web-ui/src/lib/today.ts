@@ -156,11 +156,14 @@ async function readShownDay() {
 	if (latestToday)
 		return { day: "today" as const, date: today, latest: latestToday };
 	const yesterday = addDays(today, -1);
-	return {
-		day: "yesterday" as const,
-		date: yesterday,
-		latest: await latestOn(yesterday),
-	};
+	const latestYesterday = await latestOn(yesterday);
+	if (latestYesterday)
+		return {
+			day: "yesterday" as const,
+			date: yesterday,
+			latest: latestYesterday,
+		};
+	return { day: "today" as const, date: today, latest: undefined };
 }
 
 async function loadNowData(withAudio: boolean) {

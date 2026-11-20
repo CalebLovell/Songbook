@@ -64,7 +64,9 @@ const WINDOW_FIT_CLASS =
 const BODY_GRID_CLASS = `mt-page grid grid-cols-1 items-start gap-page lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:grid-rows-[auto_1fr] xl:grid-rows-[auto_minmax(0,1fr)] xl:items-stretch ${WINDOW_FIT_CLASS}`;
 const FEED_SLOT_CLASS = "min-w-0 lg:col-start-1 lg:row-start-1 xl:self-start";
 const HOURS_SLOT_CLASS = "flex min-w-0 flex-col lg:col-start-1 lg:row-start-2";
-const COLLAGE_FIT_CLASS = `lg:col-start-2 lg:row-span-2 lg:row-start-1 ${WINDOW_FIT_CLASS}`;
+const COLLAGE_SLOT_CLASS = "lg:col-start-2 lg:row-span-2 lg:row-start-1";
+const COLLAGE_FIT_CLASS = `${COLLAGE_SLOT_CLASS} ${WINDOW_FIT_CLASS}`;
+const COLLAGE_EMPTY_CLASS = `${COLLAGE_SLOT_CLASS} self-start`;
 const DAY_LABEL: Record<ShownDay, string> = {
 	today: "Today",
 	yesterday: "Yesterday",
@@ -223,8 +225,8 @@ function useRefetchOnNewDetection(
 }
 
 function useCollageSpecies(rows: TimelineRow[] | null) {
-	const signature = (rows ?? [])
-		.map((row) => `${row.comName}:${row.totalDetections}`)
+	const signature = rows
+		?.map((row) => `${row.comName}:${row.totalDetections}`)
 		.join("|");
 	// biome-ignore lint/correctness/useExhaustiveDependencies: a refetch returns new rows for the same birds; repack the collage only when the birds change
 	return useMemo(
@@ -306,7 +308,9 @@ function TodayBody({ snapshot }: { snapshot: TodaySnapshot }) {
 						summary={<WindowSummary rows={rows} />}
 						trailing={sunTimes}
 						reshuffle={false}
-						className={COLLAGE_FIT_CLASS}
+						className={
+							collageSpecies.length > 0 ? COLLAGE_FIT_CLASS : COLLAGE_EMPTY_CLASS
+						}
 					/>
 				) : (
 					<CollageCardSkeleton
