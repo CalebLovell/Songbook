@@ -11,6 +11,7 @@ import { useId } from "react";
 import { AccountCard } from "~/components/sidebar/account-card.tsx";
 import { EXPLORE_LINKS } from "~/components/sidebar/explore-links.ts";
 import { SidebarStatusBar } from "~/components/sidebar/sidebar-status-bar.tsx";
+import { useTabLink } from "~/components/sidebar/tab-spots.ts";
 import { ThemeSwitcher } from "~/components/sidebar/theme-switcher.tsx";
 import type { HealthAttention } from "~/lib/health-cards.ts";
 import { useHealthMark } from "~/lib/use-health-mark.ts";
@@ -44,11 +45,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 				aria-labelledby={`${id}-explore`}
 			>
 				<SectionLabel id={`${id}-explore`}>Explore</SectionLabel>
-				{EXPLORE_LINKS.map(({ label, icon, link }) => (
-					<Link key={label} {...link} {...linkProps}>
-						<NavIcon icon={icon} />
-						{label}
-					</Link>
+				{EXPLORE_LINKS.map((tab) => (
+					<ExploreNavLink key={tab.label} tab={tab} onNavigate={onNavigate} />
 				))}
 			</nav>
 
@@ -96,6 +94,25 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 				<SidebarStatusBar className="-mx-3 px-6" />
 			</div>
 		</div>
+	);
+}
+
+function ExploreNavLink({
+	tab,
+	onNavigate,
+}: {
+	tab: (typeof EXPLORE_LINKS)[number];
+	onNavigate?: () => void;
+}) {
+	return (
+		<Link
+			{...useTabLink(tab.link)}
+			className={NAV_ROW_CLASS}
+			onClick={onNavigate}
+		>
+			<NavIcon icon={tab.icon} />
+			{tab.label}
+		</Link>
 	);
 }
 

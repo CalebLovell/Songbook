@@ -402,6 +402,11 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   icon over an 11px label in its own flush cell, with `--line` hairlines
   between cells; active fills the whole cell (down through the home-indicator
   padding) in the nav rows' active fill. Station pages stay in the drawer.
+- Explore tabs remember your spot, like an app's tabs: each tab (bottom bar and
+  sidebar alike, via `useTabLink` in `tab-spots.ts`) links back to the last URL you
+  were on inside it, so page state belongs in search params, never component
+  state. Tab pages key scroll restoration by URL, so the scroll position comes
+  back too. Tapping the tab you're already on goes to its plain default.
 - Anything in a variable-width track responds to its card through container
   queries, not the viewport.
 - Grids holding long names use `minmax(0,1fr)` or `grid-cols-1`, never the implicit
