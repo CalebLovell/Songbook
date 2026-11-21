@@ -1,4 +1,23 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, MouseEvent } from "react";
+
+const OWN_CLICK = "a, button, input, label, select, textarea, [role=button]";
+
+export const SELECTABLE_ROW_CLASS = "cursor-pointer";
+
+export function selectableRowProps(
+	onToggle: (event: MouseEvent<HTMLElement>) => void,
+) {
+	return {
+		onMouseDown: (event: MouseEvent<HTMLElement>) => {
+			if (event.shiftKey) event.preventDefault();
+		},
+		onClick: (event: MouseEvent<HTMLElement>) => {
+			if ((event.target as Element).closest(OWN_CLICK)) return;
+			if (window.getSelection()?.toString()) return;
+			onToggle(event);
+		},
+	};
+}
 
 export function RowCheckbox({
 	actionsId,

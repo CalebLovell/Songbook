@@ -8,7 +8,13 @@ import {
 	useTable,
 } from "@tanstack/react-table";
 import { ArrowRight, Calendar, Trash2, X } from "lucide-react";
-import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import {
+	type CSSProperties,
+	type ReactNode,
+	type SyntheticEvent,
+	useId,
+	useState,
+} from "react";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
@@ -21,7 +27,11 @@ import {
 	PageStepper,
 	PageStepperShell,
 } from "~/components/ui/page-stepper.tsx";
-import { RowCheckbox } from "~/components/ui/row-checkbox.tsx";
+import {
+	RowCheckbox,
+	SELECTABLE_ROW_CLASS,
+	selectableRowProps,
+} from "~/components/ui/row-checkbox.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
 import { DebouncedSearchInput } from "~/components/ui/search-input.tsx";
 import { SelectionBar } from "~/components/ui/selection-bar.tsx";
@@ -104,6 +114,8 @@ const CELL_CLASSES: Record<string, string> = {
 };
 
 const GRID_ROW = "col-span-full grid grid-cols-subgrid items-center";
+const SPECIES_NAME_CLASS =
+	"@max-xl:block @max-xl:truncate font-medium @max-xl:leading-tight";
 
 function gridColumns(canDelete: boolean, canListen: boolean): CSSProperties {
 	const lead = canDelete ? "max-content max-content " : "max-content ";
@@ -437,6 +449,23 @@ export function DetectionsTable({
 		updateSearch(nextDetectionSort(search, sort));
 	}
 
+	function toggleRow(
+		orderedIds: string[],
+		rowId: string,
+		checked: boolean,
+		event: SyntheticEvent,
+	) {
+		const ids = rowsForClick(orderedIds, rowId, event);
+		onRowSelectionChange((current) => {
+			const next = { ...current };
+			for (const id of ids) {
+				if (checked) next[id] = true;
+				else delete next[id];
+			}
+			return next;
+		});
+	}
+
 	const selectColumn: DetectionColumn = {
 		id: "select",
 		header: ({ table }) => (
@@ -453,19 +482,14 @@ export function DetectionsTable({
 				aria-label={`Select ${row.original.Com_Name}`}
 				actionsId={actionsId}
 				checked={row.getIsSelected()}
-				onChange={(event) => {
-					const { checked } = event.target;
-					const orderedIds = table.getRowModel().rows.map(({ id }) => id);
-					const ids = rowsForClick(orderedIds, row.id, event);
-					onRowSelectionChange((current) => {
-						const next = { ...current };
-						for (const id of ids) {
-							if (checked) next[id] = true;
-							else delete next[id];
-						}
-						return next;
-					});
-				}}
+				onChange={(event) =>
+					toggleRow(
+						table.getRowModel().rows.map(({ id }) => id),
+						row.id,
+						event.target.checked,
+						event,
+					)
+				}
 			/>
 		),
 	};
@@ -526,14 +550,18 @@ export function DetectionsTable({
 			),
 			cell: ({ row }) => (
 				<>
-					<Link
-						to="/birds/$comName"
-						preload={false}
-						params={{ comName: comNameToSlug(row.original.Com_Name) }}
-						className="@max-xl:block @max-xl:truncate font-medium @max-xl:leading-tight no-underline hover:underline"
-					>
-						{row.original.Com_Name}
-					</Link>
+					{canDelete ? (
+						<span className={SPECIES_NAME_CLASS}>{row.original.Com_Name}</span>
+					) : (
+						<Link
+							to="/birds/$comName"
+							preload={false}
+							params={{ comName: comNameToSlug(row.original.Com_Name) }}
+							className={cn(SPECIES_NAME_CLASS, "no-underline hover:underline")}
+						>
+							{row.original.Com_Name}
+						</Link>
+					)}
 					<em className="block @xl:hidden truncate text-bark text-xs leading-tight">
 						{row.original.Sci_Name}
 					</em>
@@ -565,26 +593,35 @@ export function DetectionsTable({
 					onSort={sortBy}
 				/>
 			),
-			cell: ({ row }) => (
-				<Link
-					to="/timeline"
-					preload={false}
-					search={{ period: "day", date: row.original.Date }}
-					className="text-sm tabular-nums no-underline hover:underline"
-				>
-					<span className="flex @xl:hidden flex-col items-end">
-						<span className="leading-tight">
-							{formatTime(row.original.Time)}
+			cell: ({ row }) => {
+				const recorded = (
+					<>
+						<span className="flex @xl:hidden flex-col items-end">
+							<span className="leading-tight">
+								{formatTime(row.original.Time)}
+							</span>
+							<span className="text-muted-foreground text-xs leading-tight">
+								{formatDate(row.original.Date)}
+							</span>
 						</span>
-						<span className="text-muted-foreground text-xs leading-tight">
-							{formatDate(row.original.Date)}
+						<span className="@xl:inline hidden">
+							{formatDateTime(row.original.Date, row.original.Time)}
 						</span>
-					</span>
-					<span className="@xl:inline hidden">
-						{formatDateTime(row.original.Date, row.original.Time)}
-					</span>
-				</Link>
-			),
+					</>
+				);
+				return canDelete ? (
+					<span className="text-sm tabular-nums">{recorded}</span>
+				) : (
+					<Link
+						to="/timeline"
+						preload={false}
+						search={{ period: "day", date: row.original.Date }}
+						className="text-sm tabular-nums no-underline hover:underline"
+					>
+						{recorded}
+					</Link>
+				);
+			},
 		},
 		{
 			accessorKey: "Confidence",
@@ -744,9 +781,20 @@ export function DetectionsTable({
 							key={row.id}
 							role="row"
 							data-state={row.getIsSelected() && "selected"}
+							{...(canDelete
+								? selectableRowProps((event) =>
+										toggleRow(
+											table.getRowModel().rows.map(({ id }) => id),
+											row.id,
+											!row.getIsSelected(),
+											event,
+										),
+									)
+								: {})}
 							className={cn(
 								GRID_ROW,
 								"h-auto min-h-10.25",
+								canDelete && SELECTABLE_ROW_CLASS,
 								row.getIsSelected() ? "bg-row-selected" : "bg-card",
 							)}
 						>

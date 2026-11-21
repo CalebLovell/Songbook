@@ -1,8 +1,7 @@
-import { Link } from "@tanstack/react-router";
 import {
-	type ChangeEvent,
 	type CSSProperties,
 	type ReactNode,
+	type SyntheticEvent,
 	useId,
 } from "react";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
@@ -16,7 +15,11 @@ import {
 	PageStepper,
 	PageStepperShell,
 } from "~/components/ui/page-stepper.tsx";
-import { RowCheckbox } from "~/components/ui/row-checkbox.tsx";
+import {
+	RowCheckbox,
+	SELECTABLE_ROW_CLASS,
+	selectableRowProps,
+} from "~/components/ui/row-checkbox.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { SkipLink } from "~/components/ui/skip-link.tsx";
@@ -44,7 +47,6 @@ import {
 	SPECIES_FILTER_SORTS,
 	type SpeciesFilterSort,
 } from "~/lib/species-filter-workspace.ts";
-import { comNameToSlug } from "~/lib/species-slug.ts";
 import type { SortDirection } from "~/lib/table-sort.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { cn } from "~/lib/utils.ts";
@@ -206,8 +208,7 @@ export function SpeciesFilterTable({
 			: "Nothing selected",
 	);
 
-	function toggle(sciName: string, event: ChangeEvent<HTMLInputElement>) {
-		const { checked } = event.target;
+	function toggle(sciName: string, checked: boolean, event: SyntheticEvent) {
 		const orderedIds = (rows ?? []).map((row) => row.sciName);
 		const next = new Set(selected);
 		for (const id of rowsForClick(orderedIds, sciName, event)) {
@@ -343,9 +344,13 @@ export function SpeciesFilterTable({
 								key={row.sciName}
 								role="row"
 								data-state={isSelected && "selected"}
+								{...selectableRowProps((event) =>
+									toggle(row.sciName, !isSelected, event),
+								)}
 								className={cn(
 									GRID_ROW,
 									BODY_ROW_HEIGHT,
+									SELECTABLE_ROW_CLASS,
 									isSelected ? "bg-row-selected" : "bg-card",
 								)}
 							>
@@ -356,7 +361,9 @@ export function SpeciesFilterTable({
 									<RowCheckbox
 										aria-label={`Select ${row.comName}`}
 										checked={isSelected}
-										onChange={(event) => toggle(row.sciName, event)}
+										onChange={(event) =>
+											toggle(row.sciName, event.target.checked, event)
+										}
 									/>
 								</TableCell>
 								<TableCell role="cell" className={cn(CELL_GAP, "text-center")}>
@@ -369,14 +376,9 @@ export function SpeciesFilterTable({
 									role="cell"
 									className={cn(CELL_GAP, NAME_CELL, "truncate")}
 								>
-									<Link
-										to="/birds/$comName"
-										preload={false}
-										params={{ comName: comNameToSlug(row.comName) }}
-										className="@max-xl:block @max-xl:truncate font-medium @max-xl:leading-tight no-underline hover:underline"
-									>
+									<span className="@max-xl:block @max-xl:truncate font-medium @max-xl:leading-tight">
 										{row.comName}
-									</Link>
+									</span>
 									<em className="block @xl:hidden truncate text-bark text-xs leading-tight">
 										{row.sciName}
 									</em>
