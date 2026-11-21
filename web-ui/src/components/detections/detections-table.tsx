@@ -264,7 +264,7 @@ function DetectionSelectionBar({
 				type="button"
 				aria-label={`Delete ${count} selected ${plural(count, "detection")}`}
 				onClick={onDelete}
-				className="flex @xl:w-auto pointer-coarse:w-9 w-8 items-center justify-center gap-2 border-input border-l @xl:px-3 text-destructive hover:bg-destructive/10"
+				className="flex @max-xl:pointer-coarse:w-9 @max-xl:w-8 items-center justify-center gap-2 border-input border-l @xl:px-3 text-destructive hover:bg-destructive/10"
 			>
 				<Trash2 className="size-4" aria-hidden="true" />
 				<span className="sr-only @xl:not-sr-only">Delete</span>
