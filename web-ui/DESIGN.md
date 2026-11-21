@@ -336,7 +336,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   a native select in the same control dress, so a phone opens its own picker.
 - **Date controls** show the house format with the native input laid invisibly
   over it, and a click calls `showPicker`. Where a browser has no real picker for
-  the type, the overlay comes off and the arrows do the work.
+  the type, the overlay comes off and the arrows do the work. The date never
+  truncates: the stepper keeps its full width, and the controls beside it give
+  way first (Timeline's segments turn into a select under 880px and the row
+  stacks under 520px).
 - **Touch type**: fields use 16px under `pointer-coarse`, so iOS doesn't zoom on
   focus. This keys off the pointer, not the viewport width.
 - **Flags** (New, Rare, Vocal, After dark, Returned, Regular) stack, render as glyph pills

@@ -80,9 +80,9 @@ export function PeriodToolbar({
 	};
 
 	return (
-		<div className="flex items-center justify-between gap-page max-[480px]:flex-wrap">
+		<div className="flex items-center justify-between gap-page max-[520px]:flex-wrap">
 			<PeriodSelect period={period} onPick={pickPeriod} />
-			<div className="hidden min-[800px]:block">
+			<div className="hidden min-[880px]:block">
 				<ToggleGroup
 					type="single"
 					variant="outline"
@@ -104,7 +104,7 @@ export function PeriodToolbar({
 				</ToggleGroup>
 			</div>
 
-			<div className="flex min-w-0 flex-1 items-center justify-end gap-page max-[480px]:contents">
+			<div className="flex min-w-0 flex-1 items-center justify-end gap-page max-[520px]:contents">
 				{viewSwitch}
 				{period !== "all" ? (
 					<WindowStepper
@@ -133,7 +133,7 @@ function PeriodSelect({
 			value={period}
 			onChange={onPick}
 			iconHiddenWhenNarrow
-			className="min-[800px]:hidden"
+			className="min-[880px]:hidden"
 			options={TIMELINE_PERIODS.map((value) => ({
 				value,
 				label: TIMELINE_PERIOD_LABELS[value],
@@ -165,7 +165,7 @@ function WindowStepper({
 		<div
 			className={cn(
 				JOINED_CONTROL_CLASS,
-				"h-8.5 pointer-coarse:h-9 min-w-0 max-w-64 flex-1 focus-within:border-focus-ring max-[480px]:max-w-none max-[480px]:basis-full",
+				"h-8.5 pointer-coarse:h-9 min-w-fit max-w-64 flex-1 focus-within:border-focus-ring max-[520px]:max-w-none max-[520px]:basis-full",
 			)}
 		>
 			<JoinedStep
@@ -174,15 +174,15 @@ function WindowStepper({
 				target={prevTarget}
 				onPick={onPick}
 			/>
-			<div className="relative flex min-w-0 flex-1 items-center justify-center px-1 pointer-coarse:text-base text-sm">
+			<div className="relative flex flex-1 items-center justify-center px-1 pointer-coarse:text-base text-sm">
 				<Calendar
 					className="mr-2 size-4 shrink-0 text-muted-foreground max-[400px]:hidden"
 					aria-hidden="true"
 				/>
-				<span className="truncate max-[400px]:hidden">
+				<span className="whitespace-nowrap max-[400px]:hidden">
 					{shortAnchorLabel(period, anchor)}
 				</span>
-				<span className="truncate min-[400px]:hidden">
+				<span className="whitespace-nowrap min-[400px]:hidden">
 					{shortAnchorLabel(period, anchor, { compact: true })}
 				</span>
 				{period === "year" ? (
