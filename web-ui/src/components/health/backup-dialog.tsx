@@ -32,11 +32,7 @@ function BackupDialog({ onClose }: { onClose: () => void }) {
 	const includeClips = contents === "clips";
 	const { data: summary } = useQuery(dataSummaryQuery);
 	return (
-		<ModalDialog
-			title="Download a backup"
-			className="max-w-lg"
-			onClose={onClose}
-		>
+		<ModalDialog title="Backup" className="max-w-lg" onClose={onClose}>
 			<p className="m-0 text-muted-foreground text-sm leading-relaxed">
 				A copy of this station to keep somewhere safe, or to start a new station
 				from. Recording keeps running while it downloads. Your sign-in password

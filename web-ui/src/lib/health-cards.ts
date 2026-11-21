@@ -3,6 +3,7 @@ import {
 	BOOT_GRACE_SECONDS,
 	type CheckState,
 	describeToDo,
+	type FullDiskAction,
 	type PowerState,
 	type StationHealth,
 } from "~/lib/health-data.ts";
@@ -48,6 +49,7 @@ export type HealthCardView = {
 	meter: { usedPercent: number; threshold: number | null } | null;
 	actions: HealthAction[];
 	automaticUpdates?: true;
+	info?: string[];
 };
 
 export type HealthAttention = { count: number; broken: boolean; label: string };
@@ -162,6 +164,9 @@ function modelCard(health: StationHealth): HealthCardView {
 	return {
 		id: "model",
 		title: "BirdNET model",
+		info: [
+			"BirdNET is the model that listens to the microphone and names the birds in each few seconds of audio.",
+		],
 		tone: toneFor(analyzer.state, health.settingUp),
 		figure:
 			analyzer.state === "unknown"
@@ -329,9 +334,9 @@ function backupsCard(health: StationHealth): HealthCardView {
 			figure: null,
 			details: [],
 			problem: {
-				title: "Bring over your old station (optional)",
+				title: "An old station's data can be restored here",
 				detail:
-					"Restore a backup from your old station to keep every detection, review and setting.",
+					"A backup from an older station brings over every detection, review and setting.",
 			},
 			actions: [{ kind: "restore-backup", primary: false }],
 		};
@@ -374,7 +379,7 @@ function backupsCard(health: StationHealth): HealthCardView {
 		problem: stale
 			? {
 					title: "Your last backup is over a month old",
-					detail: "Download a fresh one to keep recent detections safe.",
+					detail: "Detections since then aren't in any backup.",
 				}
 			: null,
 		actions: [
@@ -382,6 +387,16 @@ function backupsCard(health: StationHealth): HealthCardView {
 			{ kind: "restore-backup", primary: false },
 		],
 	};
+}
+
+function storageInfo(threshold: number | null, action: FullDiskAction): string {
+	const rule =
+		threshold === null
+			? "When the disk is nearly full, the oldest clips are removed to make room, unless the station is set to keep them."
+			: action === "keep"
+				? `This station is set to keep every clip, so it stops recording when the disk reaches ${threshold}% full.`
+				: `When the disk reaches ${threshold}% full, the oldest clips are removed to make room.`;
+	return `Audio clips take up most of the space. ${rule} Detection records are always kept.`;
 }
 
 function storageCard(health: StationHealth): HealthCardView {
@@ -403,6 +418,7 @@ function storageCard(health: StationHealth): HealthCardView {
 	return {
 		id: "storage",
 		title: "Storage",
+		info: [storageInfo(storage.threshold, storage.action)],
 		tone: toneFor(storage.state, health.settingUp),
 		figure:
 			used !== null ? `${used}% used${free ? ` · ${free}` : ""}` : NOT_KNOWN,
@@ -425,6 +441,9 @@ function updatesCard(
 		id: "updates" as const,
 		title: "Updates",
 		meter: null,
+		info: [
+			"Every night the station checks for a new Songbook release. With automatic updates on, it installs the release then. Otherwise the release waits here until Install is pressed.",
+		],
 	};
 	if (!updates)
 		return {

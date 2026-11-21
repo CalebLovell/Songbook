@@ -18,6 +18,7 @@ import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
+import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { toast } from "~/components/ui/toaster.tsx";
@@ -163,7 +164,15 @@ function HealthCard({
 				titleId={titleId}
 				title={card.title}
 				className={HEADER_TONE_CLASS[card.tone] ?? ""}
-			/>
+			>
+				{card.info ? (
+					<InfoTip label={card.title} size="default">
+						{card.info.map((line) => (
+							<p key={line}>{line}</p>
+						))}
+					</InfoTip>
+				) : null}
+			</CardHeader>
 			<div className="flex flex-col gap-2">
 				{card.figure ? (
 					<p

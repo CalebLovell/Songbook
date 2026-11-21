@@ -425,7 +425,7 @@ export function describeToDo(toDo: StationToDo): ToDoCopy {
 			};
 		case "location-guessed":
 			return {
-				title: "Check the station's location",
+				title: "The station's location was guessed",
 				detail: `The location${toDo.place ? `, near ${toDo.place},` : ""} and the time zone${toDo.timezone ? `, ${toDo.timezone.replaceAll("_", " ")},` : ""} were guessed from your internet connection, which can be miles off. BirdNET uses the location to decide which birds live nearby.`,
 			};
 		case "timezone":
@@ -435,8 +435,8 @@ export function describeToDo(toDo: StationToDo): ToDoCopy {
 			};
 		case "name":
 			return {
-				title: "Give the station a name",
-				detail: "The station has no name. Choose one that visitors will see.",
+				title: "The station has no name",
+				detail: "Visitors see the station's name at the top of every page.",
 			};
 		case "audio":
 			return describeAudioProblem(toDo.problem);

@@ -6,7 +6,6 @@ import {
 } from "react";
 import { IndexDot, TABLE_INDEX_FLOOR } from "~/components/index-dot.tsx";
 import { Badge } from "~/components/ui/badge.tsx";
-import { InfoTip } from "~/components/ui/info-tip.tsx";
 import {
 	PAGE_RANGE_CLASS,
 	PAGE_RANGE_NARROW_HIDDEN,
@@ -50,6 +49,7 @@ import {
 import type { SortDirection } from "~/lib/table-sort.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { cn } from "~/lib/utils.ts";
+import { SpeciesStatusInfo } from "./species-filter-info.tsx";
 
 export type SpeciesFilterViewRow = SpeciesFilterRow & {
 	status: SpeciesStatus;
@@ -291,7 +291,7 @@ export function SpeciesFilterTable({
 								CELL_GAP,
 							)}
 						>
-							<StatusTip />
+							<SpeciesStatusInfo />
 							<span className="sr-only">Row</span>
 						</TableHead>
 						{sortHeading("species")}
@@ -315,7 +315,7 @@ export function SpeciesFilterTable({
 							>
 								Select all
 							</label>
-							<StatusTip />
+							<SpeciesStatusInfo />
 						</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -456,27 +456,6 @@ export function SpeciesFilterTable({
 				)}
 			</div>
 		</div>
-	);
-}
-
-function StatusTip() {
-	return (
-		<InfoTip label="Species statuses">
-			<ul className="space-y-1">
-				<li>
-					<strong>Automatic:</strong> uses BirdNET's usual species rules.
-				</li>
-				<li>
-					<strong>Custom:</strong> adds the species to your custom list.
-				</li>
-				<li>
-					<strong>Always detect:</strong> skips its species-frequency check.
-				</li>
-				<li>
-					<strong>Never detect:</strong> excludes it outright.
-				</li>
-			</ul>
-		</InfoTip>
 	);
 }
 

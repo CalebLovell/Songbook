@@ -31,10 +31,12 @@ function stopAtDialog(event: SyntheticEvent) {
 export function InfoTip({
 	label,
 	size = "sm",
+	className,
 	children,
 }: {
 	label: string;
 	size?: "sm" | "default";
+	className?: string;
 	children: ReactNode;
 }) {
 	const [open, setOpen] = useState(false);
@@ -45,11 +47,13 @@ export function InfoTip({
 				<button
 					type="button"
 					aria-label={`About ${label}`}
-					className={`inline-flex shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-accent-foreground ${
+					className={cn(
+						"inline-flex shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground hover:border-border hover:bg-accent hover:text-accent-foreground",
 						size === "default"
 							? "-me-1.5 size-7 min-[400px]:-me-2.5"
-							: "-m-1.25 size-6"
-					}`}
+							: "-m-1.25 size-6",
+						className,
+					)}
 					onClick={(event) => {
 						event.preventDefault();
 						setOpen(true);

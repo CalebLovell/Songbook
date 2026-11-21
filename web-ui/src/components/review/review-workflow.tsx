@@ -6,6 +6,7 @@ import {
 	Search,
 	ShieldCheck,
 	Shuffle,
+	SkipForward,
 	Trash2,
 	X,
 } from "lucide-react";
@@ -29,6 +30,7 @@ import {
 	MODAL_ACTIONS_CLASS,
 } from "~/components/ui/confirm-dialog.tsx";
 import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
+import { InfoTip } from "~/components/ui/info-tip.tsx";
 import { Input } from "~/components/ui/input.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
 import { ModalDialog } from "~/components/ui/modal-dialog.tsx";
@@ -38,7 +40,7 @@ import {
 } from "~/components/ui/page-stepper.tsx";
 import { RowWell } from "~/components/ui/row-well.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
-import { formatConfidence } from "~/lib/confidence.ts";
+import { CONFIDENT_MIN, formatConfidence } from "~/lib/confidence.ts";
 import { formatDate, formatDateTime, formatTime } from "~/lib/date-format.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import type { ReviewCandidate, ReviewPage } from "~/lib/review.server.ts";
@@ -117,6 +119,15 @@ function UnderReviewSkeleton() {
 					<span className={ACTION_LABEL_CLASS}>Delete</span>
 				</Button>
 				<div className="ml-auto flex items-center gap-page">
+					<Button
+						variant="outline"
+						size="default"
+						className={ACTION_ICON_ONLY_CLASS}
+						disabled
+					>
+						<SkipForward />
+						<span className={ACTION_LABEL_CLASS}>Skip</span>
+					</Button>
 					<Button
 						variant="outline"
 						size="default"
@@ -217,6 +228,37 @@ function ReviewWorkflowEmpty({
 	);
 }
 
+function QueueInfo({ rareMax }: { rareMax: number | null }) {
+	return (
+		<InfoTip label="Review queue" size="default">
+			<p>
+				A detection enters the queue when its species has been recorded{" "}
+				{rareMax === null
+					? "only a few times (at or below the Rare limit in Settings)"
+					: `${rareMax.toLocaleString()} times or fewer (the Rare limit in Settings)`}{" "}
+				and BirdNET was less than {formatConfidence(CONFIDENT_MIN)} sure. Common
+				birds and confident calls skip the queue.
+			</p>
+			<ul className="space-y-1">
+				<li>
+					<strong>Correct:</strong> confirms BirdNET's answer.
+				</li>
+				<li>
+					<strong>Recategorize:</strong> renames the detection to the right
+					bird.
+				</li>
+				<li>
+					<strong>Delete:</strong> removes the detection and its audio.
+				</li>
+				<li>
+					<strong>Skip:</strong> moves on and leaves the detection in the queue.
+				</li>
+			</ul>
+			<p>The first three take the detection out of the queue.</p>
+		</InfoTip>
+	);
+}
+
 type Action =
 	| { kind: "correct"; row: ReviewCandidate }
 	| { kind: "delete"; row: ReviewCandidate }
@@ -294,6 +336,15 @@ export function ReviewWorkflow({
 		else await onRecategorize(action.row.rowId, action.species);
 		setAction(null);
 		setIndex(0);
+	}
+	const rowIndex = row ? rows.indexOf(row) : -1;
+	const hasLaterPage = pageCount !== null && shownPage < pageCount;
+	const canSkip = (total ?? rows.length) > 1;
+	function skip() {
+		if (rowIndex < rows.length - 1) setIndex(rowIndex + 1);
+		else if (hasLaterPage) onPageChange(shownPage + 1);
+		else if (shownPage > 1) onPageChange(1);
+		else setIndex(0);
 	}
 	if (page && !row) {
 		const hasNextPage = pageCount !== null && page.page < pageCount;
@@ -388,8 +439,7 @@ export function ReviewWorkflow({
 								) : (
 									<div>
 										<p className="grid h-40 place-items-center rounded-md border border-line border-dashed px-4 text-center text-destructive text-sm">
-											Audio unavailable. You can delete or skip this orphaned
-											entry.
+											Audio unavailable.
 										</p>
 										<div className="mt-page flex flex-wrap items-center justify-end gap-page">
 											{heard}
@@ -409,6 +459,16 @@ export function ReviewWorkflow({
 										<span className={ACTION_LABEL_CLASS}>Delete</span>
 									</Button>
 									<div className="ml-auto flex items-center gap-page">
+										<Button
+											variant="outline"
+											size="default"
+											className={ACTION_ICON_ONLY_CLASS}
+											disabled={!canSkip || busy}
+											onClick={skip}
+										>
+											<SkipForward />
+											<span className={ACTION_LABEL_CLASS}>Skip</span>
+										</Button>
 										<Button
 											variant="outline"
 											size="default"
@@ -443,14 +503,17 @@ export function ReviewWorkflow({
 					>
 						<div data-slot="card-header" className={QUEUE_HEADER_CLASS}>
 							<Kicker as="h2">In the queue</Kicker>
-							{total === null ? (
-								<ShellText
-									className={cn(COUNT_CLASS, "w-[1ch]")}
-									barClassName="right-0 left-auto w-full"
-								/>
-							) : (
-								<Count>{total}</Count>
-							)}
+							<span className="flex items-center gap-2">
+								{total === null ? (
+									<ShellText
+										className={cn(COUNT_CLASS, "w-[1ch]")}
+										barClassName="right-0 left-auto w-full"
+									/>
+								) : (
+									<Count>{total}</Count>
+								)}
+								<QueueInfo rareMax={page?.rareSpeciesMax ?? null} />
+							</span>
 						</div>
 						{page ? (
 							<RowWell
@@ -533,7 +596,7 @@ export function ReviewWorkflow({
 			</div>
 			{picker ? (
 				<ModalDialog
-					title="Choose the correct species"
+					title="Correct species"
 					className="max-h-[80vh] max-w-xl"
 					onClose={() => setPicker(null)}
 				>

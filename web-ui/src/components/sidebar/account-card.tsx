@@ -46,8 +46,8 @@ export function AccountCard({ onNavigate }: { onNavigate?: () => void }) {
 				<Link
 					to="/sign-in"
 					className={ACTION_CLASS}
-					aria-label="How to turn sign-in on"
-					title="How to turn sign-in on"
+					aria-label="Sign-in is off"
+					title="Sign-in is off"
 					onClick={onNavigate}
 				>
 					<ChevronRight aria-hidden="true" className="size-4.5" />

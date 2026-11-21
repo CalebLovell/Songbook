@@ -381,7 +381,7 @@ test("an install-time guess asks to be checked, in setup tones", () => {
 	const location = card(view, "location");
 	assert.equal(location.tone, "setup");
 	assert.equal(location.figure, "41.8810, −87.6270");
-	assert.equal(location.problem?.title, "Check the station's location");
+	assert.equal(location.problem?.title, "The station's location was guessed");
 	assert.match(location.problem?.detail ?? "", /near Portland, Oregon/);
 	assert.match(location.problem?.detail ?? "", /time zone, America\/Chicago,/);
 	assert.deepEqual(location.actions, [

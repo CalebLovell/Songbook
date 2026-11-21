@@ -41,6 +41,7 @@ import {
 import { speciesFuse } from "~/lib/species-fuse.ts";
 import { useAnnounceChange } from "~/lib/use-announce-change.ts";
 import { errorMessage } from "~/lib/utils.ts";
+import { UnmatchedEntriesInfo } from "./species-filter-info.tsx";
 import {
 	SPECIES_FILTER_PAGE_SIZE,
 	SpeciesFilterSortMenu,
@@ -590,13 +591,14 @@ export function SpeciesFilterPage({
 				>
 					<div className="flex shrink-0 items-start gap-3">
 						<CircleAlert className="mt-0.5 size-5 text-clay" />
-						<div>
+						<div className="min-w-0 flex-1">
 							<h2 className="font-semibold">Unmatched list entries</h2>
 							<p className="mt-1 text-muted-foreground text-sm">
-								These existing lines do not match the installed model. They stay
-								in place unless you remove them here.
+								Lines in the species lists that the installed model doesn't
+								recognise. They have no effect on detection.
 							</p>
 						</div>
+						<UnmatchedEntriesInfo />
 					</div>
 					<div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto">
 						{(

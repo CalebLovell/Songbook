@@ -3,9 +3,12 @@ import { useRef } from "react";
 
 import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
 import { cn } from "~/lib/utils.ts";
+import { SpeciesFilterInfo } from "./species-filter-info.tsx";
 
+const WRAP_CLASS =
+	"@max-[38rem]:order-first flex @min-[38rem]:w-fit w-full shrink-0 items-center gap-page lg:ml-auto";
 const GROUP_CLASS =
-	"@max-[38rem]:order-first h-8.5 pointer-coarse:h-9 @min-[38rem]:w-fit w-full shrink-0 pointer-coarse:text-base text-sm lg:ml-auto";
+	"h-8.5 pointer-coarse:h-9 min-w-0 @max-[38rem]:flex-1 pointer-coarse:text-base text-sm";
 const SEGMENT_CLASS =
 	"flex @min-[38rem]:flex-none flex-1 items-center justify-center gap-2 @max-[30rem]:px-3 px-3.5 hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent [&+&]:border-input [&+&]:border-l";
 const LISTS_WORD = "@max-[30rem]:hidden";
@@ -21,27 +24,30 @@ export function SpeciesFilterTools({
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	return (
-		<div className={cn(JOINED_CONTROL_CLASS, GROUP_CLASS)}>
-			<input
-				ref={inputRef}
-				className="sr-only"
-				aria-label="Import lists file"
-				tabIndex={-1}
-				type="file"
-				accept=".txt,.json,text/plain,application/json"
-				onChange={async (event) => {
-					const file = event.target.files?.[0];
-					if (file) onImport(await file.text());
-					event.target.value = "";
-				}}
-			/>
-			<Segment
-				icon={Upload}
-				verb="Import"
-				onClick={() => inputRef.current?.click()}
-			/>
-			<Segment icon={Download} verb="Export" onClick={onExport} />
-			<Segment icon={RotateCcw} verb="Reset" onClick={onReset} />
+		<div className={WRAP_CLASS}>
+			<div className={cn(JOINED_CONTROL_CLASS, GROUP_CLASS)}>
+				<input
+					ref={inputRef}
+					className="sr-only"
+					aria-label="Import lists file"
+					tabIndex={-1}
+					type="file"
+					accept=".txt,.json,text/plain,application/json"
+					onChange={async (event) => {
+						const file = event.target.files?.[0];
+						if (file) onImport(await file.text());
+						event.target.value = "";
+					}}
+				/>
+				<Segment
+					icon={Upload}
+					verb="Import"
+					onClick={() => inputRef.current?.click()}
+				/>
+				<Segment icon={Download} verb="Export" onClick={onExport} />
+				<Segment icon={RotateCcw} verb="Reset" onClick={onReset} />
+			</div>
+			<SpeciesFilterInfo />
 		</div>
 	);
 }

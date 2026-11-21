@@ -117,7 +117,7 @@ export function SettingsCard({
 				<div className="[&>:first-child]:border-t-0">
 					<Field
 						label="Show birds as"
-						hint="A bird with only one of these always shows that one."
+						hint="Illustrations are paintings and photos are real photographs. A bird with only one kind always shows that kind."
 					>
 						<FieldChoice
 							value={artwork.preference}
@@ -151,7 +151,14 @@ export function SettingsCard({
 
 					<Field
 						label="Rare"
-						hint="A species with this many records or fewer, in all. It is flagged Rare on Today and the timeline, its unsure calls wait on Review, and it sets Learn's rare pool."
+						hint="A species with this many records or fewer, in all."
+						info={
+							<p>
+								Rare species get a Rare flag on Today and the timeline. Their
+								unsure detections go to the Review queue, and they make up
+								Learn's Rare selection.
+							</p>
+						}
 					>
 						<FieldInput
 							type="number"

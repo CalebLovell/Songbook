@@ -26,8 +26,7 @@ export const PAGE_HEADERS = {
 	timeline: {
 		description: "Every detection, by species, over the selected time period.",
 		missingSection: "Timeline",
-		missingDescription:
-			"What this station heard, at whatever scale you ask for.",
+		missingDescription: "What this station heard, by day, week, month or year.",
 	},
 	detections: {
 		title: "Detections",
@@ -39,7 +38,7 @@ export const PAGE_HEADERS = {
 	},
 	learn: {
 		title: "Learn the calls",
-		description: "Test your knowledge of the bird calls from your station.",
+		description: "A listening quiz built from this station's own recordings.",
 	},
 	speciesFilter: {
 		title: "Species Filter",

@@ -192,6 +192,13 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   sign out when signed in, a link to `/sign-in?next=` when not, a chevron to `/sign-in` when
   the Pi has no usable password. Both lines truncate; they never wrap. `/sign-in` is only the
   form; signing out lives on the card. Nothing in the app is centered on the page.
+- **Descriptive copy**: titles, descriptions and body text say what a thing is, in a
+  passive, general voice, never what to do there or how it came about ("The station has no
+  name", not "Give the station a name"). Buttons carry the next step. Anything that needs
+  explaining (what a status means, why a list exists) goes in an `InfoTip`, written as
+  plainly as possible, one per subject (a page's toolbar holds at most one). Page
+  headers never carry an info icon. Outside a card header, an icon sits flush with the
+  content's right edge, never in the gutter.
 - **Error and status copy**: short, generic and clear ("Incorrect password.", "Something went
   wrong. Try again."), never chatty phrasing like "That password is not right". Public pages
   never name Pi scripts, commands or logs; setup steps live in the README.
