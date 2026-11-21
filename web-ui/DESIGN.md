@@ -328,8 +328,11 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   narrow for all of them turns the status buttons into a select, and under 28rem
   the range gives way while something is ticked. Shift-click applies the clicked
   box's new state back to the last box clicked, and repeating it on the same box
-  flips that whole range back. Signed-out visitors get
-  neither checkboxes nor a Recording column. A skip link passes the rows to the
+  flips that whole range back. A row with a checkbox carries no links: a click
+  anywhere on it, shift-click included, acts as a click on its box, except on its
+  own buttons or while dragging to select text (`selectableRowProps`). Names and
+  dates there are plain text, not moss. Signed-out visitors get
+  neither checkboxes nor a Recording column, and their rows keep the links. A skip link passes the rows to the
   footer, and Enter on a row's checkbox does the same. Cells render in place, never
   as components, so ticking a row keeps focus on it.
 - **Segmented controls** never wrap. Where the segments no longer fit they become

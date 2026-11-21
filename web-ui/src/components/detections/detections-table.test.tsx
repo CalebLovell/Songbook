@@ -4,6 +4,7 @@ import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { DetectionsTable } from "~/components/detections/detections-table.tsx";
+import type { DetectionTableRow } from "~/lib/detections.ts";
 
 const html = renderToStaticMarkup(
 	<DetectionsTable
@@ -46,4 +47,32 @@ test("the footer stays on one line", () => {
 	const footer = html.match(/<div class="([^"]*border-t[^"]*)"/)?.[1];
 	assert.ok(footer);
 	assert.doesNotMatch(footer, /flex-wrap/);
+});
+
+test("signed in, rows carry no links", () => {
+	const row = {
+		rowId: 1,
+		Date: "2026-11-20",
+		Time: "14:46:00",
+		Sci_Name: "Dryobates villosus",
+		Com_Name: "Hairy Woodpecker",
+		Confidence: 0.71,
+		File_Name: "hairy.mp3",
+	} as DetectionTableRow;
+	const signedIn = renderToStaticMarkup(
+		<DetectionsTable
+			page={{ rows: [row], total: 1 }}
+			search={{ page: 1, sort: "recorded", direction: "desc" }}
+			onSearchChange={() => {}}
+			rowSelection={{}}
+			onRowSelectionChange={() => {}}
+			canDelete
+			canListen={false}
+			onDeleteSelected={() => {}}
+		/>,
+	);
+	const body = signedIn.match(/<tbody[\s\S]*<\/tbody>/)?.[0];
+	assert.ok(body);
+	assert.match(body, /Hairy Woodpecker/);
+	assert.doesNotMatch(body, /<a\s/);
 });

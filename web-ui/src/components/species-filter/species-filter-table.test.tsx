@@ -55,3 +55,38 @@ test("a narrow card offers every status through one select", () => {
 		assert.match(select, new RegExp(`>${label}</option>`));
 	}
 });
+
+test("rows carry no links", () => {
+	const withRow = renderToStaticMarkup(
+		<SpeciesFilterTable
+			rows={[
+				{
+					sciName: "Dryobates villosus",
+					comName: "Hairy Woodpecker",
+					custom: false,
+					excluded: false,
+					whitelisted: false,
+					history: {
+						detections: 2,
+						maxConfidence: 0.71,
+						lastSeen: null,
+						recordings: 2,
+					},
+					status: "automatic",
+				},
+			]}
+			page={1}
+			pageCount={1}
+			selected={new Set()}
+			sort="species"
+			direction="asc"
+			onSortChange={() => {}}
+			onSelectedChange={() => {}}
+			onPageChange={() => {}}
+		/>,
+	);
+	const body = withRow.match(/<tbody[\s\S]*<\/tbody>/)?.[0];
+	assert.ok(body);
+	assert.match(body, /Hairy Woodpecker/);
+	assert.doesNotMatch(body, /<a\s/);
+});
