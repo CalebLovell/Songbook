@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs the release job's web UI checks before a push to main, so a formatting
 # slip fails here in seconds instead of failing the release on GitHub.
-# Enable once per clone: git config core.hooksPath .githooks
+# npm install in web-ui/ enables these hooks (git config core.hooksPath .githooks).
 set -e
 while read -r _ _ remote_ref _; do
   [ "$remote_ref" = refs/heads/main ] || continue

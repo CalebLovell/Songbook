@@ -776,12 +776,17 @@ def painted_bounds(image) -> tuple[int, int, int, int] | None:
     return left, top, right - left, bottom - top
 
 
+def object_key(stem: str) -> str:
+    """`stem` as a TypeScript object key, quoted only when it must be, as Biome formats it."""
+    return stem if re.fullmatch(r'[A-Za-z_$][\w$]*', stem) else f'"{stem}"'
+
+
 def rewrite_bounds(source: str, bounds: dict[str, tuple[int, int, int, int]], name: str = BOUNDS_NAME) -> str:
     """The TypeScript `source` with `export const <name>` mapping each file's
     stem to its painted bounds, one per line as Biome would format it; added
     at the end when it isn't there yet."""
     entries = ''.join(
-        f'\t"{stem}": [{", ".join(str(n) for n in box)}],\n' for stem, box in sorted(bounds.items())
+        f'\t{object_key(stem)}: [{", ".join(str(n) for n in box)}],\n' for stem, box in sorted(bounds.items())
     )
     block = f'export const {name}: Record<string, PaintedBounds> = {{\n{entries}}};'
     new, count = re.subn(
@@ -815,7 +820,7 @@ def listed_bounds(source: str, name: str = BOUNDS_NAME) -> dict[str, tuple[int, 
         return {}
     return {
         stem: tuple(int(n) for n in numbers.split(','))
-        for stem, numbers in re.findall(r'"([^"]+)": \[([\d, ]+)\]', block.group(1))
+        for stem, numbers in re.findall(r'"?([\w$-]+)"?: \[([\d, ]+)\]', block.group(1))
     }
 
 

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Runs Biome on the web UI before every commit, so a formatting slip never
+# reaches main. Slower checks run in pre-push. npm install in web-ui/ enables
+# these hooks (git config core.hooksPath .githooks).
+set -e
+cd "$(git rev-parse --show-toplevel)/web-ui"
+npx biome ci . || { echo "pre-commit: Biome failed. Run 'npx biome check --write .' in web-ui/." >&2; exit 1; }

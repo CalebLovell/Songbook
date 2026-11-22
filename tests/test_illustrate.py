@@ -342,6 +342,12 @@ class InstallTest(unittest.TestCase):
             self.assertEqual(bounds["c-d"], illustrate.painted_bounds(painting))
             self.assertNotIn("gone", bounds)
 
+    def test_bounds_keys_are_quoted_only_when_needed(self):
+        """Catches "dog": failing Biome's format check, which wants dog: unquoted."""
+        source = illustrate.rewrite_bounds("", {"a-b": (1, 2, 3, 4), "dog": (5, 6, 7, 8)})
+        self.assertIn('\t"a-b": [1, 2, 3, 4],\n\tdog: [5, 6, 7, 8],\n', source)
+        self.assertEqual(illustrate.listed_bounds(source), {"a-b": (1, 2, 3, 4), "dog": (5, 6, 7, 8)})
+
     def test_flight_poses_are_listed_apart_from_perched_ones(self):
         """Catches a hero slot pointing at a flight pose that doesn't exist."""
         with tempfile.TemporaryDirectory() as tmp:
