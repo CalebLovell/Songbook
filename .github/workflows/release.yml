@@ -47,6 +47,7 @@ jobs:
           npx biome ci .
           npx tsc --noEmit
           npm test
+          npm run build
 
       - name: Release
         env:
