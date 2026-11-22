@@ -327,6 +327,21 @@ class InstallTest(unittest.TestCase):
         self.assertIn('\t"a-b": [5, 6, 7, 8],\n\t"a-b-2": [0, 0, 9, 9],\n};', twice)
         self.assertTrue(twice.startswith(source))
 
+    def test_install_keeps_listed_bounds_for_untouched_paintings(self):
+        """Catches every install re-measuring all paintings and shifting their bounds by a pixel."""
+        from PIL import Image
+
+        with tempfile.TemporaryDirectory() as tmp:
+            painting = Image.new("RGBA", (40, 40), (0, 0, 0, 0))
+            painting.paste((200, 100, 50, 255), (10, 12, 30, 28))
+            for stem in ("a-b", "c-d"):
+                painting.save(Path(tmp) / f"{stem}.webp", lossless=True)
+            source = illustrate.rewrite_bounds("", {"a-b": (1, 2, 3, 4), "c-d": (1, 2, 3, 4), "gone": (1, 2, 3, 4)})
+            bounds = illustrate.installed_bounds(Path(tmp), illustrate.listed_bounds(source), {"c-d"})
+            self.assertEqual(bounds["a-b"], (1, 2, 3, 4))
+            self.assertEqual(bounds["c-d"], illustrate.painted_bounds(painting))
+            self.assertNotIn("gone", bounds)
+
     def test_flight_poses_are_listed_apart_from_perched_ones(self):
         """Catches a hero slot pointing at a flight pose that doesn't exist."""
         with tempfile.TemporaryDirectory() as tmp:

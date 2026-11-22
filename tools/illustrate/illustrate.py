@@ -808,12 +808,33 @@ def species_paintings(folder: Path) -> list[Path]:
     return sorted(p for p in folder.glob('*.webp') if p.stem not in OTHER_ARTWORK)
 
 
-def installed_bounds(folder: Path) -> dict[str, tuple[int, int, int, int]]:
-    """Each installed illustration's painted bounds, by file stem."""
+def listed_bounds(source: str, name: str = BOUNDS_NAME) -> dict[str, tuple[int, int, int, int]]:
+    """The bounds already in the TypeScript `source`, by file stem."""
+    block = re.search(rf'^export const {name}: Record<[^>]*> = \{{(.*?)^\}};', source, flags=re.DOTALL | re.MULTILINE)
+    if block is None:
+        return {}
+    return {
+        stem: tuple(int(n) for n in numbers.split(','))
+        for stem, numbers in re.findall(r'"([^"]+)": \[([\d, ]+)\]', block.group(1))
+    }
+
+
+def installed_bounds(
+    folder: Path,
+    known: dict[str, tuple[int, int, int, int]] | None = None,
+    fresh: set[str] = frozenset(),
+) -> dict[str, tuple[int, int, int, int]]:
+    """Each installed illustration's painted bounds, by file stem. A stem in
+    `known` keeps its value unless it's in `fresh`: decoders differ by a pixel
+    at soft edges, so re-measuring untouched paintings only churns the file."""
     from PIL import Image
 
+    known = known or {}
     bounds = {}
     for path in species_paintings(folder):
+        if path.stem in known and path.stem not in fresh:
+            bounds[path.stem] = known[path.stem]
+            continue
         with Image.open(path) as image:
             box = painted_bounds(image.convert('RGBA'))
         if box is not None:
@@ -853,17 +874,17 @@ def install_painting(source: Path, folder: Path) -> None:
 
 def cmd_install(args):
     wanted = {sp['slug'] for sp in select(load_species(args.db), args.slugs)}
-    written = 0
+    written = set()
     for path in sorted(CUT_DIR.glob('*.png')) if CUT_DIR.is_dir() else []:
         if path.stem.removesuffix('-2') in wanted:
             install_painting(path, PUBLIC_DIR)
-            written += 1
+            written.add(path.stem)
     perched, flight = installed_slugs(PUBLIC_DIR)
     source = SLUGS_TS.read_text(encoding='utf-8')
     source = rewrite_slugs(rewrite_slugs(source, perched), flight, FLIGHT_SLUGS_NAME)
-    source = rewrite_bounds(source, installed_bounds(PUBLIC_DIR))
+    source = rewrite_bounds(source, installed_bounds(PUBLIC_DIR, listed_bounds(source), written))
     SLUGS_TS.write_text(source, encoding='utf-8', newline='\n')
-    print(f'Installed {written} paintings. {len(perched)} species in {SLUGS_TS.name}, {len(flight)} with a flight pose.')
+    print(f'Installed {len(written)} paintings. {len(perched)} species in {SLUGS_TS.name}, {len(flight)} with a flight pose.')
 
 
 def main(argv=None):
