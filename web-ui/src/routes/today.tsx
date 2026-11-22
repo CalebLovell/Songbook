@@ -309,7 +309,9 @@ function TodayBody({ snapshot }: { snapshot: TodaySnapshot }) {
 						trailing={sunTimes}
 						reshuffle={false}
 						className={
-							collageSpecies.length > 0 ? COLLAGE_FIT_CLASS : COLLAGE_EMPTY_CLASS
+							collageSpecies.length > 0
+								? COLLAGE_FIT_CLASS
+								: COLLAGE_EMPTY_CLASS
 						}
 					/>
 				) : (
