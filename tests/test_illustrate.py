@@ -341,6 +341,13 @@ class InstallTest(unittest.TestCase):
                 (Path(tmp) / name).write_bytes(b"")
             self.assertEqual(illustrate.installed_slugs(Path(tmp)), (["a-b"], []))
 
+    def test_one_word_sound_class_is_a_species(self):
+        """Catches install leaving out dog.webp because its slug has no hyphen."""
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ("a-b.webp", "dog.webp", "nest.webp"):
+                (Path(tmp) / name).write_bytes(b"")
+            self.assertEqual(illustrate.installed_slugs(Path(tmp)), (["a-b", "dog"], []))
+
     def test_generate_paints_perched_only_by_default(self):
         """Catches flight poses, which double the cost, being painted unasked."""
         with tempfile.TemporaryDirectory() as tmp:

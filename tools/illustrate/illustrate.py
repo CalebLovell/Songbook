@@ -798,10 +798,14 @@ def rewrite_bounds(source: str, bounds: dict[str, tuple[int, int, int, int]], na
     return source.rstrip('\n') + '\n' + intro + block + '\n'
 
 
+# Artwork that shares the illustrations folder but isn't a species.
+OTHER_ARTWORK = {'nest'}
+
+
 def species_paintings(folder: Path) -> list[Path]:
-    """The species paintings in `folder`, sorted. A species slug always has a
-    hyphen, which tells them apart from artwork like nest.webp in the same folder."""
-    return sorted(p for p in folder.glob('*.webp') if '-' in p.stem)
+    """The species paintings in `folder`, sorted. Sound classes such as Dog
+    have one-word slugs, so artwork is told apart by name, not by a hyphen."""
+    return sorted(p for p in folder.glob('*.webp') if p.stem not in OTHER_ARTWORK)
 
 
 def installed_bounds(folder: Path) -> dict[str, tuple[int, int, int, int]]:
