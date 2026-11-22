@@ -16,7 +16,8 @@
 .idea
 
 # Local agent planning and design notes
-/docs/
+/docs/*
+!/docs/web-philosophy.md
 .playwright-mcp/
 .worktrees/
 
