@@ -11,13 +11,13 @@ import {
 	type DetectionClipIdentity,
 	removeClipFile,
 } from "~/lib/detection-file-path.server.ts";
+import { detectionSearchMatch } from "~/lib/detection-search.server.ts";
 import {
 	DETECTIONS_PAGE_SIZE,
 	type DetectionWorkspaceSearch,
 	detectionWorkspaceSearchSchema,
 } from "~/lib/detection-workspace.ts";
 import { illustrationUrlFor } from "~/lib/illustrations.ts";
-import { speciesFuse } from "~/lib/species-fuse.ts";
 import { type SpeciesLink, speciesLinkFor } from "~/lib/species-link.ts";
 
 export type DetectionTableRow = Omit<
@@ -31,39 +31,6 @@ export type DetectionPage = {
 	rows: DetectionTableRow[];
 	total: number;
 };
-
-async function fuzzySpeciesNames(query: string): Promise<string[]> {
-	const names = await db
-		.selectDistinct({
-			comName: detections.Com_Name,
-			sciName: detections.Sci_Name,
-		})
-		.from(detections);
-	return speciesFuse(names)
-		.search(query)
-		.map((result) => result.item.comName);
-}
-
-function confidencePercent(query: string): number | null {
-	const match = /^(\d{1,3})\s*%?$/.exec(query.trim());
-	if (!match) return null;
-	const percent = Number(match[1]);
-	return percent >= 0 && percent <= 100 ? percent : null;
-}
-
-export type DetectionSearchMatch = {
-	comNames: string[];
-	percent: number | null;
-};
-
-export async function detectionSearchMatch(
-	text: string,
-): Promise<DetectionSearchMatch> {
-	return {
-		comNames: await fuzzySpeciesNames(text),
-		percent: confidencePercent(text),
-	};
-}
 
 async function detectionFilters(search: DetectionWorkspaceSearch) {
 	const filters = [];

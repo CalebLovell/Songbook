@@ -8,7 +8,7 @@ import {
 	detectionCsvChunks,
 	detectionCsvFileName,
 } from "~/lib/data-export.server.ts";
-import { detectionSearchMatch } from "~/lib/detections.ts";
+import { detectionSearchMatch } from "~/lib/detection-search.server.ts";
 
 export const Route = createFileRoute("/api/data/export")({
 	server: {

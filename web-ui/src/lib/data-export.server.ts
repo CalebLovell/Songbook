@@ -2,7 +2,7 @@ import "@tanstack/react-start/server-only";
 
 import { DatabaseSync } from "node:sqlite";
 
-import type { DetectionSearchMatch } from "./detections.ts";
+import type { DetectionSearchMatch } from "./detection-search.server.ts";
 
 export type DetectionCsvFilter = {
 	from?: string;
