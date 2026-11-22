@@ -32,7 +32,7 @@ export type SpeciesFilterPageData = {
 	listFiles: Record<SpeciesListName, boolean>;
 };
 
-const scientificNamePattern = /^[\p{L}][\p{L}.'-]*(?: [\p{L}][\p{L}.'-]*)+$/u;
+const scientificNamePattern = /^[\p{L}][\p{L}.'-]*(?: [\p{L}][\p{L}.'-]*)*$/u;
 
 const scientificNameSchema = z
 	.string()

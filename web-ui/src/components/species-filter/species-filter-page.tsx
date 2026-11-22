@@ -416,16 +416,22 @@ export function SpeciesFilterPage({
 	function proposeBulkStatus(status: SpeciesStatus) {
 		const action = BULK_STATUS_ACTIONS.find((item) => item.status === status);
 		if (!action || selected.size === 0) return;
-		setDialog({
-			kind: "status",
-			input: speciesFilterInputWithStatus(
-				currentSaveInput(),
-				[...selected],
-				status,
-			),
-			label: action.label,
-			count: selected.size,
-		});
+		try {
+			setDialog({
+				kind: "status",
+				input: speciesFilterInputWithStatus(
+					currentSaveInput(),
+					[...selected],
+					status,
+				),
+				label: action.label,
+				count: selected.size,
+			});
+		} catch (error) {
+			toast.error(
+				errorMessage(error, "Species statuses could not be changed."),
+			);
+		}
 	}
 
 	function importLists(text: string) {

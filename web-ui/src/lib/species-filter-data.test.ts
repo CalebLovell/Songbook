@@ -93,6 +93,21 @@ test("applying a status produces mutually exclusive list memberships", () => {
 	});
 });
 
+test("save schema accepts the model's one-word non-bird labels", () => {
+	const input = {
+		revision: "abc",
+		custom: [],
+		excluded: ["Engine", "Siren"],
+		whitelisted: ["Dog"],
+		removeUnresolved: [],
+	};
+	assert.equal(speciesFilterSaveSchema.safeParse(input).success, true);
+	assert.deepEqual(
+		speciesFilterInputWithStatus(input, ["Dog", "Gun"], "never").excluded,
+		["Engine", "Siren", "Dog", "Gun"],
+	);
+});
+
 test("save normalization trims, stably deduplicates, and preserves list order", () => {
 	assert.deepEqual(
 		normalizeSpeciesFilterSave({
@@ -124,10 +139,12 @@ test("save schema rejects invalid scientific names, oversized lists, and extra k
 		removeUnresolved: [],
 	};
 	assert.equal(speciesFilterSaveSchema.safeParse(base).success, true);
-	assert.equal(
-		speciesFilterSaveSchema.safeParse({ ...base, custom: ["coyote"] }).success,
-		false,
-	);
+	for (const invalid of ["Canis_latrans", "Canis\nlatrans", "Canis  latrans"]) {
+		assert.equal(
+			speciesFilterSaveSchema.safeParse({ ...base, custom: [invalid] }).success,
+			false,
+		);
+	}
 	assert.equal(
 		speciesFilterSaveSchema.safeParse({
 			...base,
