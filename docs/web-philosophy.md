@@ -38,6 +38,13 @@ Instructions for any agent building a website with me. These rules apply to ever
 - If a class repeats, make a component rather than a CSS class.
 - Every button has an icon.
 
+## Toasts
+
+- Every action and mutation reports how it went with a toast, on success and on failure.
+- Outcomes arrive as toasts, never as a status line or coloured stripe on a card.
+- A toast's colour follows the outcome, never the kind of action. Anything that succeeded is the success colour, a delete or reset included. A failure is the error colour.
+- Toast copy is short, generic and plain: "Saved.", "Something went wrong. Try again." Never chatty.
+
 ## States
 
 Most bugs and most unfinished design live in the states nobody drew. Every page, card and component accounts for every state before it counts as done.
@@ -53,17 +60,16 @@ Most bugs and most unfinished design live in the states nobody drew. Every page,
 ## Data and loading
 
 - Navigation is instant. The page frame appears at once, and each card loads on its own.
-- A route's loader starts its server calls and returns the promises without awaiting them.
-- Each card waits for its own promise and shows its loading shell until the data lands.
+- Page data lives in TanStack Query, never in loader promises. A loader only prefetches its queries, and never awaits them unless `head` or `notFound` needs the data.
+- Each card calls `useQuery` for its own data and shows its loading shell until the data lands. No Suspense, so hydration can't strand a shell.
+- Paging or filtering shows the shell too, never the old rows.
 - Anything that doesn't depend on the data, such as titles and controls, renders immediately.
 - A loading shell measures the same as the loaded card, so nothing shifts when data arrives.
 - Controls never move under the cursor.
 - Shells are built from the card's own markup so the two can't drift apart.
 - A loading shell stays up for at least 200ms so it never flashes, and the data that replaces it fades in. Cached pages still appear instantly.
-- Every read and write goes through a server function. Its input and output are Zod schemas, never hand-written checks. After a write, `router.invalidate()` refreshes what's on the page.
-- Loaders own what a route needs to render. TanStack Query owns everything a loader can't: data that polls while the page is open, and data asked for on demand, such as a page inside a card or an index fetched on first focus.
+- Every read and write goes through a server function. Its input and output are Zod schemas, never hand-written checks. After a write, `invalidateQueries` refreshes what's on the page.
 - Every write is a `useMutation`. Its pending and error state come from the mutation, never from `useState` and `try`/`finally`.
-- Every action and mutation tells the user how it went, for example with a toast on success or failure.
 - Create the `QueryClient` in the router factory, so server requests never share a cache, and pass it through router context. Loaders prefetch queries in the browser, so links still preload on intent.
 
 ## React Hooks

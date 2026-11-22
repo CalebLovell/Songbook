@@ -246,8 +246,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   controls) uses its real string as the `ShellText` strut: the last data
   shown when there is some (`useLastDefined`, so a pull to refresh keeps its
   shape), else a typical sample.
-  No animation between the two: shells show from the first frame and content
-  replaces them in place. The collage is the one exception: its picture area draws no shell
+  Shells show from the first frame and content replaces them in place, fading
+  in over 150ms (see Motion). The collage is the one exception: its picture area draws no shell
   (the birds' pop-in is its loading cue), stays empty until every painting is
   decoded, then the birds pop in in a random order, kept for the
   life of the layout so a resize doesn't reorder them (500ms each, starts
