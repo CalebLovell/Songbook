@@ -9,17 +9,15 @@ const PROFILE_CARD_CLASS =
 	"grid overflow-hidden p-0 sm:grid-cols-[11.5rem_minmax(0,1fr)]";
 const PROFILE_PORTRAIT_CLASS =
 	"flex h-34 items-center justify-center overflow-hidden p-4 pb-0 sm:h-38 sm:self-center sm:pb-4";
-export const PROFILE_TEXT_CLASS =
+const PROFILE_TEXT_CLASS =
 	"flex min-w-0 flex-col justify-center gap-3 p-4 sm:min-h-39 sm:justify-between sm:pl-0";
 
-export function ProfileCardFrame({
-	label,
+function ProfileCardFrame({
 	portrait,
 	busy,
 	className,
 	children,
 }: {
-	label: string;
 	portrait: ReactNode;
 	busy?: boolean;
 	className?: string;
@@ -28,7 +26,7 @@ export function ProfileCardFrame({
 	return (
 		<Card
 			as="section"
-			aria-label={label}
+			aria-label="Bird profile"
 			aria-busy={busy || undefined}
 			className={cn(PROFILE_CARD_CLASS, className)}
 		>
@@ -39,19 +37,15 @@ export function ProfileCardFrame({
 }
 
 export function BirdProfileCard({
-	label = "Bird profile",
 	imageUrl,
 	comName,
-	name,
 	sciName,
 	line,
 	actions,
 	className,
 }: {
-	label?: string;
 	imageUrl: string | null;
 	comName: string;
-	name?: ReactNode;
 	sciName: ReactNode;
 	line: ReactNode;
 	actions: ReactNode;
@@ -59,7 +53,6 @@ export function BirdProfileCard({
 }) {
 	return (
 		<ProfileCardFrame
-			label={label}
 			className={className}
 			portrait={
 				<SpeciesImage
@@ -73,7 +66,7 @@ export function BirdProfileCard({
 			<div className={PROFILE_TEXT_CLASS}>
 				<div className="min-w-0">
 					<h1 className="font-bold text-2xl text-moss sm:text-3xl">
-						{name ?? comName}
+						{comName}
 					</h1>
 					<p className="text-bark text-xs italic">{sciName}</p>
 				</div>
@@ -84,7 +77,7 @@ export function BirdProfileCard({
 	);
 }
 
-export function ProfileTextShell({ actions }: { actions: ReactNode }) {
+function ProfileTextShell({ actions }: { actions: ReactNode }) {
 	return (
 		<div aria-hidden="true" className={PROFILE_TEXT_CLASS}>
 			<div className="min-w-0">
@@ -103,22 +96,17 @@ export function ProfileTextShell({ actions }: { actions: ReactNode }) {
 }
 
 export function BirdProfileCardShell({
-	label = "Bird profile",
-	portrait,
 	actions,
 	className,
 }: {
-	label?: string;
-	portrait?: ReactNode;
 	actions: ReactNode;
 	className?: string;
 }) {
 	return (
 		<ProfileCardFrame
 			busy
-			label={label}
 			className={className}
-			portrait={portrait ?? <ShellBar className="size-full rounded-md" />}
+			portrait={<ShellBar className="size-full rounded-md" />}
 		>
 			<ProfileTextShell actions={actions} />
 		</ProfileCardFrame>

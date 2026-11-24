@@ -6,6 +6,7 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { Sun } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -17,23 +18,21 @@ import {
 	HourBarsCardSkeleton,
 	sumHours,
 } from "~/components/hour-bars-card.tsx";
+import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import {
 	HeaderSunTimes,
 	HeaderSunTimesSkeleton,
 } from "~/components/species-by-hour-card.tsx";
 import { WindowSummary } from "~/components/timeline/window-summary.tsx";
 import {
-	RecentLogCard,
-	RecentLogCardSkeleton,
-} from "~/components/today/recent-log-card.tsx";
-import {
-	TodayHeader,
-	TodayHeaderShell,
-} from "~/components/today/today-header.tsx";
+	VisitsCard,
+	VisitsCardSkeleton,
+} from "~/components/today/visits-card.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { announce } from "~/lib/announce.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
+import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { prefetchInBrowser } from "~/lib/query-client.ts";
 import type { WindowSun } from "~/lib/sun-times.ts";
 import type { TimelineRow } from "~/lib/timeline.ts";
@@ -48,11 +47,10 @@ import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 const POLL_INTERVAL_MS = 10_000;
 const FLASH_DURATION_MS = 2_400;
 const NEW_BIRD_ANNOUNCE_GAP_MS = 60_000;
-// 9.875rem is the header at xl: its 7.75rem row, 1rem padding each side and a 2px border.
 const WINDOW_FIT_CLASS =
-	"min-[1800px]:h-[calc(100dvh-9.875rem-3*var(--page-gap))]! min-[1800px]:min-h-[28rem]";
-// Source order is the stacked order (Today, Hourly activity, Recent activity); from 1800px the
-// grid puts Today across both rows on the left and Hourly activity under Recent activity on the right.
+	"min-[1800px]:h-[calc(100dvh-var(--masthead-h)-3*var(--page-gap))]! min-[1800px]:min-h-[28rem]";
+// Source order is the stacked order (Today, Hourly activity, Visit log); from 1800px the
+// grid puts Today across both rows on the left and Hourly activity under Visit log on the right.
 const BODY_GRID_CLASS = `mt-page grid grid-cols-1 items-start gap-page min-[1800px]:grid-cols-[72rem_minmax(0,1fr)] min-[1800px]:grid-rows-[minmax(0,1fr)_auto] min-[1800px]:items-stretch ${WINDOW_FIT_CLASS}`;
 const FEED_SLOT_CLASS =
 	"flex min-h-0 min-w-0 flex-col min-[1800px]:col-start-2 min-[1800px]:row-start-1";
@@ -126,19 +124,21 @@ function Today() {
 }
 
 function LiveLayout({
-	header,
 	hours,
 	collage,
 	feed,
 }: {
-	header: ReactNode;
 	hours: ReactNode;
 	collage: ReactNode;
 	feed: ReactNode;
 }) {
 	return (
 		<PageWrap>
-			{header}
+			<PageHeaderCard
+				icon={Sun}
+				title={PAGE_HEADERS.today.title}
+				description={PAGE_HEADERS.today.description}
+			/>
 			<div className={BODY_GRID_CLASS}>
 				{collage}
 				<div className={HOURS_SLOT_CLASS}>{hours}</div>
@@ -151,8 +151,7 @@ function LiveLayout({
 function TodayShell() {
 	return (
 		<LiveLayout
-			header={<TodayHeaderShell />}
-			feed={<RecentLogCardSkeleton />}
+			feed={<VisitsCardSkeleton />}
 			hours={<HourBarsCardSkeleton />}
 			collage={
 				<CollageCardSkeleton
@@ -214,28 +213,21 @@ function TodayBody({ snapshot }: { snapshot: TodaySnapshot }) {
 		<HeaderSunTimes sun={body.sun} />
 	) : undefined;
 	const collageSpecies = useCollageSpecies(rows);
-	const heroKey = snapshot.current?.key;
-	const freshKeys = useFreshKeys(snapshot.recent.map((visit) => visit.key));
-	const freshHeroKeys = useFreshKeys(heroKey ? [heroKey] : []);
+	const newest = snapshot.visits.at(0);
+	const freshKeys = useFreshKeys(
+		snapshot.visits.map((visit) => visit.latestKey),
+	);
 	const lastHour =
 		snapshot.day === "today" ? Number(snapshot.generatedAt.slice(11, 13)) : 23;
 
-	useRefetchOnNewDetection(heroKey, dayQuery.queryKey);
-	useAnnounceNewBird(snapshot.current?.comName ?? null);
+	useRefetchOnNewDetection(newest?.latestKey, dayQuery.queryKey);
+	useAnnounceNewBird(newest?.comName ?? null);
 
 	return (
 		<LiveLayout
-			header={
-				<TodayHeader
-					current={snapshot.current}
-					hasAnyDetections={snapshot.hasAnyDetections}
-					generatedAt={snapshot.generatedAt}
-					flash={heroKey !== undefined && freshHeroKeys.has(heroKey)}
-				/>
-			}
 			feed={
-				<RecentLogCard
-					recent={snapshot.recent}
+				<VisitsCard
+					visits={snapshot.visits}
 					generatedAt={snapshot.generatedAt}
 					freshKeys={freshKeys}
 				/>

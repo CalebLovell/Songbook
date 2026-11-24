@@ -1,16 +1,11 @@
 export const EMPTY = {
 	station: {
-		liveHeroTitle: "All Quiet",
-		liveHeroBody: "As birds are heard, each new one will appear here.",
 		detections: "No detections recorded yet.",
 		species: "No species recorded yet.",
 		recordings: "No recordings yet.",
 	},
 
 	window: {
-		liveQuietTitle: "All Quiet",
-		liveQuietBody:
-			"Nothing heard yet today. New detections will appear here on their own.",
 		today: "No detections recorded yet today.",
 		timelineWindow: (windowLabel: string | null) =>
 			windowLabel

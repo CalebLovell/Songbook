@@ -474,13 +474,11 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   switch re-anchors on the latest day in the window with detections. Only a Daily
   address that isn't a date replaces the page. An empty station keeps its controls.
 - **Today** is the station's today at a glance (since midnight), in two
-  columns (from 1800px) under a header. The header is its own Now hearing card
-  (`today-header.tsx`, not the bird page's profile card): the newest bird's painting
-  in a 9.5rem column, name over binomial, then the time ago in moss over "last heard
-  <date, time>", confidence and play, full width. Below, the right column holds Recent
-  activity (every visit of the day, flashing in as they arrive; one bare arrow in its
-  header, down for Most recent and up for Least recent, flips the list,
-  starting at Most recent on each page load, and scrolls it back to the top; it has no
+  columns (from 1800px) under the standard page header (`PageHeaderCard`). The right
+  column holds Visit log (every visit of the day, the newest bird first; a row
+  flashes when it arrives or its visit gains a detection; one button in its
+  header, Newest with a down arrow or Oldest with an up arrow, flips the list,
+  starting at Newest on each page load, and scrolls it back to the top; it has no
   info popup),
   then Hourly activity: the bird page's Detections by hour card as bars, each colored
   by the Activity heat ramp (`heatColor`, log scale, the busiest in full moss) (same
@@ -494,19 +492,19 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   Today (Yesterday overnight) with the Activity card's header: the day's
   detections and species, and sunrise and sunset in place of Reshuffle, which
   Live doesn't offer. The collage card is always Timeline's size: the full content
-  width below 1800px, and from 1800px Timeline's 72rem on the left, with Recent
-  activity over Hourly activity in a right column that takes whatever width is left. Recent activity's rows scroll inside
-  its card: stacked, the card stands at most clamp(20rem, 60vh, 36rem); from 1800px
+  width below 1800px, and from 1800px Timeline's 72rem on the left, with Visit log
+  over Hourly activity in a right column that takes whatever width is left. Visit log's rows
+  scroll inside its card: stacked, the card stands at most clamp(20rem, 60vh, 36rem); from 1800px
   both columns are as tall as the window allows under the header, Hourly activity
-  keeps its own 18rem and Recent activity fills the rest, so the page doesn't
-  scroll (the collage is the header's extra height shorter than Timeline's there).
+  keeps its own 18rem and Visit log fills the rest, so the page doesn't
+  scroll (with no toolbar above it, the collage is taller than Timeline's there).
   In one column (below 1800px) it stacks: header,
-  Today, Hourly activity, Recent activity. That is also the source order at every
+  Today, Hourly activity, Visit log. That is also the source order at every
   width: from 1800px grid placement, never `order`, puts Today on the left and
-  Hourly activity under Recent activity on the right. Hourly activity has no tab
-  stops, so keyboard focus still runs Today, then Recent activity. The bars and
+  Hourly activity under Visit log on the right. Hourly activity has no tab
+  stops, so keyboard focus still runs Today, then Visit log. The bars and
   collage read Timeline's Daily query (`timelineQuery` in
-  `lib/timeline-page.ts`), so the pages share a cache; the header and list come
+  `lib/timeline-page.ts`), so the pages share a cache; the list comes
   from the polled snapshot, and the day cards refetch only when its newest
   detection changes. The collage repacks only when a bird or its count changes.
   Until today's first detection everything shows yesterday, so the page isn't
