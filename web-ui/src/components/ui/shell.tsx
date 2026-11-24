@@ -69,23 +69,6 @@ export function ShellSized({
 	);
 }
 
-export function ShellLines({
-	widths = ["w-4/5", "w-3/5", "w-2/3"],
-	className,
-}: {
-	widths?: string[];
-	className?: string;
-}) {
-	return (
-		<span className={cn("flex flex-col gap-3 py-2", className)}>
-			{widths.map((width, index) => (
-				// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
-				<ShellBar key={index} className={cn("h-3.5", width)} />
-			))}
-		</span>
-	);
-}
-
 export function ShellChartCard({
 	title,
 	ariaLabel,

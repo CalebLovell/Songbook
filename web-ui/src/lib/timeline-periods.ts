@@ -14,3 +14,7 @@ export const TIMELINE_PERIOD_LABELS: Record<TimelinePeriod, string> = {
 	year: "Yearly",
 	all: "All Time",
 };
+
+export function periodTitle(heading: string[]): string {
+	return heading.join(" — ");
+}

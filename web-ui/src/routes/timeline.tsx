@@ -24,11 +24,7 @@ import {
 	sumHours,
 } from "~/components/hour-bars-card.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
-import {
-	ShareButton,
-	type ShareContent,
-	useShare,
-} from "~/components/share-button.tsx";
+import { ShareButton } from "~/components/share-button.tsx";
 import { InMenuBar } from "~/components/sidebar/mobile-nav.tsx";
 import {
 	SpeciesByHourCard,
@@ -47,25 +43,22 @@ import { ButtonLink } from "~/components/ui/button-link.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
 import { TooltipProvider } from "~/components/ui/tooltip.tsx";
-import { getDayShareCard } from "~/lib/day-share.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import type { HighlightThresholds } from "~/lib/highlight-thresholds.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { prefetchInBrowser } from "~/lib/query-client.ts";
-import { formatShareCard } from "~/lib/share-card.ts";
+import type { ShareImageInput } from "~/lib/share-image.ts";
 import type { WindowSun } from "~/lib/sun-times.ts";
 import type { TimelineData, TimelineRow } from "~/lib/timeline.ts";
 import { type TimelinePageData, timelineQuery } from "~/lib/timeline-page.ts";
 import {
+	periodTitle,
 	TIMELINE_PERIOD_LABELS,
 	TIMELINE_PERIODS,
 	type TimelinePeriod,
 } from "~/lib/timeline-periods.ts";
-import {
-	formatTimelineShareCard,
-	timelineTotals,
-} from "~/lib/timeline-share.ts";
+import { timelineTotals } from "~/lib/timeline-totals.ts";
 import {
 	loadTimelineView,
 	saveTimelineView,
@@ -276,63 +269,32 @@ function TimelineHeader({
 	viewSwitch: React.ReactNode;
 	onChange: (next: { period?: TimelinePeriod; date?: string }) => void;
 }) {
-	const rows = data?.body.kind === "rows" ? data.body.rows : [];
-	const highlights = data?.body.kind === "rows" ? data.body.highlights : [];
+	const body = data?.body.kind === "rows" ? data.body : null;
 	const toolbarData = data ?? staleData;
 	const { auth } = useRouteContext({ from: "__root__" });
 
-	const loadShare = async (): Promise<ShareContent> => {
-		const heading = headerLines(period, anchor);
-		const stationName = auth.siteName;
-		const birds = rows.map((row) => ({
-			comName: row.comName,
-			sciName: row.sciName,
-			count: row.totalDetections,
-		}));
-		if (period === "day") {
-			const day = await getDayShareCard({ data: anchor });
-			return {
-				text: formatShareCard({ ...day, highlights, heading, stationName }),
-				image: {
-					heading,
-					stationName,
-					species: day.species,
-					detections: day.detections,
-					peakHour: day.busiestHour?.hour ?? null,
-					birds,
-					highlights,
-				},
-			};
-		}
-		return {
-			text: formatTimelineShareCard({
-				period,
-				heading,
-				rows,
-				highlights,
-				stationName,
-			}),
-			image: {
-				heading,
-				stationName,
-				...timelineTotals(rows),
-				birds,
-				highlights,
-			},
-		};
-	};
-	const share = useShare({
-		subject: `${period}:${anchor}`,
-		hasData: data !== null,
-		load: loadShare,
-	});
+	const shareInput: ShareImageInput | null =
+		body && body.rows.length > 0
+			? {
+					heading: headerLines(period, anchor),
+					stationName: auth.siteName,
+					...timelineTotals(body.rows),
+					birds: body.rows.map((row) => ({
+						comName: row.comName,
+						sciName: row.sciName,
+						count: row.totalDetections,
+					})),
+					highlights: body.highlights,
+					highlightSciNames: body.highlightSciNames,
+				}
+			: null;
 	const canShare = toolbarData?.hasAnyDetections ?? false;
 
 	return (
 		<>
 			{canShare && (
 				<InMenuBar>
-					<ShareButton state={share} shape="plain" />
+					<ShareButton input={shareInput} shape="plain" />
 				</InMenuBar>
 			)}
 			<PageHeaderCard
@@ -341,7 +303,7 @@ function TimelineHeader({
 				description={PAGE_HEADERS.timeline.description}
 				action={
 					canShare ? (
-						<ShareButton state={share} className="max-xl:hidden" />
+						<ShareButton input={shareInput} className="max-xl:hidden" />
 					) : undefined
 				}
 				afterHeader={
@@ -361,7 +323,7 @@ function TimelineHeader({
 }
 
 function headerTitle(period: TimelinePeriod, anchor: string): string {
-	return headerLines(period, anchor).join(" — ");
+	return periodTitle(headerLines(period, anchor));
 }
 
 function headerLines(period: TimelinePeriod, anchor: string): string[] {

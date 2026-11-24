@@ -57,6 +57,7 @@ export type TimelineRow = {
 export type TimelineData = {
 	rows: TimelineRow[];
 	highlights: Highlight[];
+	highlightSciNames: Record<string, string>;
 	window: TimelineWindow | null;
 	prevAnchor: TimelineAnchor | null;
 	nextAnchor: TimelineAnchor | null;
@@ -172,6 +173,9 @@ export async function loadTimelineData({
 			db
 				.select({
 					comName: detections.Com_Name,
+					sciName: window
+						? sql<string | null>`min(${detections.Sci_Name})`
+						: sql<string | null>`null`,
 					lifetime: sql<number>`count(*)`,
 					lastBefore: window
 						? sql<
@@ -278,6 +282,19 @@ export async function loadTimelineData({
 		settings,
 	);
 
+	const silentSciNames = new Map(
+		historyRows.map((row) => [row.comName, row.sciName]),
+	);
+	const highlightSciNames: Record<string, string> = {};
+	for (const highlight of highlights) {
+		if (!("birds" in highlight)) continue;
+		for (const { comName } of highlight.birds) {
+			const sciName =
+				bySpecies.get(comName)?.sciName ?? silentSciNames.get(comName);
+			if (sciName) highlightSciNames[comName] = sciName;
+		}
+	}
+
 	const withImages = Array.from(bySpecies.values()).map((entry) => {
 		const flag = flags.get(entry.comName);
 		return {
@@ -304,6 +321,7 @@ export async function loadTimelineData({
 	return {
 		rows: withImages.sort((a, b) => b.totalDetections - a.totalDetections),
 		highlights,
+		highlightSciNames,
 		...nav,
 	};
 }

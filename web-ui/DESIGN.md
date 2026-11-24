@@ -392,21 +392,33 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   focus and hide the page behind them, then give focus back to what opened them,
   or to `main` if that has gone. The menu drawer does the same by hand so it can
   keep its slide.
-- **Sharing**: Share opens a modal showing the exact text that will be sent, on a
-  meadow well; opening it sends nothing. Copy is always there, and a touch screen
-  with a share sheet adds Share as the primary button. A Text / Image toggle offers
-  the same summary as a 1080×1920 portrait card drawn on a canvas in the browser
-  (`lib/share-image.ts` picks what goes on it, `lib/share-image-canvas.ts` draws
-  it). The two mirror each other: the same "Weekly Summary" title and date, the
-  same top three birds (🥇🥈🥉 in the text; on the card, 1st as a large painting
-  and 2nd and 3rd as ranked rows with thumbnails, rank numerals in sand, grey and
-  clay), and the same highlight lines, built once by `lib/highlights-share.ts`.
-  The card sets highlights as a label column (moss kicker labels, no icons) where
-  the text uses emoji. As in the app, bird names are moss at 600 and the title is
-  moss; the header is the real `SongbookWordmark`. Paintings stand bare, with no
-  disc behind them. It uses theme tokens, so it matches the theme it was made
-  in, and nothing is generated or sent anywhere. It starts drawing when the modal
-  opens, so switching to Image is instant. Image offers Download always, Copy
+- **Sharing**: Share opens a modal holding an image of the window; opening it
+  sends nothing, and there is no text summary. A Top Birds / Highlights toggle,
+  opening on Top Birds, picks between two 1080×1920 portrait cards drawn on a
+  canvas in the browser (`lib/share-image.ts` picks what goes on them,
+  `lib/share-image-canvas.ts` draws them). It is hidden, leaving Top Birds, when
+  the window has no highlighted bird, and Share is disabled when nothing was
+  heard. The cards differ only in their rows. Top Birds lists the top five birds
+  with thumbnails and counts, busiest first and without rank numerals. Highlights
+  shows one bird for each highlight the window has, in the Highlights card's
+  order, its thumbnail and name on the left and the highlight's name as a muted
+  kicker on the right; a bird leads a second highlight only when that one has no
+  other bird. Both run header, collage, rows, then totals (the other orders were
+  tried and dropped). The totals (detections, species, peak hour) are spaced edge
+  to edge (the first and last touch the margins, the gaps between are equal, each
+  halved by a vertical hairline), each number centred over its label. The collage
+  runs half a margin past the text on both sides; holding every block to one exact
+  edge was tried and dropped. No horizontal hairlines anywhere on the card. The
+  collage is packed by the same `lib/collage-layout.ts` as the Collage view, with
+  its own draw of flying birds made when the modal opens, filling whatever height
+  the other blocks leave. It shows every painted bird; where none is painted it
+  falls back to photos, and a picture that won't load is left out before packing.
+  As in the app, bird names are moss at 600 and the title is moss. The card's
+  header is Timeline's own page title ("Daily — Nov 23rd, 2026", or "All Time";
+  both from `periodTitle`) with the station name under it: no logo. Paintings
+  stand bare, with no disc behind them. It uses theme tokens, so it matches the
+  theme it was made in, and nothing is generated or sent anywhere. Both cards draw
+  when the modal opens, so switching is instant. Download is always there, Copy
   where the browser can put an image on the clipboard (not on plain-HTTP LAN
   addresses), and Share as primary where the share sheet takes files.
 - **Explanations**: `InfoTip` opens a modal from the info icon. `Hint` is the hover

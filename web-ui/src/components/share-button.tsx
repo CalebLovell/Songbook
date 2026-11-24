@@ -1,155 +1,34 @@
-import { useQuery } from "@tanstack/react-query";
-import {
-	Check,
-	Copy,
-	FileText,
-	Image,
-	RotateCw,
-	Share2,
-	X,
-} from "lucide-react";
+import { Share2, Star, Trophy, X } from "lucide-react";
 import { Dialog } from "radix-ui";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { ShareImagePanel } from "~/components/share-image-panel.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { CARD_CLASS } from "~/components/ui/card.tsx";
 import {
-	MODAL_ACTIONS_CLASS,
 	MODAL_BACKDROP_CLASS,
 	MODAL_CARD_CLASS,
 	MODAL_TITLE_CLASS,
 } from "~/components/ui/confirm-dialog.tsx";
-import { ShellLines } from "~/components/ui/shell.tsx";
-import { toast } from "~/components/ui/toaster.tsx";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
-import { copyText } from "~/lib/copy-text.ts";
+import { randomMixSeed } from "~/lib/collage-birds.ts";
 import {
-	buildShareImage,
+	buildShareImages,
 	type ShareImageInput,
-	type ShareImageModel,
+	type ShareImages,
 } from "~/lib/share-image.ts";
 import { cn } from "~/lib/utils.ts";
 
-const COPIED_FEEDBACK_MS = 2_000;
-const COPY_BUTTON_CLASS = "min-w-26";
-const SUMMARY_SHELL_WIDTHS = [
-	"w-1/3",
-	"w-1/2",
-	"w-1/3",
-	"w-2/5",
-	"w-1/2",
-	"w-2/5",
-	"w-3/5",
-	"w-1/2",
-];
+type ShareKind = keyof ShareImages;
 
-function hasShareSheet(): boolean {
-	return (
-		typeof navigator.share === "function" &&
-		window.matchMedia("(pointer: coarse)").matches
-	);
-}
-
-export type ShareContent = { text: string; image: ShareImageInput | null };
-
-type ShareFormat = "text" | "image";
-
-type ShareSummary =
-	| { status: "loading" }
-	| { status: "ready"; text: string; image: ShareImageModel | null }
-	| { status: "failed" };
-
-export type ShareState = {
-	isReady: boolean;
-	summary: ShareSummary;
-	retry: () => void;
-};
-
-export function useShare({
-	subject,
-	hasData,
-	load,
-}: {
-	subject: string;
-	hasData: boolean;
-	load: () => Promise<ShareContent>;
-}): ShareState {
-	const {
-		data: content,
-		isError,
-		isFetching,
-		refetch,
-	} = useQuery({
-		queryKey: ["share-summary", subject],
-		queryFn: async () => {
-			const { text, image } = await load();
-			return { text, image: image ? buildShareImage(image) : null };
-		},
-		enabled: hasData,
-		staleTime: Number.POSITIVE_INFINITY,
-		gcTime: 0,
-	});
-
-	let summary: ShareSummary = { status: "loading" };
-	if (content !== undefined) summary = { status: "ready", ...content };
-	else if (isError && !isFetching) summary = { status: "failed" };
-
-	return {
-		isReady: hasData || summary.status === "ready",
-		summary,
-		retry: () => void refetch(),
-	};
-}
-
-function ShareDialogContent({ state }: { state: ShareState }) {
-	const { summary } = state;
-	const text = summary.status === "ready" ? summary.text : null;
-	const image = summary.status === "ready" ? summary.image : null;
-	const [format, setFormat] = useState<ShareFormat>("text");
-	const contentRef = useRef<HTMLDivElement>(null);
-	const primaryRef = useRef<HTMLButtonElement>(null);
-	const [justCopied, setJustCopied] = useState(false);
-	const [offerShareSheet] = useState(hasShareSheet);
-
-	useEffect(() => {
-		if (!justCopied) return;
-		const timer = setTimeout(() => setJustCopied(false), COPIED_FEEDBACK_MS);
-		return () => clearTimeout(timer);
-	}, [justCopied]);
-
-	async function copy() {
-		if (text === null || !contentRef.current) return;
-		if (!(await copyText(text, contentRef.current))) {
-			toast.error("Copying was blocked by the browser.");
-			return;
-		}
-		setJustCopied(true);
-		toast.success("Copied to clipboard");
-	}
-
-	async function openShareSheet() {
-		if (text === null) return;
-		try {
-			await navigator.share({ text });
-		} catch (error) {
-			if (error instanceof DOMException && error.name === "AbortError") return;
-			toast.error("Could not open the share sheet.");
-		}
-	}
+function ShareDialogContent({ images }: { images: ShareImages }) {
+	const [kind, setKind] = useState<ShareKind>("topBirds");
 
 	return (
 		<Dialog.Portal>
 			<Dialog.Overlay className={MODAL_BACKDROP_CLASS}>
 				<Dialog.Content
-					ref={contentRef}
 					aria-describedby={undefined}
 					className={cn(CARD_CLASS, MODAL_CARD_CLASS, "max-h-full max-w-md")}
-					onOpenAutoFocus={(event) => {
-						const primary = primaryRef.current;
-						if (!primary || primary.disabled) return;
-						event.preventDefault();
-						primary.focus();
-					}}
 				>
 					<div className="flex items-center justify-between gap-page">
 						<Dialog.Title className={MODAL_TITLE_CLASS}>
@@ -166,91 +45,35 @@ function ShareDialogContent({ state }: { state: ShareState }) {
 						</Dialog.Close>
 					</div>
 
-					{image && (
+					{images.highlights && (
 						<ToggleGroup
 							type="single"
 							variant="outline"
-							aria-label="Share as"
+							aria-label="Share"
 							className="w-full"
-							value={format}
+							value={kind}
 							onValueChange={(next) => {
-								if (next) setFormat(next as ShareFormat);
+								if (next) setKind(next as ShareKind);
 							}}
 						>
-							<ToggleGroupItem value="text" className="flex-1 gap-1.5">
-								<FileText aria-hidden="true" />
-								Text
+							<ToggleGroupItem value="topBirds" className="flex-1 gap-1.5">
+								<Trophy aria-hidden="true" />
+								Top Birds
 							</ToggleGroupItem>
-							<ToggleGroupItem value="image" className="flex-1 gap-1.5">
-								<Image aria-hidden="true" />
-								Image
+							<ToggleGroupItem value="highlights" className="flex-1 gap-1.5">
+								<Star aria-hidden="true" />
+								Highlights
 							</ToggleGroupItem>
 						</ToggleGroup>
 					)}
 
-					{image && (
-						<div className={format === "image" ? "contents" : "hidden"}>
-							<ShareImagePanel model={image} />
+					<div className={kind === "topBirds" ? "contents" : "hidden"}>
+						<ShareImagePanel model={images.topBirds} />
+					</div>
+					{images.highlights && (
+						<div className={kind === "highlights" ? "contents" : "hidden"}>
+							<ShareImagePanel model={images.highlights} />
 						</div>
-					)}
-					{(!image || format === "text") && (
-						<>
-							<div
-								data-testid="share-preview"
-								aria-busy={summary.status === "loading"}
-								className="min-h-0 overflow-y-auto whitespace-pre-wrap rounded-md border border-line bg-meadow p-page text-sm leading-relaxed"
-							>
-								{summary.status === "ready" && summary.text}
-								{summary.status === "loading" && (
-									<ShellLines widths={SUMMARY_SHELL_WIDTHS} />
-								)}
-								{summary.status === "failed" && (
-									<span className="text-muted-foreground">
-										Could not build the summary.
-									</span>
-								)}
-							</div>
-
-							<div className={MODAL_ACTIONS_CLASS}>
-								{summary.status === "failed" ? (
-									<Button
-										type="button"
-										size="default"
-										icon={RotateCw}
-										onClick={state.retry}
-									>
-										Try again
-									</Button>
-								) : (
-									<>
-										<Button
-											ref={offerShareSheet ? undefined : primaryRef}
-											type="button"
-											size="default"
-											variant={offerShareSheet ? "outline" : "default"}
-											icon={justCopied ? Check : Copy}
-											loading={text === null}
-											onClick={copy}
-											className={COPY_BUTTON_CLASS}
-										>
-											{justCopied ? "Copied" : "Copy"}
-										</Button>
-										{offerShareSheet && (
-											<Button
-												ref={primaryRef}
-												type="button"
-												size="default"
-												icon={Share2}
-												loading={text === null}
-												onClick={openShareSheet}
-											>
-												Share
-											</Button>
-										)}
-									</>
-								)}
-							</div>
-						</>
 					)}
 				</Dialog.Content>
 			</Dialog.Overlay>
@@ -259,24 +82,31 @@ function ShareDialogContent({ state }: { state: ShareState }) {
 }
 
 export function ShareButton({
-	state,
+	input,
 	shape = "pill",
 	className,
 }: {
-	state: ShareState;
+	input: ShareImageInput | null;
 	shape?: "pill" | "plain";
 	className?: string;
 }) {
-	const [open, setOpen] = useState(false);
+	const [images, setImages] = useState<ShareImages | null>(null);
 
 	return (
-		<Dialog.Root open={open} onOpenChange={setOpen}>
+		<Dialog.Root
+			open={images !== null}
+			onOpenChange={(open) =>
+				setImages(
+					open && input ? buildShareImages(input, randomMixSeed()) : null,
+				)
+			}
+		>
 			<Dialog.Trigger asChild>
 				<Button
 					variant="outline"
 					size={shape === "pill" ? "lg" : "default"}
 					icon={Share2}
-					disabled={!state.isReady}
+					disabled={input === null}
 					className={cn(
 						shape === "pill" &&
 							"h-8 self-center rounded-full px-4 text-moss hover:border-hover-line hover:bg-icon-well hover:text-moss [&_svg]:size-5!",
@@ -286,7 +116,7 @@ export function ShareButton({
 					Share
 				</Button>
 			</Dialog.Trigger>
-			{open && <ShareDialogContent state={state} />}
+			{images && <ShareDialogContent images={images} />}
 		</Dialog.Root>
 	);
 }

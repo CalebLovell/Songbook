@@ -31,6 +31,7 @@ type TimelineBody =
 			kind: "rows";
 			rows: TimelineRow[];
 			highlights: TimelineData["highlights"];
+			highlightSciNames: TimelineData["highlightSciNames"];
 			thresholds: HighlightThresholds;
 			sun: WindowSun;
 	  }
@@ -58,12 +59,13 @@ export const getTimelinePage = createServerFn({ method: "GET" })
 			readHighlightThresholds(),
 			readStationLocation(),
 		]);
-		const { rows, highlights, ...nav } = await loadTimelineData({
-			period,
-			anchor,
-			settings: thresholds,
-			place: location,
-		});
+		const { rows, highlights, highlightSciNames, ...nav } =
+			await loadTimelineData({
+				period,
+				anchor,
+				settings: thresholds,
+				place: location,
+			});
 		const sun: WindowSun = location
 			? windowSun(
 					sunDays(nav),
@@ -75,7 +77,14 @@ export const getTimelinePage = createServerFn({ method: "GET" })
 		return {
 			...nav,
 			period,
-			body: { kind: "rows", rows, highlights, thresholds, sun },
+			body: {
+				kind: "rows",
+				rows,
+				highlights,
+				highlightSciNames,
+				thresholds,
+				sun,
+			},
 		};
 	});
 

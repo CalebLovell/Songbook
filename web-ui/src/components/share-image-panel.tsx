@@ -1,7 +1,6 @@
 import { Check, Copy, Download, RotateCw, Share2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { SongbookWordmark } from "~/components/sidebar/songbook-wordmark.tsx";
 import { Button } from "~/components/ui/button.tsx";
 import { MODAL_ACTIONS_CLASS } from "~/components/ui/confirm-dialog.tsx";
 import { ShellBar } from "~/components/ui/shell.tsx";
@@ -21,29 +20,6 @@ function canCopyImage(): boolean {
 		typeof ClipboardItem !== "undefined" &&
 		typeof navigator.clipboard?.write === "function"
 	);
-}
-
-function inlineColors(source: Element, copy: Element) {
-	const { fill, stroke } = getComputedStyle(source);
-	if (source.hasAttribute("fill")) copy.setAttribute("fill", fill);
-	if (source.hasAttribute("stroke")) copy.setAttribute("stroke", stroke);
-	for (const [index, child] of [...source.children].entries()) {
-		inlineColors(child, copy.children[index]);
-	}
-}
-
-function wordmarkImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
-	const copy = svg.cloneNode(true) as SVGSVGElement;
-	inlineColors(svg, copy);
-	const { width, height } = svg.viewBox.baseVal;
-	copy.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-	copy.setAttribute("width", String(Math.round(width / 10)));
-	copy.setAttribute("height", String(Math.round(height / 10)));
-	copy.removeAttribute("style");
-	copy.removeAttribute("class");
-	const image = new Image();
-	image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy))}`;
-	return image.decode().then(() => image);
 }
 
 function canShareFile(file: File): boolean {
@@ -75,24 +51,19 @@ function ImagePanel({
 	const [rendered, setRendered] = useState<Rendered>({ status: "drawing" });
 	const [justCopied, setJustCopied] = useState(false);
 	const [offerCopy] = useState(canCopyImage);
-	const wordmarkRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		let url: string | null = null;
 		let live = true;
-		const svg = wordmarkRef.current?.querySelector("svg");
-		const wordmark = svg ? wordmarkImage(svg).catch(() => null) : null;
-		Promise.resolve(wordmark)
-			.then((image) => renderShareImage(model, image))
-			.then(
-				(blob) => {
-					if (!live) return;
-					url = URL.createObjectURL(blob);
-					const file = new File([blob], model.fileName, { type: "image/png" });
-					setRendered({ status: "ready", file, url });
-				},
-				() => live && setRendered({ status: "failed" }),
-			);
+		renderShareImage(model).then(
+			(blob) => {
+				if (!live) return;
+				url = URL.createObjectURL(blob);
+				const file = new File([blob], model.fileName, { type: "image/png" });
+				setRendered({ status: "ready", file, url });
+			},
+			() => live && setRendered({ status: "failed" }),
+		);
 		return () => {
 			live = false;
 			if (url) URL.revokeObjectURL(url);
@@ -141,9 +112,6 @@ function ImagePanel({
 
 	return (
 		<>
-			<div ref={wordmarkRef} hidden className="text-moss">
-				<SongbookWordmark />
-			</div>
 			<div
 				data-testid="share-image-preview"
 				aria-busy={rendered.status === "drawing"}
@@ -152,7 +120,7 @@ function ImagePanel({
 				{ready && (
 					<img
 						src={ready.url}
-						alt={`${model.title}: ${model.podium.map((bird) => bird.comName).join(", ")} were heard most`}
+						alt={model.alt}
 						className="size-full object-contain"
 					/>
 				)}

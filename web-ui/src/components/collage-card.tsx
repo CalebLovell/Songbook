@@ -36,7 +36,7 @@ import {
 	layoutCollage,
 	ownerAt,
 } from "~/lib/collage-layout.ts";
-import { maskFor } from "~/lib/collage-masks.ts";
+import { maskForBird } from "~/lib/collage-masks.ts";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { plural } from "~/lib/number-format.ts";
 import { comNameToSlug } from "~/lib/species-slug.ts";
@@ -598,12 +598,6 @@ function useElementSize(ref: React.RefObject<HTMLElement | null>) {
 	return size;
 }
 
-const SOLID_MASK: CollageMask = {
-	width: 1,
-	height: 1,
-	filled: Uint8Array.of(1),
-};
-
 function useMasks(birds: ShownCollageBird[]): CollageMask[] | null {
 	const [masks, setMasks] = useState<{
 		birds: ShownCollageBird[];
@@ -611,13 +605,7 @@ function useMasks(birds: ShownCollageBird[]): CollageMask[] | null {
 	} | null>(null);
 	useEffect(() => {
 		let cancelled = false;
-		Promise.all(
-			birds.map((bird) =>
-				bird.kind === "photo"
-					? SOLID_MASK
-					: maskFor(bird.imageUrl, bird.bounds).catch(() => SOLID_MASK),
-			),
-		).then((loaded) => {
+		Promise.all(birds.map(maskForBird)).then((loaded) => {
 			if (!cancelled) setMasks({ birds, masks: loaded });
 		});
 		return () => {

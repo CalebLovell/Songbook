@@ -1,9 +1,12 @@
+import type { ShownCollageBird } from "~/lib/collage-birds.ts";
+import { type CollageTile, layoutCollage } from "~/lib/collage-layout.ts";
+import { maskForBird } from "~/lib/collage-masks.ts";
 import {
 	SHARE_IMAGE_HEIGHT,
 	SHARE_IMAGE_WIDTH,
 	type ShareImageArt,
-	type ShareImageBird,
 	type ShareImageModel,
+	type ShareImageRow,
 } from "~/lib/share-image.ts";
 import {
 	fitSize,
@@ -16,18 +19,16 @@ const FONT_STACK = "Georgia, 'Times New Roman', serif";
 const PAINTING_SIDE = 480;
 const MARGIN = 96;
 const CONTENT_WIDTH = SHARE_IMAGE_WIDTH - MARGIN * 2;
+const COLLAGE_WIDTH = SHARE_IMAGE_WIDTH - MARGIN;
+const EDGE = MARGIN * 0.75;
 const KICKER_TRACKING = 0.16;
-const BLOCK_GAP = 52;
+const BLOCK_GAP = 44;
 const PHOTO_RADIUS = 12;
-const WORDMARK_HEIGHT = 64;
 const NAME_WEIGHT = 600;
 
 const COLOR_TOKENS = [
 	"--paper",
-	"--ink",
 	"--moss",
-	"--sand",
-	"--clay",
 	"--muted-foreground",
 	"--line",
 ] as const;
@@ -50,10 +51,6 @@ export function readShareImageColors(): ShareImageColors {
 	) as ShareImageColors;
 	probe.remove();
 	return colors;
-}
-
-function medalColors(colors: ShareImageColors): string[] {
-	return [colors["--sand"], colors["--muted-foreground"], colors["--clay"]];
 }
 
 function font(size: number, weight: Weight = "normal"): string {
@@ -126,21 +123,24 @@ function kicker(
 	}
 }
 
+type Box = { x: number; y: number; width: number; height: number };
+
 function drawArt(
 	ctx: Ctx,
 	art: ShareImageArt,
 	image: HTMLImageElement | null,
-	cx: number,
-	bottom: number,
-	side: number,
+	box: Box,
 ) {
 	if (!art || !image) return;
 
 	if (art.kind === "photo") {
+		const side = Math.min(box.width, box.height);
+		const x = box.x + (box.width - side) / 2;
+		const y = box.y + (box.height - side) / 2;
 		const crop = Math.min(image.naturalWidth, image.naturalHeight);
 		ctx.save();
 		ctx.beginPath();
-		ctx.roundRect(cx - side / 2, bottom - side, side, side, PHOTO_RADIUS);
+		ctx.roundRect(x, y, side, side, PHOTO_RADIUS);
 		ctx.clip();
 		ctx.drawImage(
 			image,
@@ -148,8 +148,8 @@ function drawArt(
 			(image.naturalHeight - crop) / 2,
 			crop,
 			crop,
-			cx - side / 2,
-			bottom - side,
+			x,
+			y,
 			side,
 			side,
 		);
@@ -159,7 +159,7 @@ function drawArt(
 
 	const scale = image.naturalWidth / PAINTING_SIDE;
 	const [bx, by, bw, bh] = art.bounds;
-	const fit = Math.min(side / bw, side / bh);
+	const fit = Math.min(box.width / bw, box.height / bh);
 	const width = bw * fit;
 	const height = bh * fit;
 	ctx.drawImage(
@@ -168,56 +168,48 @@ function drawArt(
 		by * scale,
 		bw * scale,
 		bh * scale,
-		cx - width / 2,
-		bottom - height,
+		box.x + (box.width - width) / 2,
+		box.y + (box.height - height) / 2,
 		width,
 		height,
 	);
 }
 
+const CAP_HEIGHT = 0.72;
+const STATION_DROP = 52;
+const STATION_SIZE = 36;
+
 function headerBlock(
+	ctx: Ctx,
 	model: ShareImageModel,
-	wordmark: HTMLImageElement | null,
 	colors: ShareImageColors,
 ): Block {
+	const titleSize = fitSize(
+		measurer(ctx, "bold"),
+		[model.title],
+		CONTENT_WIDTH,
+		84,
+		36,
+	);
+	const titleHeight = Math.ceil(titleSize * CAP_HEIGHT);
 	return {
-		height: model.subtitle ? 250 : 190,
+		height: titleHeight + (model.stationName ? STATION_DROP : 0),
 		draw(ctx, top) {
-			if (wordmark) {
-				const width =
-					(WORDMARK_HEIGHT * wordmark.naturalWidth) / wordmark.naturalHeight;
-				ctx.drawImage(wordmark, MARGIN, top, width, WORDMARK_HEIGHT);
-			}
+			const titleBaseline = top + titleHeight;
+			text(ctx, model.title, MARGIN - 3, titleBaseline, {
+				size: titleSize,
+				weight: "bold",
+				color: colors["--moss"],
+			});
 			if (model.stationName) {
 				const name = truncate(
 					measurer(ctx, "normal"),
 					model.stationName,
-					30,
-					480,
+					STATION_SIZE,
+					CONTENT_WIDTH,
 				);
-				text(ctx, name, SHARE_IMAGE_WIDTH - MARGIN, top + 44, {
-					size: 30,
-					color: colors["--muted-foreground"],
-					align: "right",
-				});
-			}
-
-			const size = fitSize(
-				measurer(ctx, "bold"),
-				[model.title],
-				CONTENT_WIDTH,
-				92,
-				56,
-			);
-			const titleBaseline = top + WORDMARK_HEIGHT + 34 + size;
-			text(ctx, model.title, MARGIN - 3, titleBaseline, {
-				size,
-				weight: "bold",
-				color: colors["--moss"],
-			});
-			if (model.subtitle) {
-				text(ctx, model.subtitle, MARGIN, titleBaseline + 64, {
-					size: 40,
+				text(ctx, name, MARGIN, titleBaseline + STATION_DROP, {
+					size: STATION_SIZE,
 					color: colors["--muted-foreground"],
 				});
 			}
@@ -225,104 +217,135 @@ function headerBlock(
 	};
 }
 
-const HERO_TEXT_HEIGHT = 150;
+type LoadedCollageBird = {
+	art: Exclude<ShareImageArt, null>;
+	image: HTMLImageElement;
+	tile: CollageTile;
+};
 
-function heroBlock(
-	hero: ShareImageBird,
-	image: HTMLImageElement | null,
-	art: number,
-	colors: ShareImageColors,
-): Block {
+const loadedCollages = new WeakMap<
+	readonly ShownCollageBird[],
+	Promise<LoadedCollageBird[]>
+>();
+
+function sharedCollage(
+	birds: readonly ShownCollageBird[],
+): Promise<LoadedCollageBird[]> {
+	let loaded = loadedCollages.get(birds);
+	if (!loaded) {
+		loaded = loadCollage(birds);
+		loadedCollages.set(birds, loaded);
+	}
+	return loaded;
+}
+
+async function loadCollage(
+	birds: readonly ShownCollageBird[],
+): Promise<LoadedCollageBird[]> {
+	const loaded = await Promise.all(
+		birds.map(async (bird): Promise<LoadedCollageBird | null> => {
+			if (!bird.imageUrl) return null;
+			const [image, mask] = await Promise.all([
+				loadImage(bird.imageUrl),
+				maskForBird(bird),
+			]);
+			if (!image) return null;
+			return {
+				art:
+					bird.kind === "painting"
+						? { kind: "painting", url: bird.imageUrl, bounds: bird.bounds }
+						: { kind: "photo", url: bird.imageUrl },
+				image,
+				tile: { key: bird.comName, count: bird.count, mask },
+			};
+		}),
+	);
+	return loaded.filter((bird) => bird !== null);
+}
+
+function collageBlock(birds: LoadedCollageBird[], height: number): Block {
+	const layout = layoutCollage(
+		birds.map((bird) => bird.tile),
+		COLLAGE_WIDTH,
+		height,
+	);
+	const byKey = new Map(birds.map((bird) => [bird.tile.key, bird]));
 	return {
-		height: art + HERO_TEXT_HEIGHT,
+		height,
 		draw(ctx, top) {
-			const cx = SHARE_IMAGE_WIDTH / 2;
-			drawArt(ctx, hero.art, image, cx, top + art, art);
-
-			const rank = "1";
-			const gap = 22;
-			const nameMeasure = measurer(ctx, NAME_WEIGHT);
-			const rankWidth = measurer(ctx, "bold")(rank, 60);
-			const room = CONTENT_WIDTH - rankWidth - gap;
-			const size = fitSize(nameMeasure, [hero.comName], room, 60, 40);
-			const name = truncate(nameMeasure, hero.comName, size, room);
-			const left = cx - (rankWidth + gap + nameMeasure(name, size)) / 2;
-			const baseline = top + art + 50 + size;
-			text(ctx, rank, left, baseline, {
-				size: 60,
-				weight: "bold",
-				color: medalColors(colors)[0],
-			});
-			text(ctx, name, left + rankWidth + gap, baseline, {
-				size,
-				weight: NAME_WEIGHT,
-				color: colors["--moss"],
-			});
-			text(ctx, hero.countLabel, cx, baseline + 54, {
-				size: 34,
-				color: colors["--muted-foreground"],
-				align: "center",
-			});
+			const left = (SHARE_IMAGE_WIDTH - COLLAGE_WIDTH) / 2;
+			for (const placement of layout.placements) {
+				const bird = byKey.get(placement.key);
+				if (!bird) continue;
+				drawArt(ctx, bird.art, bird.image, {
+					x: left + placement.x,
+					y: top + placement.y,
+					width: placement.width,
+					height: placement.height,
+				});
+			}
 		},
 	};
 }
 
-const ROW_HEIGHT = 124;
-const ROW_ART = 92;
+const ROW_HEIGHT = 88;
+const ROW_ART = 76;
 const ROW_NAME_SIZE = 40;
+const ROW_LINE_HEIGHT = 42;
+const ROW_COUNT_SIZE = 36;
+const ROW_GAP = 32;
+const LABEL_SIZE = 24;
+
+function drawRowEnd(
+	ctx: Ctx,
+	row: ShareImageRow,
+	mid: number,
+	colors: ShareImageColors,
+): number {
+	const right = SHARE_IMAGE_WIDTH - MARGIN;
+	const color = colors["--muted-foreground"];
+	if (row.kind === "highlight") {
+		kicker(ctx, row.label, right, mid + 9, LABEL_SIZE, color, "right");
+		return trackedWidth(ctx, row.label, LABEL_SIZE);
+	}
+	text(ctx, row.count, right, mid + 13, {
+		size: ROW_COUNT_SIZE,
+		color,
+		align: "right",
+	});
+	return measurer(ctx, "normal")(row.count, ROW_COUNT_SIZE);
+}
 
 function rowsBlock(
-	birds: ShareImageBird[],
+	rows: ShareImageRow[],
 	images: (HTMLImageElement | null)[],
 	colors: ShareImageColors,
 ): Block {
 	return {
-		height: birds.length * ROW_HEIGHT,
+		height: rows.length * ROW_HEIGHT,
 		draw(ctx, top) {
-			const medals = medalColors(colors);
 			const nameMeasure = measurer(ctx, NAME_WEIGHT);
-			const artCx = MARGIN + 70 + ROW_ART / 2;
-			const nameX = artCx + ROW_ART / 2 + 32;
-			for (const [index, bird] of birds.entries()) {
-				const rank = index + 2;
-				const rowTop = top + index * ROW_HEIGHT;
-				const mid = rowTop + ROW_HEIGHT / 2;
-				ctx.fillStyle = colors["--line"];
-				ctx.fillRect(MARGIN, rowTop, CONTENT_WIDTH, 2);
-
-				text(ctx, String(rank), MARGIN + 6, mid + 16, {
-					size: 46,
-					weight: "bold",
-					color: medals[rank - 1],
+			for (const [index, row] of rows.entries()) {
+				const mid = top + (index + 0.5) * ROW_HEIGHT;
+				drawArt(ctx, row.art, images[index], {
+					x: MARGIN,
+					y: mid - ROW_ART / 2,
+					width: ROW_ART,
+					height: ROW_ART,
 				});
-				drawArt(
-					ctx,
-					bird.art,
-					images[index],
-					artCx,
-					mid + ROW_ART / 2,
-					ROW_ART,
-				);
 
-				const count = bird.count.toLocaleString();
-				const countWidth = measurer(ctx, "normal")(count, 36);
-				text(ctx, count, SHARE_IMAGE_WIDTH - MARGIN, mid + 13, {
-					size: 36,
-					color: colors["--muted-foreground"],
-					align: "right",
-				});
-				const nameWidth = SHARE_IMAGE_WIDTH - MARGIN - countWidth - 32 - nameX;
+				const endWidth = drawRowEnd(ctx, row, mid, colors);
+				const nameX = MARGIN + ROW_ART + ROW_GAP;
 				const lines = wrapLines(
 					nameMeasure,
-					bird.comName,
+					row.comName,
 					ROW_NAME_SIZE,
-					nameWidth,
+					SHARE_IMAGE_WIDTH - MARGIN - endWidth - ROW_GAP - nameX,
 					2,
 				);
-				const lineHeight = 46;
-				const first = mid + 14 - ((lines.length - 1) * lineHeight) / 2;
+				const first = mid + 14 - ((lines.length - 1) * ROW_LINE_HEIGHT) / 2;
 				for (const [line, value] of lines.entries()) {
-					text(ctx, value, nameX, first + line * lineHeight, {
+					text(ctx, value, nameX, first + line * ROW_LINE_HEIGHT, {
 						size: ROW_NAME_SIZE,
 						weight: NAME_WEIGHT,
 						color: colors["--moss"],
@@ -335,12 +358,9 @@ function rowsBlock(
 
 function statsBlock(model: ShareImageModel, colors: ShareImageColors): Block {
 	return {
-		height: 190,
+		height: 130,
 		draw(ctx, top) {
 			const columnWidth = CONTENT_WIDTH / model.stats.length;
-			ctx.fillStyle = colors["--line"];
-			ctx.fillRect(MARGIN, top, CONTENT_WIDTH, 2);
-			ctx.fillRect(MARGIN, top + 188, CONTENT_WIDTH, 2);
 
 			const size = fitSize(
 				measurer(ctx, "bold"),
@@ -349,13 +369,25 @@ function statsBlock(model: ShareImageModel, colors: ShareImageColors): Block {
 				84,
 				40,
 			);
+			const valueMeasure = measurer(ctx, "bold");
+			const widths = model.stats.map((stat) =>
+				Math.max(
+					valueMeasure(stat.value, size),
+					trackedWidth(ctx, stat.label, LABEL_SIZE),
+				),
+			);
+			const gap =
+				(CONTENT_WIDTH - widths.reduce((sum, width) => sum + width, 0)) /
+				(widths.length - 1);
+			let left = MARGIN;
 			for (const [index, stat] of model.stats.entries()) {
-				const cx = MARGIN + columnWidth * (index + 0.5);
+				const cx = left + widths[index] / 2;
 				if (index > 0) {
 					ctx.fillStyle = colors["--line"];
-					ctx.fillRect(MARGIN + columnWidth * index, top + 36, 2, 118);
+					ctx.fillRect(left - gap / 2 - 1, top, 2, 128);
 				}
-				text(ctx, stat.value, cx, top + 48 + size * 0.8, {
+				left += widths[index] + gap;
+				text(ctx, stat.value, cx, top + 12 + size * 0.8, {
 					size,
 					weight: "bold",
 					color: colors["--moss"],
@@ -365,8 +397,8 @@ function statsBlock(model: ShareImageModel, colors: ShareImageColors): Block {
 					ctx,
 					stat.label,
 					cx,
-					top + 148,
-					24,
+					top + 122,
+					LABEL_SIZE,
 					colors["--muted-foreground"],
 					"center",
 				);
@@ -375,73 +407,16 @@ function statsBlock(model: ShareImageModel, colors: ShareImageColors): Block {
 	};
 }
 
-const LINE_HEIGHT = 62;
-const LINE_SIZE = 36;
-const LABEL_SIZE = 24;
-
-function linesBlock(model: ShareImageModel, colors: ShareImageColors): Block {
-	return {
-		height: 44 + model.lines.length * LINE_HEIGHT,
-		draw(ctx, top) {
-			kicker(ctx, "Highlights", MARGIN, top + 26, 26, colors["--moss"]);
-			const labelWidth = Math.max(
-				...model.lines.map((line) => trackedWidth(ctx, line.label, LABEL_SIZE)),
-			);
-			const textX = MARGIN + labelWidth + 32;
-			const textRight = SHARE_IMAGE_WIDTH - MARGIN;
-			const birdMeasure = measurer(ctx, NAME_WEIGHT);
-			const plainMeasure = measurer(ctx, "normal");
-
-			for (const [index, line] of model.lines.entries()) {
-				const baseline = top + 44 + index * LINE_HEIGHT + 44;
-				kicker(
-					ctx,
-					line.label,
-					MARGIN,
-					baseline - 4,
-					LABEL_SIZE,
-					colors["--moss"],
-				);
-
-				let x = textX;
-				let rest = line.text;
-				if (line.bird && rest.startsWith(line.bird)) {
-					const bird = truncate(
-						birdMeasure,
-						line.bird,
-						LINE_SIZE,
-						textRight - x,
-					);
-					text(ctx, bird, x, baseline, {
-						size: LINE_SIZE,
-						weight: NAME_WEIGHT,
-						color: colors["--moss"],
-					});
-					x += birdMeasure(bird, LINE_SIZE);
-					rest = bird === line.bird ? rest.slice(line.bird.length) : "";
-				}
-				if (rest) {
-					text(
-						ctx,
-						truncate(plainMeasure, rest, LINE_SIZE, textRight - x),
-						x,
-						baseline,
-						{ size: LINE_SIZE, color: colors["--ink"] },
-					);
-				}
-			}
-		},
-	};
-}
-
 export async function renderShareImage(
 	model: ShareImageModel,
-	wordmark: HTMLImageElement | null = null,
 	colors: ShareImageColors = readShareImageColors(),
 ): Promise<Blob> {
-	const images = await Promise.all(
-		model.podium.map((bird) => (bird.art ? loadImage(bird.art.url) : null)),
-	);
+	const [images, collage] = await Promise.all([
+		Promise.all(
+			model.rows.map((row) => (row.art ? loadImage(row.art.url) : null)),
+		),
+		sharedCollage(model.collage),
+	]);
 
 	const canvas = document.createElement("canvas");
 	canvas.width = SHARE_IMAGE_WIDTH;
@@ -453,35 +428,24 @@ export async function renderShareImage(
 	ctx.fillRect(0, 0, SHARE_IMAGE_WIDTH, SHARE_IMAGE_HEIGHT);
 	ctx.textBaseline = "alphabetic";
 
-	const [hero, ...others] = model.podium;
-	const header = headerBlock(model, wordmark, colors);
-	const after = [
-		...(others.length > 0 ? [rowsBlock(others, images.slice(1), colors)] : []),
-		statsBlock(model, colors),
-		...(model.lines.length > 0 ? [linesBlock(model, colors)] : []),
-	];
-	const fixedHeight = [header, ...after].reduce(
-		(sum, block) => sum + block.height,
-		0,
-	);
-	const room =
+	const header = headerBlock(ctx, model, colors);
+	const rows = rowsBlock(model.rows, images, colors);
+	const stats = statsBlock(model, colors);
+	const collageHeight =
 		SHARE_IMAGE_HEIGHT -
-		MARGIN * 1.5 -
-		fixedHeight -
-		BLOCK_GAP * (after.length + 1) -
-		HERO_TEXT_HEIGHT;
-	const heroArt = Math.max(200, Math.min(440, room));
-	const blocks = [
-		header,
-		heroBlock(hero, images[0], heroArt, colors),
-		...after,
-	];
+		EDGE * 2 -
+		header.height -
+		rows.height -
+		stats.height -
+		BLOCK_GAP * 3;
 
-	const total =
-		blocks.reduce((sum, block) => sum + block.height, 0) +
-		BLOCK_GAP * (blocks.length - 1);
-	let top = Math.max(MARGIN * 0.75, (SHARE_IMAGE_HEIGHT - total) / 2);
-	for (const block of blocks) {
+	let top = EDGE;
+	for (const block of [
+		header,
+		collageBlock(collage, collageHeight),
+		rows,
+		stats,
+	]) {
 		block.draw(ctx, top);
 		top += block.height + BLOCK_GAP;
 	}

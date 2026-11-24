@@ -1,3 +1,4 @@
+import type { ShownCollageBird } from "~/lib/collage-birds.ts";
 import type { CollageMask } from "~/lib/collage-layout.ts";
 import type { PaintedBounds } from "~/lib/painted-species.ts";
 
@@ -5,9 +6,15 @@ const PAINTING_SIDE = 480;
 const MASK_LONG_SIDE = 72;
 const ALPHA_FLOOR = 48;
 
+const SOLID_MASK: CollageMask = {
+	width: 1,
+	height: 1,
+	filled: Uint8Array.of(1),
+};
+
 const masks = new Map<string, Promise<CollageMask>>();
 
-export function maskFor(
+function maskFor(
 	imageUrl: string,
 	bounds: PaintedBounds,
 ): Promise<CollageMask> {
@@ -20,6 +27,12 @@ export function maskFor(
 		masks.set(imageUrl, mask);
 	}
 	return mask;
+}
+
+export function maskForBird(bird: ShownCollageBird): Promise<CollageMask> {
+	return bird.kind === "photo"
+		? Promise.resolve(SOLID_MASK)
+		: maskFor(bird.imageUrl, bird.bounds).catch(() => SOLID_MASK);
 }
 
 async function loadMask(
