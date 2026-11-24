@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { CARD_HEADER_CLASS } from "~/components/card-header.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
+import { GLYPH_CHIP_SM_SIZE } from "~/components/glyph-chip.tsx";
 import { SpeciesFlagPills } from "~/components/species-flag-pills.tsx";
 import {
 	SpeciesHourBars,
@@ -39,6 +40,11 @@ const CELL_CLASS =
 	"flex min-h-16 min-w-0 flex-col gap-2 rounded-md bg-tile px-3 py-2 max-[400px]:px-2";
 const LINKED_CELL_CLASS =
 	"relative has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2";
+
+const UPPER_CLASS = "flex min-w-0 items-center gap-3 max-[400px]:gap-2";
+const CORNER_CLASS =
+	"flex shrink-0 flex-col items-end justify-between self-stretch";
+const FLAGS_CLASS = "flex items-center justify-end gap-1.5";
 
 const SKELETON_CELL_CLASS = cn(CELL_CLASS, "**:[.animate-pulse]:bg-line");
 
@@ -95,7 +101,7 @@ export function SpeciesGrid({
 function SpeciesGridCell({ item }: { item: SpeciesGridItem }) {
 	return (
 		<li className={cn(CELL_CLASS, LINKED_CELL_CLASS)}>
-			<div className="flex min-w-0 items-center gap-3 max-[400px]:gap-2">
+			<div className={UPPER_CLASS}>
 				<div className="shrink-0">
 					<SpeciesThumbnail imageUrl={item.imageUrl} comName={item.comName} />
 				</div>
@@ -115,9 +121,9 @@ function SpeciesGridCell({ item }: { item: SpeciesGridItem }) {
 					</div>
 				</div>
 
-				<div className="flex shrink-0 flex-col items-end">
+				<div className={CORNER_CLASS}>
 					<Count>{item.count.toLocaleString()}</Count>
-					<div className="relative flex flex-wrap items-center justify-end gap-1.5">
+					<div className={cn(FLAGS_CLASS, "relative")}>
 						<SpeciesFlagPills
 							isNew={item.isNew}
 							isReturned={item.isReturned}
@@ -166,7 +172,7 @@ export function SpeciesGridSkeleton({
 				{Array.from({ length: SKELETON_CELLS }, (_, index) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 					<li key={index} className={SKELETON_CELL_CLASS}>
-						<div className="flex min-w-0 items-center gap-3 max-[400px]:gap-2">
+						<div className={UPPER_CLASS}>
 							<div className="flex size-10 shrink-0 items-center justify-center">
 								<ShellBar className="size-9 rounded-md" />
 							</div>
@@ -177,11 +183,16 @@ export function SpeciesGridSkeleton({
 								/>
 								<ShellText className="text-xs" barClassName="w-24" />
 							</div>
-							<div className="flex shrink-0 flex-col items-end">
+							<div className={CORNER_CLASS}>
 								<ShellText
 									className={cn(COUNT_CLASS, "w-10")}
 									barClassName="right-0 left-auto w-8"
 								/>
+								<div className={FLAGS_CLASS}>
+									<ShellBar
+										className={cn(GLYPH_CHIP_SM_SIZE, "rounded-full")}
+									/>
+								</div>
 							</div>
 						</div>
 						<SpeciesHourBarsSkeleton className="border-line border-t pt-2" />

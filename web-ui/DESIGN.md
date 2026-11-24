@@ -277,7 +277,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
 - **Grid** (`species-grid.tsx`): the Timeline's second view. One Activity
   card, whose own color runs unbroken behind the species cells; the cells are filled
   with `--tile`, with page-gap gutters between them, never dividers or borders. Each cell is one link; hovering it
-  underlines the name, since only cards lift.
+  underlines the name, since only cards lift. A cell's upper section keeps its count
+  in the top right corner whether or not the bird has highlights; highlight icons
+  sit in the bottom right corner below it, and the skeleton draws both.
 - **Collage** (`collage-card.tsx`): the Timeline's third view, after List and
   Grid (Images icon), drawn from the same rows for whatever window is shown, and
   Live's day; it is not a page of its own. Painted birds only, packed centre-out in an
