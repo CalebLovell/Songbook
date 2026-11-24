@@ -19,10 +19,6 @@ import {
 	sumHours,
 } from "~/components/hour-bars-card.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
-import {
-	HeaderSunTimes,
-	HeaderSunTimesSkeleton,
-} from "~/components/species-by-hour-card.tsx";
 import { WindowSummary } from "~/components/timeline/window-summary.tsx";
 import {
 	VisitsCard,
@@ -34,14 +30,9 @@ import { EMPTY } from "~/lib/empty-messages.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { prefetchInBrowser } from "~/lib/query-client.ts";
-import type { WindowSun } from "~/lib/sun-times.ts";
 import type { TimelineRow } from "~/lib/timeline.ts";
 import { type TimelinePageData, timelineQuery } from "~/lib/timeline-page.ts";
-import {
-	getTodaySnapshot,
-	type ShownDay,
-	type TodaySnapshot,
-} from "~/lib/today.ts";
+import { getTodaySnapshot, type TodaySnapshot } from "~/lib/today.ts";
 import { useSkeletonMinimum } from "~/lib/use-skeleton-minimum.ts";
 
 const POLL_INTERVAL_MS = 10_000;
@@ -49,8 +40,8 @@ const FLASH_DURATION_MS = 2_400;
 const NEW_BIRD_ANNOUNCE_GAP_MS = 60_000;
 const WINDOW_FIT_CLASS =
 	"min-[1800px]:h-[calc(100dvh-var(--masthead-h)-3*var(--page-gap))]! min-[1800px]:min-h-[28rem]";
-// Source order is the stacked order (Today, Hourly activity, Visit log); from 1800px the
-// grid puts Today across both rows on the left and Hourly activity under Visit log on the right.
+// Source order is the stacked order (Activity, Hourly activity, Visit log); from 1800px the
+// grid puts Activity across both rows on the left and Hourly activity under Visit log on the right.
 const BODY_GRID_CLASS = `mt-page grid grid-cols-1 items-start gap-page min-[1800px]:grid-cols-[72rem_minmax(0,1fr)] min-[1800px]:grid-rows-[minmax(0,1fr)_auto] min-[1800px]:items-stretch ${WINDOW_FIT_CLASS}`;
 const FEED_SLOT_CLASS =
 	"flex min-h-0 min-w-0 flex-col min-[1800px]:col-start-2 min-[1800px]:row-start-1";
@@ -60,10 +51,6 @@ const COLLAGE_SLOT_CLASS =
 	"min-w-0 min-[1800px]:col-start-1 min-[1800px]:row-span-2 min-[1800px]:row-start-1";
 const COLLAGE_FIT_CLASS = `${COLLAGE_SLOT_CLASS} ${WINDOW_FIT_CLASS}`;
 const COLLAGE_EMPTY_CLASS = `${COLLAGE_SLOT_CLASS} self-start`;
-const DAY_LABEL: Record<ShownDay, string> = {
-	today: "Today",
-	yesterday: "Yesterday",
-};
 
 function useAnnounceNewBird(comName: string | null) {
 	const spoken = useRef({ comName, at: 0 });
@@ -155,9 +142,7 @@ function TodayShell() {
 			hours={<HourBarsCardSkeleton />}
 			collage={
 				<CollageCardSkeleton
-					title={DAY_LABEL.today}
 					summary={<WindowSummary rows={null} />}
-					trailing={<HeaderSunTimesSkeleton />}
 					className={COLLAGE_FIT_CLASS}
 				/>
 			}
@@ -194,24 +179,21 @@ function useCollageSpecies(rows: TimelineRow[] | null) {
 	);
 }
 
-type DayBody = { rows: TimelineRow[]; sun: WindowSun };
-
-function dayBody(page: TimelinePageData | undefined): DayBody | null {
-	return page?.body.kind === "rows"
-		? { rows: page.body.rows, sun: page.body.sun }
-		: null;
+function dayRows(page: TimelinePageData | undefined): TimelineRow[] | null {
+	return page?.body.kind === "rows" ? page.body.rows : null;
 }
 
 function TodayBody({ snapshot }: { snapshot: TodaySnapshot }) {
 	const dayQuery = timelineQuery({ period: "day", anchor: snapshot.date });
-	const body = dayBody(
+	const rows = dayRows(
 		useQuery({ ...dayQuery, placeholderData: keepPreviousData }).data,
 	);
-	const rows = body?.rows ?? null;
-	const title = DAY_LABEL[snapshot.day];
-	const sunTimes = body?.sun.available ? (
-		<HeaderSunTimes sun={body.sun} />
-	) : undefined;
+	const summary = (
+		<WindowSummary
+			rows={rows}
+			label={snapshot.day === "yesterday" ? "Yesterday" : undefined}
+		/>
+	);
 	const collageSpecies = useCollageSpecies(rows);
 	const newest = snapshot.visits.at(0);
 	const freshKeys = useFreshKeys(
@@ -244,10 +226,7 @@ function TodayBody({ snapshot }: { snapshot: TodaySnapshot }) {
 					<CollageCard
 						species={collageSpecies}
 						emptyMessage={EMPTY.window.today}
-						title={title}
-						summary={<WindowSummary rows={rows} />}
-						trailing={sunTimes}
-						reshuffle={false}
+						summary={summary}
 						className={
 							collageSpecies.length > 0
 								? COLLAGE_FIT_CLASS
@@ -256,9 +235,7 @@ function TodayBody({ snapshot }: { snapshot: TodaySnapshot }) {
 					/>
 				) : (
 					<CollageCardSkeleton
-						title={title}
-						summary={<WindowSummary rows={null} />}
-						trailing={<HeaderSunTimesSkeleton />}
+						summary={summary}
 						className={COLLAGE_FIT_CLASS}
 					/>
 				)

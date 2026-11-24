@@ -251,7 +251,7 @@ function SunTimesFrame({
 	);
 }
 
-export function HeaderSunTimes({ sun }: { sun: DaylightSun }) {
+function HeaderSunTimes({ sun }: { sun: DaylightSun }) {
 	return (
 		<SunTimesFrame
 			qualifier={sun.days > 1 ? <span>avg</span> : null}
@@ -261,7 +261,7 @@ export function HeaderSunTimes({ sun }: { sun: DaylightSun }) {
 	);
 }
 
-export function HeaderSunTimesSkeleton() {
+function HeaderSunTimesSkeleton() {
 	return (
 		<SunTimesFrame
 			sunrise={

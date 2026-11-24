@@ -503,10 +503,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   out of the popover, a fixed 3px), so the day reads as 24 slots, and any hour
   with a detection draws at least 6px so it always stands taller than a stub. Timeline
   shows the same card (`components/hour-bars-card.tsx`) beside Highlights, summed
-  over whatever window is shown, in place of a line chart. The collage is titled
-  Today (Yesterday overnight) with the Activity card's header: the day's
-  detections and species, and sunrise and sunset in place of Reshuffle, which
-  Live doesn't offer. The collage card is always Timeline's size: the full content
+  over whatever window is shown, in place of a line chart. The collage is
+  Timeline's Activity card unchanged, title and Reshuffle included; overnight its
+  header summary starts with Yesterday. The card is always Timeline's size: the full content
   width below 1800px, and from 1800px Timeline's 72rem on the left, with Visit log
   over Hourly activity in a right column that takes whatever width is left. Visit log's rows
   scroll inside its card: stacked, the card stands at most clamp(20rem, 60vh, 36rem); from 1800px
@@ -514,10 +513,10 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   keeps its own 18rem and Visit log fills the rest, so the page doesn't
   scroll (with no toolbar above it, the collage is taller than Timeline's there).
   In one column (below 1800px) it stacks: header,
-  Today, Hourly activity, Visit log. That is also the source order at every
-  width: from 1800px grid placement, never `order`, puts Today on the left and
+  Activity, Hourly activity, Visit log. That is also the source order at every
+  width: from 1800px grid placement, never `order`, puts Activity on the left and
   Hourly activity under Visit log on the right. Hourly activity has no tab
-  stops, so keyboard focus still runs Today, then Visit log. The bars and
+  stops, so keyboard focus still runs Activity, then Visit log. The bars and
   collage read Timeline's Daily query (`timelineQuery` in
   `lib/timeline-page.ts`), so the pages share a cache; the list comes
   from the polled snapshot, and the day cards refetch only when its newest
