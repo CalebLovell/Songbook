@@ -301,8 +301,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   hover grows an image. Names stay off the collage itself (nesting them along
   each bird's edge was tried and dropped). From `md` a
   narrow list to the left of the flock names the shown birds, busiest first, each
-  row like a List-view row (painting thumb, name, total); it scrolls inside the
-  card. Rows are toggle buttons, never links to the bird: hovering or focusing a
+  row like a List-view row (painting thumb, name, total) on one 32px line; a second
+  line for the scientific name, Visit log's green text and hairlines between rows were
+  tried and dropped. The list scrolls inside the card, padded `p-page` above and below.
+  Each row spans the list from the card's border to the hairline beside the flock, its
+  side padding inside the row and its focus ring inset.
+  Rows are toggle buttons, never links to the bird: hovering or focusing a
   row lifts that bird and pops its tooltip, and clicking it pins that label until
   it is clicked again or a pointer goes down outside the list. Hovering a bird
   highlights its row. Birds are a mix of perched and

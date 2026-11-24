@@ -48,8 +48,9 @@ const COLLAGE_FILLED_CLASS =
 const COLLAGE_BODY_CLASS = "mt-page flex min-h-0 flex-1 gap-page";
 const COLLAGE_AREA_CLASS = "relative min-w-0 flex-1";
 const NAME_LIST_CLASS =
-	"-ms-2 hidden w-64 shrink-0 overflow-y-auto border-line border-e pe-2 md:block";
-const NAME_ROW_CLASS = "flex h-8 items-center gap-2 rounded-sm px-2";
+	"-my-page -ms-page hidden w-66 shrink-0 overflow-y-auto border-line border-e py-page md:block";
+const NAME_ROW_CLASS = "flex h-8 items-center gap-2 px-page";
+const NAME_THUMB_CLASS = "flex size-6 shrink-0 items-center justify-center";
 const RESIZE_SETTLE_MS = 150;
 const POP_SPREAD_MS = 1200;
 
@@ -430,7 +431,7 @@ function NameList({
 						onBlur={() => onHover(-1)}
 						className={cn(
 							NAME_ROW_CLASS,
-							"w-full cursor-pointer text-left",
+							"w-full cursor-pointer text-left focus-visible:-outline-offset-2",
 							shownIndex === index && "bg-accent",
 						)}
 					>
@@ -448,10 +449,7 @@ function NameList({
 
 function NameThumb({ bird }: { bird: ShownCollageBird }) {
 	return (
-		<span
-			aria-hidden="true"
-			className="flex size-6 shrink-0 items-center justify-center"
-		>
+		<span aria-hidden="true" className={NAME_THUMB_CLASS}>
 			{bird.kind === "painting" ? (
 				<svg
 					viewBox={bird.bounds.join(" ")}
@@ -477,11 +475,13 @@ const SKELETON_NAMES = 12;
 
 function NameListSkeleton() {
 	return (
-		<div aria-hidden="true" className={NAME_LIST_CLASS}>
+		<div aria-hidden="true" className={cn(NAME_LIST_CLASS, "overflow-hidden")}>
 			{Array.from({ length: SKELETON_NAMES }, (_, index) => (
 				// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 				<div key={index} className={NAME_ROW_CLASS}>
-					<ShellBar className="size-5 rounded" />
+					<div className={NAME_THUMB_CLASS}>
+						<ShellBar className="size-5 rounded" />
+					</div>
 					<ShellBar
 						className={cn(
 							"h-3 rounded",
