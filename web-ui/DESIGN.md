@@ -303,9 +303,13 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   hover grows an image. Names stay off the collage itself (nesting them along
   each bird's edge was tried and dropped). From `md` a
   narrow list to the left of the flock names the shown birds, busiest first, each
-  row like a List-view row (painting thumb, name, total) on one 32px line; a second
-  line for the scientific name, Visit log's green text and hairlines between rows were
-  tried and dropped. The list scrolls inside the card, padded `p-page` above and below.
+  row like a List-view row (painting thumb, name, total) on one 32px line, the name
+  in List view's moss 14px semibold though the row is not a link; a second line for the
+  scientific name, Visit log's larger text, ink names and hairlines between rows were
+  tried and dropped. The list scrolls inside the card on a
+  tighter inset than the card's own: `py-2` on the list and `px-3` on its rows leave 12px
+  from the thumb box to every edge. The paintings float inside that box, so the full
+  `p-page` measured level with the header but looked loose, and a flush top looked cramped.
   Each row spans the list from the card's border to the hairline beside the flock, its
   side padding inside the row and its focus ring inset.
   Rows are toggle buttons, never links to the bird: hovering or focusing a

@@ -48,8 +48,8 @@ const COLLAGE_FILLED_CLASS =
 const COLLAGE_BODY_CLASS = "mt-page flex min-h-0 flex-1 gap-page";
 const COLLAGE_AREA_CLASS = "relative min-w-0 flex-1";
 const NAME_LIST_CLASS =
-	"-my-page -ms-page hidden w-66 shrink-0 overflow-y-auto border-line border-e py-page md:block";
-const NAME_ROW_CLASS = "flex h-8 items-center gap-2 px-page";
+	"-my-page -ms-page hidden w-64 shrink-0 overflow-y-auto border-line border-e py-2 md:block";
+const NAME_ROW_CLASS = "flex h-8 items-center gap-2 px-3";
 const NAME_THUMB_CLASS = "flex size-6 shrink-0 items-center justify-center";
 const RESIZE_SETTLE_MS = 150;
 const POP_SPREAD_MS = 1200;
@@ -436,7 +436,7 @@ function NameList({
 						)}
 					>
 						<NameThumb bird={bird} />
-						<span className="min-w-0 flex-1 truncate font-semibold text-sm">
+						<span className="min-w-0 flex-1 truncate font-semibold text-moss text-sm">
 							{bird.comName}
 						</span>
 						<Count>{bird.count.toLocaleString()}</Count>
