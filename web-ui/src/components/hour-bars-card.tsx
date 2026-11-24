@@ -26,12 +26,10 @@ import { heatColor } from "~/lib/heatmap.ts";
 import { useTheme } from "~/lib/theme.ts";
 import { hourLabel } from "~/lib/time-ago.ts";
 import { useReducedMotion } from "~/lib/use-reduced-motion.ts";
+import { cn } from "~/lib/utils.ts";
 
 const TITLE = "Hourly activity";
-// From xl the chart takes whatever height Recent activity leaves above it.
-const FIT_CLASS = "min-h-72 xl:min-h-48 xl:flex-1";
-export const HOUR_BARS_MIN_PX = 192;
-// What a 192px card leaves for the plot under its header band and padding.
+const FIT_CLASS = "min-h-72";
 const CHART_MIN_PX = 96;
 // A quiet hour keeps a stub so the day shows all 24 slots; any detection stands taller than it.
 const STUB_PX = 3;
@@ -46,18 +44,30 @@ export function sumHours(rows: readonly { hourCounts: number[] }[]): number[] {
 
 type HourDatum = { count: number | null };
 
-export function HourBarsCardSkeleton() {
+export function HourBarsCardSkeleton({
+	className = "",
+}: {
+	className?: string;
+}) {
 	return (
-		<ShellChartCard title={TITLE} ariaLabel={TITLE} className={FIT_CLASS} />
+		<ShellChartCard
+			title={TITLE}
+			ariaLabel={TITLE}
+			className={cn(FIT_CLASS, className)}
+		/>
 	);
 }
 
 export function HourBarsCard({
 	hours,
-	lastHour,
+	lastHour = 23,
+	emptyMessage = EMPTY.window.today,
+	className = "",
 }: {
 	hours: number[];
-	lastHour: number;
+	lastHour?: number;
+	emptyMessage?: string;
+	className?: string;
 }) {
 	const reducedMotion = useReducedMotion();
 	const theme = useTheme();
@@ -79,9 +89,13 @@ export function HourBarsCard({
 
 	if (hours.every((count) => count === 0)) {
 		return (
-			<Card as="section" aria-label={TITLE} className="flex flex-col">
+			<Card
+				as="section"
+				aria-label={TITLE}
+				className={cn("flex flex-col", className)}
+			>
 				<CardHeader title={TITLE} />
-				<EmptyNote>{EMPTY.window.today}</EmptyNote>
+				<EmptyNote>{emptyMessage}</EmptyNote>
 			</Card>
 		);
 	}
@@ -90,11 +104,11 @@ export function HourBarsCard({
 		<Card
 			as="section"
 			aria-label={TITLE}
-			className={`flex flex-col ${FIT_CLASS}`}
+			className={cn("flex flex-col", FIT_CLASS, className)}
 		>
 			<CardHeader title={TITLE} />
 
-			<div className="mt-page h-50 min-h-0 xl:h-auto xl:flex-1">
+			<div className="mt-page h-50 min-h-0">
 				<ResponsiveContainer
 					width="100%"
 					height="100%"

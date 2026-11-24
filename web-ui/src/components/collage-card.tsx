@@ -18,8 +18,9 @@ import {
 	SpeciesImage,
 } from "~/components/species-image.tsx";
 import { Card } from "~/components/ui/card.tsx";
+import { Count } from "~/components/ui/count.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
-import { ShellSized } from "~/components/ui/shell.tsx";
+import { ShellBar, ShellSized } from "~/components/ui/shell.tsx";
 import {
 	type CollageSource,
 	collageBirdsFrom,
@@ -44,7 +45,11 @@ import { cn } from "~/lib/utils.ts";
 const COLLAGE_CARD_CLASS = "flex flex-col";
 const COLLAGE_FILLED_CLASS =
 	"h-[clamp(28rem,70vh,48rem)] xl:h-[calc(100dvh_-_var(--masthead-h)_-_2.125rem_-_4*var(--page-gap))] xl:min-h-[28rem]";
-const COLLAGE_AREA_CLASS = "relative mt-page flex-1";
+const COLLAGE_BODY_CLASS = "mt-page flex min-h-0 flex-1 gap-page";
+const COLLAGE_AREA_CLASS = "relative min-w-0 flex-1";
+const NAME_LIST_CLASS =
+	"-ms-2 hidden w-64 shrink-0 overflow-y-auto border-line border-e pe-2 md:block";
+const NAME_ROW_CLASS = "flex h-8 items-center gap-2 rounded-sm px-2";
 const RESIZE_SETTLE_MS = 150;
 const POP_SPREAD_MS = 1200;
 
@@ -116,7 +121,10 @@ export function CollageCardSkeleton({
 					) : null)
 				}
 			/>
-			<div data-entrance="own" className={COLLAGE_AREA_CLASS} />
+			<div className={COLLAGE_BODY_CLASS}>
+				<NameListSkeleton />
+				<div data-entrance="own" className={COLLAGE_AREA_CLASS} />
+			</div>
 		</Card>
 	);
 }
@@ -193,6 +201,10 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 	const navigate = useNavigate();
 	const [hoveredIndex, setHoveredIndex] = useState(-1);
 	const [tapped, setTapped] = useState(false);
+	const [pinnedName, setPinnedName] = useState<string | null>(null);
+	const pinnedIndex = birds.findIndex((bird) => bird.comName === pinnedName);
+	const listRef = useRef<HTMLUListElement>(null);
+	const shownIndex = hoveredIndex >= 0 ? hoveredIndex : pinnedIndex;
 	const lastPointerType = useRef("mouse");
 
 	const layout = useMemo<CollageLayout | null>(() => {
@@ -221,6 +233,16 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 		});
 
 	useEffect(() => {
+		if (!pinnedName) return;
+		const unpinOutside = (event: PointerEvent) => {
+			if (listRef.current?.contains(event.target as Node)) return;
+			setPinnedName(null);
+		};
+		document.addEventListener("pointerdown", unpinOutside);
+		return () => document.removeEventListener("pointerdown", unpinOutside);
+	}, [pinnedName]);
+
+	useEffect(() => {
 		if (!tapped) return;
 		const dismissOutside = (event: PointerEvent) => {
 			if (areaRef.current?.contains(event.target as Node)) return;
@@ -246,107 +268,228 @@ function CollageArea({ birds }: { birds: ShownCollageBird[] }) {
 	);
 
 	return (
-		// biome-ignore lint/a11y/useKeyWithClickEvents: each bird is also a focusable link; the area only hit-tests silhouettes for the pointer
-		// biome-ignore lint/a11y/noStaticElementInteractions: as above
-		<div
-			ref={areaRef}
-			data-entrance="own"
-			className={cn(COLLAGE_AREA_CLASS, hoveredIndex >= 0 && "cursor-pointer")}
-			onPointerDown={(event) => {
-				lastPointerType.current = event.pointerType;
-			}}
-			onPointerMove={(event) => {
-				if (event.pointerType === "mouse") hover(indexAt(event));
-			}}
-			onPointerLeave={(event) => {
-				if (event.pointerType === "mouse") hover(-1);
-			}}
-			onClick={(event) => {
-				const index = indexAt(event);
-				const bird = birds[index];
-				if (lastPointerType.current === "mouse") {
-					if (bird) openBird(bird);
-					return;
+		<div className={COLLAGE_BODY_CLASS}>
+			<NameList
+				ref={listRef}
+				birds={birds}
+				shownIndex={shownIndex}
+				pinnedIndex={pinnedIndex}
+				onHover={hover}
+				onPin={(comName) =>
+					setPinnedName((pinned) => (pinned === comName ? null : comName))
 				}
-				if (bird && tapped && index === hoveredIndex) {
-					openBird(bird);
-					return;
-				}
-				setHoveredIndex(index);
-				setTapped(index >= 0);
-			}}
-		>
-			{layout ? (
-				<ul aria-label="Birds" className="absolute inset-0">
-					{layout.placements.map((placement) => {
-						const index = byKey.get(placement.key) ?? -1;
-						const bird = birds[index];
-						if (!bird) return null;
-						const lifted = hoveredIndex === index;
-						return (
-							<li
-								key={placement.key}
-								className={cn(
-									"absolute animate-collage-pop motion-reduce:animate-none",
-									lifted && "z-10",
-								)}
-								style={{
-									animationDelay: `${popDelays.get(placement.key) ?? 0}ms`,
-									left: placement.x,
-									top: placement.y,
-									width: placement.width,
-									height: placement.height,
-								}}
-							>
-								<Link
-									to="/birds/$comName"
-									params={{ comName: comNameToSlug(bird.comName) }}
-									preload={false}
-									aria-label={`${bird.comName}, ${bird.count.toLocaleString()} ${plural(bird.count, "detection")}`}
-									onFocus={() => hover(index)}
-									onBlur={() => hover(-1)}
+			/>
+			{/* biome-ignore lint/a11y/useKeyWithClickEvents: each bird is also a focusable link; the area only hit-tests silhouettes for the pointer */}
+			{/* biome-ignore lint/a11y/noStaticElementInteractions: as above */}
+			<div
+				ref={areaRef}
+				data-entrance="own"
+				className={cn(
+					COLLAGE_AREA_CLASS,
+					hoveredIndex >= 0 && "cursor-pointer",
+				)}
+				onPointerDown={(event) => {
+					lastPointerType.current = event.pointerType;
+				}}
+				onPointerMove={(event) => {
+					if (event.pointerType === "mouse") hover(indexAt(event));
+				}}
+				onPointerLeave={(event) => {
+					if (event.pointerType === "mouse") hover(-1);
+				}}
+				onClick={(event) => {
+					const index = indexAt(event);
+					const bird = birds[index];
+					if (lastPointerType.current === "mouse") {
+						if (bird) openBird(bird);
+						return;
+					}
+					if (bird && tapped && index === hoveredIndex) {
+						openBird(bird);
+						return;
+					}
+					setHoveredIndex(index);
+					setTapped(index >= 0);
+				}}
+			>
+				{layout ? (
+					<ul aria-label="Birds" className="absolute inset-0">
+						{layout.placements.map((placement) => {
+							const index = byKey.get(placement.key) ?? -1;
+							const bird = birds[index];
+							if (!bird) return null;
+							const lifted = shownIndex === index;
+							return (
+								<li
+									key={placement.key}
 									className={cn(
-										"pointer-events-none block size-full rounded-md transition-transform duration-180 ease-[ease] motion-reduce:transition-none",
-										lifted && "scale-103",
+										"absolute animate-collage-pop motion-reduce:animate-none",
+										lifted && "z-10",
 									)}
+									style={{
+										animationDelay: `${popDelays.get(placement.key) ?? 0}ms`,
+										left: placement.x,
+										top: placement.y,
+										width: placement.width,
+										height: placement.height,
+									}}
 								>
-									{bird.kind === "painting" ? (
-										<svg
-											viewBox={bird.bounds.join(" ")}
-											aria-hidden="true"
-											className="size-full"
-										>
-											<image href={bird.imageUrl} width={480} height={480} />
-										</svg>
-									) : (
-										<span
-											aria-hidden="true"
-											className="flex size-full items-center justify-center"
-										>
-											<SpeciesImage
-												imageUrl={bird.imageUrl}
-												alt=""
-												glyphClassName="size-1/2"
-											/>
-										</span>
-									)}
-								</Link>
-							</li>
-						);
-					})}
-				</ul>
-			) : null}
-			{layout && size ? (
-				<HoverPopup
-					bird={birds[hoveredIndex]}
-					placement={layout.placements.find(
-						(placement) => placement.key === birds[hoveredIndex]?.comName,
-					)}
-					areaWidth={size.width}
-					tapped={tapped}
+									<Link
+										to="/birds/$comName"
+										params={{ comName: comNameToSlug(bird.comName) }}
+										preload={false}
+										aria-label={`${bird.comName}, ${bird.count.toLocaleString()} ${plural(bird.count, "detection")}`}
+										onFocus={() => hover(index)}
+										onBlur={() => hover(-1)}
+										className={cn(
+											"pointer-events-none block size-full rounded-md transition-transform duration-180 ease-[ease] motion-reduce:transition-none",
+											lifted && "scale-103",
+										)}
+									>
+										{bird.kind === "painting" ? (
+											<svg
+												viewBox={bird.bounds.join(" ")}
+												aria-hidden="true"
+												className="size-full"
+											>
+												<image href={bird.imageUrl} width={480} height={480} />
+											</svg>
+										) : (
+											<span
+												aria-hidden="true"
+												className="flex size-full items-center justify-center"
+											>
+												<SpeciesImage
+													imageUrl={bird.imageUrl}
+													alt=""
+													glyphClassName="size-1/2"
+												/>
+											</span>
+										)}
+									</Link>
+								</li>
+							);
+						})}
+					</ul>
+				) : null}
+				{layout && size ? (
+					<HoverPopup
+						bird={birds[shownIndex]}
+						placement={layout.placements.find(
+							(placement) => placement.key === birds[shownIndex]?.comName,
+						)}
+						areaWidth={size.width}
+						tapped={tapped}
+					/>
+				) : null}
+				{layout ? null : <div aria-busy="true" className="absolute inset-0" />}
+			</div>
+		</div>
+	);
+}
+
+function NameList({
+	ref,
+	birds,
+	shownIndex,
+	pinnedIndex,
+	onHover,
+	onPin,
+}: {
+	ref: React.Ref<HTMLUListElement>;
+	birds: ShownCollageBird[];
+	shownIndex: number;
+	pinnedIndex: number;
+	onHover: (index: number) => void;
+	onPin: (comName: string) => void;
+}) {
+	const ranked = birds
+		.map((bird, index) => ({ bird, index }))
+		.sort(
+			(a, b) =>
+				b.bird.count - a.bird.count ||
+				a.bird.comName.localeCompare(b.bird.comName),
+		);
+	return (
+		<ul ref={ref} aria-label="Bird names" className={NAME_LIST_CLASS}>
+			{ranked.map(({ bird, index }) => (
+				<li key={bird.comName}>
+					<button
+						type="button"
+						aria-pressed={pinnedIndex === index}
+						onClick={() => onPin(bird.comName)}
+						onPointerEnter={(event) => {
+							if (event.pointerType === "mouse") onHover(index);
+						}}
+						onPointerLeave={(event) => {
+							if (event.pointerType === "mouse") onHover(-1);
+						}}
+						onFocus={(event) => {
+							if (event.currentTarget.matches(":focus-visible")) onHover(index);
+						}}
+						onBlur={() => onHover(-1)}
+						className={cn(
+							NAME_ROW_CLASS,
+							"w-full cursor-pointer text-left",
+							shownIndex === index && "bg-accent",
+						)}
+					>
+						<NameThumb bird={bird} />
+						<span className="min-w-0 flex-1 truncate font-semibold text-sm">
+							{bird.comName}
+						</span>
+						<Count>{bird.count.toLocaleString()}</Count>
+					</button>
+				</li>
+			))}
+		</ul>
+	);
+}
+
+function NameThumb({ bird }: { bird: ShownCollageBird }) {
+	return (
+		<span
+			aria-hidden="true"
+			className="flex size-6 shrink-0 items-center justify-center"
+		>
+			{bird.kind === "painting" ? (
+				<svg
+					viewBox={bird.bounds.join(" ")}
+					aria-hidden="true"
+					className="size-full"
+				>
+					<image href={bird.imageUrl} width={480} height={480} />
+				</svg>
+			) : (
+				<SpeciesImage
+					imageUrl={bird.imageUrl}
+					alt=""
+					glyphClassName="size-3.5"
+					loading="lazy"
 				/>
-			) : null}
-			{layout ? null : <div aria-busy="true" className="absolute inset-0" />}
+			)}
+		</span>
+	);
+}
+
+const NAME_WIDTHS = ["w-28", "w-20", "w-24", "w-32", "w-16"];
+const SKELETON_NAMES = 12;
+
+function NameListSkeleton() {
+	return (
+		<div aria-hidden="true" className={NAME_LIST_CLASS}>
+			{Array.from({ length: SKELETON_NAMES }, (_, index) => (
+				// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
+				<div key={index} className={NAME_ROW_CLASS}>
+					<ShellBar className="size-5 rounded" />
+					<ShellBar
+						className={cn(
+							"h-3 rounded",
+							NAME_WIDTHS[index % NAME_WIDTHS.length],
+						)}
+					/>
+				</div>
+			))}
 		</div>
 	);
 }

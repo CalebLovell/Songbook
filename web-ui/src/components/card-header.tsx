@@ -4,9 +4,8 @@ import { Kicker } from "~/components/ui/kicker.tsx";
 export const CARD_HEADER_CLASS =
 	"-mx-page -mt-page flex min-h-11.25 items-center justify-between gap-2 border-b px-page";
 
-export const CARD_HEADER_LINK_CLASS =
-	"inline-flex items-center gap-1 text-xs no-underline hover:underline";
-export const CARD_HEADER_TEXT_BUTTON_CLASS = `${CARD_HEADER_LINK_CLASS} cursor-pointer text-moss decoration-moss/45 underline-offset-2 hover:text-ink`;
+export const CARD_HEADER_TEXT_BUTTON_CLASS =
+	"inline-flex cursor-pointer items-center gap-1 text-moss text-xs no-underline decoration-moss/45 underline-offset-2 hover:text-ink hover:underline";
 
 export function CardHeader({
 	title,

@@ -1,27 +1,28 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react";
+import { useRef, useState } from "react";
 
-import {
-	CARD_HEADER_LINK_CLASS,
-	CardHeader,
-} from "~/components/card-header.tsx";
+import { CardHeader } from "~/components/card-header.tsx";
 import { ConfidencePill } from "~/components/confidence-pill.tsx";
 import { EmptyNote } from "~/components/empty-state.tsx";
 import { RecordingButton } from "~/components/recording-button.tsx";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
+import { Button } from "~/components/ui/button.tsx";
 import { Card } from "~/components/ui/card.tsx";
 import { Count } from "~/components/ui/count.tsx";
 import { ShellBar, ShellSized, ShellText } from "~/components/ui/shell.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
 import { formatClockRange, formatTimeAgo } from "~/lib/time-ago.ts";
-import { RECENT_LIMIT, type RecentVisit, type ShownDay } from "~/lib/today.ts";
+import type { RecentVisit } from "~/lib/today.ts";
 import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
 
+const TITLE = "Recent activity";
 const CARD_CLASS = "@container flex flex-col";
-const LISTED_CARD_CLASS = `${CARD_CLASS} pb-0`;
+const LISTED_CARD_CLASS = `${CARD_CLASS} max-h-[clamp(20rem,60vh,36rem)] min-[1800px]:max-h-none min-h-0 min-[1800px]:flex-1 pb-0`;
 const ROW_CLASS = "flex items-center @min-[26rem]:gap-3 gap-2 px-page py-1.75";
-const LIST_CLASS = "-mx-page divide-y";
+const LIST_CLASS = "-mx-page min-h-0 flex-1 divide-y";
+const SKELETON_ROWS = 12;
 const TIME_COLUMN_CLASS = "@min-[26rem]:block hidden shrink-0 text-right";
 const ROW_BUTTON = {
 	size: "sm" as const,
@@ -29,22 +30,35 @@ const ROW_BUTTON = {
 	className: "@min-[26rem]:w-auto w-7 @min-[26rem]:px-3 px-0",
 };
 
-function RecentLogHeader({ day, date }: { day: ShownDay; date?: string }) {
+type VisitOrder = "newest" | "oldest";
+
+const ORDER_META: Record<VisitOrder, { label: string; icon: LucideIcon }> = {
+	newest: { label: "Most recent", icon: ArrowDown },
+	oldest: { label: "Least recent", icon: ArrowUp },
+};
+
+function VisitOrderButton({
+	order,
+	onOrderChange,
+}: {
+	order: VisitOrder;
+	onOrderChange?: (next: VisitOrder) => void;
+}) {
+	const { label, icon } = ORDER_META[order];
 	return (
-		<CardHeader title="Recent activity">
-			<Link
-				to="/timeline"
-				search={date ? { period: "day", date } : undefined}
-				className={CARD_HEADER_LINK_CLASS}
-			>
-				All of {day}
-				<ArrowRight aria-hidden className="size-3" />
-			</Link>
-		</CardHeader>
+		<Button
+			variant="ghost"
+			size="icon-sm"
+			icon={icon}
+			aria-label={`Visit order: ${label}`}
+			title={label}
+			className="-me-1.75 pointer-coarse:-me-2.75 pointer-coarse:size-9 text-muted-foreground"
+			onClick={() => onOrderChange?.(order === "newest" ? "oldest" : "newest")}
+		/>
 	);
 }
 
-export function RecentLogCardSkeleton({ day }: { day: ShownDay }) {
+export function RecentLogCardSkeleton() {
 	const canListen = useCanListen();
 	return (
 		<Card
@@ -53,9 +67,13 @@ export function RecentLogCardSkeleton({ day }: { day: ShownDay }) {
 			aria-label="Recent detections"
 			className={LISTED_CARD_CLASS}
 		>
-			<RecentLogHeader day={day} />
-			<ul aria-hidden="true" className={LIST_CLASS}>
-				{Array.from({ length: RECENT_LIMIT }, (_, index) => (
+			<CardHeader title={TITLE}>
+				<ShellSized className="rounded-md">
+					<VisitOrderButton order="newest" />
+				</ShellSized>
+			</CardHeader>
+			<ul aria-hidden="true" className={`${LIST_CLASS} overflow-hidden`}>
+				{Array.from({ length: SKELETON_ROWS }, (_, index) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
 					<li key={index} className={ROW_CLASS}>
 						<div className="flex size-10 shrink-0 items-center justify-center">
@@ -97,21 +115,18 @@ const NAME_WIDTHS = ["w-36", "w-28", "w-44", "w-32", "w-40"];
 
 export function RecentLogCard({
 	recent,
-	day,
-	date,
 	generatedAt,
 	freshKeys,
-	limit,
 }: {
 	recent: RecentVisit[];
-	day: ShownDay;
-	date: string;
 	generatedAt: string;
 	freshKeys: Set<string>;
-	limit?: number;
 }) {
 	const canListen = useCanListen();
 	const offsetMs = useAgeOffset(generatedAt);
+	const [order, setOrder] = useState<VisitOrder>("newest");
+	const listRef = useRef<HTMLUListElement>(null);
+	const visits = order === "newest" ? recent : [...recent].reverse();
 
 	return (
 		<Card
@@ -119,13 +134,23 @@ export function RecentLogCard({
 			aria-label="Recent detections"
 			className={recent.length > 0 ? LISTED_CARD_CLASS : CARD_CLASS}
 		>
-			<RecentLogHeader day={day} date={date} />
+			<CardHeader title={TITLE}>
+				{recent.length > 0 ? (
+					<VisitOrderButton
+						order={order}
+						onOrderChange={(next) => {
+							setOrder(next);
+							listRef.current?.scrollTo({ top: 0 });
+						}}
+					/>
+				) : null}
+			</CardHeader>
 
 			{recent.length === 0 ? (
 				<EmptyNote>{EMPTY.window.today}</EmptyNote>
 			) : (
-				<ul className={LIST_CLASS}>
-					{recent.slice(0, limit).map((visit) => {
+				<ul ref={listRef} className={`${LIST_CLASS} overflow-y-auto`}>
+					{visits.map((visit) => {
 						const clock = formatClockRange(visit.firstAt, visit.lastAt);
 						const age = formatTimeAgo(visit.ageMs + offsetMs);
 

@@ -17,11 +17,12 @@ import {
 	CollageCard,
 	CollageCardSkeleton,
 } from "~/components/collage-card.tsx";
-import {
-	DetectionsByHourCard,
-	DetectionsByHourCardSkeleton,
-} from "~/components/detections-by-hour-card.tsx";
 import { HighlightsCard } from "~/components/highlights-card.tsx";
+import {
+	HourBarsCard,
+	HourBarsCardSkeleton,
+	sumHours,
+} from "~/components/hour-bars-card.tsx";
 import { PageHeaderCard } from "~/components/page-header-card.tsx";
 import {
 	ShareButton,
@@ -52,7 +53,6 @@ import { pageHead } from "~/lib/link-preview.ts";
 import { PAGE_HEADERS } from "~/lib/page-headers.ts";
 import { prefetchInBrowser } from "~/lib/query-client.ts";
 import { formatShareCard } from "~/lib/share-card.ts";
-import type { HourActivity } from "~/lib/stats-data.ts";
 import type { WindowSun } from "~/lib/sun-times.ts";
 import type { TimelineData, TimelineRow } from "~/lib/timeline.ts";
 import { type TimelinePageData, timelineQuery } from "~/lib/timeline-page.ts";
@@ -228,22 +228,11 @@ function TimelineCardsShell({
 					emptyMessage=""
 					className="self-start"
 				/>
-				<DetectionsByHourCardSkeleton
-					info={HOUR_CARD_INFO}
-					className="self-start"
-				/>
+				<HourBarsCardSkeleton className="self-start" />
 			</div>
 		</div>
 	);
 }
-
-const HOUR_CARD_INFO = (
-	<p>
-		This chart shows all the birds recorded each hour for the selected time
-		period. The peaks show what time of day the station is most active, and the
-		valleys show when it is most quiet.
-	</p>
-);
 
 type JumpTarget = {
 	anchor: string;
@@ -464,14 +453,6 @@ function TimelineCards({
 		[rows],
 	);
 
-	const hourActivity: HourActivity[] = Array.from(
-		{ length: 24 },
-		(_, hour) => ({
-			hour,
-			count: rows.reduce((sum, row) => sum + (row.hourCounts[hour] ?? 0), 0),
-		}),
-	);
-
 	const body =
 		view === "hours" ? (
 			<SpeciesByHourCard
@@ -511,10 +492,9 @@ function TimelineCards({
 					emptyMessage={emptyMessage}
 					className="self-start"
 				/>
-				<DetectionsByHourCard
-					activity={hourActivity}
+				<HourBarsCard
+					hours={sumHours(rows)}
 					emptyMessage={emptyMessage}
-					info={HOUR_CARD_INFO}
 					className="self-start"
 				/>
 			</div>

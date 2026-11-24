@@ -55,8 +55,6 @@ export type TodaySnapshot = {
 	recent: RecentVisit[];
 };
 
-export const RECENT_LIMIT = 6;
-
 type LatestRow = {
 	comName: string;
 	sciName: string;
@@ -115,7 +113,7 @@ async function recentOn(
 	const visits = groupVisits(
 		rows.map((row) => ({ ...row, timestamp: row.detectedAt })),
 	).filter((visit) => detectionKeyOf(visit.moments.at(-1)) !== heroKey);
-	return visits.slice(0, RECENT_LIMIT).map((visit) => {
+	return visits.map((visit) => {
 		const first = visit.moments[0];
 		const last = visit.moments[visit.moments.length - 1];
 		const best = visit.moments.reduce((top, moment) =>
