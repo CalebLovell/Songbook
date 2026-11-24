@@ -239,13 +239,13 @@ function SunTimesFrame({
 	return (
 		<p className="flex h-6 shrink-0 translate-y-[-1.5px] items-center gap-2 whitespace-nowrap text-[13px] text-muted-foreground">
 			{qualifier}
-			<Sunrise aria-hidden="true" className="size-3.5 shrink-0" />
+			<Sunrise aria-hidden="true" className="size-3.5 shrink-0 text-sunrise" />
 			{sunrise}
 			<span
 				className="size-0.75 shrink-0 rounded-full bg-muted-foreground opacity-60"
 				aria-hidden="true"
 			/>
-			<Sunset aria-hidden="true" className="size-3.5 shrink-0" />
+			<Sunset aria-hidden="true" className="size-3.5 shrink-0 text-sunset" />
 			{sunset}
 		</p>
 	);
@@ -318,7 +318,10 @@ function SunMark({ hour, sun }: { hour: number; sun: DaylightSun }) {
 					aria-label={label}
 					className="flex size-4 cursor-default items-center justify-center"
 				>
-					<Icon aria-hidden="true" className="size-3 text-moss" />
+					<Icon
+						aria-hidden="true"
+						className={cn("size-3", isSunrise ? "text-sunrise" : "text-sunset")}
+					/>
 				</button>
 			</Hint>
 		);

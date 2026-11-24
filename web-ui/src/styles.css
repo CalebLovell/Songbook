@@ -52,6 +52,8 @@
 	--toast-warning-line: color-mix(in oklab, var(--sand) 50%, var(--paper-raised));
 	--toast-error-fill: color-mix(in oklab, var(--clay) 8%, var(--paper-raised));
 	--toast-error-line: color-mix(in oklab, var(--clay) 32%, var(--paper-raised));
+	--sunrise: color-mix(in oklab, var(--clay) 60%, var(--sand));
+	--sunset: #5f5f9e;
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -122,6 +124,8 @@
   --color-toast-warning-line: var(--toast-warning-line);
   --color-toast-error-fill: var(--toast-error-fill);
   --color-toast-error-line: var(--toast-error-line);
+  --color-sunrise: var(--sunrise);
+  --color-sunset: var(--sunset);
   --spacing-page: var(--page-gap);
   --spacing-cell: var(--cell-gap);
   --spacing-card-edge: var(--card-edge);
@@ -363,5 +367,6 @@
   --shade: black;
   --muted-foreground: color-mix(in oklab, var(--ink) 60%, var(--paper-raised));
   --primary: oklch(0.44 0.065 135);
+  --sunset: #9f9fd2;
   --primary-foreground: var(--ink);
 }

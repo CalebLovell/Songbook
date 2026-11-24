@@ -55,6 +55,7 @@ for a meaning; don't write a new mix inline when one exists:
 | `--row-selected` | a selected row in a list or table |
 | `--row-well` | the slack under a paged list's rows on a short page (`RowWell`) |
 | `--toast-{success,warning,error}-fill/-line` | outcome tones: toasts, Station cards, quiz answers, warning wells; title is moss / bark / clay, neutral toasts stay white |
+| `--sunrise` / `--sunset` | the sunrise icon (dusty terracotta) and sunset icon (night blue-purple, a literal per theme), never their times or other marks; muted, but 3:1 or better on a card |
 
 Confidence pills are three bands, not a ramp (`lib/confidence.ts`): green at
 90% and up (`CONFIDENT_MIN`, the same line review uses), amber from 80%, and
