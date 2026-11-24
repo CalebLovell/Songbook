@@ -212,7 +212,7 @@ function DateSegment({
 			<span
 				className={`@min-[38rem]:min-w-26 truncate whitespace-nowrap max-[400px]:text-sm ${value ? "" : "text-muted-foreground"}`}
 			>
-				{value ? formatDate(value) : "Any date"}
+				{value ? formatDate(value) : "Date"}
 			</span>
 			<input
 				aria-label={label}
