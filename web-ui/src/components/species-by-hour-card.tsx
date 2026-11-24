@@ -237,7 +237,7 @@ function SunTimesFrame({
 	sunset: ReactNode;
 }) {
 	return (
-		<p className="flex h-6 shrink-0 translate-y-[-1.5px] items-center gap-2 whitespace-nowrap text-[13px] text-muted-foreground">
+		<p className="flex h-6 shrink-0 items-center gap-2 whitespace-nowrap text-[13px] text-muted-foreground">
 			{qualifier}
 			<Sunrise aria-hidden="true" className="size-3.5 shrink-0 text-sunrise" />
 			{sunrise}

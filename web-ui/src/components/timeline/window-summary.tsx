@@ -22,7 +22,7 @@ export function WindowSummary({
 	return (
 		<div className="flex min-w-0 items-center gap-2.5">
 			<span className="h-4 w-px shrink-0 bg-line" aria-hidden="true" />
-			<div className="flex translate-y-[-1.5px] items-center gap-2 truncate text-[13px] text-muted-foreground">
+			<div className="flex items-center gap-2 truncate text-[13px] text-muted-foreground">
 				{label ? (
 					<>
 						<span className="whitespace-nowrap">{label}</span>
