@@ -3,7 +3,7 @@ import { createElement, Fragment, type ReactNode } from "react";
 export const PAGE_HEADERS = {
 	today: {
 		title: "Today",
-		description: "What the station is hearing right now.",
+		description: "A live view of the day's bird activity.",
 	},
 	birds: {
 		title: "All Birds",

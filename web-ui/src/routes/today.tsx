@@ -86,7 +86,7 @@ export const Route = createFileRoute("/today")({
 	head: () =>
 		pageHead(
 			"Today",
-			"What this station is hearing right now, identified as it sings.",
+			"A live view of the day's bird activity at this station.",
 		),
 	component: Today,
 	loader: ({ context }) => {
