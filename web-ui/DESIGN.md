@@ -361,6 +361,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   truncates: the stepper keeps its full width, and the controls beside it give
   way first (Timeline's segments turn into a select under 880px and the row
   stacks under 520px).
+- **Timeline's view switch** (List, Grid, Collage) ends on the right edge of the
+  Activity card it controls from 1800px, where Highlights sits beside the card.
+  Below that it sits just before the date stepper.
 - **Touch type**: fields use 16px under `pointer-coarse`, so iOS doesn't zoom on
   focus. This keys off the pointer, not the viewport width.
 - **Flags** (New, Rare, Vocal, After dark, Returned, Regular) stack, render as glyph pills

@@ -40,6 +40,7 @@ import {
 	SpeciesGridSkeleton,
 } from "~/components/species-grid.tsx";
 import { StatusPage } from "~/components/status-page.tsx";
+import { BODY_CARD_WIDTH } from "~/components/timeline/body-card-width.ts";
 import { PeriodToolbar } from "~/components/timeline/period-toolbar.tsx";
 import { WindowSummary } from "~/components/timeline/window-summary.tsx";
 import { ButtonLink } from "~/components/ui/button-link.tsx";
@@ -501,8 +502,6 @@ function TimelineCards({
 		</div>
 	);
 }
-
-const BODY_CARD_WIDTH = "min-w-0 min-[1800px]:w-6xl min-[1800px]:flex-none";
 
 const VIEW_META: Record<
 	TimelineView,

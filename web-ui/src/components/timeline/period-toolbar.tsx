@@ -8,6 +8,7 @@ import {
 	Infinity as InfinityIcon,
 } from "lucide-react";
 
+import { BODY_CARD_WIDTH } from "~/components/timeline/body-card-width.ts";
 import { IconSelect } from "~/components/ui/icon-select.tsx";
 import { JOINED_CONTROL_CLASS } from "~/components/ui/joined-control.ts";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group.tsx";
@@ -67,7 +68,7 @@ export function PeriodToolbar({
 	window: TimelineWindow | null;
 	lastActiveDay: string | null;
 	stationRange: { first: string; last: string } | null;
-	viewSwitch?: React.ReactNode;
+	viewSwitch: React.ReactNode;
 	onChange: (next: { period?: TimelinePeriod; date?: string }) => void;
 }) {
 	const pickPeriod = (next: TimelinePeriod) => {
@@ -81,40 +82,44 @@ export function PeriodToolbar({
 
 	return (
 		<div className="flex items-center justify-between gap-page max-[520px]:flex-wrap">
-			<PeriodSelect period={period} onPick={pickPeriod} />
-			<div className="hidden min-[880px]:block">
-				<ToggleGroup
-					type="single"
-					variant="outline"
-					aria-label="Period"
-					value={period}
-					onValueChange={(value) => {
-						if (value) pickPeriod(value as TimelinePeriod);
-					}}
-				>
-					{TIMELINE_PERIODS.map((value) => {
-						const Icon = PERIOD_ICONS[value];
-						return (
-							<ToggleGroupItem key={value} value={value}>
-								<Icon className="size-4" />
-								{TIMELINE_PERIOD_LABELS[value]}
-							</ToggleGroupItem>
-						);
-					})}
-				</ToggleGroup>
+			<div
+				className={cn(
+					"contents min-[1800px]:flex min-[1800px]:items-center",
+					BODY_CARD_WIDTH,
+				)}
+			>
+				<PeriodSelect period={period} onPick={pickPeriod} />
+				<div className="hidden min-[880px]:block">
+					<ToggleGroup
+						type="single"
+						variant="outline"
+						aria-label="Period"
+						value={period}
+						onValueChange={(value) => {
+							if (value) pickPeriod(value as TimelinePeriod);
+						}}
+					>
+						{TIMELINE_PERIODS.map((value) => {
+							const Icon = PERIOD_ICONS[value];
+							return (
+								<ToggleGroupItem key={value} value={value}>
+									<Icon className="size-4" />
+									{TIMELINE_PERIOD_LABELS[value]}
+								</ToggleGroupItem>
+							);
+						})}
+					</ToggleGroup>
+				</div>
+				<div className="ml-auto shrink-0">{viewSwitch}</div>
 			</div>
-
-			<div className="flex min-w-0 flex-1 items-center justify-end gap-page max-[520px]:contents">
-				{viewSwitch}
-				{period !== "all" ? (
-					<WindowStepper
-						period={period}
-						anchor={anchor}
-						stationRange={stationRange}
-						onPick={(date) => onChange({ date })}
-					/>
-				) : null}
-			</div>
+			{period !== "all" ? (
+				<WindowStepper
+					period={period}
+					anchor={anchor}
+					stationRange={stationRange}
+					onPick={(date) => onChange({ date })}
+				/>
+			) : null}
 		</div>
 	);
 }
