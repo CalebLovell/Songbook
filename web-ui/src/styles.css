@@ -33,6 +33,7 @@
 	--focus-ring: color-mix(in oklch, var(--moss) 50%, oklch(0.3 0.17 145));
   --kicker: var(--moss);
 	--shade: var(--ink);
+	--scroll-shade: color-mix(in oklab, var(--moss) 20%, transparent);
 
 	/* Named tints. Each is one colour pushed into paper; they live here so a
 	   component asks for a meaning rather than re-deriving a mix inline.
@@ -116,6 +117,7 @@
   --color-focus-ring: var(--focus-ring);
   --color-kicker: var(--kicker);
   --color-shade: var(--shade);
+  --color-scroll-shade: var(--scroll-shade);
   --color-icon-well: var(--icon-well);
   --color-row-selected: var(--row-selected);
   --color-row-well: var(--row-well);
@@ -368,6 +370,7 @@
   --hover-line: color-mix(in oklab, var(--moss) 50%, var(--line));
   --focus-ring: var(--moss);
   --shade: black;
+  --scroll-shade: color-mix(in oklab, var(--shade) 44%, transparent);
   --muted-foreground: color-mix(in oklab, var(--ink) 60%, var(--paper-raised));
   --primary: oklch(0.44 0.065 135);
   --sunset: #9f9fd2;

@@ -16,6 +16,7 @@ import { formatClockRange, formatTimeAgo } from "~/lib/time-ago.ts";
 import type { DayVisit } from "~/lib/today.ts";
 import { useAgeOffset } from "~/lib/use-age-offset.ts";
 import { useCanListen } from "~/lib/use-can-listen.ts";
+import { useRowsBelow } from "~/lib/use-rows-below.ts";
 
 const TITLE = "Visit log";
 const CARD_CLASS = "@container flex flex-col";
@@ -129,6 +130,7 @@ export function VisitsCard({
 	const [order, setOrder] = useState<VisitOrder>("newest");
 	const listRef = useRef<HTMLUListElement>(null);
 	const orderedVisits = order === "newest" ? visits : [...visits].reverse();
+	const rowsBelow = useRowsBelow(listRef, orderedVisits.at(-1)?.key);
 
 	return (
 		<Card
@@ -151,82 +153,88 @@ export function VisitsCard({
 			{visits.length === 0 ? (
 				<EmptyNote>{EMPTY.window.today}</EmptyNote>
 			) : (
-				<ul ref={listRef} className={`${LIST_CLASS} overflow-y-auto`}>
-					{orderedVisits.map((visit) => {
-						const clock = formatClockRange(visit.firstAt, visit.lastAt);
-						const age = formatTimeAgo(visit.ageMs + offsetMs);
+				<div className="relative -mx-page flex min-h-0 flex-1 flex-col">
+					<ul ref={listRef} className="min-h-0 flex-1 divide-y overflow-y-auto">
+						{orderedVisits.map((visit) => {
+							const clock = formatClockRange(visit.firstAt, visit.lastAt);
+							const age = formatTimeAgo(visit.ageMs + offsetMs);
 
-						return (
-							<li
-								key={visit.key}
-								className={`${ROW_CLASS} ${freshKeys.has(visit.latestKey) ? "animate-flash-in" : ""}`}
-							>
-								<Link
-									to="/birds/$comName"
-									preload={false}
-									params={{ comName: visit.speciesSlug }}
-									tabIndex={-1}
-									aria-hidden="true"
-									className="shrink-0"
+							return (
+								<li
+									key={visit.key}
+									className={`${ROW_CLASS} ${freshKeys.has(visit.latestKey) ? "animate-flash-in" : ""}`}
 								>
-									<SpeciesThumbnail
-										imageUrl={visit.imageUrl}
-										comName={visit.comName}
-									/>
-								</Link>
-
-								<div className="min-w-0 flex-1">
-									<div className="flex min-w-0 items-baseline gap-1.5">
-										<Link
-											to="/birds/$comName"
-											preload={false}
-											params={{ comName: visit.speciesSlug }}
-											className="block min-w-0 max-w-fit truncate font-medium no-underline hover:underline"
-										>
-											{visit.comName}
-										</Link>
-										{visit.detections > 1 ? (
-											<Count
-												className="shrink-0"
-												title={`${visit.detections.toLocaleString()} detections in this visit`}
-											>
-												×{visit.detections.toLocaleString()}
-											</Count>
-										) : null}
-									</div>
-									<div className="@min-[26rem]:block hidden truncate text-bark text-xs italic">
-										{visit.sciName}
-									</div>
-									<div className="@min-[26rem]:hidden truncate text-muted-foreground text-xs tabular-nums">
-										{age} · {clock}
-									</div>
-								</div>
-
-								<div className={TIME_COLUMN_CLASS}>
-									<div className="text-sm tabular-nums">{age}</div>
-									<time
-										dateTime={visit.lastAt.replace(" ", "T")}
-										className="block text-muted-foreground text-xs tabular-nums"
+									<Link
+										to="/birds/$comName"
+										preload={false}
+										params={{ comName: visit.speciesSlug }}
+										tabIndex={-1}
+										aria-hidden="true"
+										className="shrink-0"
 									>
-										{clock}
-									</time>
-								</div>
+										<SpeciesThumbnail
+											imageUrl={visit.imageUrl}
+											comName={visit.comName}
+										/>
+									</Link>
 
-								<ConfidencePill
-									confidence={visit.confidence}
-									className="shrink-0"
-								/>
-								{canListen ? (
-									<RecordingButton
-										audioUrl={visit.audioUrl}
-										speciesName={visit.comName}
-										{...ROW_BUTTON}
+									<div className="min-w-0 flex-1">
+										<div className="flex min-w-0 items-baseline gap-1.5">
+											<Link
+												to="/birds/$comName"
+												preload={false}
+												params={{ comName: visit.speciesSlug }}
+												className="block min-w-0 max-w-fit truncate font-medium no-underline hover:underline"
+											>
+												{visit.comName}
+											</Link>
+											{visit.detections > 1 ? (
+												<Count
+													className="shrink-0"
+													title={`${visit.detections.toLocaleString()} detections in this visit`}
+												>
+													×{visit.detections.toLocaleString()}
+												</Count>
+											) : null}
+										</div>
+										<div className="@min-[26rem]:block hidden truncate text-bark text-xs italic">
+											{visit.sciName}
+										</div>
+										<div className="@min-[26rem]:hidden truncate text-muted-foreground text-xs tabular-nums">
+											{age} · {clock}
+										</div>
+									</div>
+
+									<div className={TIME_COLUMN_CLASS}>
+										<div className="text-sm tabular-nums">{age}</div>
+										<time
+											dateTime={visit.lastAt.replace(" ", "T")}
+											className="block text-muted-foreground text-xs tabular-nums"
+										>
+											{clock}
+										</time>
+									</div>
+
+									<ConfidencePill
+										confidence={visit.confidence}
+										className="shrink-0"
 									/>
-								) : null}
-							</li>
-						);
-					})}
-				</ul>
+									{canListen ? (
+										<RecordingButton
+											audioUrl={visit.audioUrl}
+											speciesName={visit.comName}
+											{...ROW_BUTTON}
+										/>
+									) : null}
+								</li>
+							);
+						})}
+					</ul>
+					<div
+						aria-hidden="true"
+						className={`pointer-events-none absolute right-(--scrollbar-w,0px) bottom-0 left-0 h-6.5 rounded-b-[3px] bg-linear-to-t from-scroll-shade to-transparent transition-opacity duration-150 ${rowsBelow ? "" : "opacity-0"}`}
+					/>
+				</div>
 			)}
 		</Card>
 	);

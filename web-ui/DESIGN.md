@@ -51,6 +51,7 @@ for a meaning; don't write a new mix inline when one exists:
 | `--focus-ring` | keyboard focus, 2px outline, 2px offset; drawn inset on a segment of a joined control (`JOINED_CONTROL_CLASS`), whose group clips outside it |
 | `--muted-foreground` | secondary text (neutral grey, black 49%) |
 | `--shade` | the tint of every shadow and dimming backdrop: ink in light, black in dark (never thin `--ink` for a shadow, it turns into a glow in dark) |
+| `--scroll-shade` | the bottom edge of a list that scrolls inside its card while rows sit below it (moss in light, black in dark) |
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
 | `--tile` | a species cell's fill in Timeline's grid, a step off the card (sage); loading bars on it use `--line` |
@@ -522,7 +523,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   header summary starts with Yesterday. The card is always Timeline's size: the full content
   width below 1800px, and from 1800px Timeline's 72rem on the left, with Visit log
   over Hourly activity in a right column that takes whatever width is left. Visit log's rows
-  scroll inside its card: stacked, the card stands at most clamp(20rem, 60vh, 36rem); from 1800px
+  scroll inside its card, under a 26px straight `--scroll-shade` along the bottom edge while
+  rows sit below it (`useRowsBelow`), gone at the last row and never over the scrollbar: stacked, the card stands at most clamp(20rem, 60vh, 36rem); from 1800px
   both columns are as tall as the window allows under the header, Hourly activity
   keeps its own 18rem and Visit log fills the rest, so the page doesn't
   scroll (with no toolbar above it, the collage is taller than Timeline's there).
