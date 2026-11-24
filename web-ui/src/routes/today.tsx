@@ -104,10 +104,65 @@ function useFreshKeys(keys: string[]): Set<string> {
 }
 
 function Today() {
-	const snapshot = useSkeletonMinimum(useQuery(snapshotQuery).data);
+	const loaded = useQuery(snapshotQuery).data;
+	const dayQuery = timelineQuery({
+		period: "day",
+		anchor: loaded?.date ?? "",
+	});
+	const loadedDay = useQuery({
+		...dayQuery,
+		enabled: loaded !== undefined,
+		placeholderData: keepPreviousData,
+	}).data;
+	const snapshot = useSkeletonMinimum(loaded);
+	const rows = useSkeletonMinimum(loaded ? dayRows(loadedDay) : undefined);
+	const collageSpecies = useCollageSpecies(rows);
 
-	if (!snapshot) return <TodayShell />;
-	return <TodayBody snapshot={snapshot} />;
+	return (
+		<LiveLayout
+			feed={
+				snapshot ? (
+					<VisitFeed snapshot={snapshot} dayQueryKey={dayQuery.queryKey} />
+				) : (
+					<VisitsCardSkeleton />
+				)
+			}
+			hours={
+				snapshot && rows ? (
+					<HourBarsCard
+						hours={sumHours(rows)}
+						lastHour={lastHourOf(snapshot)}
+					/>
+				) : (
+					<HourBarsCardSkeleton />
+				)
+			}
+			collage={
+				snapshot && rows && collageSpecies ? (
+					<CollageCard
+						species={collageSpecies}
+						emptyMessage={EMPTY.window.today}
+						summary={
+							<WindowSummary
+								rows={rows}
+								label={snapshot.day === "yesterday" ? "Yesterday" : undefined}
+							/>
+						}
+						className={
+							collageSpecies.length > 0
+								? COLLAGE_FIT_CLASS
+								: COLLAGE_EMPTY_CLASS
+						}
+					/>
+				) : (
+					<CollageCardSkeleton
+						summary={<WindowSummary rows={null} />}
+						className={COLLAGE_FIT_CLASS}
+					/>
+				)
+			}
+		/>
+	);
 }
 
 function LiveLayout({
@@ -135,21 +190,6 @@ function LiveLayout({
 	);
 }
 
-function TodayShell() {
-	return (
-		<LiveLayout
-			feed={<VisitsCardSkeleton />}
-			hours={<HourBarsCardSkeleton />}
-			collage={
-				<CollageCardSkeleton
-					summary={<WindowSummary rows={null} />}
-					className={COLLAGE_FIT_CLASS}
-				/>
-			}
-		/>
-	);
-}
-
 function useRefetchOnNewDetection(
 	latestKey: string | undefined,
 	queryKey: QueryKey,
@@ -163,7 +203,7 @@ function useRefetchOnNewDetection(
 	}, [latestKey, queryKey, queryClient]);
 }
 
-function useCollageSpecies(rows: TimelineRow[] | null) {
+function useCollageSpecies(rows: TimelineRow[] | undefined) {
 	const signature = rows
 		?.map((row) => `${row.comName}:${row.totalDetections}`)
 		.join("|");
@@ -179,67 +219,38 @@ function useCollageSpecies(rows: TimelineRow[] | null) {
 	);
 }
 
-function dayRows(page: TimelinePageData | undefined): TimelineRow[] | null {
-	return page?.body.kind === "rows" ? page.body.rows : null;
+function dayRows(
+	page: TimelinePageData | undefined,
+): TimelineRow[] | undefined {
+	return page?.body.kind === "rows" ? page.body.rows : undefined;
 }
 
-function TodayBody({ snapshot }: { snapshot: TodaySnapshot }) {
-	const dayQuery = timelineQuery({ period: "day", anchor: snapshot.date });
-	const rows = dayRows(
-		useQuery({ ...dayQuery, placeholderData: keepPreviousData }).data,
-	);
-	const summary = (
-		<WindowSummary
-			rows={rows}
-			label={snapshot.day === "yesterday" ? "Yesterday" : undefined}
-		/>
-	);
-	const collageSpecies = useCollageSpecies(rows);
+function lastHourOf(snapshot: TodaySnapshot): number {
+	return snapshot.day === "today"
+		? Number(snapshot.generatedAt.slice(11, 13))
+		: 23;
+}
+
+function VisitFeed({
+	snapshot,
+	dayQueryKey,
+}: {
+	snapshot: TodaySnapshot;
+	dayQueryKey: QueryKey;
+}) {
 	const newest = snapshot.visits.at(0);
 	const freshKeys = useFreshKeys(
 		snapshot.visits.map((visit) => visit.latestKey),
 	);
-	const lastHour =
-		snapshot.day === "today" ? Number(snapshot.generatedAt.slice(11, 13)) : 23;
 
-	useRefetchOnNewDetection(newest?.latestKey, dayQuery.queryKey);
+	useRefetchOnNewDetection(newest?.latestKey, dayQueryKey);
 	useAnnounceNewBird(newest?.comName ?? null);
 
 	return (
-		<LiveLayout
-			feed={
-				<VisitsCard
-					visits={snapshot.visits}
-					generatedAt={snapshot.generatedAt}
-					freshKeys={freshKeys}
-				/>
-			}
-			hours={
-				rows ? (
-					<HourBarsCard hours={sumHours(rows)} lastHour={lastHour} />
-				) : (
-					<HourBarsCardSkeleton />
-				)
-			}
-			collage={
-				collageSpecies ? (
-					<CollageCard
-						species={collageSpecies}
-						emptyMessage={EMPTY.window.today}
-						summary={summary}
-						className={
-							collageSpecies.length > 0
-								? COLLAGE_FIT_CLASS
-								: COLLAGE_EMPTY_CLASS
-						}
-					/>
-				) : (
-					<CollageCardSkeleton
-						summary={summary}
-						className={COLLAGE_FIT_CLASS}
-					/>
-				)
-			}
+		<VisitsCard
+			visits={snapshot.visits}
+			generatedAt={snapshot.generatedAt}
+			freshKeys={freshKeys}
 		/>
 	);
 }
