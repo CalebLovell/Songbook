@@ -43,6 +43,7 @@
 	   A warm off-white, picked by eye over cream, grey and the paper ground: a
 	   literal because no mix of the named colours lands on it. */
 	--row-well: #fafaf5;
+	--tile: color-mix(in oklab, var(--sage) 25%, var(--paper-raised));
 	/* Toast tones (ui/toaster.tsx): a fill and a border per outcome, with the
 	   title in the full colour. Done is moss, done-with-a-catch is sand with
 	   bark text, failed is clay. Neutral news (info, in progress) stays white. */
@@ -118,6 +119,7 @@
   --color-icon-well: var(--icon-well);
   --color-row-selected: var(--row-selected);
   --color-row-well: var(--row-well);
+  --color-tile: var(--tile);
   --color-toast-success-fill: var(--toast-success-fill);
   --color-toast-success-line: var(--toast-success-line);
   --color-toast-warning-fill: var(--toast-warning-fill);
@@ -359,6 +361,7 @@
   --clay: #e08b74;
   --meadow: #2c2d29;
   --row-well: #1e1e1d;
+  --tile: color-mix(in oklab, var(--sage) 30%, var(--paper-raised));
   --surface: var(--paper-raised);
   --line: color-mix(in oklab, var(--ink) 14%, transparent);
   --track: color-mix(in oklab, var(--ink) 22%, transparent);

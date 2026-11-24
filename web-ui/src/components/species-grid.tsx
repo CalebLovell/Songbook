@@ -8,7 +8,7 @@ import {
 	SpeciesHourBarsSkeleton,
 } from "~/components/species-hour-bars.tsx";
 import { SpeciesThumbnail } from "~/components/species-row.tsx";
-import { CARD_CLASS, Card } from "~/components/ui/card.tsx";
+import { Card } from "~/components/ui/card.tsx";
 import { COUNT_CLASS, Count } from "~/components/ui/count.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
 import { ShellBar, ShellText } from "~/components/ui/shell.tsx";
@@ -34,24 +34,26 @@ export type SpeciesGridItem = {
 	hourCounts?: number[];
 };
 
-const LIST_CLASS =
-	"mt-page grid grid-cols-1 gap-page sm:grid-cols-2 xl:grid-cols-3";
-const TILE_CLASS = cn(
-	CARD_CLASS,
-	"flex min-h-16 min-w-0 flex-col gap-2 px-3 py-2 max-[400px]:px-2",
-);
-const LINKED_TILE_CLASS =
-	"relative hover:transform-[translateY(-2px)] hover:border-hover-line has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2";
-const HEADER_CARD_CLASS = "py-0";
-const HEADER_ROW_CLASS = "flex min-h-11.25 min-w-0 items-center gap-3";
+const GRID_CLASS = "grid grid-cols-1 gap-page sm:grid-cols-2 xl:grid-cols-3";
+const CELL_CLASS =
+	"flex min-h-16 min-w-0 flex-col gap-2 rounded-md bg-tile px-3 py-2 max-[400px]:px-2";
+const LINKED_CELL_CLASS =
+	"relative has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2";
+
+const SKELETON_CELL_CLASS = cn(CELL_CLASS, "**:[.animate-pulse]:bg-line");
 
 function GridHeader({ summary }: { summary?: ReactNode }) {
 	return (
-		<div data-slot="card-header" className={HEADER_ROW_CLASS}>
-			<Kicker as="h2" className="shrink-0">
-				Activity
-			</Kicker>
-			{summary}
+		<div
+			data-slot="card-header"
+			className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2`}
+		>
+			<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
+				<Kicker as="h2" className="shrink-0">
+					Activity
+				</Kicker>
+				{summary}
+			</div>
 		</div>
 	);
 }
@@ -71,41 +73,28 @@ export function SpeciesGrid({
 }) {
 	return (
 		<TooltipProvider>
-			{species.length === 0 ? (
-				<Card as="section" aria-label="Species" className={className}>
-					<div
-						data-slot="card-header"
-						className={`${CARD_HEADER_CLASS} mb-page gap-3 py-2`}
-					>
-						<div className="flex h-[1.035rem] min-w-0 items-center gap-3">
-							<Kicker as="h2" className="shrink-0">
-								Activity
-							</Kicker>
-							{summary}
-						</div>
-					</div>
-					<EmptyNote>{emptyMessage}</EmptyNote>
-					{emptyAction ? <div className="mt-3">{emptyAction}</div> : null}
-				</Card>
-			) : (
-				<section aria-label="Species" className={className}>
-					<Card className={HEADER_CARD_CLASS}>
-						<GridHeader summary={summary} />
-					</Card>
-					<ul className={LIST_CLASS}>
+			<Card as="section" aria-label="Species" className={className}>
+				<GridHeader summary={summary} />
+				{species.length === 0 ? (
+					<>
+						<EmptyNote>{emptyMessage}</EmptyNote>
+						{emptyAction ? <div className="mt-3">{emptyAction}</div> : null}
+					</>
+				) : (
+					<ul className={GRID_CLASS}>
 						{species.map((item) => (
-							<SpeciesGridRow key={item.comName} item={item} />
+							<SpeciesGridCell key={item.comName} item={item} />
 						))}
 					</ul>
-				</section>
-			)}
+				)}
+			</Card>
 		</TooltipProvider>
 	);
 }
 
-function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
+function SpeciesGridCell({ item }: { item: SpeciesGridItem }) {
 	return (
-		<li className={cn(TILE_CLASS, LINKED_TILE_CLASS)}>
+		<li className={cn(CELL_CLASS, LINKED_CELL_CLASS)}>
 			<div className="flex min-w-0 items-center gap-3 max-[400px]:gap-2">
 				<div className="shrink-0">
 					<SpeciesThumbnail imageUrl={item.imageUrl} comName={item.comName} />
@@ -117,7 +106,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 						preload={false}
 						params={{ comName: comNameToSlug(item.comName) }}
 						data-card-link=""
-						className="block max-w-fit truncate font-medium no-underline after:absolute after:inset-0 focus-visible:outline-none"
+						className="block max-w-fit truncate font-medium no-underline after:absolute after:inset-0 hover:underline focus-visible:outline-none"
 					>
 						{item.comName}
 					</Link>
@@ -156,7 +145,7 @@ function SpeciesGridRow({ item }: { item: SpeciesGridItem }) {
 }
 
 const NAME_WIDTHS = ["w-32", "w-24", "w-36", "w-28"];
-const SKELETON_TILES = 9;
+const SKELETON_CELLS = 9;
 
 export function SpeciesGridSkeleton({
 	summary,
@@ -166,14 +155,17 @@ export function SpeciesGridSkeleton({
 	className?: string;
 }) {
 	return (
-		<section aria-busy="true" aria-label="Species" className={className}>
-			<Card className={HEADER_CARD_CLASS}>
-				<GridHeader summary={summary} />
-			</Card>
-			<ul aria-hidden="true" className={LIST_CLASS}>
-				{Array.from({ length: SKELETON_TILES }, (_, index) => (
+		<Card
+			as="section"
+			aria-busy="true"
+			aria-label="Species"
+			className={className}
+		>
+			<GridHeader summary={summary} />
+			<ul aria-hidden="true" className={GRID_CLASS}>
+				{Array.from({ length: SKELETON_CELLS }, (_, index) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: static decoration
-					<li key={index} className={TILE_CLASS}>
+					<li key={index} className={SKELETON_CELL_CLASS}>
 						<div className="flex min-w-0 items-center gap-3 max-[400px]:gap-2">
 							<div className="flex size-10 shrink-0 items-center justify-center">
 								<ShellBar className="size-9 rounded-md" />
@@ -196,6 +188,6 @@ export function SpeciesGridSkeleton({
 					</li>
 				))}
 			</ul>
-		</section>
+		</Card>
 	);
 }

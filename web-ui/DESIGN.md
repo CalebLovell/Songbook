@@ -53,6 +53,7 @@ for a meaning; don't write a new mix inline when one exists:
 | `--shade` | the tint of every shadow and dimming backdrop: ink in light, black in dark (never thin `--ink` for a shadow, it turns into a glow in dark) |
 | `--icon-well` | round background behind a card's leading icon |
 | `--row-selected` | a selected row in a list or table |
+| `--tile` | a species cell's fill in Timeline's grid, a step off the card (sage); loading bars on it use `--line` |
 | `--row-well` | the slack under a paged list's rows on a short page (`RowWell`) |
 | `--toast-{success,warning,error}-fill/-line` | outcome tones: toasts, Station cards, quiz answers, warning wells; title is moss / bark / clay, neutral toasts stay white |
 | `--sunrise` / `--sunset` | the sunrise icon (dusty terracotta) and sunset icon (night blue-purple, a literal per theme), never their times or other marks; muted, but 3:1 or better on a card |
@@ -271,11 +272,12 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   the current year, and never draws a day still to come. Only days with detections
   are links; together they are one tab stop, walked in date order with the arrows.
   Their 12px squares miss the 24px target size, a known gap kept for the look. Hour bars on a species
-  tile are the one exception to the shared heat scale: they compare a bird only
+  cell are the one exception to the shared heat scale: they compare a bird only
   with itself, as a linear share of its own peak.
-- **Grid** (`species-grid.tsx`): the Timeline's second view. Its Activity header
-  is a card of its own and each species tile is a card on the paper below it,
-  never tiles inside an Activity card. An empty window keeps one card.
+- **Grid** (`species-grid.tsx`): the Timeline's second view. One Activity
+  card, whose own color runs unbroken behind the species cells; the cells are filled
+  with `--tile`, with page-gap gutters between them, never dividers or borders. Each cell is one link; hovering it
+  underlines the name, since only cards lift.
 - **Collage** (`collage-card.tsx`): the Timeline's third view, after List and
   Grid (Images icon), drawn from the same rows for whatever window is shown, and
   Live's day; it is not a page of its own. Painted birds only, packed centre-out in an
