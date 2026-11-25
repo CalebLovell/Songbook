@@ -640,6 +640,7 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   after a dip since boot (`vcgencmd get_throttled`). A backup counts when a
   download finishes (`last-backup.json` in `Songbook-data`); one over 30 days old needs a look,
   and so does none yet once the first detection is 30 days old (a new station has little to lose).
+  Until then the card stays plain, even during setup, when it offers only Restore a backup.
 
 - **Installable app**: `public/manifest.webmanifest` plus `public/sw.js`, registered
   only in production builds. The worker caches nothing but `offline.html` and the

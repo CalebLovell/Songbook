@@ -254,7 +254,7 @@ test("a new station shows set-up cards, not problems", () => {
 	);
 	const cards = cardsOf(view);
 	assert.equal(card(view, "name").tone, "setup");
-	assert.equal(card(view, "backups").tone, "setup");
+	assert.equal(card(view, "backups").tone, "warning");
 	assert.ok(cards.every((each) => each.tone !== "problem"));
 	assert.deepEqual(healthAttention(cards), {
 		count: 3,
@@ -303,6 +303,22 @@ test("a missing backup waits for a month of detections", () => {
 			.tone,
 		"warning",
 	);
+});
+
+test("a new station being set up offers a restore without needing a look", () => {
+	for (const historyDays of [null, 29]) {
+		const view = health(
+			{ backups: { ageSeconds: null, historyDays } },
+			{ settingUp: true },
+		);
+		const backups = card(view, "backups");
+		assert.equal(backups.tone, "ok");
+		assert.equal(backups.problem, null);
+		assert.deepEqual(backups.actions, [
+			{ kind: "restore-backup", primary: false },
+		]);
+		assert.equal(healthAttention(cardsOf(view)), null);
+	}
 });
 
 test("spans read naturally", () => {

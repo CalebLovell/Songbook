@@ -327,20 +327,20 @@ function powerCard(health: StationHealth): HealthCardView {
 function backupsCard(health: StationHealth): HealthCardView {
 	const { ageSeconds, historyDays } = health.checks.backups;
 	const base = { id: "backups" as const, title: "Backups", meter: null };
-	if (health.settingUp)
+	const tooNewToBackUp =
+		ageSeconds === null && (historyDays ?? 0) < BACKUP_WORTHY_HISTORY_DAYS;
+	if (tooNewToBackUp && health.settingUp)
 		return {
 			...base,
-			tone: "setup",
-			figure: null,
-			details: [],
-			problem: {
-				title: "An old station's data can be restored here",
-				detail:
-					"A backup from an older station brings over every detection, review and setting.",
-			},
+			tone: "ok",
+			figure: "No backup yet",
+			details: [
+				"A backup from an older station can be restored here, bringing over every detection, review and setting.",
+			],
+			problem: null,
 			actions: [{ kind: "restore-backup", primary: false }],
 		};
-	if (ageSeconds === null && (historyDays ?? 0) < BACKUP_WORTHY_HISTORY_DAYS)
+	if (tooNewToBackUp)
 		return {
 			...base,
 			tone: "ok",
