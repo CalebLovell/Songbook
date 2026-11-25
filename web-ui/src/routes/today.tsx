@@ -117,6 +117,10 @@ function Today() {
 	const snapshot = useSkeletonMinimum(loaded);
 	const rows = useSkeletonMinimum(loaded ? dayRows(loadedDay) : undefined);
 	const collageSpecies = useCollageSpecies(rows);
+	const hours = rows && sumHours(rows);
+	const nothingHeard = hours
+		? hours.every((count) => count === 0)
+		: snapshot?.visits.length === 0;
 
 	return (
 		<LiveLayout
@@ -128,11 +132,8 @@ function Today() {
 				)
 			}
 			hours={
-				snapshot && rows ? (
-					<HourBarsCard
-						hours={sumHours(rows)}
-						lastHour={lastHourOf(snapshot)}
-					/>
+				nothingHeard ? null : snapshot && hours ? (
+					<HourBarsCard hours={hours} lastHour={lastHourOf(snapshot)} />
 				) : (
 					<HourBarsCardSkeleton />
 				)
@@ -183,7 +184,7 @@ function LiveLayout({
 			/>
 			<div className={BODY_GRID_CLASS}>
 				{collage}
-				<div className={HOURS_SLOT_CLASS}>{hours}</div>
+				{hours && <div className={HOURS_SLOT_CLASS}>{hours}</div>}
 				<div className={FEED_SLOT_CLASS}>{feed}</div>
 			</div>
 		</PageWrap>

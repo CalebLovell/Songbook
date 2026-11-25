@@ -474,7 +474,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   sets the row's height; the hour and month charts beside it stretch to match it,
   never the other way round.
 - Empty wording comes from `lib/empty-messages.ts`: name what's missing and stop.
-  A card keeps its title whether full or empty.
+  A card keeps its title whether full or empty. Today drops Hourly activity while the
+  day has no detections, since Activity and Visit log already say so.
 
 ## Behaviour
 
