@@ -27,7 +27,7 @@ import {
 	type RestorePreview,
 	restorePreviewSchema,
 } from "~/lib/data-backup-format.ts";
-import { formatDate, formatDateTime } from "~/lib/date-format.ts";
+import { formatDate, formatInstant } from "~/lib/date-format.ts";
 import { PAGE_QUERY, refreshAllData } from "~/lib/query-client.ts";
 import { errorMessage } from "~/lib/utils.ts";
 
@@ -97,7 +97,7 @@ function StagedBackup({ staged }: { staged: RestorePreview }) {
 		<div className="space-y-page rounded-md bg-muted p-page">
 			<p className="m-0 text-sm">
 				This backup of {staged.stationName || "a station"} was saved{" "}
-				{formatDateTime(staged.createdAt)} and passed its checks.
+				{formatInstant(staged.createdAt)} and passed its checks.
 			</p>
 			<div className="grid grid-cols-2 gap-page sm:grid-cols-4">
 				<Figure label="Detections" value={count(staged.detections)} />
@@ -209,7 +209,7 @@ function SafetyCopy({
 				<p className="m-0 font-semibold text-sm">Safety copy</p>
 				<p className="m-0 text-muted-foreground text-xs leading-relaxed">
 					Your station as it was before the restore on{" "}
-					{formatDateTime(createdAt)}. It takes up disk space until you undo or
+					{formatInstant(createdAt)}. It takes up disk space until you undo or
 					delete it, and you need to do one of those before restoring again.
 				</p>
 			</div>

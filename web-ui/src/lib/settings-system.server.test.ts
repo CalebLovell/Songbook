@@ -65,6 +65,48 @@ test("Station applies a changed timezone without constructing a shell command", 
 	]);
 });
 
+test("a changed timezone reaches the running web UI", async (t) => {
+	const before = process.env.TZ;
+	t.after(() => {
+		if (before === undefined) delete process.env.TZ;
+		else process.env.TZ = before;
+	});
+	process.env.TZ = "America/New_York";
+	const runningTimezone = () =>
+		Intl.DateTimeFormat().resolvedOptions().timeZone;
+	assert.equal(runningTimezone(), "America/New_York");
+
+	await runCardSystemActions(
+		"station",
+		{
+			previousTimezone: "America/New_York",
+			timezone: "America/Chicago",
+			timezoneFileExists: false,
+		},
+		recordingRunner([]),
+	);
+	assert.equal(runningTimezone(), "America/Chicago");
+	assert.equal(new Date("2026-01-01T12:00:00Z").getHours(), 6);
+});
+
+test("a refused timezone leaves the running web UI alone", async () => {
+	const before = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	await assert.rejects(
+		runCardSystemActions(
+			"station",
+			{
+				previousTimezone: before,
+				timezone: "Pacific/Auckland",
+				timezoneFileExists: false,
+			},
+			async () => {
+				throw new Error("refused");
+			},
+		),
+	);
+	assert.equal(Intl.DateTimeFormat().resolvedOptions().timeZone, before);
+});
+
 test("Station skips timezone commands when it did not change", async () => {
 	const calls: unknown[] = [];
 	await runCardSystemActions(

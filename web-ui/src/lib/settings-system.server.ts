@@ -130,6 +130,8 @@ export async function runCardSystemActions(
 				["tee", "/etc/timezone"],
 				`${context.timezone as string}\n`,
 			);
+		// Node reads the system time zone once; assigning TZ makes it read again.
+		process.env.TZ = context.timezone;
 	}
 	const restart = await restartServices([kind], context, runner);
 	return { attempted: attempted || restart.attempted, skipped: false };

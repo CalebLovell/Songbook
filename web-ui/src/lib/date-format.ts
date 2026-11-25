@@ -2,18 +2,24 @@ const DATE = new Intl.DateTimeFormat("en-US", {
 	month: "short",
 	day: "numeric",
 	year: "numeric",
+	timeZone: "UTC",
 });
 
-const DATE_TIME = new Intl.DateTimeFormat("en-US", {
+const DATE_TIME_FIELDS = {
 	month: "short",
 	day: "numeric",
 	year: "numeric",
 	hour: "numeric",
 	minute: "2-digit",
+} as const;
+
+const DATE_TIME = new Intl.DateTimeFormat("en-US", {
+	...DATE_TIME_FIELDS,
+	timeZone: "UTC",
 });
 
 function parse(date: string, time = "00:00:00"): Date | null {
-	const parsed = new Date(`${date}T${time}`);
+	const parsed = new Date(`${date}T${time}Z`);
 	return Number.isNaN(parsed.valueOf()) ? null : parsed;
 }
 
@@ -34,9 +40,17 @@ export function formatDateTime(dateOrTimestamp: string, time?: string): string {
 const TIME = new Intl.DateTimeFormat("en-US", {
 	hour: "numeric",
 	minute: "2-digit",
+	timeZone: "UTC",
 });
 
 export function formatTime(time: string): string {
 	const parsed = parse("2000-01-01", time);
 	return parsed ? TIME.format(parsed) : time;
+}
+
+export function formatInstant(iso: string): string {
+	const parsed = new Date(iso);
+	return Number.isNaN(parsed.valueOf())
+		? iso
+		: new Intl.DateTimeFormat("en-US", DATE_TIME_FIELDS).format(parsed);
 }
