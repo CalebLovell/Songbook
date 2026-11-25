@@ -1,7 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, FlaskConical, KeyRound } from "lucide-react";
+import {
+	AlertTriangle,
+	Eye,
+	EyeOff,
+	FlaskConical,
+	KeyRound,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CardHeader } from "~/components/card-header.tsx";
 import { Button } from "~/components/ui/button.tsx";
@@ -20,6 +26,7 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const [password, setPassword] = useState("");
+	const [revealed, setRevealed] = useState(false);
 	const [error, setError] = useState<string | undefined>();
 	const signIn = useMutation({
 		mutationFn: (attempt: string) => unlock({ data: { password: attempt } }),
@@ -45,6 +52,7 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 		},
 	});
 	const pending = signIn.isPending;
+	const RevealIcon = revealed ? EyeOff : Eye;
 	const field = useRef<HTMLInputElement>(null);
 
 	// An effect, not `autoFocus`: React doesn't apply that attribute when hydrating.
@@ -54,6 +62,7 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 
 	function onSubmit(event: React.FormEvent) {
 		event.preventDefault();
+		setRevealed(false);
 		signIn.mutate(password);
 	}
 
@@ -83,17 +92,31 @@ export function UnlockGate({ onUnlock }: { onUnlock?: () => void }) {
 					>
 						Password
 					</label>
-					<Input
-						ref={field}
-						id="station-password"
-						aria-invalid={error ? true : undefined}
-						aria-describedby="station-password-error"
-						name="password"
-						type="password"
-						autoComplete="current-password"
-						value={password}
-						onChange={(event) => setPassword(event.target.value)}
-					/>
+					<div className="relative">
+						<Input
+							ref={field}
+							id="station-password"
+							aria-invalid={error ? true : undefined}
+							aria-describedby="station-password-error"
+							name="password"
+							type={revealed ? "text" : "password"}
+							autoComplete="current-password"
+							autoCapitalize="none"
+							autoCorrect="off"
+							spellCheck={false}
+							className="pr-9 [&::-ms-reveal]:hidden"
+							value={password}
+							onChange={(event) => setPassword(event.target.value)}
+						/>
+						<button
+							type="button"
+							aria-label={revealed ? "Hide password" : "Show password"}
+							onClick={() => setRevealed((shown) => !shown)}
+							className="absolute inset-y-0 right-0 flex pointer-coarse:w-9 w-8.5 items-center justify-center text-muted-foreground hover:text-foreground"
+						>
+							<RevealIcon aria-hidden="true" className="size-4" />
+						</button>
+					</div>
 					<p
 						id="station-password-error"
 						aria-live="polite"

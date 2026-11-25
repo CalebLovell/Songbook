@@ -184,6 +184,8 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   while on (`aria-pressed`). Making play an outline toggle to match was considered and declined.
 - **Input**: focus is shown by a `--focus-ring` border, not the outline. Fields and checkboxes keep the
   site's light borders even though they fall short of 3:1 (WCAG 1.4.11): a darker line was tried and looked wrong.
+  The sign-in password has an eye button inside its right edge that shows or hides it;
+  submitting hides it again.
 - **Nav rows**: active is marked by fill alone (a step deeper than the meadow
   hover), never bolder text. Gated pages stay listed with a lock icon.
 - **Sidebar**: logo, then site search (species, pages, filtered detections;
