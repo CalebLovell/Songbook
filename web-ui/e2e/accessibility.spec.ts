@@ -317,7 +317,7 @@ test.describe("reduced motion", () => {
 
 test.describe("heat map", () => {
 	test("gives screen readers a table of species by hour", async ({ page }) => {
-		await settle(page, "/timeline");
+		await settle(page, "/timeline?period=all");
 		const table = page.getByRole("table", { name: /Species by hour/ });
 		await expect(table).toHaveCount(1);
 		await expect(table.getByRole("columnheader").first()).toHaveText("Species");

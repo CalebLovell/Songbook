@@ -12,14 +12,14 @@ const PERIODS = ["Weekly", "Monthly", "Yearly", "Daily", "Weekly"] as const;
 
 /**
  * The species figure in the body card's kicker, once the window has loaded.
- * An empty window drops the figures for a "No detections recorded" card.
+ * An empty window says "No detections recorded", beside a zero figure or none.
  */
 async function speciesOnScreen(page: Page): Promise<number> {
 	const figure = page
 		.locator("span.whitespace-nowrap", { hasText: /species$/ })
 		.locator('[data-slot="count"]');
 	const empty = page.getByText("No detections recorded").first();
-	await expect(figure.or(empty)).toBeVisible();
+	await expect(figure.or(empty).first()).toBeVisible();
 	if (await empty.isVisible()) return 0;
 	return Number((await figure.innerText()).replace(/,/g, ""));
 }
