@@ -175,7 +175,7 @@ ssh -t <user>@<hostname>.local 'sudo ~/BirdNET-Pi/scripts/set_web_ui_password.sh
 
 The web UI logs each wrong password: `journalctl -u birdnet_web_ui | grep "failed unlock"`. It
 reads the password file on every attempt, so a restart never helps. Have them set it again as
-above. After 5 wrong tries, sign-in makes them wait 30 seconds, doubling each time.
+above. After 20 wrong tries, sign-in makes them wait 30 seconds, doubling each time.
 
 ### The browser can't find the station
 

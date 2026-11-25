@@ -121,7 +121,7 @@ and run:
 sudo ~/BirdNET-Pi/scripts/set_web_ui_password.sh
 ```
 
-After 5 wrong tries, sign-in makes you wait.
+After 20 wrong tries, sign-in makes you wait.
 
 **No birds after a day.** Check **Health → Audio input**, then repeat step 6.
 

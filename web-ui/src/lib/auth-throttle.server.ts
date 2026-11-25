@@ -3,7 +3,7 @@ import "@tanstack/react-start/server-only";
 import { readFile, writeFile } from "node:fs/promises";
 import { isPrivateAddress } from "./auth-policy.server.ts";
 
-export const FREE_ATTEMPTS = 5;
+export const FREE_ATTEMPTS = 20;
 const MAX_BACKOFF_MS = 900_000;
 export const GLOBAL_CEILING = 50;
 const GLOBAL_WINDOW_MS = 900_000;
