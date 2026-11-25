@@ -38,10 +38,10 @@ function describe(error: GeolocationPositionError): string {
 }
 
 export function StationLocation({
-	current,
+	saved,
 	onApply,
 }: {
-	current: Coordinates;
+	saved: Coordinates;
 	onApply: (coordinates: Coordinates) => void;
 }) {
 	const [state, setState] = useState<State>({ kind: "idle" });
@@ -110,9 +110,8 @@ export function StationLocation({
 								</div>
 							</dl>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								This replaces {current.latitude}, {current.longitude} in the
-								form. Nothing is written to the station until you save the
-								Station card.
+								The station is set to {saved.latitude}, {saved.longitude}. It
+								stays there until you press Save in the Location form.
 							</p>
 							{state.accuracy !== null ? (
 								<p className="text-muted-foreground text-xs leading-relaxed">

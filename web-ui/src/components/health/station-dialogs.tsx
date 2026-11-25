@@ -139,10 +139,6 @@ export function StationNameDialog({
 	);
 }
 
-function numberOr(value: number, fallback: number) {
-	return Number.isNaN(value) ? fallback : value;
-}
-
 function BrowserTimezoneHint({
 	timezone,
 	onUse,
@@ -178,11 +174,19 @@ export function LocationDialog({
 	onClose: () => void;
 }) {
 	const id = useId();
-	const [values, setValues] = useState(editing.values);
+	const [latitude, setLatitude] = useState(String(editing.values.latitude));
+	const [longitude, setLongitude] = useState(String(editing.values.longitude));
+	const [timezone, setTimezone] = useState(editing.values.timezone);
 	const save = useDialogSave(editing.save, onClose);
 	function submit(event: SyntheticEvent) {
 		event.preventDefault();
-		save.mutate({ ...values, locationConfirmed: true });
+		save.mutate({
+			...editing.values,
+			latitude: Number(latitude),
+			longitude: Number(longitude),
+			timezone,
+			locationConfirmed: true,
+		});
 	}
 	const guessed = editing.values.locationConfirmed === false;
 	return (
@@ -203,16 +207,8 @@ export function LocationDialog({
 							max={90}
 							step="any"
 							required
-							value={values.latitude}
-							onChange={(event) =>
-								setValues({
-									...values,
-									latitude: numberOr(
-										event.target.valueAsNumber,
-										values.latitude,
-									),
-								})
-							}
+							value={latitude}
+							onChange={(event) => setLatitude(event.target.value)}
 						/>
 					</Field>
 					<Field id={`${id}-lon`} label="Longitude">
@@ -223,22 +219,20 @@ export function LocationDialog({
 							max={180}
 							step="any"
 							required
-							value={values.longitude}
-							onChange={(event) =>
-								setValues({
-									...values,
-									longitude: numberOr(
-										event.target.valueAsNumber,
-										values.longitude,
-									),
-								})
-							}
+							value={longitude}
+							onChange={(event) => setLongitude(event.target.value)}
 						/>
 					</Field>
 				</div>
 				<StationLocation
-					current={{ latitude: values.latitude, longitude: values.longitude }}
-					onApply={(coordinates) => setValues({ ...values, ...coordinates })}
+					saved={{
+						latitude: editing.values.latitude,
+						longitude: editing.values.longitude,
+					}}
+					onApply={(coordinates) => {
+						setLatitude(String(coordinates.latitude));
+						setLongitude(String(coordinates.longitude));
+					}}
 				/>
 				<Field
 					id={`${id}-tz`}
@@ -248,10 +242,7 @@ export function LocationDialog({
 							<p className="m-0">
 								Type to search, e.g. “New York”. Also sets the station's clock.
 							</p>
-							<BrowserTimezoneHint
-								timezone={values.timezone}
-								onUse={(timezone) => setValues({ ...values, timezone })}
-							/>
+							<BrowserTimezoneHint timezone={timezone} onUse={setTimezone} />
 						</>
 					}
 				>
@@ -261,14 +252,12 @@ export function LocationDialog({
 						autoComplete="off"
 						spellCheck={false}
 						required
-						value={values.timezone}
-						onChange={(event) =>
-							setValues({ ...values, timezone: event.target.value })
-						}
+						value={timezone}
+						onChange={(event) => setTimezone(event.target.value)}
 					/>
 					<datalist id={`${id}-timezones`}>
-						{editing.timezones.map((timezone) => (
-							<option key={timezone} value={timezone} />
+						{editing.timezones.map((option) => (
+							<option key={option} value={option} />
 						))}
 					</datalist>
 				</Field>
