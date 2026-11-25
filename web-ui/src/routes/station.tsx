@@ -2,10 +2,7 @@ import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 
-import {
-	HealthPage,
-	HealthPageSkeleton,
-} from "~/components/health/health-page.tsx";
+import { HealthPage } from "~/components/health/health-page.tsx";
 import { stationHealthQuery } from "~/lib/health.ts";
 import { pageHead } from "~/lib/link-preview.ts";
 import {
@@ -85,8 +82,6 @@ function HealthRoute() {
 	const saveUpdates = useServerFn(saveUpdateSettingsFn);
 	const checkForUpdates = useServerFn(checkForUpdatesFn);
 	const installUpdate = useServerFn(installUpdateFn);
-
-	if (!health) return <HealthPageSkeleton />;
 
 	return (
 		<HealthPage

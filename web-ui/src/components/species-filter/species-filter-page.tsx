@@ -18,10 +18,7 @@ import { Card } from "~/components/ui/card.tsx";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog.tsx";
 import { Kicker } from "~/components/ui/kicker.tsx";
 import { PageWrap } from "~/components/ui/page-wrap.tsx";
-import {
-	DebouncedSearchInput,
-	SearchInput,
-} from "~/components/ui/search-input.tsx";
+import { DebouncedSearchInput } from "~/components/ui/search-input.tsx";
 import { SelectionBar } from "~/components/ui/selection-bar.tsx";
 import { toast } from "~/components/ui/toaster.tsx";
 import { EMPTY } from "~/lib/empty-messages.ts";
@@ -58,62 +55,7 @@ const SEARCH_ROW_CLASS =
 const TABLE_CARD_CLASS =
 	"@container flex min-h-80 flex-col overflow-hidden [--card-edge:min(var(--page-gap),0.75rem)]";
 
-export function SpeciesFilterPageSkeleton({
-	search,
-}: {
-	search: SpeciesFilterWorkspaceSearch;
-}) {
-	return (
-		<PageWrap className="flex h-full min-h-fit flex-col gap-page">
-			<div className="@container shrink-0 space-y-page">
-				<PageHeaderCard
-					icon={SlidersHorizontal}
-					title={PAGE_HEADERS.speciesFilter.title}
-					description={PAGE_HEADERS.speciesFilter.description}
-				/>
-				<div inert className={TOOLBAR_CLASS}>
-					<div className={SEARCH_ROW_CLASS}>
-						<SearchInput
-							aria-label="Search installed species"
-							placeholder="Search…"
-							value={search.query ?? ""}
-							onChange={() => {}}
-							onClear={() => {}}
-						/>
-						<SpeciesFilterSortMenu
-							sort={search.sort}
-							direction={search.direction}
-							onSortChange={() => {}}
-						/>
-					</div>
-					<SpeciesFilterTools
-						onImport={() => {}}
-						onExport={() => {}}
-						onReset={() => {}}
-					/>
-				</div>
-			</div>
-			<Card
-				as="section"
-				aria-busy="true"
-				aria-label="Installed species"
-				className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
-			>
-				<SpeciesFilterTable
-					rows={null}
-					page={search.page}
-					pageCount={130}
-					selected={new Set()}
-					sort={search.sort}
-					direction={search.direction}
-					onSortChange={() => {}}
-					onSelectedChange={() => {}}
-					onPageChange={() => {}}
-				/>
-			</Card>
-		</PageWrap>
-	);
-}
+const SKELETON_PAGE_COUNT = 130;
 
 type PageAdapters = {
 	search: SpeciesFilterWorkspaceSearch;
@@ -290,16 +232,34 @@ export function SpeciesSelectionBar({
 }
 
 function setFrom(
-	data: SpeciesFilterPageData,
+	data: SpeciesFilterPageData | undefined,
 	key: "custom" | "excluded" | "whitelisted",
 ) {
 	return new Set(
-		data.rows
+		(data?.rows ?? NO_ROWS)
 			.filter((row) =>
 				key === "custom" ? speciesStatusFor(row) === "custom" : row[key],
 			)
 			.map((row) => row.sciName),
 	);
+}
+
+const NO_ROWS: SpeciesFilterPageData["rows"] = [];
+
+const NO_UNRESOLVED: SpeciesFilterPageData["unresolved"] = {
+	custom: [],
+	excluded: [],
+	whitelisted: [],
+};
+
+function listsFrom(data: SpeciesFilterPageData | undefined) {
+	return {
+		revision: data?.revision ?? "",
+		custom: setFrom(data, "custom"),
+		excluded: setFrom(data, "excluded"),
+		whitelisted: setFrom(data, "whitelisted"),
+		removedUnresolved: new Set<string>(),
+	};
 }
 
 export function SpeciesFilterPage({
@@ -308,18 +268,20 @@ export function SpeciesFilterPage({
 	onSearchChange,
 	onSave,
 	onCommitted,
-}: { initialData: SpeciesFilterPageData } & PageAdapters) {
-	const [custom, setCustom] = useState(() => setFrom(initialData, "custom"));
-	const [excluded, setExcluded] = useState(() =>
-		setFrom(initialData, "excluded"),
-	);
-	const [whitelisted, setWhitelisted] = useState(() =>
-		setFrom(initialData, "whitelisted"),
-	);
-	const [revision, setRevision] = useState(initialData.revision);
+}: { initialData: SpeciesFilterPageData | undefined } & PageAdapters) {
+	const loading = !initialData;
+	const [lists, setLists] = useState(() => listsFrom(initialData));
 	const [selected, setSelected] = useState(new Set<string>());
-	const [removedUnresolved, setRemovedUnresolved] = useState(new Set<string>());
 	const [dialog, setDialog] = useState<ProposedDialog | null>(null);
+	const [wasLoading, setWasLoading] = useState(loading);
+	if (loading !== wasLoading) {
+		setWasLoading(loading);
+		setLists(listsFrom(initialData));
+		setSelected(new Set());
+		setDialog(null);
+	}
+	const { custom, excluded, whitelisted, revision, removedUnresolved } = lists;
+	const installed = initialData?.rows ?? NO_ROWS;
 	const commitMutation = useMutation({
 		mutationFn: ({
 			save,
@@ -331,19 +293,18 @@ export function SpeciesFilterPage({
 			clearSelection: boolean;
 		}) => save(input),
 		onSuccess: async (result, { input, messages, clearSelection }) => {
-			setRevision(result.revision);
-			setCustom(new Set(input.custom));
-			setExcluded(new Set(input.excluded));
-			setWhitelisted(new Set(input.whitelisted));
-			if (input.removeUnresolved.length > 0) {
-				setRemovedUnresolved((current) => {
-					const next = new Set(current);
-					for (const entry of input.removeUnresolved) {
-						next.add(`${entry.list}\0${entry.raw}`);
-					}
-					return next;
-				});
-			}
+			setLists((current) => ({
+				revision: result.revision,
+				custom: new Set(input.custom),
+				excluded: new Set(input.excluded),
+				whitelisted: new Set(input.whitelisted),
+				removedUnresolved: new Set([
+					...current.removedUnresolved,
+					...input.removeUnresolved.map(
+						(entry) => `${entry.list}\0${entry.raw}`,
+					),
+				]),
+			}));
 			if (clearSelection) setSelected(new Set());
 			setDialog(null);
 			await onCommitted?.();
@@ -358,7 +319,7 @@ export function SpeciesFilterPage({
 
 	const viewRows = useMemo<SpeciesFilterViewRow[]>(
 		() =>
-			initialData.rows.map((row) => {
+			installed.map((row) => {
 				const membership = {
 					custom: custom.has(row.sciName),
 					excluded: excluded.has(row.sciName),
@@ -370,7 +331,7 @@ export function SpeciesFilterPage({
 					status: speciesStatusFor(membership),
 				};
 			}),
-		[custom, excluded, initialData.rows, whitelisted],
+		[custom, excluded, installed, whitelisted],
 	);
 	const searched = useMemo(() => {
 		if (!search.query) return viewRows;
@@ -382,12 +343,13 @@ export function SpeciesFilterPage({
 		() => sortSpeciesFilterRows(searched, search.sort, search.direction),
 		[searched, search.sort, search.direction],
 	);
-	const pageCount = Math.max(
-		1,
-		Math.ceil(sorted.length / SPECIES_FILTER_PAGE_SIZE),
+	const pageCount = loading
+		? SKELETON_PAGE_COUNT
+		: Math.max(1, Math.ceil(sorted.length / SPECIES_FILTER_PAGE_SIZE));
+	const safePage = loading ? search.page : Math.min(search.page, pageCount);
+	useAnnounceChange(
+		loading ? null : `${sorted.length.toLocaleString()} species`,
 	);
-	const safePage = Math.min(search.page, pageCount);
-	useAnnounceChange(`${sorted.length.toLocaleString()} species`);
 	const pagedRows = sorted.slice(
 		(safePage - 1) * SPECIES_FILTER_PAGE_SIZE,
 		safePage * SPECIES_FILTER_PAGE_SIZE,
@@ -397,11 +359,10 @@ export function SpeciesFilterPage({
 			onSearchChange({ ...search, page: safePage });
 		}
 	}, [onSearchChange, safePage, search]);
+	const unresolved = initialData?.unresolved ?? NO_UNRESOLVED;
 	const unresolvedCount =
-		Object.values(initialData.unresolved).reduce(
-			(sum, values) => sum + values.length,
-			0,
-		) - removedUnresolved.size;
+		Object.values(unresolved).reduce((sum, values) => sum + values.length, 0) -
+		removedUnresolved.size;
 
 	function currentSaveInput(): SpeciesFilterSaveInput {
 		return {
@@ -436,7 +397,7 @@ export function SpeciesFilterPage({
 
 	function importLists(text: string) {
 		try {
-			const known = new Set(initialData.rows.map((row) => row.sciName));
+			const known = new Set(installed.map((row) => row.sciName));
 			const normalizeImported = (value: unknown) => {
 				if (typeof value !== "string") return null;
 				const trimmed = value.trim();
@@ -513,7 +474,11 @@ export function SpeciesFilterPage({
 					description={PAGE_HEADERS.speciesFilter.description}
 				/>
 
-				<div data-layout="species-filter-toolbar" className={TOOLBAR_CLASS}>
+				<div
+					data-layout="species-filter-toolbar"
+					inert={loading}
+					className={TOOLBAR_CLASS}
+				>
 					<div className={SEARCH_ROW_CLASS}>
 						<DebouncedSearchInput
 							aria-label="Search installed species"
@@ -549,7 +514,7 @@ export function SpeciesFilterPage({
 				</div>
 			</div>
 
-			{pagedRows.length === 0 ? (
+			{!loading && pagedRows.length === 0 ? (
 				<Card as="section" aria-label="Installed species" className="shrink-0">
 					<CardHeader title="Installed species" />
 					<EmptyNote>{EMPTY.filter.speciesFilterSearch}</EmptyNote>
@@ -557,11 +522,12 @@ export function SpeciesFilterPage({
 			) : (
 				<Card
 					as="section"
+					aria-busy={loading}
 					aria-label="Installed species"
 					className={`${TABLE_CARD_CLASS} flex-1 pr-card-edge pb-0`}
 				>
 					<SpeciesFilterTable
-						rows={pagedRows}
+						rows={loading ? null : pagedRows}
 						page={safePage}
 						pageCount={pageCount}
 						selected={selected}
@@ -608,7 +574,7 @@ export function SpeciesFilterPage({
 					</div>
 					<div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto">
 						{(
-							Object.entries(initialData.unresolved) as [
+							Object.entries(unresolved) as [
 								"custom" | "excluded" | "whitelisted",
 								string[],
 							][]

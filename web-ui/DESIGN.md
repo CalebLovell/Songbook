@@ -228,6 +228,9 @@ the full figure (a heat-map cell) shortens past three digits: 1k, 1.2k, 300k,
   and sorting keep keyboard focus.
   A card that waits on chained queries keeps one skeleton mounted through all of
   them: a second skeleton would fade in over the first and read as a flash.
+  A page keeps one tree mounted from loading to loaded, so its masthead,
+  toolbar and labels never remount: a separate whole-page skeleton fades them
+  in a second time, which reads as a flash.
   Page queries spread `PAGE_QUERY`, or `FORM_QUERY` when a form seeds from the
   data once (no cached copy, so never an old revision). Neither refetches on
   focus. Data refreshes on navigation, after a change (`invalidateQueries`), and

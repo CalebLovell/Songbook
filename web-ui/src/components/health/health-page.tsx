@@ -118,30 +118,27 @@ export function HealthPage({
 	updates,
 	handlers,
 }: {
-	health: StationHealth;
+	health: StationHealth | undefined;
 	updates: UpdateState | null;
 	handlers: HealthHandlers;
 }) {
-	const cards = healthCards(health, updates);
 	return (
 		<PageWrap className="@container space-y-page">
-			<HealthHeader />
-			<div className={GRID_CLASS}>
-				{cards.map((card) => (
-					<HealthCard key={card.id} card={card} handlers={handlers} />
-				))}
+			<PageHeaderCard
+				icon={RadioTower}
+				title={PAGE_HEADERS.station.title}
+				description={PAGE_HEADERS.station.description}
+			/>
+			<div className={GRID_CLASS} aria-busy={!health}>
+				{health ? (
+					healthCards(health, updates).map((card) => (
+						<HealthCard key={card.id} card={card} handlers={handlers} />
+					))
+				) : (
+					<HealthCardsSkeleton />
+				)}
 			</div>
 		</PageWrap>
-	);
-}
-
-function HealthHeader() {
-	return (
-		<PageHeaderCard
-			icon={RadioTower}
-			title={PAGE_HEADERS.station.title}
-			description={PAGE_HEADERS.station.description}
-		/>
 	);
 }
 
@@ -630,47 +627,44 @@ const SKELETON_CARDS: {
 	},
 ];
 
-export function HealthPageSkeleton() {
+function HealthCardsSkeleton() {
 	return (
-		<PageWrap className="@container space-y-page">
-			<HealthHeader />
-			<div className={GRID_CLASS} aria-busy="true">
-				{SKELETON_CARDS.map(({ title, meter, buttons }) => (
-					<Card
-						key={title}
-						as="section"
-						aria-label={title}
-						className="flex flex-col gap-page"
-					>
-						<CardHeader title={title} />
-						<div className="flex flex-col gap-2">
-							<ShellText className={FIGURE_CLASS} barClassName="w-40" />
-							{meter ? <ShellBar className="h-2 w-full rounded-full" /> : null}
-							<ShellText
-								className="text-sm leading-relaxed"
-								barClassName="w-4/5"
-							/>
+		<>
+			{SKELETON_CARDS.map(({ title, meter, buttons }) => (
+				<Card
+					key={title}
+					as="section"
+					aria-label={title}
+					className="flex flex-col gap-page"
+				>
+					<CardHeader title={title} />
+					<div className="flex flex-col gap-2">
+						<ShellText className={FIGURE_CLASS} barClassName="w-40" />
+						{meter ? <ShellBar className="h-2 w-full rounded-full" /> : null}
+						<ShellText
+							className="text-sm leading-relaxed"
+							barClassName="w-4/5"
+						/>
+					</div>
+					{buttons.length ? (
+						<div className="mt-auto flex flex-wrap gap-page">
+							{buttons.map(({ label, icon }) => (
+								<ShellSized key={label}>
+									<Button
+										type="button"
+										variant="outline"
+										size="default"
+										icon={icon}
+										tabIndex={-1}
+									>
+										{label}
+									</Button>
+								</ShellSized>
+							))}
 						</div>
-						{buttons.length ? (
-							<div className="mt-auto flex flex-wrap gap-page">
-								{buttons.map(({ label, icon }) => (
-									<ShellSized key={label}>
-										<Button
-											type="button"
-											variant="outline"
-											size="default"
-											icon={icon}
-											tabIndex={-1}
-										>
-											{label}
-										</Button>
-									</ShellSized>
-								))}
-							</div>
-						) : null}
-					</Card>
-				))}
-			</div>
-		</PageWrap>
+					) : null}
+				</Card>
+			))}
+		</>
 	);
 }

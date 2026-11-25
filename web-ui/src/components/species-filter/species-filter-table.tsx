@@ -195,7 +195,7 @@ export function SpeciesFilterTable({
 	onPageChange: (page: number) => void;
 	actions?: ReactNode;
 }) {
-	const allSelected = rows?.every((row) => selected.has(row.sciName));
+	const allSelected = rows?.every((row) => selected.has(row.sciName)) ?? false;
 	const firstIndex = (page - 1) * SPECIES_FILTER_PAGE_SIZE + 1;
 	const lastIndex = firstIndex + (rows?.length ?? SPECIES_FILTER_PAGE_SIZE) - 1;
 

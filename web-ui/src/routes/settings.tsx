@@ -2,10 +2,7 @@ import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 
-import {
-	SettingsPage,
-	SettingsPageSkeleton,
-} from "~/components/settings/settings-page.tsx";
+import { SettingsPage } from "~/components/settings/settings-page.tsx";
 import { pageHead } from "~/lib/link-preview.ts";
 import { FORM_QUERY, refreshAllData } from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
@@ -46,8 +43,6 @@ function SettingsRoute() {
 		await refreshAllData(router, queryClient);
 		return result;
 	};
-
-	if (!initial) return <SettingsPageSkeleton />;
 
 	return (
 		<SettingsPage

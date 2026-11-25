@@ -18,7 +18,7 @@ const done = async (values: PreferenceSettings) => ({
 
 const ACTIONS = { save: done, reset: () => done(PREFERENCE_DEFAULTS) };
 
-function render(initial: PreferenceSettings) {
+function render(initial: PreferenceSettings | undefined) {
 	return renderToStaticMarkup(
 		<QueryClientProvider client={new QueryClient()}>
 			<SettingsCard initial={initial} actions={ACTIONS} />
@@ -52,4 +52,12 @@ test("Reset is live once a saved value differs from its default", () => {
 		highlights: { ...PREFERENCE_DEFAULTS.highlights, rareMax: 12 },
 	});
 	assert.doesNotMatch(button(markup, "Reset settings") ?? "", /disabled=""/);
+});
+
+test("the card waits inert, with nothing to press, until its values load", () => {
+	const loading = render(undefined);
+	assert.match(loading, /<section[^>]*aria-busy="true"[^>]*inert=""/);
+	assert.match(button(loading, "Reset settings") ?? "", /disabled=""/);
+	assert.match(button(loading, "Save") ?? "", /disabled=""/);
+	assert.doesNotMatch(render(PREFERENCE_DEFAULTS), /inert=""/);
 });

@@ -35,21 +35,26 @@ export type SettingsActions = {
 const TOAST_ID = "settings";
 const HEADING_ID = "settings-card";
 
+const SKELETON_VALUES_CLASS =
+	"[&_:is(input,select,textarea)]:animate-pulse! [&_:is(input,select,textarea)]:border-transparent! [&_:is(input,select,textarea)]:bg-muted! [&_:is(input,select,textarea)]:bg-none! [&_:is(input,select,textarea)]:text-transparent! [&_:is(input,textarea)::placeholder]:text-transparent! **:data-[slot=toggle-group-item]:animate-pulse! **:data-[slot=toggle-group-item]:border-paper-raised! **:data-[slot=toggle-group-item]:bg-muted! **:data-[slot=toggle-group-item]:text-transparent!";
+
 function same(a: unknown, b: unknown) {
 	return JSON.stringify(a) === JSON.stringify(b);
 }
 
 function useSettingsForm(
-	initial: PreferenceSettings,
-	actions: SettingsActions | null,
+	initial: PreferenceSettings | undefined,
+	actions: SettingsActions,
 ) {
-	const [values, setValues] = useState(initial);
-	const [saved, setSaved] = useState(initial);
+	const [values, setValues] = useState(initial ?? PREFERENCE_DEFAULTS);
+	const [saved, setSaved] = useState(initial ?? PREFERENCE_DEFAULTS);
 	const [seenInitial, setSeenInitial] = useState(initial);
 	if (!same(initial, seenInitial)) {
 		setSeenInitial(initial);
-		setSaved(initial);
-		if (same(values, saved)) setValues(initial);
+		if (initial) {
+			setSaved(initial);
+			if (!seenInitial || same(values, saved)) setValues(initial);
+		}
 	}
 
 	const write = useMutation({
@@ -66,7 +71,7 @@ function useSettingsForm(
 			}),
 	});
 
-	const busy = !actions || write.isPending;
+	const busy = !initial || write.isPending;
 	return {
 		values,
 		setValues,
@@ -74,12 +79,8 @@ function useSettingsForm(
 		resetDisabled:
 			busy ||
 			(same(values, PREFERENCE_DEFAULTS) && same(saved, PREFERENCE_DEFAULTS)),
-		save: () => {
-			if (actions) write.mutate(() => actions.save(values));
-		},
-		reset: () => {
-			if (actions) write.mutate(actions.reset);
-		},
+		save: () => write.mutate(() => actions.save(values)),
+		reset: () => write.mutate(actions.reset),
 	};
 }
 
@@ -87,9 +88,10 @@ export function SettingsCard({
 	initial,
 	actions,
 }: {
-	initial: PreferenceSettings;
-	actions: SettingsActions | null;
+	initial: PreferenceSettings | undefined;
+	actions: SettingsActions;
 }) {
+	const loading = !initial;
 	const form = useSettingsForm(initial, actions);
 	const [confirmingReset, setConfirmingReset] = useState(false);
 	const { artwork, playback, highlights } = form.values;
@@ -104,7 +106,13 @@ export function SettingsCard({
 			});
 
 	return (
-		<Card as="section" aria-labelledby={HEADING_ID}>
+		<Card
+			as="section"
+			aria-labelledby={HEADING_ID}
+			aria-busy={loading}
+			inert={loading}
+			className={`**:data-[slot=toggle-group-item]:transition-colors ${loading ? SKELETON_VALUES_CLASS : ""}`}
+		>
 			<form
 				className="flex flex-col"
 				onSubmit={(event) => {
@@ -273,16 +281,5 @@ export function SettingsCard({
 				</ConfirmDialog>
 			) : null}
 		</Card>
-	);
-}
-
-const SKELETON_VALUES_CLASS =
-	"[&_:is(input,select,textarea)]:animate-pulse! [&_:is(input,select,textarea)]:border-transparent! [&_:is(input,select,textarea)]:bg-muted! [&_:is(input,select,textarea)]:bg-none! [&_:is(input,select,textarea)]:text-transparent! [&_:is(input,textarea)::placeholder]:text-transparent! **:data-[slot=toggle-group-item]:animate-pulse! **:data-[slot=toggle-group-item]:border-paper-raised! **:data-[slot=toggle-group-item]:bg-muted! **:data-[slot=toggle-group-item]:text-transparent!";
-
-export function SettingsCardSkeleton() {
-	return (
-		<div inert aria-busy="true" className={SKELETON_VALUES_CLASS}>
-			<SettingsCard initial={PREFERENCE_DEFAULTS} actions={null} />
-		</div>
 	);
 }

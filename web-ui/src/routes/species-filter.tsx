@@ -1,10 +1,7 @@
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import {
-	SpeciesFilterPage,
-	SpeciesFilterPageSkeleton,
-} from "~/components/species-filter/species-filter-page.tsx";
+import { SpeciesFilterPage } from "~/components/species-filter/species-filter-page.tsx";
 import { pageHead } from "~/lib/link-preview.ts";
 import { FORM_QUERY } from "~/lib/query-client.ts";
 import { requireUnlocked } from "~/lib/require-unlocked.ts";
@@ -35,8 +32,6 @@ function SpeciesFilterRoute() {
 	const navigate = Route.useNavigate();
 	const save = useServerFn(saveSpeciesFilter);
 	const queryClient = useQueryClient();
-
-	if (!page) return <SpeciesFilterPageSkeleton search={search} />;
 
 	return (
 		<SpeciesFilterPage
