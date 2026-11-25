@@ -30,6 +30,8 @@ import {
 	speciesFilterInputWithStatus,
 	speciesFilterResetInput,
 	speciesStatusFor,
+	type UnresolvedEntry,
+	unresolvedEntriesLeft,
 } from "~/lib/species-filter-data.ts";
 import {
 	nextSpeciesFilterSort,
@@ -258,7 +260,7 @@ function listsFrom(data: SpeciesFilterPageData | undefined) {
 		custom: setFrom(data, "custom"),
 		excluded: setFrom(data, "excluded"),
 		whitelisted: setFrom(data, "whitelisted"),
-		removedUnresolved: new Set<string>(),
+		removedUnresolved: [] as UnresolvedEntry[],
 	};
 }
 
@@ -298,12 +300,10 @@ export function SpeciesFilterPage({
 				custom: new Set(input.custom),
 				excluded: new Set(input.excluded),
 				whitelisted: new Set(input.whitelisted),
-				removedUnresolved: new Set([
+				removedUnresolved: [
 					...current.removedUnresolved,
-					...input.removeUnresolved.map(
-						(entry) => `${entry.list}\0${entry.raw}`,
-					),
-				]),
+					...input.removeUnresolved,
+				],
 			}));
 			if (clearSelection) setSelected(new Set());
 			setDialog(null);
@@ -359,10 +359,10 @@ export function SpeciesFilterPage({
 			onSearchChange({ ...search, page: safePage });
 		}
 	}, [onSearchChange, safePage, search]);
-	const unresolved = initialData?.unresolved ?? NO_UNRESOLVED;
-	const unresolvedCount =
-		Object.values(unresolved).reduce((sum, values) => sum + values.length, 0) -
-		removedUnresolved.size;
+	const unresolved = unresolvedEntriesLeft(
+		initialData?.unresolved ?? NO_UNRESOLVED,
+		removedUnresolved,
+	);
 
 	function currentSaveInput(): SpeciesFilterSaveInput {
 		return {
@@ -555,7 +555,7 @@ export function SpeciesFilterPage({
 				</Card>
 			)}
 
-			{unresolvedCount > 0 ? (
+			{unresolved.length > 0 ? (
 				<Card
 					as="section"
 					aria-label="Unmatched list entries"
@@ -573,44 +573,34 @@ export function SpeciesFilterPage({
 						<UnmatchedEntriesInfo />
 					</div>
 					<div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto">
-						{(
-							Object.entries(unresolved) as [
-								"custom" | "excluded" | "whitelisted",
-								string[],
-							][]
-						).flatMap(([list, values]) =>
-							values.map((raw) => {
-								const key = `${list}\0${raw}`;
-								return removedUnresolved.has(key) ? null : (
-									<div
-										key={key}
-										className="flex items-center justify-between gap-3 rounded-md border bg-card px-3 py-2"
-									>
-										<div>
-											<Kicker as="span">{list}</Kicker>
-											<code className="ml-2">{raw}</code>
-										</div>
-										<Button
-											aria-label={`Remove ${raw}`}
-											size="icon-xs"
-											variant="ghost"
-											onClick={() =>
-												setDialog({
-													kind: "remove-unresolved",
-													raw,
-													input: {
-														...currentSaveInput(),
-														removeUnresolved: [{ list, raw }],
-													},
-												})
-											}
-										>
-											<X />
-										</Button>
-									</div>
-								);
-							}),
-						)}
+						{unresolved.map(({ list, raw }) => (
+							<div
+								key={`${list}\0${raw}`}
+								className="flex items-center justify-between gap-3 rounded-md border bg-card px-3 py-2"
+							>
+								<div>
+									<Kicker as="span">{list}</Kicker>
+									<code className="ml-2">{raw}</code>
+								</div>
+								<Button
+									aria-label={`Remove ${raw}`}
+									size="icon-xs"
+									variant="ghost"
+									onClick={() =>
+										setDialog({
+											kind: "remove-unresolved",
+											raw,
+											input: {
+												...currentSaveInput(),
+												removeUnresolved: [{ list, raw }],
+											},
+										})
+									}
+								>
+									<X />
+								</Button>
+							</div>
+						))}
 					</div>
 				</Card>
 			) : null}

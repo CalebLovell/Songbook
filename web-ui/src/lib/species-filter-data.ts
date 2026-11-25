@@ -71,6 +71,23 @@ export const speciesFilterSaveSchema = z
 
 export type SpeciesFilterSaveInput = z.infer<typeof speciesFilterSaveSchema>;
 
+export type UnresolvedEntry = z.infer<typeof unresolvedRemovalSchema>;
+
+export function unresolvedEntriesLeft(
+	unresolved: UnresolvedSpeciesLists,
+	removed: readonly UnresolvedEntry[],
+): UnresolvedEntry[] {
+	const names: SpeciesListName[] = ["custom", "excluded", "whitelisted"];
+	return names.flatMap((list) =>
+		unresolved[list]
+			.filter(
+				(raw) =>
+					!removed.some((entry) => entry.list === list && entry.raw === raw),
+			)
+			.map((raw) => ({ list, raw })),
+	);
+}
+
 export function speciesFilterResetInput(
 	revision: string,
 ): SpeciesFilterSaveInput {

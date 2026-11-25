@@ -7,6 +7,7 @@ import {
 	speciesFilterResetInput,
 	speciesFilterSaveSchema,
 	speciesStatusFor,
+	unresolvedEntriesLeft,
 } from "./species-filter-data.ts";
 
 test("reset input clears managed lists without removing unresolved entries", () => {
@@ -157,4 +158,16 @@ test("save schema rejects invalid scientific names, oversized lists, and extra k
 			.success,
 		false,
 	);
+});
+
+test("a removed unresolved entry counts once, before and after the list refreshes", () => {
+	const removed = [{ list: "custom" as const, raw: "Gone" }];
+	const left = [
+		{ list: "custom", raw: "Kept" },
+		{ list: "excluded", raw: "Gone" },
+	];
+	const refreshed = { custom: ["Kept"], excluded: ["Gone"], whitelisted: [] };
+	const beforeRefresh = { ...refreshed, custom: ["Gone", "Kept"] };
+	assert.deepEqual(unresolvedEntriesLeft(beforeRefresh, removed), left);
+	assert.deepEqual(unresolvedEntriesLeft(refreshed, removed), left);
 });
