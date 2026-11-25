@@ -201,6 +201,41 @@ test("saves through a symlinked config into the real file", async (t) => {
 	assert.deepEqual(await readdir(path.dirname(real)), ["birdnet.conf"]);
 });
 
+test("saves a writable config in a folder that takes no new files", async () => {
+	const file = await fixtureConfig("CONFIDENCE=0.7\n");
+	const directory = path.dirname(file);
+	await chmod(directory, 0o555);
+	try {
+		await writeSettingsCard("playback", { boostQuietRecordings: false }, file);
+	} finally {
+		await chmod(directory, 0o755);
+	}
+	assert.equal(
+		await readFile(file, "utf8"),
+		"CONFIDENCE=0.7\nBOOST_QUIET_RECORDINGS=0\n",
+	);
+	assert.deepEqual(await readdir(directory), ["birdnet.conf"]);
+});
+
+test("a config that can't be written at all is left alone", async (t) => {
+	if (process.getuid?.() === 0) {
+		t.skip("root can write anything");
+		return;
+	}
+	const file = await fixtureConfig("CONFIDENCE=0.7\n");
+	const directory = path.dirname(file);
+	await chmod(file, 0o444);
+	await chmod(directory, 0o555);
+	try {
+		await assert.rejects(
+			writeSettingsCard("playback", { boostQuietRecordings: false }, file),
+		);
+	} finally {
+		await chmod(directory, 0o755);
+	}
+	assert.equal(await readFile(file, "utf8"), "CONFIDENCE=0.7\n");
+});
+
 test("appends the Rare setting once and defaults older files", async () => {
 	const file = await fixtureConfig("CONFIDENCE=0.7\n");
 	assert.equal((await readHighlightThresholds(file)).rareMax, 5);

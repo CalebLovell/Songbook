@@ -242,6 +242,11 @@ function replaceAssignments(text: string, assignments: Record<string, string>) {
 	return updated;
 }
 
+function isPermissionError(error: unknown) {
+	const code = (error as NodeJS.ErrnoException).code;
+	return code === "EACCES" || code === "EPERM";
+}
+
 export async function writeSettingsCard<K extends SettingsCardKind>(
 	kind: K,
 	values: SettingsByKind[K],
@@ -260,6 +265,11 @@ export async function writeSettingsCard<K extends SettingsCardKind>(
 		});
 		await chmod(temporaryPath, sourceStat.mode);
 		await rename(temporaryPath, settingsPath);
+	} catch (error) {
+		// Editing /etc/birdnet/birdnet.conf with sed -i swaps the link to it for a
+		// file in a folder only root can add to; the file itself stays writable.
+		if (!isPermissionError(error)) throw error;
+		await writeFile(settingsPath, updated, "utf8");
 	} finally {
 		await rm(temporaryPath, { force: true });
 	}
